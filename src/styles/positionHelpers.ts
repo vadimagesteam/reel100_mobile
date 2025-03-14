@@ -1,4 +1,5 @@
 import { TextStyle, ViewStyle } from 'react-native';
+import { colors } from './colors';
 
 export const fill: ViewStyle = {
     flex: 1,
@@ -249,3 +250,16 @@ export const mb10: ViewStyle = {
 export const mb25: ViewStyle = {
     marginBottom: 25,
 };
+
+//borderRadius
+export const br5: ViewStyle = {
+    borderRadius: 5,
+};
+
+// Button border Style
+export const buttonBorderStyle: ViewStyle = {
+    borderWidth: 1,
+    borderColor: colors.blue,
+    borderRadius: 5,
+};
+

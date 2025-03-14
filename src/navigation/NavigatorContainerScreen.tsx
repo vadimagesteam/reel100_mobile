@@ -11,8 +11,6 @@ axios.defaults.baseURL = Config.APP_API_URL;
 const NavigationContainerScreen = () => {
     const { isAuth } = useReduxSelector(state => state?.auth);
 
-
-
     return (
         <NavigationContainer>
             {
