@@ -202,6 +202,10 @@ export const mh16: ViewStyle = {
     marginHorizontal: 16,
 };
 
+export const mh20: ViewStyle = {
+    marginHorizontal: 20,
+};
+
 export const mv16: ViewStyle = {
     marginVertical: 16,
 };

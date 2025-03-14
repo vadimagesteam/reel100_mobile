@@ -7,13 +7,18 @@ import { cs } from './styles';
 import { BodyText, ButtonDefault } from '../../../components/UI';
 import { ONBOARDING_ROUTES, OnboardingRoutes } from '../../../navigation/routes';
 
+const WELCOME_TEXT = 'Welcome';
+const SIGNUP_TEXT = 'Sign up';
+const SIGNIN_TEXT = 'Sign in';
+
+
 const WelcomeScreen = () => {
     const navigation = useNavigation<NavigationProp<OnboardingRoutes>>();
 
     return (
         <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
             <View style={[positionHelpers.fill, positionHelpers.justifyCenter, cs.mh30]}>
-                <BodyText color={colors.white} fontSize={40} fontWeight={'bold'} textAlign="center" marginBottom={25}>Welcome</BodyText>
+                <BodyText color={colors.white} fontSize={40} fontWeight={'bold'} textAlign="center" marginBottom={25}>{WELCOME_TEXT}</BodyText>
                 <View>
                     <ButtonDefault onPress={() => navigation.navigate(ONBOARDING_ROUTES.SIGNUP_SCREEN)}>
                         <LinearGradient
@@ -22,14 +27,14 @@ const WelcomeScreen = () => {
                             colors={[colors.blue1, colors.blue]}
                             style={positionHelpers.br5}
                         >
-                            <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={15}>Sign up</BodyText>
+                            <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={15}>{SIGNUP_TEXT}</BodyText>
                         </LinearGradient>
                     </ButtonDefault>
                     <ButtonDefault
                         buttoStyles={[positionHelpers.buttonBorderStyle, positionHelpers.mt15]}
                         onPress={() => navigation.navigate(ONBOARDING_ROUTES.LOGIN_SCREEN)}
                     >
-                        <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={15}>Sign in</BodyText>
+                        <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={15}>{SIGNIN_TEXT}</BodyText>
                     </ButtonDefault>
                 </View>
             </View>
