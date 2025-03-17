@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
 import { useForm } from 'react-hook-form';
 import { colors, positionHelpers } from '../../../styles';
-import { BodyText, ButtonDefault } from '../../../components/UI';
+import { BodyText } from '../../../components/UI';
 import FormContainer from '../../../components/Layout/FormContainer';
 import LoginForm from './components/LoginForm';
 import BackButton from '../../../components/navigator/BackButton';
+import ButtonGradient from '../../../components/ButtonGradient';
 
 const SIGNIN_TEXT = 'Sign in';
 
@@ -48,16 +48,10 @@ const LoginScreen = () => {
                     />
                 </View>
             </FormContainer>
-            <ButtonDefault buttoStyles={[positionHelpers.mh20, positionHelpers.mb10, positionHelpers.pt10]} onPress={handleSubmit(onSignin)}>
-                <LinearGradient
-                    start={{ x: 0.1, y: 0.5 }}
-                    end={{ x: 0.9, y: 0 }}
-                    colors={[colors.blue1, colors.blue]}
-                    style={positionHelpers.br5}
-                >
-                    <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={15}>{SIGNIN_TEXT}</BodyText>
-                </LinearGradient>
-            </ButtonDefault>
+            <ButtonGradient
+                title={SIGNIN_TEXT}
+                buttonStyles={positionHelpers.mh20}
+                onPress={handleSubmit(onSignin)} />
         </SafeAreaView>
     );
 };

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { SafeAreaView, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
-import LinearGradient from 'react-native-linear-gradient';
 import { colors, positionHelpers } from '../../../styles';
-import { BodyText, ButtonDefault } from '../../../components/UI';
+import { BodyText } from '../../../components/UI';
 import FormContainer from '../../../components/Layout/FormContainer';
 import SignUpForm from './components/SignUpForm';
 import BackButton from '../../../components/navigator/BackButton';
+import { ONBOARDING_ROUTES } from '../../../navigation/routes';
+import ButtonGradient from '../../../components/ButtonGradient';
 
 interface FormData {
     username?: string;
@@ -43,6 +44,7 @@ const SignupScreen = () => {
         };
 
         console.log('dataSignUp-->', dataSignUp);
+        navigation.navigate(ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN);
     };
 
 
@@ -61,16 +63,11 @@ const SignupScreen = () => {
                     />
                 </View>
             </FormContainer>
-            <ButtonDefault buttoStyles={[positionHelpers.mh20, positionHelpers.mb10, positionHelpers.pt10]} onPress={handleSubmit(onSignup)}>
-                <LinearGradient
-                    start={{ x: 0.1, y: 0.5 }}
-                    end={{ x: 0.9, y: 0 }}
-                    colors={[colors.blue1, colors.blue]}
-                    style={positionHelpers.br5}
-                >
-                    <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={15}>{SIGNUP_TEXT}</BodyText>
-                </LinearGradient>
-            </ButtonDefault>
+            <ButtonGradient
+                buttonStyles={positionHelpers.mh20}
+                title={SIGNUP_TEXT}
+                onPress={handleSubmit(onSignup)}
+            />
         </SafeAreaView>
     );
 };

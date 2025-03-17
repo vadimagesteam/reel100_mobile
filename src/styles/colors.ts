@@ -12,6 +12,7 @@ export const colors = {
     blackOpacity35: 'rgba(0, 0, 0, 0.35)',
 
     silver: '#575757',
+    silver1: '#333',
     silverLight: '#F8F9FB',
     silver1Procent50: 'rgba(128, 128, 128, 0.5)',
 

@@ -6,6 +6,7 @@ import { ONBOARDING_ROUTES } from '../../routes';
 import WelcomeScreen from '../../../screens/Onboarding/Welcome';
 import SignupScreen from '../../../screens/Onboarding/SignUp';
 import LoginScreen from '../../../screens/Onboarding/Login';
+import VerifyEmailScreen from '../../../screens/Onboarding/VerifyEmail';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,10 @@ const AuthStack = () => {
             <Stack.Screen
                 name={ONBOARDING_ROUTES.SIGNUP_SCREEN}
                 component={SignupScreen}
+            />
+            <Stack.Screen
+                name={ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN}
+                component={VerifyEmailScreen}
             />
             <Stack.Screen
                 name={ONBOARDING_ROUTES.LOGIN_SCREEN}

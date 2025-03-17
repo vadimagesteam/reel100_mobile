@@ -1,6 +1,7 @@
 export const ONBOARDING_ROUTES = {
     WELCOME_SCREEN: 'Welcome_Screen',
     SIGNUP_SCREEN: 'SignUp_Screen',
+    VERIFY_EMAIL_SCREEN: 'Verify_Email_Screen',
     LOGIN_SCREEN: 'Login_Screen',
 } as const;
 

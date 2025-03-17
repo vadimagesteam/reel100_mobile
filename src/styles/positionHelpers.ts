@@ -251,6 +251,10 @@ export const mb10: ViewStyle = {
     marginBottom: 10,
 };
 
+export const mb20: ViewStyle = {
+    marginBottom: 20,
+};
+
 export const mb25: ViewStyle = {
     marginBottom: 25,
 };
