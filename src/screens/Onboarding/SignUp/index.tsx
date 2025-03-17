@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View } from 'react-native';
-import { useForm } from 'react-hook-form';
-import { colors, positionHelpers } from '../../../styles';
-import { BodyText, ButtonDefault, SvgIcon } from '../../../components/UI';
-import FormContainer from '../../../components/Layout/FormContainer';
 import { useNavigation } from '@react-navigation/native';
-import SignInForm from './components/SignUpForm';
+import { useForm } from 'react-hook-form';
 import LinearGradient from 'react-native-linear-gradient';
-import { cs } from './styles';
+import { colors, positionHelpers } from '../../../styles';
+import { BodyText, ButtonDefault } from '../../../components/UI';
+import FormContainer from '../../../components/Layout/FormContainer';
+import SignUpForm from './components/SignUpForm';
+import BackButton from '../../../components/navigator/BackButton';
 
 interface FormData {
     username?: string;
@@ -48,13 +48,11 @@ const SignupScreen = () => {
 
     return (
         <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
-            <ButtonDefault buttoStyles={cs.backArrow} onPress={() => navigation.goBack()}>
-                <SvgIcon image="backArrow" />
-            </ButtonDefault>
+            <BackButton onPress={() => navigation.goBack()} />
             <FormContainer>
                 <View style={positionHelpers.mh20}>
                     <BodyText color={colors.white} fontSize={40} fontWeight={'bold'} textAlign="center" marginBottom={0}>{SIGNUP_TEXT}</BodyText>
-                    <SignInForm
+                    <SignUpForm
                         control={control}
                         securityPass={securityPass}
                         setSecurityPass={setSecurityPass}

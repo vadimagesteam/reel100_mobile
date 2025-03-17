@@ -6,7 +6,7 @@ import { positionHelpers } from '../../../../../styles';
 import { cs } from './styles';
 import { Input } from '../../../../../components/UI';
 
-interface SignInFormProps {
+interface SignUpFormProps {
     control: Control<FieldValues, any>;
     securityPass: boolean;
     securityConfirmPass: boolean
@@ -20,7 +20,7 @@ const LAST_NAME_TEXT = 'Last name';
 const PASSWORD_TEXT = 'Password';
 const PASSWORD_CONFIRM_TEXT = 'Confirm Password';
 
-const SignInForm = ({ control, securityPass, setSecurityPass, securityConfirmPass, setSecurityConfirmPass }: SignInFormProps) => {
+const SignUpForm = ({ control, securityPass, setSecurityPass, securityConfirmPass, setSecurityConfirmPass }: SignUpFormProps) => {
     return (
         <>
             <Controller
@@ -137,4 +137,4 @@ const SignInForm = ({ control, securityPass, setSecurityPass, securityConfirmPas
     );
 };
 
-export default SignInForm;
+export default SignUpForm;
