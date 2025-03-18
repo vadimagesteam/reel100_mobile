@@ -3,11 +3,11 @@ import { colors } from '../../../../../styles';
 
 export const cs = StyleSheet.create({
     containerInputEmail: {
-        padding: 18,
+        padding: 15,
         borderRadius: 3,
     },
     containerInputPassword: {
-        paddingVertical: 18,
+        paddingVertical: 15,
         padding: 0,
         paddingLeft: 18,
         paddingRight: 40,

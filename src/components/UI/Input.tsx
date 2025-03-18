@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
         height: 21,
     },
     securityButton: {
-        bottom: isIOS() ? 17 : 23,
+        bottom: isIOS() ? 14 : 20,
         right: 10,
         position: 'absolute',
     },

@@ -7,6 +7,8 @@ import WelcomeScreen from '../../../screens/Onboarding/Welcome';
 import SignupScreen from '../../../screens/Onboarding/SignUp';
 import LoginScreen from '../../../screens/Onboarding/Login';
 import VerifyEmailScreen from '../../../screens/Onboarding/VerifyEmail';
+import ForgotPasswordScreen from '../../../screens/Onboarding/ForgotPassword';
+import ResetPasswordScreen from '../../../screens/Onboarding/ResetPassword';
 
 const Stack = createStackNavigator();
 
@@ -28,6 +30,14 @@ const AuthStack = () => {
             <Stack.Screen
                 name={ONBOARDING_ROUTES.LOGIN_SCREEN}
                 component={LoginScreen}
+            />
+            <Stack.Screen
+                name={ONBOARDING_ROUTES.FORGOT_PASSWORD_SCREEN}
+                component={ForgotPasswordScreen}
+            />
+            <Stack.Screen
+                name={ONBOARDING_ROUTES.RESET_PASSWORD_SCREEN}
+                component={ResetPasswordScreen}
             />
         </Stack.Navigator>
     );

@@ -3,6 +3,8 @@ export const ONBOARDING_ROUTES = {
     SIGNUP_SCREEN: 'SignUp_Screen',
     VERIFY_EMAIL_SCREEN: 'Verify_Email_Screen',
     LOGIN_SCREEN: 'Login_Screen',
+    FORGOT_PASSWORD_SCREEN: 'Forgot_Password_Screen',
+    RESET_PASSWORD_SCREEN: 'Reset_Password_Screen',
 } as const;
 
 export const DASHBOARD_ROUTES = {

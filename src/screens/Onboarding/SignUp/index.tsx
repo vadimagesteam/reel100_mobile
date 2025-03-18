@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import { colors, positionHelpers } from '../../../styles';
 import { BodyText } from '../../../components/UI';
 import FormContainer from '../../../components/Layout/FormContainer';
 import SignUpForm from './components/SignUpForm';
 import BackButton from '../../../components/navigator/BackButton';
-import { ONBOARDING_ROUTES } from '../../../navigation/routes';
+import { ONBOARDING_ROUTES, OnboardingRoutes } from '../../../navigation/routes';
 import ButtonGradient from '../../../components/ButtonGradient';
 
 interface FormData {
@@ -21,7 +21,7 @@ interface FormData {
 const SIGNUP_TEXT = 'Sign up';
 
 const SignupScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<OnboardingRoutes>>();
     const [securityPass, setSecurityPass] = useState<boolean>(true);
     const [securityConfirmPass, setSecurityConfirmPass] = useState<boolean>(true);
     const { control, handleSubmit } = useForm<FormData>({

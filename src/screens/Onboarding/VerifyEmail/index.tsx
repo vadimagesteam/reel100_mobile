@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View } from 'react-native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { colors, positionHelpers } from '../../../styles';
 import { BodyText } from '../../../components/UI';
 import BackButton from '../../../components/navigator/BackButton';
-import { useNavigation } from '@react-navigation/native';
 import PINcode from '../../../components/PINcode';
 import ButtonGradient from '../../../components/ButtonGradient';
-import { ONBOARDING_ROUTES } from '../../../navigation/routes';
+import { ONBOARDING_ROUTES, OnboardingRoutes } from '../../../navigation/routes';
 
 const CHECK_EMAIL_TEXT = 'Check your email';
 const WE_SENT_CODE_TEXT = 'We sent a verification code to';
@@ -15,11 +15,17 @@ const VERIFY_TEXT = 'Verify';
 const CODE_LENGTH = 4;
 
 const VerifyEmailScreen = () => {
-    const navigation = useNavigation();
-    const [code, setCode] = useState('');
+    const navigation = useNavigation<NavigationProp<OnboardingRoutes>>();
+    const [code, setCode] = useState<string>('');
 
     const handleVerify = () => {
-        console.log('Entered Code:', code);
+        // const dataVerify = {
+        // verifyEmailData: {
+        //     username: // after useRoute 'email'
+        //     token: code
+        // },
+        // navigation
+        // };
         navigation.navigate(ONBOARDING_ROUTES.LOGIN_SCREEN);
     };
 
