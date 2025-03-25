@@ -5,6 +5,7 @@ export const cs = StyleSheet.create({
     containerInputEmail: {
         padding: 15,
         borderRadius: 3,
+        borderWidth: 1,
     },
     containerInputPassword: {
         paddingVertical: 15,
@@ -12,6 +13,7 @@ export const cs = StyleSheet.create({
         paddingLeft: 18,
         paddingRight: 40,
         borderRadius: 3,
+        borderWidth: 1,
     },
     inputText: {
         fontWeight: '600',
