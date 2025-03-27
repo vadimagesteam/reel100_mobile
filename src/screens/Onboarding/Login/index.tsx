@@ -69,7 +69,10 @@ const LoginScreen = () => {
                         buttonStyles={[positionHelpers.mt10, positionHelpers.mb10]}
                         onPress={handleSubmit(onSignin)}
                     />
-                    <ButtonDefault onPress={() => navigation.navigate(ONBOARDING_ROUTES.FORGOT_PASSWORD_SCREEN)}>
+                    <ButtonDefault onPress={() => {
+                        navigation.navigate(ONBOARDING_ROUTES.FORGOT_PASSWORD_SCREEN);
+                        dispatch(clearErrors());
+                    }}>
                         <BodyText
                             color={colors.blue1}
                             fontSize={14}
@@ -83,7 +86,7 @@ const LoginScreen = () => {
                     </ButtonDefault>
                 </View>
             </FormContainer>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 };
 

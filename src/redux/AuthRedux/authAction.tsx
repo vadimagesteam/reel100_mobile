@@ -19,7 +19,6 @@ export const userRegisterAction = createAsyncThunk<any, RegisterDataType>(
             };
             const response = await axios.post('/api/register', registerData, config);
 
-            console.log('response --userRegisterAction->', JSON.stringify(response?.data, null, 2));
             if (response?.status === 201) {
                 // await AsyncStorage.setItem('@token', response.data.accessToken);
                 // axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
@@ -53,7 +52,6 @@ export const userVerifyAction = createAsyncThunk<any, VerifyUserType>(
             };
             const response = await axios.post('/api/verifyUser', verifyEmailData, config);
 
-            console.log('response -userVerifyAction-->', JSON.stringify(response?.data, null, 2));
             if (response?.status === 201 && response?.data?.accessToken) {
                 // await AsyncStorage.setItem('@token', response.data.accessToken);
                 // axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
@@ -93,7 +91,8 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
             };
             const response = await axios.post('/api/login', dataSignIn, config);
 
-            console.log('response --userLoginAction->', JSON.stringify(response?.data, null, 2));
+            console.log('-userLoginAction-->', response?.data);
+
             if (response?.status === 201) {
                 await AsyncStorage.setItem('@token', response.data.accessToken);
                 axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
@@ -128,7 +127,6 @@ export const forgotPasswordAction = createAsyncThunk<any, ForgotPassType>(
             };
             const response = await axios.post('/api/setResetPassword', forgotPassData, config);
 
-            console.log('response -forgotPasswordAction-->', JSON.stringify(response?.data, null, 2));
             if (response?.status === 201) {
                 navigation.navigate(ONBOARDING_ROUTES.RESET_PASSWORD_SCREEN, { email: forgotPassData.username });
                 thunkAPI.dispatch(clearErrors());
@@ -136,7 +134,6 @@ export const forgotPasswordAction = createAsyncThunk<any, ForgotPassType>(
 
             return response?.data;
         } catch (error) {
-            console.log('-forgotPasswordAction-->', error?.response?.data);
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);
@@ -161,15 +158,21 @@ export const resetPasswordAction = createAsyncThunk<any, ResetPassType>(
             };
             const response = await axios.post('/api/resetPassword', resetPassData, config);
 
-            console.log('response -resetPasswordAction-->', JSON.stringify(response?.data, null, 2));
             if (response?.status === 201) {
-
+                navigation.dispatch(
+                    CommonActions.reset({
+                        index: 1,
+                        routes: [
+                            { name: ONBOARDING_ROUTES.WELCOME_SCREEN },
+                            { name: ONBOARDING_ROUTES.LOGIN_SCREEN },
+                        ],
+                    })
+                );
                 thunkAPI.dispatch(clearErrors());
             }
 
             return response?.data;
         } catch (error) {
-            console.log('-resetPasswordAction-->', error?.response?.data);
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);

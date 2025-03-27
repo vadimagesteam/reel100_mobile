@@ -8,4 +8,5 @@ export interface SvgIconProps {
 export type SvgIconsNames =
     | 'backArrow'
     | 'eyeShow'
-    | 'eyeHide';
+    | 'eyeHide'
+    | 'arrowBottom';

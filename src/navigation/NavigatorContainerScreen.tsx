@@ -5,7 +5,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useReduxDispatch, useReduxSelector } from '../store/store';
 import AuthStack from './Onboarding/AuthStack';
-import { setIsAuth } from '../redux/AuthRedux/authSlice';
+import { onLogout, setIsAuth } from '../redux/AuthRedux/authSlice';
 import CustomTabNavigator from './CustomTabNavigator';
 
 axios.defaults.baseURL = Config.APP_API_URL;
@@ -18,6 +18,7 @@ const NavigationContainerScreen = () => {
         const checkAuth = async () => {
             try {
                 // await AsyncStorage.removeItem('@token');
+                // dispatch(onLogout());
                 const token = await AsyncStorage.getItem('@token');
                 if (token) {
                     axios.defaults.headers.common.Authorization = `Bearer ${token}`;
