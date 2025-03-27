@@ -8,7 +8,13 @@ export const ONBOARDING_ROUTES = {
 } as const;
 
 export const DASHBOARD_ROUTES = {
+    MAIN_TAB: 'Main_Tab',
+    GLOBAL_VIDEO_TAB: 'Global_Video_Tab',
+    FOUR_U_TAB: 'Four_U_Tab',
+    PROFILE_TAB: 'Profile_Tab',
+
     MAIN_SCREEN: 'Main_Screen',
+
 } as const;
 
 export type valueof<T> = T[keyof T];

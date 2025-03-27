@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { useReduxDispatch, useReduxSelector } from '../store/store';
-import AuthStack from './Onboarding/AuthStack';
-import MainScreen from '../screens/Dashboard/Main';
 import Config from 'react-native-config';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useReduxDispatch, useReduxSelector } from '../store/store';
+import AuthStack from './Onboarding/AuthStack';
 import { setIsAuth } from '../redux/AuthRedux/authSlice';
+import CustomTabNavigator from './CustomTabNavigator';
 
 axios.defaults.baseURL = Config.APP_API_URL;
 
@@ -39,7 +39,7 @@ const NavigationContainerScreen = () => {
                 !isAuth ? (
                     <AuthStack />
                 ) : (
-                    <MainScreen />
+                    <CustomTabNavigator />
                 )
             }
         </NavigationContainer>

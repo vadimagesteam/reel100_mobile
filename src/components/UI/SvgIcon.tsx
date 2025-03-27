@@ -6,7 +6,7 @@ import { SvgIconProps, SvgIconsNames } from '../../assets/icons/typesSvg';
 import sourcesSvg from '../../assets/icons/sourcesSvg';
 
 interface Props {
-    image: SvgIconsNames;
+    image: SvgIconsNames | string;
     color?: string;
     style?: ViewStyle;
 }
