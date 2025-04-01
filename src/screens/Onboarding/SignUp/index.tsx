@@ -13,6 +13,7 @@ import { useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { userRegisterAction } from '../../../redux/AuthRedux/authAction';
 import { FormData } from './types';
 import { clearErrors } from '../../../redux/AuthRedux/authSlice';
+import { usePaddingInsets } from '../../../utils/paddingInsets';
 
 const SIGNUP_TEXT = 'Sign up';
 
@@ -52,7 +53,7 @@ const SignupScreen = () => {
     };
 
     return (
-        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
+        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4, paddingTop: usePaddingInsets() }]} >
             <BackButton onPress={() => goBackCallback()} />
             <FormContainer>
                 <View style={positionHelpers.mh20}>

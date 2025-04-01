@@ -84,6 +84,14 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        // externalNativeBuild {
+        //     cmake {
+        //         cppFlags "-frtti -fexceptions"
+        //     }
+        // }
+    }
+    buildFeatures {
+        prefab=true // add this
     }
     signingConfigs {
         debug {
@@ -105,11 +113,15 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-     externalNativeBuild {
-        cmake {
-            version "3.22.1"  // You can adjust this to your installed version or newer one
-        }
-    }
+    //  externalNativeBuild {
+    //     cmake {
+    //         version "3.31.6"  // You can adjust this to your installed version or newer one
+    //         // path "$projectDir/src/main/jni/CMakeLists.txt"
+    //         path "CMakeLists.txt"
+            
+
+    //     }
+    // }
 }
 
 dependencies {

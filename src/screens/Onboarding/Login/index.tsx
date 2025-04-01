@@ -12,6 +12,7 @@ import { ONBOARDING_ROUTES, OnboardingRoutes } from '../../../navigation/routes'
 import { useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { userLoginAction } from '../../../redux/AuthRedux/authAction';
 import { clearErrors } from '../../../redux/AuthRedux/authSlice';
+import { usePaddingInsets } from '../../../utils/paddingInsets';
 
 const SIGNIN_TEXT = 'Sign in';
 const FORGOT_YOUR_PASS_TEXT = 'Forgot your password?';
@@ -48,7 +49,7 @@ const LoginScreen = () => {
     };
 
     return (
-        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
+        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4, paddingTop: usePaddingInsets() }]} >
             <BackButton onPress={() => goBackCallback()} />
             <FormContainer>
                 <View style={positionHelpers.mh20}>

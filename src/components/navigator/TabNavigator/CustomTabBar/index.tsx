@@ -39,7 +39,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
                         <LinearGradient
                             start={{ x: 0.1, y: 0.5 }}
                             end={{ x: 0.9, y: 0 }}
-                            colors={isFocused ? [colors.blue1, colors.blue] : []}
+                            colors={isFocused ? [colors.blue1, colors.blue] : ['transparent', 'transparent']}
                             style={[positionHelpers.center, cs.br40]}
                         >
                             <View style={[positionHelpers.center, cs.br40, cs.p5]}>
