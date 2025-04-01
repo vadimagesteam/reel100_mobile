@@ -9,4 +9,5 @@ export type SvgIconsNames =
     | 'backArrow'
     | 'eyeShow'
     | 'eyeHide'
+    | 'location'
     | 'arrowBottom';

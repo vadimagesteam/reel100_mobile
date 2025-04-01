@@ -11,6 +11,7 @@ import ResetPassForm from './components/ResetPassForm';
 import { FormData } from './types';
 import { useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { resetPasswordAction } from '../../../redux/AuthRedux/authAction';
+import { usePaddingInsets } from '../../../utils/paddingInsets';
 
 const NEW_PASSWORD_TEXT = 'New password';
 const CONFIRM_TEXT = 'Confirm';
@@ -50,7 +51,7 @@ const ResetPasswordScreen = () => {
     };
 
     return (
-        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
+        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4, paddingTop: usePaddingInsets() }]} >
             <BackButton onPress={() => navigation.goBack()} />
             <FormContainer>
                 <View style={positionHelpers.mh20}>

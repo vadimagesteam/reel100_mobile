@@ -9,6 +9,7 @@ import ButtonGradient from '../../../components/ButtonGradient';
 import { OnboardingRoutes } from '../../../navigation/routes';
 import { useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { userVerifyAction } from '../../../redux/AuthRedux/authAction';
+import { usePaddingInsets } from '../../../utils/paddingInsets';
 
 const CHECK_EMAIL_TEXT = 'Check your email';
 const WE_SENT_CODE_TEXT = 'We sent a verification code to';
@@ -35,7 +36,7 @@ const VerifyEmailScreen = () => {
     };
 
     return (
-        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
+        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4, paddingTop: usePaddingInsets() }]} >
             <BackButton onPress={() => navigation.goBack()} />
             <View style={[positionHelpers.mt20, positionHelpers.mb25, positionHelpers.mh20]}>
                 <BodyText color={colors.white} fontSize={25} fontWeight={'bold'} textAlign="center" marginBottom={7}>{CHECK_EMAIL_TEXT}</BodyText>

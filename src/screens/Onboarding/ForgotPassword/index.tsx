@@ -12,6 +12,7 @@ import { FormData } from './types';
 import { useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { forgotPasswordAction } from '../../../redux/AuthRedux/authAction';
 import { clearErrors } from '../../../redux/AuthRedux/authSlice';
+import { usePaddingInsets } from '../../../utils/paddingInsets';
 
 const SEND_TEXT = 'Send';
 const FORGOT_YOUR_PASS_TEXT = 'Forgot your password?';
@@ -44,7 +45,7 @@ const ForgotPasswordScreen = () => {
 
 
     return (
-        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
+        <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4, paddingTop: usePaddingInsets() }]} >
             <BackButton onPress={() => goBackCallback()} />
             <View style={positionHelpers.mh20}>
                 <BodyText color={colors.white} fontSize={20} fontWeight={'bold'} textAlign="center">{FORGOT_YOUR_PASS_TEXT}</BodyText>
