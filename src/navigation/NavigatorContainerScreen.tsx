@@ -7,10 +7,8 @@ import { useReduxDispatch, useReduxSelector } from '../store/store';
 import AuthStack from './Onboarding/AuthStack';
 import { onLogout, setIsAuth } from '../redux/AuthRedux/authSlice';
 import CustomTabNavigator from './CustomTabNavigator';
-// import { isIOS } from '../utils/platformChecker';
 
 axios.defaults.baseURL = Config.APP_API_URL;
-// axios.defaults.baseURL = isIOS() ? Config.APP_API_URL : 'http://44.239.248.108';
 
 const NavigationContainerScreen = () => {
     const dispatch = useReduxDispatch();
