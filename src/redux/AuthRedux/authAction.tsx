@@ -89,9 +89,9 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.post('http://44.239.248.108/api/login', dataSignIn, config);
+            const response = await axios.post('/api/login', dataSignIn, config);
 
-            console.log('-userLoginAction-->', response);
+            // console.log('-userLoginAction-->', response);
             // console.log('-userLoginAction-->', response?.data);
 
             if (response?.status === 201) {
@@ -104,7 +104,7 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
             return response?.data;
         } catch (error) {
 
-            console.log('-userLoginAction-error->', error);
+            // console.log('-userLoginAction-error->', error);
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);
