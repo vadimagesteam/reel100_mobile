@@ -12,12 +12,15 @@ import {
 } from '../../../../store/store';
 import { getStatesAction } from '../../../../redux/StatesRedux/statesAction';
 import { requestLocationPermission, getStateFromCoords } from './helpers';
+import TabViewVideo from '../../../../components/TabViewVideo';
 
 const MainScreen = () => {
     const dispatch = useReduxDispatch();
+    // const { statesData } = useReduxSelector(state => state?.states);
     const [selectedState, setSelectedState] = useState<string | null>(null);
     const [_, setSelectedAutoState] = useState<string | null>(null);
-    // const { statesData } = useReduxSelector(state => state?.states);
+    const [activeTab, setActiveTab] = useState<string>('top_100');
+
 
     useEffect(() => {
         dispatch(getStatesAction());
@@ -58,18 +61,18 @@ const MainScreen = () => {
             <CustomHeader title="00:00:00" />
             <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
                 <View style={[positionHelpers.ph16, positionHelpers.mt10, positionHelpers.rowFillCenter]}>
+                    {/* Dropdown menu(geolocation) */}
                     <DropdownMenu
                         data={states}
-                        placeholder="Select an option"
+                        placeholder="Change Country"
                         selectedValue={selectedState}
                         onSelect={setSelectedState}
                     />
-
                     <SvgIcon image="eyeShow" color={colors.white} />
                 </View>
-                {/* <View>
-                    <BodyText></BodyText>
-                </View> */}
+
+                {/* TabView for Video */}
+                <TabViewVideo activeTab={activeTab} setActiveTab={setActiveTab} />
             </SafeAreaView>
         </>
     );
