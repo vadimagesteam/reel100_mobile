@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, SafeAreaView } from 'react-native';
-import CustomHeader from '../../../../navigation/CustomHeader';
 import { colors, positionHelpers } from '../../../../styles';
+import CustomHeader from '../../../../components/navigator/CustomHeader';
 
 const ProfileScreen = () => {
     return (

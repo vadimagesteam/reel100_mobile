@@ -2,9 +2,10 @@ import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, positionHelpers } from '../../styles';
-import { BodyText, SvgIcon } from '../../components/UI';
+
 import { cs } from './styles';
+import { colors, positionHelpers } from '../../../styles';
+import { BodyText, SvgIcon } from '../../UI';
 
 interface CustomHeaderProps {
     title: string;

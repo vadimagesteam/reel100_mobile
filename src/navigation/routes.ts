@@ -14,6 +14,7 @@ export const DASHBOARD_ROUTES = {
     PROFILE_TAB: 'Profile_Tab',
 
     MAIN_SCREEN: 'Main_Screen',
+    FULL_VIDEO_SCREEN: 'Full_Video_Screen',
 
 } as const;
 

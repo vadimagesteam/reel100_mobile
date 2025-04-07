@@ -15,7 +15,18 @@ const ICONS: Record<string, string> = {
     [DASHBOARD_ROUTES.PROFILE_TAB]: 'eyeShow',
 };
 
-const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
+const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
+    const currentRoute = state.routes[state.index];
+    const nestedState = descriptors[currentRoute.key]?.navigation?.getState?.();
+    const innerRoutes = nestedState?.routes?.[nestedState.index]?.state?.routes || [];
+
+    const isFullVideoScreen = innerRoutes.some(
+        (r) => r.name === DASHBOARD_ROUTES.FULL_VIDEO_SCREEN
+    );
+
+    if (isFullVideoScreen) {
+        return null;
+    }
     return (
         <View style={cs.container}>
             {state.routes.map((route, index) => {

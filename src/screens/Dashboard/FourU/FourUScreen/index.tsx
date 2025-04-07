@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, SafeAreaView } from 'react-native';
 import { colors, positionHelpers } from '../../../../styles';
-import CustomHeader from '../../../../navigation/CustomHeader';
+import CustomHeader from '../../../../components/navigator/CustomHeader';
 
 const FourUScreen = () => {
     return (
