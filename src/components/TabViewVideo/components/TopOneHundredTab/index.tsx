@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { GestureHandlerRootView, HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
@@ -9,6 +9,12 @@ import { positionHelpers } from '../../../../styles';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import { videoSources } from './mockData';
 
+
+const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? `0${secs}` : secs}`;
+};
 
 const { height } = Dimensions.get('screen');
 
@@ -23,6 +29,31 @@ const TopOneHundredTab = () => {
     const scale = useSharedValue(0);
     const opacity = useSharedValue(1);
     const [tapPosition, setTapPosition] = useState({ x: 0, y: 0 });
+
+    const [durations, setDurations] = useState<Record<string, number>>({});
+    const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (activeIndex !== null) {
+                const id = videoSources[activeIndex]?.id;
+                if (id) {
+                    setRemainingSeconds(prev => {
+                        const current = prev[id];
+                        if (current > 0) {
+                            return {
+                                ...prev,
+                                [id]: current - 1,
+                            };
+                        }
+                        return prev;
+                    });
+                }
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [activeIndex]);
 
     const handleSingleTap = useCallback(
         (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>, source: string) => {
@@ -51,6 +82,23 @@ const TopOneHundredTab = () => {
         [opacity, scale]
     );
 
+    //Save duration video
+    const handleVideoLoad = useCallback((id: string, duration: number) => {
+        setDurations(prev => ({ ...prev, [id]: duration }));
+        setRemainingSeconds(prev => ({ ...prev, [id]: Math.floor(duration) }));
+    }, []);
+
+    //Repeat duration video
+    const onVideoRepeat = useCallback((id: string) => {
+        const duration = durations[id];
+        if (duration) {
+            setRemainingSeconds(prev => ({
+                ...prev,
+                [id]: Math.floor(duration),
+            }));
+        }
+    }, [durations]);
+
     const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
         if (viewableItems.length > 0 && viewableItems[0]?.index !== undefined) {
             setActiveIndex(viewableItems[0].index);
@@ -72,11 +120,17 @@ const TopOneHundredTab = () => {
                     opacity={opacity}
                     handleSingleTap={(event) => handleSingleTap(event, item.uri)}
                     handleDoubleTap={(event) => handleDoubleTap(event)}
-
+                    avatar={item?.avatar}
+                    name={item?.fullname}
+                    videoNumber={item?.list_number}
+                    videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
+                    onVideoLoad={(duration) => handleVideoLoad(item.id, duration)}
+                    likesCount={item?.like_count}
+                    onVideoRepeat={() => onVideoRepeat(item?.id)}
                 />
             );
         },
-        [activeIndex, videoHeight, tapPosition, scale, opacity, handleSingleTap, handleDoubleTap]
+        [activeIndex, videoHeight, tapPosition, scale, opacity, remainingSeconds, handleSingleTap, handleDoubleTap, handleVideoLoad]
     );
 
     return (

@@ -15,7 +15,10 @@ const FullVideoScreen = () => {
             <Video
                 source={{ uri: params?.source }}
                 style={styles.video}
-                resizeMode="contain"
+                // resizeMode="contain"
+                resizeMode="cover"
+                repeat
+                muted
                 controls
             />
         </View>

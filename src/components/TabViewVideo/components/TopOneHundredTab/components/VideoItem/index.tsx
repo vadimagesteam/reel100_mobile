@@ -5,6 +5,7 @@ import { HandlerStateChangeEvent, TapGestureHandler, TapGestureHandlerEventPaylo
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { positionHelpers } from '../../../../../../styles';
 import { cs } from './styles';
+import VideoInfo from '../VideoInfo';
 
 interface VideoItemProps {
     source: string;
@@ -15,6 +16,15 @@ interface VideoItemProps {
     opacity: Animated.SharedValue<number>;
     handleSingleTap: (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => void;
     handleDoubleTap: (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => void;
+
+    avatar: string;
+    name: string;
+    videoNumber: number;
+    videoDuration: string | number;
+    onVideoLoad: (duration: number) => void;
+    likesCount: number;
+
+    onVideoRepeat?: () => void;
 }
 
 const VideoItem: React.FC<VideoItemProps> = ({
@@ -25,7 +35,15 @@ const VideoItem: React.FC<VideoItemProps> = ({
     scale,
     opacity,
     handleSingleTap,
-    handleDoubleTap }) => {
+    handleDoubleTap,
+    avatar,
+    name,
+    videoNumber,
+    videoDuration,
+    onVideoLoad,
+    likesCount,
+    onVideoRepeat }) => {
+    const videoRef = useRef<any | null>(null);
     const doubleTapRef = useRef<TapGestureHandler>(null);
 
     // Animated style heart
@@ -57,12 +75,26 @@ const VideoItem: React.FC<VideoItemProps> = ({
                             repeat
                             muted
                             paused={!isActive}
+                            onLoad={(data) => {
+                                onVideoLoad(Math.floor(data.duration));
+                            }}
+                            onEnd={() => {
+                                videoRef.current?.seek(0);
+                                onVideoRepeat?.();
+                            }}
                         />
                     </View>
                 </TapGestureHandler>
             </TapGestureHandler>
+            <VideoInfo
+                avatar={avatar}
+                name={name}
+                videoNumber={videoNumber}
+                videoDuration={videoDuration}
+                likesCount={likesCount}
+            />
 
-            {/* Animated heart */}
+            {/* Heart animation */}
             <Animated.Text style={[cs.heart, animatedStyle]}>❤️</Animated.Text>
         </View>
     );

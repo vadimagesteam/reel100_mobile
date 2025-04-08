@@ -6,6 +6,7 @@ export const colors = {
     black2: '#535353',
     black3: '#101012',
     black4: '#111111',
+    black5: '#413e39',
     blackOpacity20: 'rgba(0, 0, 0, 0.2)',
     blackOpacity40: 'rgba(0, 0, 0, 0.4)',
     blackOpacity15: 'rgba(0, 0, 0, 0.15)',
@@ -14,6 +15,7 @@ export const colors = {
     silver: '#575757',
     silver1: '#ddd',
     silver2: '#808080',
+    silver3: '#d9d7d6',
     silverLight: '#F8F9FB',
     silver1Procent50: 'rgba(128, 128, 128, 0.5)',
 
@@ -27,5 +29,5 @@ export const colors = {
     redLight: '#FFCCCB',
     yellow: '#FFFF00',
 
-    orange: '#dbb234',
+    orange: '#e1b034',
 };
