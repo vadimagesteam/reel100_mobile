@@ -23,6 +23,7 @@ export const authSlice = createSlice({
         },
         onLogout: (state: any) => {
             AsyncStorage.removeItem('@token'); // deletes token from storage
+            // AsyncStorage.removeItem('@isVerified');
             state.loading = false;
             state.isAuth = false;
             state.user = null;

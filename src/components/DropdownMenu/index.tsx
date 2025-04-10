@@ -41,7 +41,7 @@ const DropdownMenu = ({
         <View style={[positionHelpers.fill, cs.container]}>
             <DropdownButton onPress={toggleDropdown} selectedItem={selectedItem} placeholder={placeholder} animatedStyle={animatedArrowStyle} />
             <TouchableWithoutFeedback onPress={() => (dropdownVisible.value = withTiming(0, { duration: 200 }))}>
-                <DropdownList data={data} onSelect={handleSelect} animatedStyle={animatedDropdownStyle} />
+                <DropdownList data={data} onSelect={handleSelect} animatedStyle={animatedDropdownStyle} selectedValue={selectedItem?.label ?? null} />
             </TouchableWithoutFeedback>
         </View>
     );

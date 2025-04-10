@@ -20,7 +20,9 @@ const NavigationContainerScreen = () => {
                 // await AsyncStorage.removeItem('@token');
                 // dispatch(onLogout());
                 const token = await AsyncStorage.getItem('@token');
-                if (token) {
+                const isVerified = await AsyncStorage.getItem('@isVerified');
+
+                if (token && JSON.parse(isVerified) === true) {
                     axios.defaults.headers.common.Authorization = `Bearer ${token}`;
                     dispatch(setIsAuth(true));
                 } else {

@@ -5,6 +5,7 @@ import { ONBOARDING_ROUTES } from '../../navigation/routes';
 import { ForgotPassType, LoginDataType, RegisterDataType, ResetPassType, VerifyUserType } from './types';
 import { CommonActions } from '@react-navigation/native';
 import { clearErrors, setIsAuth } from './authSlice';
+import { Alert } from 'react-native';
 
 export const userRegisterAction = createAsyncThunk<any, RegisterDataType>(
     'auth/register',
@@ -20,8 +21,6 @@ export const userRegisterAction = createAsyncThunk<any, RegisterDataType>(
             const response = await axios.post('/api/register', registerData, config);
 
             if (response?.status === 201) {
-                // await AsyncStorage.setItem('@token', response.data.accessToken);
-                // axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
                 navigation.navigate(ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN, { email: registerData.username });
                 thunkAPI.dispatch(clearErrors());
             }
@@ -30,9 +29,20 @@ export const userRegisterAction = createAsyncThunk<any, RegisterDataType>(
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {
+                    if (error.response.data?.statusCode === 401) {
+                        Alert.alert(
+                            'Registration faliled',
+                            'This account is already registered. Please check your email and enter the verification code to confirm your email address.',
+                            [
+                                {
+                                    text: 'OK',
+                                    onPress: () => navigation.navigate(ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN, { email: registerData.username }),
+                                },
+                            ],
+                        );
+                    }
                     return thunkAPI.rejectWithValue(error.response.data);
                 } else {
-                    return thunkAPI.rejectWithValue(error.message);
                 }
             }
         }
@@ -53,8 +63,9 @@ export const userVerifyAction = createAsyncThunk<any, VerifyUserType>(
             const response = await axios.post('/api/verifyUser', verifyEmailData, config);
 
             if (response?.status === 201 && response?.data?.accessToken) {
-                // await AsyncStorage.setItem('@token', response.data.accessToken);
-                // axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
+                await AsyncStorage.setItem('@token', response.data.accessToken);
+                await AsyncStorage.setItem('@isVerified', JSON.stringify(true));
+                axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
                 navigation.dispatch(
                     CommonActions.reset({
                         index: 1,
@@ -64,6 +75,7 @@ export const userVerifyAction = createAsyncThunk<any, VerifyUserType>(
                         ],
                     })
                 );
+                thunkAPI.dispatch(clearErrors());
             }
 
             return response?.data;
@@ -82,6 +94,7 @@ export const userVerifyAction = createAsyncThunk<any, VerifyUserType>(
 export const userLoginAction = createAsyncThunk<any, LoginDataType>(
     'auth/login',
     async (dataSignIn, thunkAPI) => {
+        const { dataLogin, navigation } = dataSignIn;
         try {
             const config = {
                 headers: {
@@ -89,21 +102,39 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.post('/api/login', dataSignIn, config);
+            const response = await axios.post('/api/login', dataLogin, config);
 
-            // console.log('-userLoginAction-->', response);
             // console.log('-userLoginAction-->', response?.data);
 
             if (response?.status === 201) {
+                const isVerified = await AsyncStorage.getItem('@isVerified');
+                if (JSON.parse(isVerified) !== true) {
+                    Alert.alert(
+                        'Please verify your email before logging in.',
+                        'This account is already registered. Please check your email and enter the verification code to confirm your email address.',
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => navigation.navigate(ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN, { email: dataLogin.username }),
+                            },
+                        ],
+                    );
+                    return thunkAPI.rejectWithValue({
+                        message: 'Please verify your email before logging in',
+                    });
+
+
+                }
+
                 await AsyncStorage.setItem('@token', response.data.accessToken);
                 axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
+
                 thunkAPI.dispatch(setIsAuth(true));
                 thunkAPI.dispatch(clearErrors());
             }
 
             return response?.data;
         } catch (error) {
-
             // console.log('-userLoginAction-error->', error);
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {

@@ -28,8 +28,11 @@ export type VerifyUserType = {
 }
 
 export type LoginDataType = {
-    username: string | undefined
-    password: string | undefined
+    dataLogin: {
+        username: string | undefined
+        password: string | undefined
+    },
+    navigation: any
 }
 
 export type ForgotPassType = {

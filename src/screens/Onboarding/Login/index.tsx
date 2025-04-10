@@ -41,8 +41,11 @@ const LoginScreen = () => {
 
     const onSignin = (data: FormData) => {
         const dataSignIn = {
-            username: data?.username,
-            password: data?.password,
+            dataLogin: {
+                username: data?.username,
+                password: data?.password,
+            },
+            navigation,
         };
 
         dispatch(userLoginAction(dataSignIn));

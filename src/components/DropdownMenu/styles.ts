@@ -29,4 +29,10 @@ export const cs = StyleSheet.create({
         borderBottomWidth: 0.2,
         borderBottomColor: colors.silver1,
     },
+    selectedDot: {
+        backgroundColor: colors.white,
+        width: 10,
+        height: 10,
+        borderRadius: '80%',
+    },
 });

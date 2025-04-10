@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { colors, positionHelpers } from '../../../../styles';
 import DropdownMenu from '../../../../components/DropdownMenu';
-import { SvgIcon } from '../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../components/UI';
 import { states } from './mockData';
 import {
     useReduxDispatch,
@@ -13,6 +13,7 @@ import { getStatesAction } from '../../../../redux/StatesRedux/statesAction';
 import { requestLocationPermission, getStateFromCoords } from './helpers';
 import TabViewVideo from '../../../../components/TabViewVideo';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
+import { onLogout } from '../../../../redux/AuthRedux/authSlice';
 
 const MainScreen = () => {
     const dispatch = useReduxDispatch();
@@ -59,7 +60,7 @@ const MainScreen = () => {
     return (
         <>
             <CustomHeader title="00:00:00" />
-            <SafeAreaView style={[positionHelpers.fill, { justifyContent: 'space-between', backgroundColor: colors.black4 }]} >
+            <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
                 <View style={[positionHelpers.ph16, positionHelpers.mt10, positionHelpers.rowFillCenter]}>
                     {/* Dropdown menu(geolocation) */}
                     <DropdownMenu
@@ -68,7 +69,10 @@ const MainScreen = () => {
                         selectedValue={selectedState}
                         onSelect={setSelectedState}
                     />
-                    <SvgIcon image="eyeShow" color={colors.white} />
+                    <TouchableOpacity onPress={() => dispatch(onLogout())}>
+                        <BodyText fontSize={16} fontWeight={'bold'} color={'#fff'}>EXIT</BodyText>
+                        {/* <SvgIcon image="eyeShow" color={colors.white} /> */}
+                    </TouchableOpacity>
                 </View>
 
                 {/* TabView for Video */}

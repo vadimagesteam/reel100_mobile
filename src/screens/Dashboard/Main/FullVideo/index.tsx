@@ -18,7 +18,7 @@ const FullVideoScreen = () => {
                 // resizeMode="contain"
                 resizeMode="cover"
                 repeat
-                muted
+                // muted
                 controls
             />
         </View>

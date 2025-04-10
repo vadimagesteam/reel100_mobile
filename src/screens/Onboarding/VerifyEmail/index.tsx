@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaView, View } from 'react-native';
 import { NavigationProp, useNavigation, useRoute } from '@react-navigation/native';
 import { colors, positionHelpers } from '../../../styles';
-import { BodyText } from '../../../components/UI';
+import { BodyText, ButtonDefault } from '../../../components/UI';
 import BackButton from '../../../components/navigator/BackButton';
 import PINcode from '../../../components/PINcode';
 import ButtonGradient from '../../../components/ButtonGradient';
@@ -53,7 +53,10 @@ const VerifyEmailScreen = () => {
                 buttonStyles={positionHelpers.mh20}
                 onPress={handleVerify}
             />
-        </SafeAreaView>
+            {/* <ButtonDefault onPress={() => true}>
+                <BodyText paddingVertical={8} fontSize={14} textAlign="center" textDecorationLine="underline" color={colors.blue1}>Send code again</BodyText>
+            </ButtonDefault> */}
+        </SafeAreaView >
     );
 };
 
