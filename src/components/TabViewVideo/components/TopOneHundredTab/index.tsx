@@ -8,13 +8,7 @@ import VideoItem from './components/VideoItem';
 import { positionHelpers } from '../../../../styles';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import { videoSources } from './mockData';
-
-
-const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? `0${secs}` : secs}`;
-};
+import { formatTime } from '../../../../utils/formatTime';
 
 const { height } = Dimensions.get('screen');
 
@@ -30,6 +24,7 @@ const TopOneHundredTab = () => {
     const opacity = useSharedValue(1);
     const [tapPosition, setTapPosition] = useState({ x: 0, y: 0 });
 
+    const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
 
@@ -56,9 +51,13 @@ const TopOneHundredTab = () => {
     }, [activeIndex]);
 
     const handleSingleTap = useCallback(
-        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>, source: string) => {
+        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>, selectedId: string) => {
             if (event.nativeEvent.state === State.END) {
-                runOnJS(navigation.navigate)(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, { source });
+                const index = videoSources.findIndex(video => video.id === selectedId);
+                runOnJS(navigation.navigate)(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
+                    videos: videoSources,
+                    index,
+                });
             }
         },
         [navigation]
@@ -86,6 +85,7 @@ const TopOneHundredTab = () => {
     const handleVideoLoad = useCallback((id: string, duration: number) => {
         setDurations(prev => ({ ...prev, [id]: duration }));
         setRemainingSeconds(prev => ({ ...prev, [id]: Math.floor(duration) }));
+        setVideoStartTimes(prev => ({ ...prev, [id]: 0 }));
     }, []);
 
     //Repeat duration video
@@ -96,6 +96,10 @@ const TopOneHundredTab = () => {
                 ...prev,
                 [id]: Math.floor(duration),
             }));
+            setVideoStartTimes(prev => ({
+                ...prev,
+                [id]: 0,
+            }));
         }
     }, [durations]);
 
@@ -104,8 +108,9 @@ const TopOneHundredTab = () => {
             setActiveIndex(viewableItems[0].index);
             scale.value = 0;
             opacity.value = 0;
+            onVideoRepeat(viewableItems[0]?.item?.id);
         }
-    }, [opacity, scale]);
+    }, [opacity, scale, onVideoRepeat]);
 
     //TYPE FOR 'ITEM' !!!!!
     const renderItem = useCallback(
@@ -118,7 +123,7 @@ const TopOneHundredTab = () => {
                     tapPosition={tapPosition}
                     scale={scale}
                     opacity={opacity}
-                    handleSingleTap={(event) => handleSingleTap(event, item.uri)}
+                    handleSingleTap={(event) => handleSingleTap(event, item?.id)}
                     handleDoubleTap={(event) => handleDoubleTap(event)}
                     avatar={item?.avatar}
                     name={item?.fullname}
@@ -130,7 +135,18 @@ const TopOneHundredTab = () => {
                 />
             );
         },
-        [activeIndex, videoHeight, tapPosition, scale, opacity, remainingSeconds, handleSingleTap, handleDoubleTap, handleVideoLoad]
+        [
+            activeIndex,
+            videoHeight,
+            tapPosition,
+            scale,
+            opacity,
+            remainingSeconds,
+            handleSingleTap,
+            handleDoubleTap,
+            onVideoRepeat,
+            handleVideoLoad,
+        ]
     );
 
     return (

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../../../../styles';
+import { colors } from '../../styles';
 
 export const cs = StyleSheet.create({
     containerName: {
@@ -38,12 +38,21 @@ export const cs = StyleSheet.create({
         left: 0,
         right: 0,
     },
+    circleButton: {
+        borderWidth: 1,
+        borderRadius: '80%',
+        borderColor: colors.white,
+        padding: 12,
+        backgroundColor: colors.silver3,
+        opacity: 0.8,
+        marginHorizontal: 5,
+    },
     likeCountContainer: {
         minWidth: '30%',
         borderWidth: 1,
         borderRadius: 20,
         borderColor: colors.white,
-        padding: 10,
+        padding: 8,
         backgroundColor: colors.silver3,
         opacity: 0.8,
     },

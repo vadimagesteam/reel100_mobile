@@ -1,15 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import Video from 'react-native-video';
 import { HandlerStateChangeEvent, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { positionHelpers } from '../../../../../../styles';
 import { cs } from './styles';
-import VideoInfo from '../VideoInfo';
+import VideoAbsoluteInfo from '../../../../../VideoAbsoluteInfo';
 
 interface VideoItemProps {
     source: string;
-    isActive: number | boolean
+    isActive: boolean
     videoHeight: number
     tapPosition: { x: number, y: number };
     scale: Animated.SharedValue<number>;
@@ -46,6 +46,12 @@ const VideoItem: React.FC<VideoItemProps> = ({
     const videoRef = useRef<any | null>(null);
     const doubleTapRef = useRef<TapGestureHandler>(null);
 
+    useEffect(() => {
+        if (isActive && videoRef.current) {
+            videoRef.current.seek(0);
+        }
+    }, [isActive]);
+
     // Animated style heart
     const animatedStyle = useAnimatedStyle(() => ({
         // position: 'absolute',
@@ -54,6 +60,7 @@ const VideoItem: React.FC<VideoItemProps> = ({
         opacity: opacity.value,
         transform: [{ scale: scale.value }],
     }));
+
 
     return (
         <View style={positionHelpers.fill}>
@@ -66,6 +73,7 @@ const VideoItem: React.FC<VideoItemProps> = ({
                     ref={doubleTapRef}>
                     <View style={[positionHelpers.center, cs.videoWrapper]}>
                         <Video
+                            ref={videoRef}
                             source={{ uri: source }}
                             style={[
                                 cs.video,
@@ -86,7 +94,7 @@ const VideoItem: React.FC<VideoItemProps> = ({
                     </View>
                 </TapGestureHandler>
             </TapGestureHandler>
-            <VideoInfo
+            <VideoAbsoluteInfo
                 avatar={avatar}
                 name={name}
                 videoNumber={videoNumber}
