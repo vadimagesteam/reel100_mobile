@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { hideSplash } from 'react-native-splash-view';
 import Config from 'react-native-config';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -35,6 +36,12 @@ const NavigationContainerScreen = () => {
 
         checkAuth();
     }, [dispatch]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            hideSplash();
+        }, 1000);
+    }, []);
 
     return (
         <NavigationContainer>

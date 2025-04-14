@@ -6,6 +6,9 @@ import ReactAppDependencyProvider
 @main
 class AppDelegate: RCTAppDelegate {
   override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    // Call the custom method to show the splash screen
+    showSplashScreen()
+
     self.moduleName = "ReelsApp"
     self.dependencyProvider = RCTAppDependencyProvider()
 
@@ -26,5 +29,15 @@ class AppDelegate: RCTAppDelegate {
 #else
     Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
+  }
+
+  // Method to show splash screen
+  private func showSplashScreen() {
+    DispatchQueue.main.async {
+      if let splashClass = NSClassFromString("SplashView") as? NSObject.Type,
+         let splashInstance = splashClass.perform(NSSelectorFromString("sharedInstance"))?.takeUnretainedValue() as? NSObject {
+        splashInstance.perform(NSSelectorFromString("showSplash"))
+      }
+    }
   }
 }
