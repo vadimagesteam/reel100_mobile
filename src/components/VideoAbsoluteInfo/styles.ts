@@ -38,6 +38,9 @@ export const cs = StyleSheet.create({
         left: 0,
         right: 0,
     },
+    left10: {
+        left: 10,
+    },
     circleButton: {
         borderWidth: 1,
         borderRadius: '80%',

@@ -3,12 +3,12 @@ import { colors } from '../../styles';
 
 export const cs = StyleSheet.create({
     tabItem: {
-        paddingVertical: 15,
+        paddingVertical: 10,
         borderBottomWidth: 0.5,
         borderColor: colors.black4,
     },
     tabItemActive: {
-        paddingVertical: 15,
+        paddingVertical: 10,
         borderBottomWidth: 0.5,
         borderColor: colors.white,
     },

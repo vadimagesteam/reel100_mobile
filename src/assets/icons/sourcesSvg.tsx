@@ -82,8 +82,20 @@ const arrowBottom = {
     viewBox: '0 0 330 330',
 };
 
+const menu = {
+    Draw: () => (
+        <Path
+            fill="#D9D9D9"
+            d="M0 0h15v2.167H0V0Zm0 5.417h15v2.166H0V5.417Zm15 5.416V13H0v-2.167h15Z"
+        />
+    ),
+    height: 13,
+    width: 15,
+    viewBox: '0 0 15 13',
+};
+
 const top100Tab = {
-    Draw: ({ }) => (
+    Draw: () => (
         <Path
             fill="#5F85BE"
             d="M12.705 0c2.579 0 4.576 2.252 4.253 4.798l-.646 5.184a4.287 4.287 0 0 1-4.253 3.742c-2.579 0-4.576-2.252-4.253-4.798l.646-5.184A4.283 4.283 0 0 1 12.705 0Zm-.834 4.165-.652 5.184a.84.84 0 0 0 1.67.21l.65-5.185a.84.84 0 0 0-1.668-.209Zm13.89 12.973L1.641 20.57l-.49-3.399 24.118-3.43.485 3.398h.005Zm0 5.147L13.7 24l-.49-3.399 12.06-1.715.484 3.399h.005ZM18.422 3.892A4.29 4.29 0 0 1 22.703 0c2.524 0 4.506 2.16 4.28 4.664l-.394 4.31a4.29 4.29 0 0 1-4.28 3.892c-2.524 0-4.506-2.16-4.28-4.664l.393-4.31Zm4.28-.461a.844.844 0 0 0-.846.772l-.393 4.31a.845.845 0 0 0 .846.922.844.844 0 0 0 .845-.772l.393-4.31a.845.845 0 0 0-.845-.922ZM3.139 4.53l-.2.086-1.582.702L0 2.188l1.583-.703L4.598.15l2.384 1.78-1.857 12.946-3.548.504.054-.37L3.14 4.53Z"
@@ -94,10 +106,118 @@ const top100Tab = {
     viewBox: '0 0 27 24',
 };
 
+const stateFeedTab = {
+    Draw: () => (
+        <Path
+            fill="#5F85BE"
+            d="M28 0H4.667v17.286H28V0ZM9.722 2.357v2.357H7.39V2.357h2.333Zm13.222 0h2.334v2.357h-2.334V2.357ZM9.722 7.464v2.357H7.39V7.464h2.333Zm13.222 0h2.334v2.357h-2.334V7.464ZM9.722 12.571v2.358H7.39V12.57h2.333Zm13.222 0h2.334v2.358h-2.334V12.57ZM20.222 2.357v5.5h-7.778v-5.5h7.778ZM12.444 9.43h7.778v5.5h-7.778v-5.5ZM2.334 4.32V3.143H0V22H23.333v-2.357h-21V4.32Z"
+        />
+    ),
+    height: 22,
+    width: 28,
+    viewBox: '0 0 28 22',
+};
+
+const calendarTab = {
+    Draw: () => (
+        <Path
+            fill="#5F85BE"
+            d="M4.5 0v3H0v4.5h21V3h-4.5V0h-3v3h-6V0h-3ZM21 9H0v15h21V9ZM6 12v3H3v-3h3Zm9 9v-3h3v3h-3Zm3-8.625v2.25H9v-2.25h9Zm-15 6h9v2.25H3v-2.25Z"
+        />
+    ),
+    height: 24,
+    width: 21,
+    viewBox: '0 0 21 24',
+};
+
+const homeNavTab = {
+    Draw: ({ color = '#CECECE' }) => (
+        <Path
+            fill={color}
+            d="M22 11.234h-2.452L19.586 20H2.448v-8.766H0V9.375L11.015 0 22 9.375v1.86Z"
+        />
+    ),
+    height: 20,
+    width: 22,
+    viewBox: '0 0 22 20',
+};
+
+const globalNavTab = {
+    Draw: ({ color = '#CECECE' }) => (
+        <Circle cx={11} cy={11} r={11} fill={color} />
+    ),
+    height: 23,
+    width: 23,
+    viewBox: '0 0 23 23',
+};
+
+const fourU_NavTab = {
+    Draw: ({ color = '#CECECE' }) => (
+        <Path fill={color} d="M18 11 0 0v22l18-11Z" />
+    ),
+    height: 22,
+    width: 18,
+    viewBox: '0 0 18 22',
+};
+
+const profileNavTab = {
+    Draw: ({ color = '#CECECE' }) => (
+        <>
+            <Path
+                // stroke="#292D32"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                fill={color}
+                d="M12.12 12.78a.963.963 0 0 0-.24 0 3.27 3.27 0 0 1-3.16-3.27c0-1.81 1.46-3.28 3.28-3.28a3.276 3.276 0 0 1 .12 6.55ZM18.74 19.38A9.934 9.934 0 0 1 12 22c-2.6 0-4.96-.99-6.74-2.62.1-.94.7-1.86 1.77-2.58 2.74-1.82 7.22-1.82 9.94 0 1.07.72 1.67 1.64 1.77 2.58Z"
+            />
+            <Path
+                stroke={color}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                fill="none"
+                d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"
+            />
+        </>
+    ),
+    height: 30,
+    width: 30,
+    viewBox: '0 0 24 24',
+};
+
+const like_heart = {
+    Draw: ({ color = colors.white }) => (
+        <>
+            <G filter="url(#a)">
+                <Path
+                    stroke={color}
+                    fill={'none'}
+                    d="M11.392 6.794 8 10.283 4.609 6.794l-.473-.486a2.266 2.266 0 0 1-.636-1.58c0-1.244.977-2.228 2.152-2.228.566 0 1.111.23 1.517.648l.473.486.358.369.358-.369.473-.486c.406-.417.951-.648 1.517-.648 1.175 0 2.152.984 2.152 2.228 0 .595-.23 1.163-.636 1.58l-.473.486Z"
+                    shapeRendering="crispEdges"
+                />
+            </G>
+            <Defs />
+        </>
+    ),
+    height: 20,
+    width: 19,
+    viewBox: '0 0 16 15',
+};
+
 export default {
     backArrow,
     eyeShow,
     eyeHide,
     location,
     arrowBottom,
+    menu,
+    top100Tab,
+    stateFeedTab,
+    calendarTab,
+    homeNavTab,
+    globalNavTab,
+    fourU_NavTab,
+    profileNavTab,
+    like_heart,
 };

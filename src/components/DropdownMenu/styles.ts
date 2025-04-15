@@ -9,7 +9,7 @@ export const cs = StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.black1,
         borderRadius: 5,
-        padding: 12,
+        padding: 11,
         backgroundColor: colors.black1,
     },
     dropdownList: {

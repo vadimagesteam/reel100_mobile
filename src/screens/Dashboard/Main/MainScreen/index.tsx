@@ -69,9 +69,12 @@ const MainScreen = () => {
                         selectedValue={selectedState}
                         onSelect={setSelectedState}
                     />
-                    <TouchableOpacity onPress={() => dispatch(onLogout())}>
-                        <BodyText fontSize={16} fontWeight={'bold'} color={'#fff'}>EXIT</BodyText>
-                        {/* <SvgIcon image="eyeShow" color={colors.white} /> */}
+                    <TouchableOpacity
+                        onPress={() => true}
+                    // onPress={() => dispatch(onLogout())}
+                    >
+                        {/* <BodyText fontSize={16} fontWeight={'bold'} color={'#fff'}>EXIT</BodyText> */}
+                        <SvgIcon image="menu" />
                     </TouchableOpacity>
                 </View>
 

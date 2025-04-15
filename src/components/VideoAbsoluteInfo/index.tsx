@@ -18,6 +18,7 @@ interface VideoAbsoluteInfoProps {
     showArrow?: boolean
     showChat?: boolean
     showReplay?: boolean
+    fullLike?: boolean
 }
 
 const VideoAbsoluteInfo = ({
@@ -30,6 +31,7 @@ const VideoAbsoluteInfo = ({
     showArrow = false,
     showChat = false,
     showReplay = false,
+    fullLike = false,
 }: VideoAbsoluteInfoProps) => {
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
@@ -47,7 +49,7 @@ const VideoAbsoluteInfo = ({
                 ) : (
                     <Image source={{ uri: avatar }} style={cs.avatar} />
                 )}
-                <BodyText fontWeight={'bold'} color={colors.white} paddingLeft={5}>{name}</BodyText>
+                <BodyText fontWeight={'700'} color={colors.white} paddingLeft={5}>{name}</BodyText>
             </View>
 
 
@@ -61,22 +63,32 @@ const VideoAbsoluteInfo = ({
             </View>
 
             {/* Likes */}
-            <View style={[positionHelpers.absolute, positionHelpers.rowCenter, cs.containerLikes]}>
-                {showChat && (
-                    <TouchableOpacity style={[positionHelpers.alignCenter, cs.circleButton]}>
-                        <SvgIcon image="eyeShow" color={colors.white} />
-                    </TouchableOpacity>
-                )}
+            {fullLike ? (
+                <View style={[positionHelpers.absolute, positionHelpers.rowCenter, cs.containerLikes]}>
+                    {showChat && (
+                        <TouchableOpacity style={[positionHelpers.alignCenter, cs.circleButton]}>
+                            <SvgIcon image="eyeShow" color={colors.white} />
+                        </TouchableOpacity>
+                    )}
 
-                <View style={[positionHelpers.alignCenter, cs.likeCountContainer]}>
-                    <BodyText fontSize={16} fontWeight={'bold'} color={colors.white}>{likesCount}</BodyText>
+                    <View style={[positionHelpers.alignCenter, cs.likeCountContainer]}>
+                        <BodyText fontSize={16} fontWeight={'bold'} color={colors.white}>{likesCount}</BodyText>
+                    </View>
+                    {showReplay && (
+                        <TouchableOpacity style={[positionHelpers.alignCenter, cs.circleButton]}>
+                            <SvgIcon image="eyeShow" color={colors.white} />
+                        </TouchableOpacity>
+                    )}
                 </View>
-                {showReplay && (
-                    <TouchableOpacity style={[positionHelpers.alignCenter, cs.circleButton]}>
-                        <SvgIcon image="eyeShow" color={colors.white} />
-                    </TouchableOpacity>
-                )}
-            </View>
+            ) : (
+                <View style={[positionHelpers.absolute, cs.containerLikes, cs.left10]}>
+                    <View style={[positionHelpers.flexRow]}>
+                        <SvgIcon image="like_heart" />
+                        <BodyText fontSize={16} fontWeight={'700'} color={colors.white}>{likesCount}</BodyText>
+                    </View>
+                </View>
+            )}
+
         </>
     );
 };

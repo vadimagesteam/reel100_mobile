@@ -10,4 +10,13 @@ export type SvgIconsNames =
     | 'eyeShow'
     | 'eyeHide'
     | 'location'
-    | 'arrowBottom';
+    | 'arrowBottom'
+    | 'menu'
+    | 'top100Tab'
+    | 'stateFeedTab'
+    | 'calendarTab'
+    | 'homeNavTab'
+    | 'globalNavTab'
+    | 'fourU_NavTab'
+    | 'profileNavTab'
+    | 'like_heart';

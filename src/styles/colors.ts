@@ -24,6 +24,7 @@ export const colors = {
 
     blue: '#2140a1',
     blue1: '#39bdc5',
+    blue2: '#5F85BE',
 
     red: '#E95050',
     redLight: '#FFCCCB',

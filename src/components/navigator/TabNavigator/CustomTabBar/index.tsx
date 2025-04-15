@@ -9,10 +9,10 @@ import { colors, positionHelpers } from '../../../../styles';
 import { cs } from './styles';
 
 const ICONS: Record<string, string> = {
-    [DASHBOARD_ROUTES.MAIN_TAB]: 'eyeShow',
-    [DASHBOARD_ROUTES.GLOBAL_VIDEO_TAB]: 'eyeShow',
-    [DASHBOARD_ROUTES.FOUR_U_TAB]: 'eyeShow',
-    [DASHBOARD_ROUTES.PROFILE_TAB]: 'eyeShow',
+    [DASHBOARD_ROUTES.MAIN_TAB]: 'homeNavTab',
+    [DASHBOARD_ROUTES.GLOBAL_VIDEO_TAB]: 'globalNavTab',
+    [DASHBOARD_ROUTES.FOUR_U_TAB]: 'fourU_NavTab',
+    [DASHBOARD_ROUTES.PROFILE_TAB]: 'profileNavTab',
 };
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
@@ -47,20 +47,20 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
                 return (
                     <CustomTabBarButton key={route.key} onPress={onPress}>
-                        <LinearGradient
+                        {/* <LinearGradient
                             start={{ x: 0.1, y: 0.5 }}
                             end={{ x: 0.9, y: 0 }}
                             colors={isFocused ? [colors.blue1, colors.blue] : ['transparent', 'transparent']}
                             style={[positionHelpers.center, cs.br40]}
-                        >
-                            <View style={[positionHelpers.center, cs.br40, cs.p5]}>
-                                <SvgIcon
-                                    image={ICONS[route.name]}
-                                    color={colors.white}
-                                    style={{ width: widthAndHeightSize, height: widthAndHeightSize }}
-                                />
-                            </View>
-                        </LinearGradient>
+                        > */}
+                        <View style={[positionHelpers.center, cs.br40, cs.p5, positionHelpers.mb10]}>
+                            <SvgIcon
+                                image={ICONS[route.name]}
+                                color={isFocused ? colors.blue2 : colors.white}
+                                style={{ width: widthAndHeightSize, height: widthAndHeightSize }}
+                            />
+                        </View>
+                        {/* </LinearGradient> */}
                     </CustomTabBarButton>
                 );
             })}

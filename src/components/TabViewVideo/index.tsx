@@ -26,7 +26,7 @@ const TabViewVideo = ({ activeTab, setActiveTab }: TabViewVideoProps) => {
                         activeTab === 'top_100' ? cs.tabItemActive : cs.tabItem,
                     ]}
                     onPress={() => handleTabPress('top_100')}>
-                    <SvgIcon image="eyeShow" color={colors.white} />
+                    <SvgIcon image="top100Tab" />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[
@@ -35,7 +35,7 @@ const TabViewVideo = ({ activeTab, setActiveTab }: TabViewVideoProps) => {
                         activeTab === 'state_feed' ? cs.tabItemActive : cs.tabItem,
                     ]}
                     onPress={() => handleTabPress('state_feed')}>
-                    <SvgIcon image="eyeShow" color={colors.white} />
+                    <SvgIcon image="stateFeedTab" />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[
@@ -44,7 +44,7 @@ const TabViewVideo = ({ activeTab, setActiveTab }: TabViewVideoProps) => {
                         activeTab === 'top_video' ? cs.tabItemActive : cs.tabItem,
                     ]}
                     onPress={() => handleTabPress('top_video')}>
-                    <SvgIcon image="eyeShow" color={colors.white} />
+                    <SvgIcon image="calendarTab" />
                 </TouchableOpacity>
             </View>
             <>
