@@ -8,7 +8,7 @@ import PINcode from '../../../components/PINcode';
 import ButtonGradient from '../../../components/ButtonGradient';
 import { OnboardingRoutes } from '../../../navigation/routes';
 import { useReduxDispatch, useReduxSelector } from '../../../store/store';
-import { userVerifyAction } from '../../../redux/AuthRedux/authAction';
+import { resendUserVerifyAction, userVerifyAction } from '../../../redux/AuthRedux/authAction';
 import { usePaddingInsets } from '../../../utils/paddingInsets';
 
 const CHECK_EMAIL_TEXT = 'Check your email';
@@ -21,28 +21,36 @@ const VerifyEmailScreen = () => {
     const { params } = useRoute<any>();
     const navigation = useNavigation<NavigationProp<OnboardingRoutes>>();
     const dispatch = useReduxDispatch();
-    const { loading } = useReduxSelector(state => state?.auth);
+    const { loading, isStatus } = useReduxSelector(state => state?.auth);
     const [code, setCode] = useState<string>('');
 
     const handleVerify = () => {
         const dataVerify = {
             verifyEmailData: {
-                username: params?.email,
+                username: isStatus === null ? params?.email : isStatus?.email,
                 token: String(code),
             },
-            navigation,
         };
         dispatch(userVerifyAction(dataVerify));
     };
 
+    const handleResendVerify = () => {
+        const dataResendVerify = {
+            resendVerifyEmailData: {
+                username: isStatus === null ? params?.email : isStatus?.email,
+            },
+        };
+        dispatch(resendUserVerifyAction(dataResendVerify));
+    };
+
     return (
         <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4, paddingTop: usePaddingInsets() }]} >
-            <BackButton onPress={() => navigation.goBack()} />
+            {isStatus === null ? <BackButton onPress={() => navigation.goBack()} /> : null}
             <View style={[positionHelpers.mt20, positionHelpers.mb25, positionHelpers.mh20]}>
                 <BodyText color={colors.white} fontSize={25} fontWeight={'bold'} textAlign="center" marginBottom={7}>{CHECK_EMAIL_TEXT}</BodyText>
                 <View>
                     <BodyText color={colors.white} fontSize={14} fontWeight={'400'} textAlign="center" >{WE_SENT_CODE_TEXT}</BodyText>
-                    <BodyText color={colors.white} fontSize={14} fontWeight={'bold'} textAlign="center" >{params?.email}</BodyText>
+                    <BodyText color={colors.white} fontSize={14} fontWeight={'bold'} textAlign="center" >{isStatus === null ? params?.email : isStatus?.email}</BodyText>
                 </View>
             </View>
             <PINcode code={code} codeLength={CODE_LENGTH} setCode={setCode} />
@@ -53,9 +61,9 @@ const VerifyEmailScreen = () => {
                 buttonStyles={positionHelpers.mh20}
                 onPress={handleVerify}
             />
-            {/* <ButtonDefault onPress={() => true}>
+            <ButtonDefault onPress={handleResendVerify}>
                 <BodyText paddingVertical={8} fontSize={14} textAlign="center" textDecorationLine="underline" color={colors.blue1}>Send code again</BodyText>
-            </ButtonDefault> */}
+            </ButtonDefault>
         </SafeAreaView >
     );
 };

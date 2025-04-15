@@ -6,28 +6,37 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useReduxDispatch, useReduxSelector } from '../store/store';
 import AuthStack from './Onboarding/AuthStack';
-import { onLogout, setIsAuth } from '../redux/AuthRedux/authSlice';
+import { onLogout, setIsAuth, setStatusRegister } from '../redux/AuthRedux/authSlice';
 import CustomTabNavigator from './CustomTabNavigator';
 
 axios.defaults.baseURL = Config.APP_API_URL;
 
 const NavigationContainerScreen = () => {
     const dispatch = useReduxDispatch();
-    const { isAuth } = useReduxSelector(state => state?.auth);
+    const { isAuth, isStatus } = useReduxSelector(state => state?.auth);
 
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                // await AsyncStorage.removeItem('@token');
+                // // await AsyncStorage.removeItem('@token');
                 // dispatch(onLogout());
+                // AsyncStorage.removeItem('@isVerified');
+                // AsyncStorage.removeItem('@statusRegister');
+
                 const token = await AsyncStorage.getItem('@token');
                 const isVerified = await AsyncStorage.getItem('@isVerified');
+                const statusRegister = await AsyncStorage.getItem('@statusRegister');
+                const parsedStatusData = statusRegister ? JSON.parse(statusRegister) : null;
 
-                if (token && JSON.parse(isVerified) === true) {
-                    axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-                    dispatch(setIsAuth(true));
+                if (parsedStatusData?.status === 'STATUS_PENDING') {
+                    dispatch(setStatusRegister(parsedStatusData));
                 } else {
-                    dispatch(setIsAuth(false));
+                    if (token && JSON.parse(isVerified) === true) {
+                        axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+                        dispatch(setIsAuth(true));
+                    } else {
+                        dispatch(setIsAuth(false));
+                    }
                 }
             } catch (error) {
                 console.error('Помилка перевірки авторизації:', error);
@@ -47,7 +56,7 @@ const NavigationContainerScreen = () => {
         <NavigationContainer>
             {
                 !isAuth ? (
-                    <AuthStack />
+                    <AuthStack checkStatus={isStatus?.status} />
                 ) : (
                     <CustomTabNavigator />
                 )

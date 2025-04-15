@@ -12,33 +12,48 @@ import ResetPasswordScreen from '../../../screens/Onboarding/ResetPassword';
 
 const Stack = createStackNavigator();
 
-const AuthStack = () => {
+interface AuthStackProps {
+    checkStatus: string | undefined
+}
+
+const AuthStack = ({ checkStatus }: AuthStackProps) => {
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen
-                name={ONBOARDING_ROUTES.WELCOME_SCREEN}
-                component={WelcomeScreen}
-            />
-            <Stack.Screen
-                name={ONBOARDING_ROUTES.SIGNUP_SCREEN}
-                component={SignupScreen}
-            />
-            <Stack.Screen
-                name={ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN}
-                component={VerifyEmailScreen}
-            />
-            <Stack.Screen
-                name={ONBOARDING_ROUTES.LOGIN_SCREEN}
-                component={LoginScreen}
-            />
-            <Stack.Screen
-                name={ONBOARDING_ROUTES.FORGOT_PASSWORD_SCREEN}
-                component={ForgotPasswordScreen}
-            />
-            <Stack.Screen
-                name={ONBOARDING_ROUTES.RESET_PASSWORD_SCREEN}
-                component={ResetPasswordScreen}
-            />
+            {
+                checkStatus === 'STATUS_PENDING' ?
+                    <Stack.Screen
+                        name={ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN}
+                        component={VerifyEmailScreen}
+                    /> : (
+                        <>
+                            <Stack.Screen
+                                name={ONBOARDING_ROUTES.WELCOME_SCREEN}
+                                component={WelcomeScreen}
+                            />
+                            <Stack.Screen
+                                name={ONBOARDING_ROUTES.SIGNUP_SCREEN}
+                                component={SignupScreen}
+                            />
+                            <Stack.Screen
+                                name={ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN}
+                                component={VerifyEmailScreen}
+                            />
+                            <Stack.Screen
+                                name={ONBOARDING_ROUTES.LOGIN_SCREEN}
+                                component={LoginScreen}
+                            />
+                            <Stack.Screen
+                                name={ONBOARDING_ROUTES.FORGOT_PASSWORD_SCREEN}
+                                component={ForgotPasswordScreen}
+                            />
+                            <Stack.Screen
+                                name={ONBOARDING_ROUTES.RESET_PASSWORD_SCREEN}
+                                component={ResetPasswordScreen}
+                            />
+                        </>
+                    )
+            }
+
         </Stack.Navigator>
     );
 };

@@ -46,7 +46,6 @@ const ResetPasswordScreen = () => {
             },
             navigation,
         };
-        console.log('dataResetPass-> ', JSON.stringify(dataResetPass, null, 2));
         dispatch(resetPasswordAction(dataResetPass));
     };
 

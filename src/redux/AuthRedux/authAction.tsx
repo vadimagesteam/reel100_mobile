@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { ONBOARDING_ROUTES } from '../../navigation/routes';
-import { ForgotPassType, LoginDataType, RegisterDataType, ResetPassType, VerifyUserType } from './types';
+import { ForgotPassType, LoginDataType, RegisterDataType, ResetPassType, ResendVerifyUserType, VerifyUserType } from './types';
 import { CommonActions } from '@react-navigation/native';
 import { clearErrors, setIsAuth } from './authSlice';
 import { Alert } from 'react-native';
@@ -21,6 +21,11 @@ export const userRegisterAction = createAsyncThunk<any, RegisterDataType>(
             const response = await axios.post('/api/register', registerData, config);
 
             if (response?.status === 201) {
+                const statusData = {
+                    email: registerData.username,
+                    status: 'STATUS_PENDING',
+                };
+                await AsyncStorage.setItem('@statusRegister', JSON.stringify(statusData));
                 navigation.navigate(ONBOARDING_ROUTES.VERIFY_EMAIL_SCREEN, { email: registerData.username });
                 thunkAPI.dispatch(clearErrors());
             }
@@ -52,7 +57,7 @@ export const userRegisterAction = createAsyncThunk<any, RegisterDataType>(
 export const userVerifyAction = createAsyncThunk<any, VerifyUserType>(
     'auth/verifyUser',
     async (dataVerify, thunkAPI) => {
-        const { verifyEmailData, navigation } = dataVerify;
+        const { verifyEmailData } = dataVerify;
         try {
             const config = {
                 headers: {
@@ -66,18 +71,51 @@ export const userVerifyAction = createAsyncThunk<any, VerifyUserType>(
                 await AsyncStorage.setItem('@token', response.data.accessToken);
                 await AsyncStorage.setItem('@isVerified', JSON.stringify(true));
                 axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
-                navigation.dispatch(
-                    CommonActions.reset({
-                        index: 1,
-                        routes: [
-                            { name: ONBOARDING_ROUTES.WELCOME_SCREEN },
-                            { name: ONBOARDING_ROUTES.LOGIN_SCREEN },
-                        ],
-                    })
-                );
+
+                thunkAPI.dispatch(setIsAuth(true));
                 thunkAPI.dispatch(clearErrors());
+                await AsyncStorage.removeItem('@statusRegister');
             }
 
+            return response?.data;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                if (error.response && error.response.data) {
+                    return thunkAPI.rejectWithValue(error.response.data);
+                } else {
+                    return thunkAPI.rejectWithValue(error.message);
+                }
+            }
+        }
+    },
+);
+
+export const resendUserVerifyAction = createAsyncThunk<any, ResendVerifyUserType>(
+    'auth/resendVerifyUser',
+    async (dataVerify, thunkAPI) => {
+        const { resendVerifyEmailData } = dataVerify;
+        try {
+            const config = {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            };
+            const response = await axios.post('/api/resendVerificationCode', resendVerifyEmailData, config);
+
+            if (response?.status === 201) {
+                Alert.alert(
+                    'Сode resent',
+                    'Please check your email and enter the verification code to confirm your email address.',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => true,
+                        },
+                    ],
+                );
+
+            }
             return response?.data;
         } catch (error) {
             if (error instanceof AxiosError) {

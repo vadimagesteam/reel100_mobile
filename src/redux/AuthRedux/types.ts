@@ -1,11 +1,15 @@
 export interface AuthState {
     loading: boolean;
     isAuth: boolean;
+    isStatus: StatusRegisterType | null
     user: any[];
     error: Error | null;
 }
 
-
+export type StatusRegisterType = {
+    email: string,
+    status: string
+}
 
 //Actions
 export type RegisterDataType = {
@@ -23,8 +27,13 @@ export type VerifyUserType = {
     verifyEmailData: {
         username: string
         token: string
+    }
+}
+
+export type ResendVerifyUserType = {
+    resendVerifyEmailData: {
+        username: string
     },
-    navigation: any
 }
 
 export type LoginDataType = {

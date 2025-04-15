@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthState } from './types';
-import { forgotPasswordAction, resetPasswordAction, userLoginAction, userRegisterAction, userVerifyAction } from './authAction';
+import { AuthState, StatusRegisterType } from './types';
+import { forgotPasswordAction, resendUserVerifyAction, resetPasswordAction, userLoginAction, userRegisterAction, userVerifyAction } from './authAction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const initialState: AuthState = {
     loading: false,
     isAuth: false,
+    isStatus: null,
     user: [],
     error: null,
 };
@@ -20,6 +21,9 @@ export const authSlice = createSlice({
         },
         clearErrors(state) {
             state.error = null;
+        },
+        setStatusRegister(state, action: PayloadAction<StatusRegisterType | null>) {
+            state.isStatus = action.payload;
         },
         onLogout: (state: any) => {
             AsyncStorage.removeItem('@token'); // deletes token from storage
@@ -62,6 +66,23 @@ export const authSlice = createSlice({
             )
             .addCase(
                 userVerifyAction.rejected,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                },
+            )
+            //Resend User Verify
+            .addCase(resendUserVerifyAction.pending, state => {
+                state.loading = false;
+            })
+            .addCase(
+                resendUserVerifyAction.fulfilled,
+                (state) => {
+                    state.loading = false;
+                },
+            )
+            .addCase(
+                resendUserVerifyAction.rejected,
                 (state, action: PayloadAction<any>) => {
                     state.loading = false;
                     state.error = action.payload;
@@ -123,6 +144,6 @@ export const authSlice = createSlice({
 
 });
 
-export const { setIsAuth, onLogout, clearErrors } = authSlice.actions;
+export const { setIsAuth, onLogout, clearErrors, setStatusRegister } = authSlice.actions;
 
 export default authSlice.reducer;
