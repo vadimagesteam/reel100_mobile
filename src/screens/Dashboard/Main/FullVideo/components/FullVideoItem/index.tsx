@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import Video from 'react-native-video';
 import { cs } from '../../styles';
 import VideoAbsoluteInfo from '../../../../../../components/VideoAbsoluteInfo';
@@ -26,6 +27,7 @@ const FullVideoItem = ({
     paused,
     onVideoRepeat,
 }: FullVideoItemProps) => {
+    const navigation = useNavigation();
     const videoRef = useRef<any | null>(null);
 
     useEffect(() => {
@@ -53,6 +55,7 @@ const FullVideoItem = ({
             />
             <VideoAbsoluteInfo
                 showArrow={true}
+                onArrowBack={() => navigation.goBack()}
                 showChat={true}
                 showReplay={true}
                 videoCheck={'FULL'}

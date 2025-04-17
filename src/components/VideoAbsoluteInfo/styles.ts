@@ -59,4 +59,32 @@ export const cs = StyleSheet.create({
         backgroundColor: colors.silver3,
         opacity: 0.8,
     },
+
+    //SIMPLE
+    containerNameSimple: {
+        left: 4,
+        top: 4,
+    },
+    noAvatarSimple: {
+        padding: 10,
+        borderRadius: '80%',
+        backgroundColor: colors.blue1,
+    },
+    avatarSimple: {
+        width: 15,
+        height: 15,
+        borderRadius: 16,
+        marginRight: 8,
+    },
+    containerDurationSimple: {
+        top: 5,
+        right: 4,
+    },
+    likeContainerSimple: {
+        bottom: 2,
+        left: 2,
+        paddingHorizontal: 3,
+        paddingVertical: 3,
+        borderRadius: 6,
+    },
 });
