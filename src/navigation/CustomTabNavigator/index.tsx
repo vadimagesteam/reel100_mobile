@@ -6,8 +6,8 @@ import CustomTabBar from '../../components/navigator/TabNavigator/CustomTabBar';
 // screens
 import FourUScreen from '../../screens/Dashboard/FourU/FourUScreen';
 import GlobalVideoScreen from '../../screens/Dashboard/Global/GlobalVideo';
-import ProfileScreen from '../../screens/Dashboard/Profile/ProfileScreen';
 import MainStack from '../Dashboard/MainStack';
+import ProfileStack from '../Dashboard/ProfileStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,7 +17,7 @@ const CustomTabNavigator = () => {
             <Tab.Screen name={DASHBOARD_ROUTES.MAIN_TAB} component={MainStack} />
             <Tab.Screen name={DASHBOARD_ROUTES.GLOBAL_VIDEO_TAB} component={GlobalVideoScreen} />
             <Tab.Screen name={DASHBOARD_ROUTES.FOUR_U_TAB} component={FourUScreen} />
-            <Tab.Screen name={DASHBOARD_ROUTES.PROFILE_TAB} component={ProfileScreen} />
+            <Tab.Screen name={DASHBOARD_ROUTES.PROFILE_TAB} component={ProfileStack} />
         </Tab.Navigator>
     );
 };

@@ -1,0 +1,29 @@
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import { DASHBOARD_ROUTES } from '../../routes';
+import ProfileScreen from '../../../screens/Dashboard/Profile/ProfileScreen';
+import VideoRecordScreen from '../../../screens/Dashboard/Profile/VideoRecordScreen';
+import PreviewVideoScreen from '../../../screens/Dashboard/Profile/PreviewVideoScreen';
+
+const Stack = createStackNavigator();
+
+const ProfileStack = () => {
+    return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen
+                name={DASHBOARD_ROUTES.PROFILE_SCREEN}
+                component={ProfileScreen}
+            />
+            <Stack.Screen
+                name={DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN}
+                component={VideoRecordScreen}
+            />
+            <Stack.Screen
+                name={DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN}
+                component={PreviewVideoScreen}
+            />
+        </Stack.Navigator>
+    );
+};
+
+export default ProfileStack;

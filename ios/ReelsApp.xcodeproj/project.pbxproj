@@ -12,6 +12,8 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		8186EFD29291F9279642E7F6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		F259561C2DBE2D8E0095168D /* CustomAudioSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28ACCDC2DBE20F200450952 /* CustomAudioSessionManager.swift */; };
+		F28ACCDE2DBE216B00450952 /* CustomAudioSessionManagerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = F28ACCDD2DBE216B00450952 /* CustomAudioSessionManagerBridge.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,9 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ReelsApp/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ReelsApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F28ACCDC2DBE20F200450952 /* CustomAudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomAudioSessionManager.swift; path = ReelsApp/CustomAudioSessionManager.swift; sourceTree = "<group>"; };
+		F28ACCDD2DBE216B00450952 /* CustomAudioSessionManagerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomAudioSessionManagerBridge.m; path = ReelsApp/CustomAudioSessionManagerBridge.m; sourceTree = "<group>"; };
+		F2EE6A962DBAA68C00C3FB85 /* ReelsApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ReelsApp-Bridging-Header.h"; path = "ReelsApp/ReelsApp-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +75,9 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				F28ACCDD2DBE216B00450952 /* CustomAudioSessionManagerBridge.m */,
+				F28ACCDC2DBE20F200450952 /* CustomAudioSessionManager.swift */,
+				F2EE6A962DBAA68C00C3FB85 /* ReelsApp-Bridging-Header.h */,
 				13B07FAE1A68108700A75B9A /* ReelsApp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -246,7 +254,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F259561C2DBE2D8E0095168D /* CustomAudioSessionManager.swift in Sources */,
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				F28ACCDE2DBE216B00450952 /* CustomAudioSessionManagerBridge.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,8 +269,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = 64M5LK6G97;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = V367GUL584;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = ReelsApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Reel-100";
@@ -269,7 +279,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -277,6 +287,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandook.reels;
 				PRODUCT_NAME = ReelsApp;
+				SWIFT_OBJC_BRIDGING_HEADER = "ReelsApp/ReelsApp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -289,8 +300,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = 64M5LK6G97;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = V367GUL584;
 				INFOPLIST_FILE = ReelsApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Reel-100";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -298,7 +309,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -306,6 +317,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandook.reels;
 				PRODUCT_NAME = ReelsApp;
+				SWIFT_OBJC_BRIDGING_HEADER = "ReelsApp/ReelsApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -380,13 +392,11 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_OBJC_BRIDGING_HEADER = "ReelsApp-Bridging-Header.h";
 				USE_HERMES = true;
 			};
 			name = Debug;
@@ -452,12 +462,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "ReelsApp-Bridging-Header.h";
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
 			};

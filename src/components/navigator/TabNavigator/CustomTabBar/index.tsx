@@ -20,11 +20,13 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
     const nestedState = descriptors[currentRoute.key]?.navigation?.getState?.();
     const innerRoutes = nestedState?.routes?.[nestedState.index]?.state?.routes || [];
 
-    const isFullVideoScreen = innerRoutes.some(
-        (r) => r.name === DASHBOARD_ROUTES.FULL_VIDEO_SCREEN
+    const isHiddenScreens = innerRoutes.some(
+        (r) =>
+            r.name === DASHBOARD_ROUTES.FULL_VIDEO_SCREEN ||
+            r.name === DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN
     );
 
-    if (isFullVideoScreen) {
+    if (isHiddenScreens) {
         return null;
     }
     return (

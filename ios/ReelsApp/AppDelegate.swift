@@ -1,6 +1,7 @@
 import UIKit
 import React
 import React_RCTAppDelegate
+import AVFoundation
 import ReactAppDependencyProvider
 
 @main
@@ -8,7 +9,7 @@ class AppDelegate: RCTAppDelegate {
   override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     // Call the custom method to show the splash screen
     showSplashScreen()
-
+    
     self.moduleName = "ReelsApp"
     self.dependencyProvider = RCTAppDependencyProvider()
 
