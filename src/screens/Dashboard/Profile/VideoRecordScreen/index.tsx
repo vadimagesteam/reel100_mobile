@@ -72,16 +72,23 @@ const VideoRecordScreen = () => {
     const zoom = useSharedValue(device?.neutralZoom ?? 1);
     const zoomOffset = useSharedValue(zoom.value);
     const [isCameraActive, setIsCameraActive] = useState(true);
-    const [device, setDevice] = useState<CameraDevice | null>(null);
+    // const [devices, setDevices] = useState<CameraDevice | null>(null);
+    const [availableDevices, setAvailableDevices] = useState<CameraDevice[]>([]);
+    const [isFrontCamera, setIsFrontCamera] = useState(false);
+
+    const frontCamera = availableDevices.find(d => d.position === 'front');
+    const backCamera = availableDevices.find(d => d.position === 'back');
+    const device = isFrontCamera ? frontCamera : backCamera;
 
     useFocusEffect(
         useCallback(() => {
             const init = async () => {
                 const devices = await Camera.getAvailableCameraDevices();
-                const backCamera = devices.find((d) => d.position === 'back');
-                setDevice(backCamera ?? null);
+                // const backCamera = devices.find((d) => d.position === 'back');
+                // setDevices(backCamera ?? null);
+                setAvailableDevices(devices);
 
-                await CustomAudioSessionManager.deactivateAudioSession(); // для iOS важливо
+                // await CustomAudioSessionManager.deactivateAudioSession(); // для iOS важливо
                 await CustomAudioSessionManager.activateVideoRecordingAudioSession(); // для iOS важливо
                 setAudioEnabled(true);
                 setIsCameraActive(true);
@@ -92,7 +99,7 @@ const VideoRecordScreen = () => {
 
             return () => {
                 setIsCameraActive(false);
-                setDevice(null);
+                setAvailableDevices([]);
             };
         }, [])
     );
@@ -169,21 +176,21 @@ const VideoRecordScreen = () => {
 
     const startRecording = async () => {
         if (!camera.current || isRecording) { return; }
-
+        await CustomAudioSessionManager.deactivateAudioSession();
         try {
             console.log('📸 Стартуємо запис...');
             // setIsRecording(true);
 
 
             if (Platform.OS === 'ios') {
-                await CustomAudioSessionManager.deactivateAudioSession();
+
 
                 // await CustomAudioSessionManager.activateVideoRecordingAudioSession();
                 setTimeout(async () => {
                     await CustomAudioSessionManager.activateVideoRecordingAudioSession();
                     // await CustomAudioSessionManager.deactivateAudioSession();
                     // інші налаштування
-                }, 700);
+                }, 550);
             }
 
 
@@ -476,8 +483,52 @@ const VideoRecordScreen = () => {
                     <BodyText fontSize={14} >{timer}s</BodyText>
                 </TouchableOpacity>)}
 
+            <View style={styles.optionsContainer}>
+                <TouchableOpacity style={{
+                    width: 35,
+                    height: 35,
+                    backgroundColor: 'rgba(134,131,130,255)',
+                    borderRadius: 999,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+                    onPress={() => setIsFrontCamera(prev => !prev)}
+                >
+                    <BodyText fontSize={10} >icon 1</BodyText>
+                </TouchableOpacity>
+                {/* <TouchableOpacity style={{
+                    width: 35,
+                    height: 35,
+                    backgroundColor: 'rgba(134,131,130,255)',
+                    borderRadius: 999,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <BodyText fontSize={10} >icon 2</BodyText>
+                </TouchableOpacity>
+                <TouchableOpacity style={{
+                    width: 35,
+                    height: 35,
+                    backgroundColor: 'rgba(134,131,130,255)',
+                    borderRadius: 999,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <BodyText fontSize={10} >icon 3</BodyText>
+                </TouchableOpacity>
+                <TouchableOpacity style={{
+                    width: 35,
+                    height: 35,
+                    backgroundColor: 'rgba(134,131,130,255)',
+                    borderRadius: 999,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <BodyText fontSize={10} >icon 4</BodyText>
+                </TouchableOpacity> */}
+            </View>
+
             <View style={styles.controls}>
-                {/* {previewUri ? null : ( */}
                 <PanGestureHandler onGestureEvent={gestureHandler}>
                     <Animated.View>
                         <View style={[styles.recordButtonOuter, isRecording && styles.recordingOuter]}>
@@ -489,48 +540,6 @@ const VideoRecordScreen = () => {
                         </View>
                     </Animated.View>
                 </PanGestureHandler>
-                {/* )} */}
-
-                {/* <View style={[styles.recordButtonOuter, isRecording && styles.recordingOuter]}>
-                    <Pressable
-                        onPress={handlePress}
-                        onLongPress={handleLongPress}
-                        onPressOut={handlePressOut}
-                        style={[{
-                            position: 'absolute',
-                            // bottom: 40,
-                            alignSelf: 'center',
-                            width: 65,
-                            height: 65,
-                            borderRadius: 35,
-                            backgroundColor: 'red',
-                        }, isRecording && styles.recordButtonInner]}
-                    />
-                </View> */}
-
-
-                {/* {previewUri && (
-                    <TouchableOpacity
-                        style={[styles.uploadButton, { marginTop: 10 }]}
-                        onPress={async () => {
-                            await resetCamera();
-                            // if (Platform.OS === 'ios') {
-                            //     await CustomAudioSessionManager.deactivateAudioSession();
-                            //     setAudioEnabled(false);
-                            // }
-
-
-                            // if (Platform.OS === 'ios' && RNAudioSessionManager?.deactivateAudioSession) {
-                            //     console.log('🔇 Деактивуємо аудіо сесію після помилки запису...');
-                            //     await RNAudioSessionManager.deactivateAudioSession();
-                            // setAudioEnabled(false);
-                            // }
-
-                        }}
-                    >
-                        <Text style={styles.buttonText}>Back to camera</Text>
-                    </TouchableOpacity>
-                )} */}
             </View>
         </GestureHandlerRootView >
     );
@@ -629,6 +638,13 @@ const styles = StyleSheet.create({
         height: 65,
         borderRadius: 35,
         backgroundColor: 'red',
+    },
+    optionsContainer: {
+        position: 'absolute',
+        top: '25%',
+        right: 20,
+        transform: [{ translateY: -((35 * 4 + 16 * 3) / 2) }], // 4 кнопки по 35 + 3 відступи по 16
+        gap: 16,
     },
 });
 
