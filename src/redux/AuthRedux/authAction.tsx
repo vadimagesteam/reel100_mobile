@@ -229,6 +229,7 @@ export const resetPasswordAction = createAsyncThunk<any, ResetPassType>(
             };
             const response = await axios.post('/api/resetPassword', resetPassData, config);
 
+            console.log('---resetPasswordAction--->', response?.data);
             if (response?.status === 201) {
                 navigation.dispatch(
                     CommonActions.reset({
@@ -239,6 +240,9 @@ export const resetPasswordAction = createAsyncThunk<any, ResetPassType>(
                         ],
                     })
                 );
+
+                // await AsyncStorage.setItem('@token', response.data.accessToken);
+                // axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
                 thunkAPI.dispatch(clearErrors());
             }
 

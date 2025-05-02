@@ -81,6 +81,7 @@ const VideoRecordScreen = () => {
                 const backCamera = devices.find((d) => d.position === 'back');
                 setDevice(backCamera ?? null);
 
+                await CustomAudioSessionManager.deactivateAudioSession(); // для iOS важливо
                 await CustomAudioSessionManager.activateVideoRecordingAudioSession(); // для iOS важливо
                 setAudioEnabled(true);
                 setIsCameraActive(true);
@@ -172,15 +173,20 @@ const VideoRecordScreen = () => {
         try {
             console.log('📸 Стартуємо запис...');
             // setIsRecording(true);
+
+
             if (Platform.OS === 'ios') {
                 await CustomAudioSessionManager.deactivateAudioSession();
 
                 // await CustomAudioSessionManager.activateVideoRecordingAudioSession();
                 setTimeout(async () => {
                     await CustomAudioSessionManager.activateVideoRecordingAudioSession();
+                    // await CustomAudioSessionManager.deactivateAudioSession();
                     // інші налаштування
-                }, 500);
+                }, 700);
             }
+
+
             // await new Promise((resolve) => setTimeout(resolve, 300));
             // setTimeout(async () => {
             //     try {
@@ -388,16 +394,10 @@ const VideoRecordScreen = () => {
         },
     });
 
-
     const handleLongPress = () => {
         setIsLongPressRecording(true);
         startRecording();
     };
-
-    // const handlePressOut = () => {
-    //     stopRecording();
-    //     setIsLongPressRecording(false);
-    // };
 
     const handlePress = () => {
         if (isRecording) {
@@ -406,14 +406,6 @@ const VideoRecordScreen = () => {
             startRecording();
         }
     };
-
-    // const handlePanGestureRelease = () => {
-    //     if (isLongPressRecording) {
-    //         stopRecording();
-    //         setIsLongPressRecording(false);
-    //     }
-    // };
-
 
     // Пан-жест для затиснутого запису (рух вгору/вниз)
     const panGesture = Gesture.Pan()
@@ -485,19 +477,19 @@ const VideoRecordScreen = () => {
                 </TouchableOpacity>)}
 
             <View style={styles.controls}>
-                {previewUri ? null : (
-                    <PanGestureHandler onGestureEvent={gestureHandler}>
-                        <Animated.View>
-                            <View style={[styles.recordButtonOuter, isRecording && styles.recordingOuter]}>
-                                <Pressable
-                                    onPress={handlePress}
-                                    onLongPress={handleLongPress}
-                                    style={[styles.recordButton, isRecording && styles.recordButtonInner]}
-                                />
-                            </View>
-                        </Animated.View>
-                    </PanGestureHandler>
-                )}
+                {/* {previewUri ? null : ( */}
+                <PanGestureHandler onGestureEvent={gestureHandler}>
+                    <Animated.View>
+                        <View style={[styles.recordButtonOuter, isRecording && styles.recordingOuter]}>
+                            <Pressable
+                                onPress={handlePress}
+                                onLongPress={handleLongPress}
+                                style={[styles.recordButton, isRecording && styles.recordButtonInner]}
+                            />
+                        </View>
+                    </Animated.View>
+                </PanGestureHandler>
+                {/* )} */}
 
                 {/* <View style={[styles.recordButtonOuter, isRecording && styles.recordingOuter]}>
                     <Pressable

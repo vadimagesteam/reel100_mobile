@@ -7,7 +7,7 @@ import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 
 
 const ProfileScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     return (
         <>
             <CustomHeader title="00:00:00" />

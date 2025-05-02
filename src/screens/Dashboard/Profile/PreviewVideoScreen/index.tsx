@@ -1,9 +1,13 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, NativeModules } from 'react-native';
 import Video from 'react-native-video';
+import { Camera } from 'react-native-vision-camera';
 import { isIOS } from '../../../../utils/platformChecker';
 import { SvgIcon } from '../../../../components/UI';
+
+
+const { CustomAudioSessionManager } = NativeModules;
 
 const PreviewVideoScreen = () => {
     const navigation = useNavigation();
@@ -21,11 +25,20 @@ const PreviewVideoScreen = () => {
                 repeat
             />
 
-            <TouchableOpacity style={[isIOS() ? styles.backArrowIOS : styles.backArrowAndroid]} onPress={() => {
+            <TouchableOpacity style={[isIOS() ? styles.backArrowIOS : styles.backArrowAndroid]} onPress={async () => {
                 navigation.goBack();
+                if (Platform.OS === 'ios') {
+                    // const devices = await Camera.getAvailableCameraDevices();
+                    // const backCamera = devices.find((d) => d.position === 'back');
+
+                    // await CustomAudioSessionManager.deactivateAudioSession(); // для iOS важливо
+                    // setAudioEnabled(true);
+                    // setIsCameraActive(true);
+                    // setPreviewUri(null);
+                }
             }}>
                 <SvgIcon image="backArrow" />
-            </TouchableOpacity>
+            </TouchableOpacity >
         </>
     );
 };

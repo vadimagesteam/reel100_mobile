@@ -45,8 +45,12 @@
 	<string>We need access to your location even in the background.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>We need access to your location at all times.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>This app uses Apple Music access to provide better music-related experience.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app uses speech recognition to improve voice features.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>	
+	<string>This app needs your location to suggest relevant content near you.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access is required to record video with sound.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
