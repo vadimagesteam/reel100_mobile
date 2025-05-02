@@ -6,7 +6,7 @@ import { Camera, useCameraDevice, useCameraDevices, CameraProps, CameraDevice } 
 // import { activateAudioSession } from 'react-native-vision-camera/audio';
 import { GestureDetector, Gesture, GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
 import RNFS from 'react-native-fs';
-// import { launchImageLibrary } from 'react-native-image-picker';
+import { launchImageLibrary, Asset, ImageLibraryOptions } from 'react-native-image-picker';
 import Video from 'react-native-video';
 // import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import Reanimated, { Extrapolation, interpolate, runOnJS, useAnimatedGestureHandler, useAnimatedProps, useSharedValue } from 'react-native-reanimated';
@@ -75,6 +75,7 @@ const VideoRecordScreen = () => {
     // const [devices, setDevices] = useState<CameraDevice | null>(null);
     const [availableDevices, setAvailableDevices] = useState<CameraDevice[]>([]);
     const [isFrontCamera, setIsFrontCamera] = useState(false);
+    const [torchOn, setTorchOn] = useState(false);
 
     const frontCamera = availableDevices.find(d => d.position === 'front');
     const backCamera = availableDevices.find(d => d.position === 'back');
@@ -453,6 +454,23 @@ const VideoRecordScreen = () => {
         zoom: zoom.value,
     }));
 
+    const pickVideoFromGallery = () => {
+        const options: ImageLibraryOptions = {
+            mediaType: 'video',
+            selectionLimit: 1,
+        };
+
+        launchImageLibrary(options, (response) => {
+            if (response.didCancel) {
+            } else if (response.errorCode) {
+            } else if (response.assets && response.assets.length > 0) {
+                const videoUri = response.assets[0].uri;
+                navigation.navigate(DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN, { previewUri: videoUri });
+                console.log('✅ Вибране відео: ', videoUri);
+            }
+        });
+    };
+
     if (!device) { return <Text />; }
 
     return (
@@ -468,6 +486,7 @@ const VideoRecordScreen = () => {
                     // audio={audioEnabled}
                     photo={true}
                     animatedProps={animatedProps}
+                    torch={torchOn ? 'on' : 'off'}
                 />
             </GestureDetector>
 
@@ -484,39 +503,20 @@ const VideoRecordScreen = () => {
                 </TouchableOpacity>)}
 
             <View style={styles.optionsContainer}>
-                <TouchableOpacity style={{
-                    width: 35,
-                    height: 35,
-                    backgroundColor: 'rgba(134,131,130,255)',
-                    borderRadius: 999,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
+                <TouchableOpacity style={[positionHelpers.center, styles.optionsButton]}
                     onPress={() => setIsFrontCamera(prev => !prev)}
                 >
                     <BodyText fontSize={10} >icon 1</BodyText>
                 </TouchableOpacity>
-                {/* <TouchableOpacity style={{
-                    width: 35,
-                    height: 35,
-                    backgroundColor: 'rgba(134,131,130,255)',
-                    borderRadius: 999,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
-                    <BodyText fontSize={10} >icon 2</BodyText>
+                <TouchableOpacity style={[positionHelpers.center, styles.optionsButton]}
+                    onPress={() => setTorchOn(prev => !prev)}>
+                    <BodyText fontSize={10}>{torchOn ? 'icon 2' : '2 icon'}</BodyText>
                 </TouchableOpacity>
-                <TouchableOpacity style={{
-                    width: 35,
-                    height: 35,
-                    backgroundColor: 'rgba(134,131,130,255)',
-                    borderRadius: 999,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
+                <TouchableOpacity style={[positionHelpers.center, styles.optionsButton]}
+                    onPress={pickVideoFromGallery}>
                     <BodyText fontSize={10} >icon 3</BodyText>
                 </TouchableOpacity>
-                <TouchableOpacity style={{
+                {/* <TouchableOpacity style={{
                     width: 35,
                     height: 35,
                     backgroundColor: 'rgba(134,131,130,255)',
@@ -645,6 +645,12 @@ const styles = StyleSheet.create({
         right: 20,
         transform: [{ translateY: -((35 * 4 + 16 * 3) / 2) }], // 4 кнопки по 35 + 3 відступи по 16
         gap: 16,
+    },
+    optionsButton: {
+        width: 35,
+        height: 35,
+        backgroundColor: 'rgba(134,131,130,255)',
+        borderRadius: 999,
     },
 });
 

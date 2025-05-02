@@ -11,12 +11,13 @@ const { CustomAudioSessionManager } = NativeModules;
 
 const PreviewVideoScreen = () => {
     const navigation = useNavigation();
-    const { params } = useRoute();
+    const route = useRoute();
+    const { previewUri } = route.params as { previewUri: string };
 
     return (
         <>
             <Video
-                source={{ uri: params?.previewUri }}
+                source={{ uri: previewUri }}
                 style={StyleSheet.absoluteFill}
                 controls
                 resizeMode="cover"
