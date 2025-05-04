@@ -22,7 +22,6 @@ const MainScreen = () => {
     const [_, setSelectedAutoState] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>('top_100');
 
-
     useEffect(() => {
         dispatch(getStatesAction());
     }, []);

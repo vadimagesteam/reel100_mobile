@@ -1,10 +1,12 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React from 'react';
-import { Platform, StyleSheet, TouchableOpacity, NativeModules } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, NativeModules, View } from 'react-native';
 import Video from 'react-native-video';
 import { Camera } from 'react-native-vision-camera';
 import { isIOS } from '../../../../utils/platformChecker';
-import { SvgIcon } from '../../../../components/UI';
+import { BodyText, ButtonDefault, SvgIcon } from '../../../../components/UI';
+import { positionHelpers } from '../../../../styles';
+import ButtonGradient from '../../../../components/ButtonGradient';
 
 
 const { CustomAudioSessionManager } = NativeModules;
@@ -40,6 +42,24 @@ const PreviewVideoScreen = () => {
             }}>
                 <SvgIcon image="backArrow" />
             </TouchableOpacity >
+
+
+            <View style={styles.controls}>
+                <ButtonGradient buttonStyles={{ maxWidth: '30%', height: 16 }} title="Publish now" onPress={() => true} />
+
+
+                <ButtonDefault buttoStyles={{ maxWidth: '30%', height: 16, backgroundColor: 'silver' }} onPress={() => true}>
+                    <BodyText>{'Save draft'}</BodyText>
+                </ButtonDefault >
+
+                {/* <View style={[styles.recordButtonOuter,]}>
+                            <Pressable
+                                onPress={handlePress}
+                                onLongPress={handleLongPress}
+                                style={[styles.recordButton, isRecording && styles.recordButtonInner]}
+                            />
+                        </View> */}
+            </View>
         </>
     );
 };

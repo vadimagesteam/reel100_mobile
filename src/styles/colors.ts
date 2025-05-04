@@ -1,5 +1,6 @@
 export const colors = {
     white: '#fff',
+    white1: '#fffefe',
 
     black: '#000',
     black1: '#1b1b1c',
@@ -16,6 +17,8 @@ export const colors = {
     silver1: '#ddd',
     silver2: '#808080',
     silver3: '#d9d7d6',
+    silver4: '#b3b3b3',
+    silver5: '#5c5d5d',
     silverLight: '#F8F9FB',
     silver1Procent50: 'rgba(128, 128, 128, 0.5)',
 
@@ -25,6 +28,7 @@ export const colors = {
     blue: '#2140a1',
     blue1: '#39bdc5',
     blue2: '#5F85BE',
+    blue3: '#60bfc8',
 
     red: '#E95050',
     red1: '#f76f6f',
