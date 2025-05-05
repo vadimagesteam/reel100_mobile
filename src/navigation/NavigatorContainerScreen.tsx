@@ -8,8 +8,22 @@ import { useReduxDispatch, useReduxSelector } from '../store/store';
 import AuthStack from './Onboarding/AuthStack';
 import { onLogout, setIsAuth, setStatusRegister } from '../redux/AuthRedux/authSlice';
 import CustomTabNavigator from './CustomTabNavigator';
+import { tickAction } from '../redux/CoutdownClockRedux/countdownClockSlice';
 
 axios.defaults.baseURL = Config.APP_API_URL;
+
+const TimerStarter = () => {
+    const dispatch = useReduxDispatch();
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            dispatch(tickAction());
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [dispatch]);
+
+    return null;
+};
 
 const NavigationContainerScreen = () => {
     const dispatch = useReduxDispatch();
@@ -53,15 +67,18 @@ const NavigationContainerScreen = () => {
     }, []);
 
     return (
-        <NavigationContainer>
-            {
-                !isAuth ? (
-                    <AuthStack checkStatus={isStatus?.status} />
-                ) : (
-                    <CustomTabNavigator />
-                )
-            }
-        </NavigationContainer>
+        <>
+            <TimerStarter />
+            <NavigationContainer>
+                {
+                    !isAuth ? (
+                        <AuthStack checkStatus={isStatus?.status} />
+                    ) : (
+                        <CustomTabNavigator />
+                    )
+                }
+            </NavigationContainer>
+        </>
     );
 };
 

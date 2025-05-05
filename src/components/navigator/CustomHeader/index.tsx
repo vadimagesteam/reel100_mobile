@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cs } from './styles';
 import { colors, positionHelpers } from '../../../styles';
 import { BodyText, SvgIcon } from '../../UI';
+import CountdownClockHeader from '../../CountdownClock';
 
 interface CustomHeaderProps {
     title: string;
@@ -23,7 +24,7 @@ const CustomHeader = ({
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
 
-    const paddingInsets = insets.top ? insets.top + 15 : 25;
+    const paddingInsets = insets.top ? insets.top + 8 : 18;
 
     return (
         <View
@@ -51,13 +52,14 @@ const CustomHeader = ({
                     </TouchableOpacity>
                 )}
             </View>
-            <BodyText
+            {/* <BodyText
                 fontWeight="500"
                 fontSize={18}
                 color={colors.white}
                 marginLeft={28}>
                 {title}
-            </BodyText>
+            </BodyText> */}
+            <CountdownClockHeader />
 
             <TouchableOpacity
                 disabled={true}
