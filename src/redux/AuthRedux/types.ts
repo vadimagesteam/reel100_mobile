@@ -3,6 +3,7 @@ export interface AuthState {
     isAuth: boolean;
     isStatus: StatusRegisterType | null
     user: any[];
+    userID: string | undefined | null
     error: Error | null;
 }
 

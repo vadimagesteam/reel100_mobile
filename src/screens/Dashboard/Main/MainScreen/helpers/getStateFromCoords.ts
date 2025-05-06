@@ -1,7 +1,13 @@
 export const getStateFromCoords = async (latitude: number, longitude: number) => {
     try {
         const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=5&addressdetails=1`
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=5&addressdetails=1`,
+            {
+                headers: {
+                    'User-Agent': 'YourAppName/1.0',
+                    Accept: 'application/json',
+                },
+            }
         );
         const data = await response.json();
         return data.address?.state || null;

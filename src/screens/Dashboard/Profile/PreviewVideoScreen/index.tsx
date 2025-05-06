@@ -1,32 +1,56 @@
+import React, { useEffect, useRef } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, NativeModules, View } from 'react-native';
 import Video from 'react-native-video';
 import { Camera } from 'react-native-vision-camera';
 import { isIOS } from '../../../../utils/platformChecker';
 import { BodyText, ButtonDefault, SvgIcon } from '../../../../components/UI';
-import { positionHelpers } from '../../../../styles';
+import { colors, positionHelpers } from '../../../../styles';
 import ButtonGradient from '../../../../components/ButtonGradient';
-
+import { useReduxDispatch, useReduxSelector } from '../../../../store/store';
+import { createVideoAction } from '../../../../redux/CameraRedux/cameraActions';
 
 const { CustomAudioSessionManager } = NativeModules;
 
 const PreviewVideoScreen = () => {
     const navigation = useNavigation();
-    const route = useRoute();
-    const { previewUri } = route.params as { previewUri: string };
+    // const route = useRoute();
+    const dispatch = useReduxDispatch();
+    const { customLoading, prewievVideoUrl } = useReduxSelector(state => state.camera);
+
+    const videoRef = useRef();
+    // const { previewUri } = route.params as { previewUri: string };
+
+    console.log('previewUri-->', prewievVideoUrl.split('/').pop()?.replace(/\.[^/.]+$/, ''));
+
+    const publishVideoCallback = () => {
+        const dataCreateVideo = {
+            createVideo: {
+                label: prewievVideoUrl.split('/').pop()?.replace(/\.[^/.]+$/, ''),
+            },
+            file: prewievVideoUrl,
+            navigation: navigation,
+        };
+        dispatch(createVideoAction(dataCreateVideo));
+    };
 
     return (
         <>
-            <Video
-                source={{ uri: previewUri }}
-                style={StyleSheet.absoluteFill}
-                controls
-                resizeMode="cover"
-                volume={1.0}
-                audioOutput="speaker"
-                repeat
-            />
+            {prewievVideoUrl
+                ? (
+                    <Video
+                        ref={videoRef}
+                        source={{ uri: prewievVideoUrl }}
+                        style={StyleSheet.absoluteFill}
+                        controls
+                        resizeMode="cover"
+                        volume={1.0}
+                        // audioOutput="speaker"
+                        repeat
+                    />
+                )
+                : null
+            }
 
             <TouchableOpacity style={[isIOS() ? styles.backArrowIOS : styles.backArrowAndroid]} onPress={async () => {
                 navigation.goBack();
@@ -44,32 +68,30 @@ const PreviewVideoScreen = () => {
             </TouchableOpacity >
 
 
-            <View style={styles.controls}>
-                <ButtonGradient buttonStyles={{ maxWidth: '30%', height: 16 }} title="Publish now" onPress={() => true} />
-
-
-                <ButtonDefault buttoStyles={{ maxWidth: '30%', height: 16, backgroundColor: 'silver' }} onPress={() => true}>
-                    <BodyText>{'Save draft'}</BodyText>
+            <View style={[styles.controls, { left: 20 }]}>
+                {/* <ButtonGradient buttonStyles={{ minWidth: '40%', padding: 30, borderRadius: 10, marginBottom: 0, paddingTop: 0 }} title="Publish now" onPress={() => true} /> */}
+                <ButtonDefault loading={customLoading} disabled={customLoading} buttoStyles={{ minWidth: '30%', height: 50, borderRadius: 10, backgroundColor: colors.blue, alignItems: 'center', justifyContent: 'center' }} onPress={() => publishVideoCallback()}>
+                    <BodyText fontWeight={'bold'} color={colors.white}>{'Publish now'}</BodyText>
                 </ButtonDefault >
-
-                {/* <View style={[styles.recordButtonOuter,]}>
-                            <Pressable
-                                onPress={handlePress}
-                                onLongPress={handleLongPress}
-                                style={[styles.recordButton, isRecording && styles.recordButtonInner]}
-                            />
-                        </View> */}
+            </View>
+            <View style={[styles.controls, { right: 20 }]}>
+                <ButtonDefault buttoStyles={{ minWidth: '30%', height: 50, borderRadius: 10, backgroundColor: 'silver', alignItems: 'center', justifyContent: 'center' }} onPress={() => true}>
+                    <BodyText fontWeight={'bold'}>{'Save draft'}</BodyText>
+                </ButtonDefault >
             </View>
         </>
     );
 };
 
 const styles = StyleSheet.create({
+    controlsPublish: {
+        position: 'absolute',
+        bottom: 1,
+        gap: 16,
+    },
     controls: {
         position: 'absolute',
-        bottom: 40,
-        alignSelf: 'center',
-        alignItems: 'center',
+        bottom: isIOS() ? 25 : 15,
         gap: 16,
     },
     timer: {
@@ -130,6 +152,7 @@ const styles = StyleSheet.create({
         left: 20,
         top: 20,
         alignItems: 'center',
+        justifyContent: 'center',
         width: 35,
         height: 35,
         backgroundColor: 'rgba(134,131,130,255)',

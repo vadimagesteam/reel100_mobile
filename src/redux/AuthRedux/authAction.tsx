@@ -4,7 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { ONBOARDING_ROUTES } from '../../navigation/routes';
 import { ForgotPassType, LoginDataType, RegisterDataType, ResetPassType, ResendVerifyUserType, VerifyUserType } from './types';
 import { CommonActions } from '@react-navigation/native';
-import { clearErrors, setIsAuth } from './authSlice';
+import { clearErrors, setIsAuth, setUserID } from './authSlice';
 import { Alert } from 'react-native';
 
 export const userRegisterAction = createAsyncThunk<any, RegisterDataType>(
@@ -142,7 +142,7 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
             };
             const response = await axios.post('/api/login', dataLogin, config);
 
-            // console.log('-userLoginAction-->', response?.data);
+            // console.log('-userLoginAction-->', JSON.stringify(response?.data));
 
             if (response?.status === 201) {
                 const isVerified = await AsyncStorage.getItem('@isVerified');
@@ -165,6 +165,8 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
                 }
 
                 await AsyncStorage.setItem('@token', response.data.accessToken);
+                await AsyncStorage.setItem('@userId', response.data.id);
+                thunkAPI.dispatch(setUserID(response.data.id));
                 axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
 
                 thunkAPI.dispatch(setIsAuth(true));
@@ -253,6 +255,34 @@ export const resetPasswordAction = createAsyncThunk<any, ResetPassType>(
                     return thunkAPI.rejectWithValue(error.response.data);
                 } else {
                     return thunkAPI.rejectWithValue(error.message);
+                }
+            }
+        }
+    },
+);
+
+
+export const getUserInfoAction = createAsyncThunk<any, any>(
+    'camera/getUserInfo',
+    async (userId, thunkAPI) => {
+        try {
+            // const config = {
+            //     headers: {
+            //         'Content-Type': 'multipart/form-data',
+            //     },
+            // };
+            const response = await axios.get('api/user',);
+
+            console.log('getUserVideosAction--->', JSON.stringify(response?.data, null, 2));
+
+            return response?.data;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+
+                console.log('-getVideosAction-error->', error.response.data);
+                if (error.response && error.response.data) {
+                    return thunkAPI.rejectWithValue(error.response.data);
+                } else {
                 }
             }
         }

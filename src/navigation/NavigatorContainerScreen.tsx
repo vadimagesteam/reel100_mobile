@@ -6,7 +6,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useReduxDispatch, useReduxSelector } from '../store/store';
 import AuthStack from './Onboarding/AuthStack';
-import { onLogout, setIsAuth, setStatusRegister } from '../redux/AuthRedux/authSlice';
+import { onLogout, setIsAuth, setStatusRegister, setUserID } from '../redux/AuthRedux/authSlice';
 import CustomTabNavigator from './CustomTabNavigator';
 import { tickAction } from '../redux/CoutdownClockRedux/countdownClockSlice';
 
@@ -36,7 +36,8 @@ const NavigationContainerScreen = () => {
                 // dispatch(onLogout());
                 // AsyncStorage.removeItem('@isVerified');
                 // AsyncStorage.removeItem('@statusRegister');
-
+                const userID: any = await AsyncStorage.getItem('@userId');
+                dispatch(setUserID(userID));
                 const token = await AsyncStorage.getItem('@token');
                 const isVerified = await AsyncStorage.getItem('@isVerified');
                 const statusRegister = await AsyncStorage.getItem('@statusRegister');

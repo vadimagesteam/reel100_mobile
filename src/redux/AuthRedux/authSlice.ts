@@ -8,6 +8,7 @@ const initialState: AuthState = {
     isAuth: false,
     isStatus: null,
     user: [],
+    userID: null,
     error: null,
 };
 
@@ -18,6 +19,9 @@ export const authSlice = createSlice({
         setIsAuth(state, action: PayloadAction<boolean>) {
             state.isAuth = action.payload;
             return state;
+        },
+        setUserID(state, action: PayloadAction<string>) {
+            state.userID = action?.payload;
         },
         clearErrors(state) {
             state.error = null;
@@ -31,6 +35,7 @@ export const authSlice = createSlice({
             state.loading = false;
             state.isAuth = false;
             state.user = null;
+            state.userID = null;
             state.error = null;
         },
 
@@ -94,8 +99,9 @@ export const authSlice = createSlice({
             })
             .addCase(
                 userLoginAction.fulfilled,
-                (state) => {
+                (state, action: PayloadAction<any>) => {
                     state.loading = false;
+                    state.user = action?.payload;
                 },
             )
             .addCase(
@@ -144,6 +150,6 @@ export const authSlice = createSlice({
 
 });
 
-export const { setIsAuth, onLogout, clearErrors, setStatusRegister } = authSlice.actions;
+export const { setIsAuth, setUserID, onLogout, clearErrors, setStatusRegister } = authSlice.actions;
 
 export default authSlice.reducer;

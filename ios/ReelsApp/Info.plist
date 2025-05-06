@@ -26,6 +26,11 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<!-- <key>NSAppTransportSecurity</key>
+	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>44.239.248.108</key>
@@ -36,7 +41,7 @@
 				<true/>
 			</dict>
 		</dict>
-	</dict>
+	</dict> -->
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to record videos.</string>
 	<key>NSDocumentsFolderUsageDescription</key>

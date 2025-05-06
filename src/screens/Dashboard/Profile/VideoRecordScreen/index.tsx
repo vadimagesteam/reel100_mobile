@@ -17,6 +17,8 @@ import { BodyText } from '../../../../components/UI';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { isIOS } from '../../../../utils/platformChecker';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
+import { setPreviewVideoURL } from '../../../../redux/CameraRedux/cameraSlice';
+import { useReduxDispatch } from '../../../../store/store';
 
 const { CustomAudioSessionManager } = NativeModules;
 
@@ -61,49 +63,65 @@ const requestCameraAndMicrophone = async (): Promise<boolean> => {
 
 const VideoRecordScreen = () => {
     const navigation = useNavigation();
+    const dispatch = useReduxDispatch();
     const camera = useRef<Camera>(null);
-    // const device = useCameraDevice('back');
+    // const deviceAndroid = useCameraDevice('back');
+
+    // const [availableDevices, setAvailableDevices] = useState<CameraDevice[]>([]);
+    const [isFrontCamera, setIsFrontCamera] = useState(false);
+    // const frontCamera = availableDevices.find(d => d.position === 'front');
+    // const backCamera = availableDevices.find(d => d.position === 'back');
+
+    const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('back');
+    const activeDevice = useCameraDevice(cameraPosition);
+    // const activeDevice = isFrontCamera ? frontCamera : backCamera;
     const [isRecording, setIsRecording] = useState(false);
     const [isLongPressRecording, setIsLongPressRecording] = useState(false);
     const [timer, setTimer] = useState<number>(MAX_DURATION);
     const [previewUri, setPreviewUri] = useState<string | null>(null);
     // const [audioPath, setAudioPath] = useState(null);
     const [audioEnabled, setAudioEnabled] = useState(Platform.OS === 'ios' ? false : true);
-    const zoom = useSharedValue(device?.neutralZoom ?? 1);
+    const zoom = useSharedValue(activeDevice?.neutralZoom ?? 1);
     const zoomOffset = useSharedValue(zoom.value);
     const [isCameraActive, setIsCameraActive] = useState(true);
     // const [devices, setDevices] = useState<CameraDevice | null>(null);
-    const [availableDevices, setAvailableDevices] = useState<CameraDevice[]>([]);
-    const [isFrontCamera, setIsFrontCamera] = useState(false);
     const [torchOn, setTorchOn] = useState(false);
 
-    const frontCamera = availableDevices.find(d => d.position === 'front');
-    const backCamera = availableDevices.find(d => d.position === 'back');
-    const device = isFrontCamera ? frontCamera : backCamera;
 
-    useFocusEffect(
-        useCallback(() => {
-            const init = async () => {
-                const devices = await Camera.getAvailableCameraDevices();
-                // const backCamera = devices.find((d) => d.position === 'back');
-                // setDevices(backCamera ?? null);
-                setAvailableDevices(devices);
+    // const device = Platform.OS === 'ios'
+    //     ? (isFrontCamera ? frontCamera : backCamera)
+    //     : selectedDevice;
 
-                // await CustomAudioSessionManager.deactivateAudioSession(); // для iOS важливо
-                await CustomAudioSessionManager.activateVideoRecordingAudioSession(); // для iOS важливо
-                setAudioEnabled(true);
-                setIsCameraActive(true);
-                setPreviewUri(null);
-            };
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         if (Platform.OS !== 'ios') { return; }
 
-            init();
+    //         const init = async () => {
+    //             const devices = await Camera.getAvailableCameraDevices();
+    //             // const backCamera = devices.find((d) => d.position === 'back');
+    //             // setDevices(backCamera ?? null);
+    //             setAvailableDevices(devices);
+    //             console.log(devices);
 
-            return () => {
-                setIsCameraActive(false);
-                setAvailableDevices([]);
-            };
-        }, [])
-    );
+    //             // await CustomAudioSessionManager.deactivateAudioSession(); // для iOS важливо
+    //             // await CustomAudioSessionManager.activateVideoRecordingAudioSession(); // для iOS важливо
+    //             if (Platform.OS === 'ios') {
+    //                 await CustomAudioSessionManager.activateVideoRecordingAudioSession();
+    //             }
+    //             setAudioEnabled(true);
+    //             setIsCameraActive(true);
+    //             setPreviewUri(null);
+    //         };
+
+    //         init();
+
+    //         return () => {
+    //             setIsCameraActive(false);
+    //             setAvailableDevices([]);
+    //         };
+    //     }, [])
+    // );
+
 
     useEffect(() => {
         const requestPermissions = async () => {
@@ -177,7 +195,9 @@ const VideoRecordScreen = () => {
 
     const startRecording = async () => {
         if (!camera.current || isRecording) { return; }
-        await CustomAudioSessionManager.deactivateAudioSession();
+        if (Platform.OS === 'ios') {
+            await CustomAudioSessionManager.deactivateAudioSession();
+        }
         try {
             console.log('📸 Стартуємо запис...');
             // setIsRecording(true);
@@ -222,6 +242,8 @@ const VideoRecordScreen = () => {
             if (Platform.OS === 'ios') {
                 setAudioEnabled(true);
             }
+
+            // setTimeout(async () => {
             await camera.current.startRecording({
                 // fileType: 'mp4',
                 // flash: 'off',
@@ -229,7 +251,8 @@ const VideoRecordScreen = () => {
                     // console.log('Recording finished:', video);
                     console.log('🎥 Отримане відео:', video);
                     setPreviewUri(video.path);
-                    navigation.navigate(DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN, { previewUri: video.path });
+                    dispatch(setPreviewVideoURL(video?.path));
+                    navigation.navigate(DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN);
                     setIsRecording(false);
                     // setAudioEnabled(false);
                     if (Platform.OS === 'ios') {
@@ -329,61 +352,7 @@ const VideoRecordScreen = () => {
             }
         }
     };
-
-
-
-    // const startAudioRecording = async () => {
-    //     try {
-    //         if (Platform.OS === 'ios') {
-    //             await AVAudioSessionManager.activate();
-    //         }
-    //         const path = await audioRecorderPlayer.startRecorder();
-    //         console.log('🔴 START Audio recording at:', path);
-    //         setAudioPath(path);
-    //     } catch (err) {
-    //         console.error('Error starting audio recording:', err);
-    //     }
-    // };
-
-    // const stopAudioRecording = async () => {
-    //     try {
-    //         const path = await audioRecorderPlayer.stopRecorder();
-    //         audioRecorderPlayer.removeRecordBackListener();
-    //         console.log('🛑 STOP Audio recorded at:', path);
-    //         setAudioPath(path);
-    //         if (Platform.OS === 'ios') {
-    //             await AVAudioSessionManager.deactivate();
-    //         }
-    //     } catch (err) {
-    //         console.error('Error stopping audio recording:', err);
-    //     }
-    // };
-
-    // const playAudio = async () => {
-    //     if (!audioPath) return;
-    //     try {
-    //         await audioRecorderPlayer.startPlayer(audioPath);
-    //         audioRecorderPlayer.setVolume(1.0);
-    //     } catch (err) {
-    //         console.error('Error playing audio:', err);
-    //     }
-    // };
-
-    // const resetCamera = async () => {
-    //     console.log('🔄 Resetting camera...');
-    //     setPreviewUri(null); // Прибрати прев’ю
-
-    //     if (Platform.OS === 'ios') {
-    //         await CustomAudioSessionManager.activateVideoRecordingAudioSession();
-    //         setAudioEnabled(false);
-    //     }
-
-    //     const devices = await Camera.getAvailableCameraDevices();
-    //     const backCamera = devices.find((d) => d.position === 'back');
-    //     setDevice(backCamera ?? null);
-
-    //     setIsCameraActive(true);
-    // };
+    ////
 
     const gestureHandler = useAnimatedGestureHandler({
         onStart: (_, ctx) => {
@@ -422,8 +391,8 @@ const VideoRecordScreen = () => {
             const newZoom = zoom.value + delta;
             zoom.value = interpolate(
                 newZoom,
-                [device.minZoom, device.maxZoom],
-                [device.minZoom, device.maxZoom],
+                [activeDevice.minZoom, activeDevice.maxZoom],
+                [activeDevice.minZoom, activeDevice.maxZoom],
                 Extrapolation.CLAMP
             );
         });
@@ -442,7 +411,7 @@ const VideoRecordScreen = () => {
             zoom.value = interpolate(
                 newZoom,
                 [1, 10],
-                [device.minZoom, device.maxZoom],
+                [activeDevice.minZoom, activeDevice.maxZoom],
                 Extrapolation.CLAMP
             );
         });
@@ -471,7 +440,7 @@ const VideoRecordScreen = () => {
         });
     };
 
-    if (!device) { return <Text />; }
+    if (!activeDevice) { return <Text />; }
 
     return (
         <GestureHandlerRootView style={positionHelpers.fill}>
@@ -479,7 +448,7 @@ const VideoRecordScreen = () => {
                 <ReanimatedCamera
                     ref={camera}
                     style={StyleSheet.absoluteFill}
-                    device={device}
+                    device={activeDevice}
                     isActive={true}
                     video={true}
                     audio={true}
@@ -504,7 +473,7 @@ const VideoRecordScreen = () => {
 
             <View style={styles.optionsContainer}>
                 <TouchableOpacity style={[positionHelpers.center, styles.optionsButton]}
-                    onPress={() => setIsFrontCamera(prev => !prev)}
+                    onPress={() => setCameraPosition(prev => (prev === 'back' ? 'front' : 'back'))}
                 >
                     <BodyText fontSize={10} >icon 1</BodyText>
                 </TouchableOpacity>
