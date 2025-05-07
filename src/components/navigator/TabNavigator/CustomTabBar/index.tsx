@@ -1,7 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import LinearGradient from 'react-native-linear-gradient';
 import { SvgIcon } from '../../../UI';
 import CustomTabBarButton from '../CustomTabBarButton';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';

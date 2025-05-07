@@ -14,6 +14,8 @@ import Video from 'react-native-video';
 import FullVideoModal from '../../../../components/TabViewVideo/components/StateFeedTab/components/FullVideoModal';
 import { VideoItemType } from '../../FourU/FourUScreen/types';
 import ProfileVideoModal from './components/ProfileVideoModal';
+import VideoAbsoluteInfo from '../../../../components/VideoAbsoluteInfo';
+import { formatTwoTime } from '../../../../utils/formatTime';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_MARGIN = 4;
@@ -35,7 +37,7 @@ const ProfileScreen = () => {
 
     const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
 
-    console.log('---111userID-->', userID);
+    // console.log('---filteredVideos-->', filteredVideos);
     const handleRefresh = async () => {
         setRefreshing(true);
         try {
@@ -80,15 +82,24 @@ const ProfileScreen = () => {
                     resizeMode="cover"
                 /> */}
                 {screenshot ? (
-                    <FastImage
-                        style={{ width: '100%', height: '100%', borderRadius: 5 }}
-                        source={{
-                            uri: screenshot,
-                            priority: FastImage.priority.normal,
-                            cache: FastImage.cacheControl.immutable,
-                        }}
-                        resizeMode={FastImage.resizeMode.cover}
-                    />
+                    <>
+                        <FastImage
+                            style={{ width: '100%', height: '100%', borderRadius: 5 }}
+                            source={{
+                                uri: screenshot,
+                                priority: FastImage.priority.normal,
+                                cache: FastImage.cacheControl.immutable,
+                            }}
+                            resizeMode={FastImage.resizeMode.cover}
+                        />
+                        <VideoAbsoluteInfo
+                            justInfo="SIMPLE"
+                            avatar={''}
+                            name={'Name Lastname'}
+                            // videoDuration={`${formatTwoTime(duration)}s`}
+                            likesCount={item?.like_count}
+                        />
+                    </>
                 ) : (
                     <View
                         style={{
@@ -103,6 +114,7 @@ const ProfileScreen = () => {
                         <BodyText fontSize={10} color={colors.white}>No preview</BodyText>
                     </View>
                 )}
+
             </TouchableOpacity>
         );
     };
@@ -147,20 +159,8 @@ const ProfileScreen = () => {
                     </ButtonDefault>
                 </View>
 
-                {/* <FlatList
-                    data={filteredVideos}
-                    keyExtractor={(item) => item.id}
-                    numColumns={NUM_COLUMNS}
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                    contentContainerStyle={{
-                        paddingHorizontal: 16,
-                        paddingBottom: 10,
-                    }}
-                    renderItem={renderVideoItem}
-                /> */}
                 <FlatList
-                    data={filteredVideos}
+                    data={filteredVideos.reverse()}
                     keyExtractor={(item) => item.id}
                     numColumns={NUM_COLUMNS}
                     refreshing={refreshing}

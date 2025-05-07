@@ -35,15 +35,19 @@ const DropdownMenu = ({
     const animatedDropdownStyle = useAnimatedStyle(() => ({
         opacity: dropdownVisible.value,
         transform: [{ translateY: dropdownVisible.value * 10 - 10 }],
+        zIndex: dropdownVisible.value > 0 ? 9999 : -1,
     }));
 
     return (
         <View style={[positionHelpers.fill, cs.container]}>
             <DropdownButton onPress={toggleDropdown} selectedItem={selectedItem} placeholder={placeholder} animatedStyle={animatedArrowStyle} />
+
             <TouchableWithoutFeedback onPress={() => (dropdownVisible.value = withTiming(0, { duration: 200 }))}>
-                <DropdownList data={data} onSelect={handleSelect} animatedStyle={animatedDropdownStyle} selectedValue={selectedItem?.label ?? null} />
+                <DropdownList data={data} dropdownVisible={dropdownVisible?.value} onSelect={handleSelect} animatedStyle={animatedDropdownStyle} selectedValue={selectedItem?.label ?? null} />
             </TouchableWithoutFeedback>
-        </View>
+
+
+        </View >
     );
 };
 

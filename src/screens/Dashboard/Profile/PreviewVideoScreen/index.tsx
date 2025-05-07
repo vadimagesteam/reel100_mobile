@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Platform, StyleSheet, TouchableOpacity, NativeModules, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, NativeModules, View, Alert } from 'react-native';
 import Video from 'react-native-video';
 import { Camera } from 'react-native-vision-camera';
 import { isIOS } from '../../../../utils/platformChecker';
@@ -17,11 +17,19 @@ const PreviewVideoScreen = () => {
     // const route = useRoute();
     const dispatch = useReduxDispatch();
     const { customLoading, prewievVideoUrl } = useReduxSelector(state => state.camera);
-
     const videoRef = useRef();
+    const [duration, setDuration] = useState<number | null>(null);
     // const { previewUri } = route.params as { previewUri: string };
 
-    console.log('previewUri-->', prewievVideoUrl.split('/').pop()?.replace(/\.[^/.]+$/, ''));
+    const handleLoad = (meta) => {
+        setDuration(meta.duration);
+        if (meta.duration > 100) {
+            Alert.alert('The video must be no longer than 100 seconds.');
+            navigation.goBack(); // або інша логіка
+        }
+    };
+
+    // console.log('previewUri-->', prewievVideoUrl.split('/').pop()?.replace(/\.[^/.]+$/, ''));
 
     const publishVideoCallback = () => {
         const dataCreateVideo = {
@@ -42,11 +50,11 @@ const PreviewVideoScreen = () => {
                         ref={videoRef}
                         source={{ uri: prewievVideoUrl }}
                         style={StyleSheet.absoluteFill}
-                        controls
                         resizeMode="cover"
                         volume={1.0}
                         // audioOutput="speaker"
                         repeat
+                        onLoad={handleLoad}
                     />
                 )
                 : null

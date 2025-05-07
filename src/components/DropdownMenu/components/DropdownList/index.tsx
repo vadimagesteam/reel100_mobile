@@ -5,12 +5,14 @@ import { colors, positionHelpers } from '../../../../styles';
 import { cs } from '../../styles';
 import { BodyText } from '../../../UI';
 import { DropdownItem } from '../../types';
+import { isIOS } from '../../../../utils/platformChecker';
 
 interface DropdownListProps {
     data: DropdownItem[];
     onSelect: (label: string | null) => void;
     animatedStyle: any;
     selectedValue: string | null
+    dropdownVisible: number
 }
 
 const DropdownList = ({ data, onSelect, animatedStyle, selectedValue }: DropdownListProps) => (

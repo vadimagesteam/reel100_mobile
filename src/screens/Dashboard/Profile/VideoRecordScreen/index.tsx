@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Alert, Pressable, Platform, NativeModules } from 'react-native';
 import { PERMISSIONS, request, check, RESULTS, openSettings } from 'react-native-permissions';
-import { Camera, useCameraDevice, useCameraDevices, CameraProps, CameraDevice } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraDevices, CameraProps, CameraDevice, CameraDeviceFormat, useCameraFormat } from 'react-native-vision-camera';
 // import { CameraKitCamera } from 'react-native-camera-kit';
 // import { activateAudioSession } from 'react-native-vision-camera/audio';
 import { GestureDetector, Gesture, GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
@@ -19,6 +19,7 @@ import { isIOS } from '../../../../utils/platformChecker';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import { setPreviewVideoURL } from '../../../../redux/CameraRedux/cameraSlice';
 import { useReduxDispatch } from '../../../../store/store';
+import { createThumbnail } from 'react-native-create-thumbnail';
 
 const { CustomAudioSessionManager } = NativeModules;
 
@@ -68,7 +69,7 @@ const VideoRecordScreen = () => {
     // const deviceAndroid = useCameraDevice('back');
 
     // const [availableDevices, setAvailableDevices] = useState<CameraDevice[]>([]);
-    const [isFrontCamera, setIsFrontCamera] = useState(false);
+    // const [isFrontCamera, setIsFrontCamera] = useState(false);
     // const frontCamera = availableDevices.find(d => d.position === 'front');
     // const backCamera = availableDevices.find(d => d.position === 'back');
 
@@ -82,11 +83,11 @@ const VideoRecordScreen = () => {
     // const [audioPath, setAudioPath] = useState(null);
     const [audioEnabled, setAudioEnabled] = useState(Platform.OS === 'ios' ? false : true);
     const zoom = useSharedValue(activeDevice?.neutralZoom ?? 1);
-    const zoomOffset = useSharedValue(zoom.value);
+    const zoomOffset = useSharedValue(activeDevice?.neutralZoom ?? 1);
     const [isCameraActive, setIsCameraActive] = useState(true);
     // const [devices, setDevices] = useState<CameraDevice | null>(null);
     const [torchOn, setTorchOn] = useState(false);
-
+    const [frameRate, setFrameRate] = useState<30 | 60>(60);
 
     // const device = Platform.OS === 'ios'
     //     ? (isFrontCamera ? frontCamera : backCamera)
@@ -174,6 +175,7 @@ const VideoRecordScreen = () => {
     //         CustomAudioSessionManager.deactivateAudioSession();
     //     };
     // }, []);
+
 
     useEffect(() => {
         if (isRecording && timer > 0) {
@@ -429,12 +431,40 @@ const VideoRecordScreen = () => {
             selectionLimit: 1,
         };
 
+        // launchImageLibrary(options, async (response) => {
+        //     if (response.didCancel) { return; }
+
+        //     if (response.errorCode) {
+        //         console.warn('Picker Error: ', response.errorMessage);
+        //         return;
+        //     }
+
+        //     const asset = response.assets?.[0];
+
+        //     if (asset?.uri) {
+        //         try {
+        //             const { duration } = await createThumbnail({ url: asset.uri });
+
+        //             if (duration / 1000 > 100) {
+        //                 Alert.alert('The video must be no longer than 100 seconds.');
+        //                 return;
+        //             }
+
+        //             dispatch(setPreviewVideoURL(asset.uri));
+        //             navigation.navigate(DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN);
+        //             console.log('✅ Вибране відео: ', asset.uri);
+        //         } catch (error) {
+        //             console.warn('Thumbnail Error:', error);
+        //         }
+        //     }
+        // });
         launchImageLibrary(options, (response) => {
             if (response.didCancel) {
             } else if (response.errorCode) {
             } else if (response.assets && response.assets.length > 0) {
                 const videoUri = response.assets[0].uri;
-                navigation.navigate(DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN, { previewUri: videoUri });
+                dispatch(setPreviewVideoURL(videoUri));
+                navigation.navigate(DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN);
                 console.log('✅ Вибране відео: ', videoUri);
             }
         });
@@ -481,20 +511,17 @@ const VideoRecordScreen = () => {
                     onPress={() => setTorchOn(prev => !prev)}>
                     <BodyText fontSize={10}>{torchOn ? 'icon 2' : '2 icon'}</BodyText>
                 </TouchableOpacity>
+                <TouchableOpacity
+                    style={[positionHelpers.center, styles.optionsButton]}
+                    onPress={() => setFrameRate(prev => (prev === 30 ? 60 : 30))}
+                >
+                    <BodyText fontSize={10} color={colors.white}>{frameRate}</BodyText>
+                    <BodyText fontSize={10} color={colors.white}>FPS</BodyText>
+                </TouchableOpacity>
                 <TouchableOpacity style={[positionHelpers.center, styles.optionsButton]}
                     onPress={pickVideoFromGallery}>
-                    <BodyText fontSize={10} >icon 3</BodyText>
-                </TouchableOpacity>
-                {/* <TouchableOpacity style={{
-                    width: 35,
-                    height: 35,
-                    backgroundColor: 'rgba(134,131,130,255)',
-                    borderRadius: 999,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
                     <BodyText fontSize={10} >icon 4</BodyText>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
             </View>
 
             <View style={styles.controls}>
@@ -616,8 +643,8 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     optionsButton: {
-        width: 35,
-        height: 35,
+        width: 38,
+        height: 38,
         backgroundColor: 'rgba(134,131,130,255)',
         borderRadius: 999,
     },
