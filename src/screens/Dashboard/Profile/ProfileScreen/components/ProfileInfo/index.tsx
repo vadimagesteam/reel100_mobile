@@ -3,12 +3,16 @@ import { Image, TouchableOpacity, View } from 'react-native';
 import { BodyText } from '../../../../../../components/UI';
 import { colors, positionHelpers } from '../../../../../../styles';
 
-const ProfileInfo = () => {
+interface ProfileInfoProps {
+    fullName: string
+}
+
+const ProfileInfo = ({ fullName }: ProfileInfoProps) => {
     return (
         <>
             <View style={[positionHelpers.mt20, positionHelpers.alignItemsCenterRow]}>
                 <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }} style={{ height: 60, width: 60 }} />
-                <BodyText fontWeight={'bold'} marginLeft={5} fontSize={16} color={colors.silver4}>Firstname Lastname</BodyText>
+                <BodyText fontWeight={'bold'} marginLeft={5} fontSize={16} color={colors.silver4}>{fullName}</BodyText>
             </View>
 
             <View style={[positionHelpers.mt15, positionHelpers.alignItemsCenterRow, { height: 70, backgroundColor: colors.silver5, borderRadius: 10 }]}>

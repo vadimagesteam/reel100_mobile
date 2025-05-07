@@ -3,7 +3,7 @@ import { View, SafeAreaView, TouchableOpacity } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { colors, positionHelpers } from '../../../../styles';
 import DropdownMenu from '../../../../components/DropdownMenu';
-import { BodyText, SvgIcon } from '../../../../components/UI';
+import { SvgIcon } from '../../../../components/UI';
 import { states } from './mockData';
 import {
     useReduxDispatch,
@@ -14,6 +14,7 @@ import { requestLocationPermission, getStateFromCoords } from './helpers';
 import TabViewVideo from '../../../../components/TabViewVideo';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { onLogout } from '../../../../redux/AuthRedux/authSlice';
+import { getUserInfoAction } from '../../../../redux/AuthRedux/authAction';
 
 const MainScreen = () => {
     const dispatch = useReduxDispatch();
@@ -24,6 +25,7 @@ const MainScreen = () => {
 
     useEffect(() => {
         dispatch(getStatesAction());
+        dispatch(getUserInfoAction());
     }, []);
 
     useEffect(() => {

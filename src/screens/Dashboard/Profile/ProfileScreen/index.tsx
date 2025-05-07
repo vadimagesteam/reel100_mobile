@@ -140,7 +140,7 @@ const ProfileScreen = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <ProfileInfo />
+                    <ProfileInfo fullName={`${user?.firstName} ${user?.lastName}`} />
 
                     <ButtonDefault
                         buttoStyles={[
