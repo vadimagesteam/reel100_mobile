@@ -6,7 +6,9 @@ import DropdownMenu from '../../../../components/DropdownMenu';
 import { SvgIcon } from '../../../../components/UI';
 import { states } from './mockData';
 import {
+    RootState,
     useReduxDispatch,
+    useReduxSelector,
     // useReduxSelector
 } from '../../../../store/store';
 import { getStatesAction } from '../../../../redux/StatesRedux/statesAction';
@@ -15,10 +17,11 @@ import TabViewVideo from '../../../../components/TabViewVideo';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { onLogout } from '../../../../redux/AuthRedux/authSlice';
 import { getUserInfoAction } from '../../../../redux/AuthRedux/authAction';
+import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
 
 const MainScreen = () => {
     const dispatch = useReduxDispatch();
-    // const { statesData } = useReduxSelector(state => state?.states);
+    const { videos } = useReduxSelector((state: RootState) => state?.camera);
     const [selectedState, setSelectedState] = useState<string | null>(null);
     const [_, setSelectedAutoState] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>('top_100');
@@ -26,6 +29,7 @@ const MainScreen = () => {
     useEffect(() => {
         dispatch(getStatesAction());
         dispatch(getUserInfoAction());
+        dispatch(getVideosAction());
     }, []);
 
     useEffect(() => {
@@ -80,7 +84,7 @@ const MainScreen = () => {
                 </View>
 
                 {/* TabView for Video */}
-                <TabViewVideo activeTab={activeTab} setActiveTab={setActiveTab} />
+                <TabViewVideo allVideo={videos} activeTab={activeTab} setActiveTab={setActiveTab} />
             </SafeAreaView >
         </>
     );

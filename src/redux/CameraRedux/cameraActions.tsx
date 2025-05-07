@@ -114,11 +114,11 @@ export const uploadVideoAction = createAsyncThunk<any, any>(
     },
 );
 
-export const getVideosAction = createAsyncThunk<any, any>(
+export const getVideosAction = createAsyncThunk<any, void>(
     'camera/getVideos',
     async (_, thunkAPI) => {
         try {
-            const response = await axios.get('api/videos',);
+            const response = await axios.get('api/videos');
 
             // console.log('getVideosAction--->', JSON.stringify(response?.data, null, 2));
 

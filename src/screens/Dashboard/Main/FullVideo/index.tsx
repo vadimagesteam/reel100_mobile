@@ -4,18 +4,24 @@ import { useRoute } from '@react-navigation/native';
 import { cs } from './styles';
 import FullVideoItem from './components/FullVideoItem';
 import { formatTime } from '../../../../utils/formatTime';
+import { RootState, useReduxSelector } from '../../../../store/store';
 
 const { height } = Dimensions.get('window');
 
 const FullVideoScreen = () => {
     const { params } = useRoute<any>();
-    const { videos, index: initialIndex } = params;
+    const { index: initialIndex } = params;
     const flatListRef = useRef(null);
+    const { videos } = useReduxSelector((state: RootState) => state?.camera);
+    // const validIndex = initialIndex >= 0 && initialIndex < videos.length ? initialIndex : 0;
+    // const [currentIndex, setCurrentIndex] = React.useState(validIndex);
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
 
+
+    console.log('videos--FULL>>>>>', videos, initialIndex, currentIndex);
     useEffect(() => {
         const interval = setInterval(() => {
             if (currentIndex !== null) {
@@ -36,7 +42,7 @@ const FullVideoScreen = () => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [videos, currentIndex]);
+    }, [currentIndex]);
 
     //Save duration video
     const handleVideoLoad = useCallback((id: string, duration: number) => {
@@ -73,19 +79,26 @@ const FullVideoScreen = () => {
         itemVisiblePercentThreshold: 50,
     };
 
-    const renderItem = ({ item, index }: { item: any, index: number }) => (
-        <FullVideoItem
-            videoUri={item.uri}
-            videoAvatar={item?.avatar}
-            videoName={item?.fullname}
-            videoNumber={item?.list_number}
-            videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
-            onVideoLoad={(duration) => handleVideoLoad(item.id, duration)}
-            likesCount={item?.like_count}
-            paused={index === currentIndex}
-            onVideoRepeat={() => onVideoRepeat(item?.id)}
-        />
-    );
+    const renderItem = ({ item, index }: { item: any, index: number }) => {
+        return (
+            <>
+                {item.file !== null ? (
+                    <FullVideoItem
+                        videoUri={item.file?.storagePath}
+                        videoAvatar={item?.avatar}
+                        videoName={item?.fullname}
+                        videoNumber={item?.list_number}
+                        videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
+                        onVideoLoad={(duration) => handleVideoLoad(item.id, duration)}
+                        likesCount={item?.like_count}
+                        paused={index === currentIndex}
+                        onVideoRepeat={() => onVideoRepeat(item?.id)}
+                    />
+                ) : null}
+
+            </>
+        );
+    };
 
     return (
         <View style={cs.container}>

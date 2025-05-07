@@ -272,7 +272,6 @@ export const getUserInfoAction = createAsyncThunk<any, void>(
                 },
             });
 
-            console.log('getUserInfoAction →', response?.data);
             return response?.data;
         } catch (error) {
             if (error instanceof AxiosError) {

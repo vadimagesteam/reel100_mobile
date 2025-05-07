@@ -7,13 +7,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import VideoItem from './components/VideoItem';
 import { positionHelpers } from '../../../../styles';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
-import { videoSources } from './mockData';
+// import { videoSources } from './mockData';
 import { formatTime } from '../../../../utils/formatTime';
+import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
+import { useReduxDispatch } from '../../../../store/store';
 
 const { height } = Dimensions.get('screen');
+interface TopOneHundredTabProps {
+    allVideo: any
+}
 
-const TopOneHundredTab = () => {
+const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
     const navigation = useNavigation<any>();
+    const dispatch = useReduxDispatch();
     const flatListRef = useRef<FlatList>(null);
     const insets = useSafeAreaInsets();
     const tabNavigationHeight = Math.max(150, Math.min(height * 0.19, 250));
@@ -31,7 +37,7 @@ const TopOneHundredTab = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             if (activeIndex !== null) {
-                const id = videoSources[activeIndex]?.id;
+                const id = allVideo[activeIndex]?.id;
                 if (id) {
                     setRemainingSeconds(prev => {
                         const current = prev[id];
@@ -52,15 +58,19 @@ const TopOneHundredTab = () => {
 
     const handleSingleTap = useCallback(
         (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>, selectedId: string) => {
+
+            // console.log('selectedId-->', selectedId);
             if (event.nativeEvent.state === State.END) {
-                const index = videoSources.findIndex(video => video.id === selectedId);
-                runOnJS(navigation.navigate)(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
-                    videos: videoSources,
-                    index,
-                });
+                const index = allVideo.findIndex(video => video.id === selectedId);
+                // console.log('--index-->', index);
+                // dispatch(getVideosAction());
+                // runOnJS(navigation.navigate)(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
+                //     // videos: allVideo,
+                //     index,
+                // });
             }
         },
-        [navigation]
+        []
     );
 
     const handleDoubleTap = useCallback(
@@ -116,23 +126,27 @@ const TopOneHundredTab = () => {
     const renderItem = useCallback(
         ({ item, index }: { item: any, index: number }) => {
             return (
-                <VideoItem
-                    source={item.uri}
-                    isActive={index === activeIndex}
-                    videoHeight={videoHeight}
-                    tapPosition={tapPosition}
-                    scale={scale}
-                    opacity={opacity}
-                    handleSingleTap={(event) => handleSingleTap(event, item?.id)}
-                    handleDoubleTap={(event) => handleDoubleTap(event)}
-                    avatar={item?.avatar}
-                    name={item?.fullname}
-                    videoNumber={item?.list_number}
-                    videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
-                    onVideoLoad={(duration) => handleVideoLoad(item.id, duration)}
-                    likesCount={item?.like_count}
-                    onVideoRepeat={() => onVideoRepeat(item?.id)}
-                />
+                <>
+                    {item?.file !== null ? (
+                        <VideoItem
+                            source={item.file?.storagePath}
+                            isActive={index === activeIndex}
+                            videoHeight={videoHeight}
+                            tapPosition={tapPosition}
+                            scale={scale}
+                            opacity={opacity}
+                            handleSingleTap={(event) => handleSingleTap(event, item?.id)}
+                            handleDoubleTap={(event) => handleDoubleTap(event)}
+                            avatar={item?.avatar}
+                            name={item?.fullname}
+                            videoNumber={item?.list_number}
+                            videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
+                            onVideoLoad={(duration) => handleVideoLoad(item.id, duration)}
+                            likesCount={item?.like_count}
+                            onVideoRepeat={() => onVideoRepeat(item?.id)}
+                        />
+                    ) : null}
+                </>
             );
         },
         [
@@ -153,7 +167,7 @@ const TopOneHundredTab = () => {
         <GestureHandlerRootView style={positionHelpers.fill}>
             <FlatList
                 ref={flatListRef}
-                data={videoSources}
+                data={allVideo}
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 pagingEnabled

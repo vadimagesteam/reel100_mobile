@@ -1,16 +1,17 @@
 import React, { useCallback } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { SvgIcon } from '../UI';
-import { colors, positionHelpers } from '../../styles';
+import { positionHelpers } from '../../styles';
 import { cs } from './styles';
 import { StateFeedTab, TopOneHundredTab, TopVideoTab } from './components';
 
 interface TabViewVideoProps {
+    allVideo: any
     activeTab: string
     setActiveTab: (val: string) => void
 }
 
-const TabViewVideo = ({ activeTab, setActiveTab }: TabViewVideoProps) => {
+const TabViewVideo = ({ allVideo, activeTab, setActiveTab }: TabViewVideoProps) => {
 
     const handleTabPress = useCallback((tab: string) => {
         setActiveTab(tab);
@@ -49,7 +50,7 @@ const TabViewVideo = ({ activeTab, setActiveTab }: TabViewVideoProps) => {
             </View>
             <>
                 {activeTab === 'top_100' && (
-                    <TopOneHundredTab />
+                    <TopOneHundredTab allVideo={allVideo} />
                 )}
 
                 {activeTab === 'state_feed' && (
