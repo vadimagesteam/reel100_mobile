@@ -6,9 +6,10 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useReduxDispatch, useReduxSelector } from '../store/store';
 import AuthStack from './Onboarding/AuthStack';
-import { onLogout, setIsAuth, setStatusRegister, setUserID } from '../redux/AuthRedux/authSlice';
+import { onLogout, setIsAuth, setStatusRegister } from '../redux/AuthRedux/authSlice';
 import CustomTabNavigator from './CustomTabNavigator';
 import { tickAction } from '../redux/CoutdownClockRedux/countdownClockSlice';
+import { getUserInfoAction } from '../redux/AuthRedux/authAction';
 
 axios.defaults.baseURL = Config.APP_API_URL;
 
@@ -36,8 +37,6 @@ const NavigationContainerScreen = () => {
                 // dispatch(onLogout());
                 // AsyncStorage.removeItem('@isVerified');
                 // AsyncStorage.removeItem('@statusRegister');
-                const userID: any = await AsyncStorage.getItem('@userId');
-                dispatch(setUserID(userID));
                 const token = await AsyncStorage.getItem('@token');
                 const isVerified = await AsyncStorage.getItem('@isVerified');
                 const statusRegister = await AsyncStorage.getItem('@statusRegister');
@@ -49,6 +48,7 @@ const NavigationContainerScreen = () => {
                     if (token && JSON.parse(isVerified) === true) {
                         axios.defaults.headers.common.Authorization = `Bearer ${token}`;
                         dispatch(setIsAuth(true));
+                        dispatch(getUserInfoAction());
                     } else {
                         dispatch(setIsAuth(false));
                     }

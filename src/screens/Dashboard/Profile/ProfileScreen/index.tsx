@@ -26,13 +26,14 @@ const ProfileScreen = () => {
     const navigation = useNavigation<any>();
     const dispatch = useReduxDispatch();
     const { userVideos } = useReduxSelector((state: RootState) => state.camera);
-    const { userID } = useReduxSelector((state: RootState) => state.auth);
+    const { user } = useReduxSelector((state: RootState) => state.auth);
     const [activeVideoIds, setActiveVideoIds] = useState<string[]>([]);
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
     const [refreshing, setRefreshing] = useState(false);
 
+    console.log('user--', JSON.stringify(user, null, 2));
     useEffect(() => {
-        dispatch(getUserVideosAction(userID));
+        dispatch(getUserVideosAction(user?.id));
     }, []);
 
     const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
@@ -41,7 +42,7 @@ const ProfileScreen = () => {
     const handleRefresh = async () => {
         setRefreshing(true);
         try {
-            await dispatch(getUserVideosAction(userID));
+            await dispatch(getUserVideosAction(user?.id));
         } finally {
             setRefreshing(false);
         }
