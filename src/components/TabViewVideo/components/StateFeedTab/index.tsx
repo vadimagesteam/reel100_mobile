@@ -42,7 +42,6 @@ const StateFeedTab = () => {
         }, 100)
     );
 
-    console.log('videos-->', videos);
     return (
         <>
             {isLoading ? (

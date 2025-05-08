@@ -10,10 +10,12 @@ import { VideoItemType } from './types';
 import { debounce } from '../../../../utils/debounce';
 import FullVideoModal from '../../../../components/TabViewVideo/components/StateFeedTab/components/FullVideoModal';
 import RenderBlock from '../../../../components/TabViewVideo/components/StateFeedTab/components/RenderVideo';
+import { useReduxSelector } from '../../../../store/store';
 
 const FourUScreen = () => {
-    const [videos] = useState(mockVideos);
-    const blocks = generateBlocks(videos);
+    const { videos } = useReduxSelector(state => state?.camera);
+    const checkFileVideos = videos.filter(video => video?.file !== null);
+    const blocks = generateBlocks(checkFileVideos);
     const [activeVideoIds, setActiveVideoIds] = useState<string[]>([]);
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
