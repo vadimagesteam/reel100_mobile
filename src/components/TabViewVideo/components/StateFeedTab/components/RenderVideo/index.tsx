@@ -34,26 +34,31 @@ const RenderBlock = ({
 
         return (
             <TouchableOpacity onPress={() => onVideoPress(item)} key={uniqueKey}>
-                <Video
-                    ref={videoRef}
-                    source={{ uri: item.uri }}
-                    style={style}
-                    resizeMode="cover"
-                    muted
-                    repeat
-                    paused={!activeVideoIds.includes(uniqueKey)}
-                    onLoad={(data) => onVideoLoad(item.id, Math.floor(data.duration))}
-                    onEnd={() => {
-                        videoRef.current?.seek(0);
-                    }}
-                />
-                <VideoAbsoluteInfo
-                    justInfo="SIMPLE"
-                    avatar={item?.avatar}
-                    name={item?.fullname}
-                    videoDuration={`${formatTwoTime(duration)}s`}
-                    likesCount={item?.like_count}
-                />
+                {item.file !== null ? (
+                    <>
+                        <Video
+                            ref={videoRef}
+                            source={{ uri: item.file?.storagePath }}
+                            style={style}
+                            resizeMode="cover"
+                            muted
+                            repeat
+                            paused={true}
+                            // paused={!activeVideoIds.includes(uniqueKey)}
+                            onLoad={(data) => onVideoLoad(item.id, Math.floor(data.duration))}
+                            onEnd={() => {
+                                videoRef.current?.seek(0);
+                            }}
+                        />
+                        <VideoAbsoluteInfo
+                            justInfo="SIMPLE"
+                            avatar={item?.avatar}
+                            name={item?.fullname}
+                            videoDuration={`${formatTwoTime(duration)}s`}
+                            likesCount={item?.like_count}
+                        />
+                    </>
+                ) : <></>}
             </TouchableOpacity>
         );
     };

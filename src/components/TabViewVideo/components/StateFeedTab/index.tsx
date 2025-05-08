@@ -7,10 +7,13 @@ import { mockVideos } from './mockData';
 import { debounce } from '../../../../utils/debounce';
 import { generateBlocks } from './helpers/generateBlocks';
 import FullVideoModal from './components/FullVideoModal';
+import { useReduxSelector } from '../../../../store/store';
 
 const StateFeedTab = () => {
-    const [videos] = useState(mockVideos);
-    const blocks = generateBlocks(videos);
+    const { videos } = useReduxSelector(state => state?.camera);
+    // const [videos] = useState(mockVideos);
+    const checkFileVideos = videos.filter(video => video?.file !== null);
+    const blocks = generateBlocks(checkFileVideos);
     const [activeVideoIds, setActiveVideoIds] = useState<string[]>([]);
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -39,6 +42,7 @@ const StateFeedTab = () => {
         }, 100)
     );
 
+    console.log('videos-->', videos);
     return (
         <>
             {isLoading ? (

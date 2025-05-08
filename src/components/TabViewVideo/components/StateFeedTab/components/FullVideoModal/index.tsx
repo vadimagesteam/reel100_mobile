@@ -77,7 +77,7 @@ const FullVideoModal = ({ modalVideo, activeVideoIds, onArrowPress }: FullVideoM
                     <>
                         <Video
                             ref={videoRef}
-                            source={{ uri: modalVideo.uri }}
+                            source={{ uri: modalVideo.file?.storagePath }}
                             style={positionHelpers.fill}
                             resizeMode="cover"
                             muted={false}
