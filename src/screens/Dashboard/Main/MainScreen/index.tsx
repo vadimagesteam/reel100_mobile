@@ -81,7 +81,6 @@ const MainScreen = () => {
                         onPress={() => setVisible(true)}
 
                     >
-                        {/* <BodyText fontSize={16} fontWeight={'bold'} color={'#fff'}>EXIT</BodyText> */}
                         <SvgIcon image="menu" />
                     </TouchableOpacity>
                 </View>

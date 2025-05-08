@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, SafeAreaView, TouchableOpacity, ScrollView, FlatList, Dimensions, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { GestureHandlerRootView, HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
+import { useSharedValue, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
 import { colors, positionHelpers } from '../../../../styles';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +20,7 @@ import VideoAbsoluteInfo from '../../../../components/VideoAbsoluteInfo';
 import { formatTwoTime } from '../../../../utils/formatTime';
 import MenuModal from '../../../../components/Modals/MemuModal';
 
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_MARGIN = 4;
 const NUM_COLUMNS = 3;
@@ -31,6 +34,11 @@ const ProfileScreen = () => {
     const [activeVideoIds, setActiveVideoIds] = useState<string[]>([]);
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
     const [refreshing, setRefreshing] = useState(false);
+
+    const scale = useSharedValue(0);
+    const opacity = useSharedValue(1);
+    const tapX = useSharedValue(0);
+    const tapY = useSharedValue(0);
     const [visible, setVisible] = useState<boolean>(false);
 
     useEffect(() => {
@@ -47,6 +55,27 @@ const ProfileScreen = () => {
             setRefreshing(false);
         }
     };
+
+    const handleDoubleTap = useCallback(
+        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
+            if (event.nativeEvent.state === State.END) {
+                const { x, y } = event.nativeEvent;
+
+                tapX.value = x;
+                tapY.value = y;
+
+                scale.value = 1;
+                opacity.value = 1;
+
+                scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+                    scale.value = withTiming(0, { duration: 500 });
+                    opacity.value = withTiming(0, { duration: 500 });
+                });
+            }
+        },
+        [scale, opacity, tapX, tapY]
+    );
+
 
     const renderVideoItem = ({ item, index }: { item: VideoItemType; index: number }) => {
         const url = item?.file?.storagePath;
@@ -182,6 +211,11 @@ const ProfileScreen = () => {
                 modalVideo={modalVideo}
                 activeVideoIds={activeVideoIds}
                 onArrowPress={() => setModalVideo(null)}
+                tapX={tapX}
+                tapY={tapY}
+                scale={scale}
+                opacity={opacity}
+                handleDoubleTap={(event) => handleDoubleTap(event)}
             />
 
             {/* MenuModal */}

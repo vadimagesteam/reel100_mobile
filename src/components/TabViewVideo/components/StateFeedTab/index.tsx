@@ -1,5 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { FlatList } from 'react-native';
+import { GestureHandlerRootView, HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
+import { useSharedValue, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
 import { LoaderIndicator } from '../../../UI';
 import RenderBlock from './components/RenderVideo';
 import { VideoItemType } from './components/RenderVideo/types';
@@ -19,6 +21,11 @@ const StateFeedTab = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [durations, setDurations] = useState<Record<string, number>>({});
 
+    const scale = useSharedValue(0);
+    const opacity = useSharedValue(1);
+    const tapX = useSharedValue(0);
+    const tapY = useSharedValue(0);
+
     const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
 
     useEffect(() => {
@@ -27,6 +34,26 @@ const StateFeedTab = () => {
             setIsLoading(false);
         }, 1200);
     }, []);
+
+    const handleDoubleTap = useCallback(
+        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
+            if (event.nativeEvent.state === State.END) {
+                const { x, y } = event.nativeEvent;
+
+                tapX.value = x;
+                tapY.value = y;
+
+                scale.value = 1;
+                opacity.value = 1;
+
+                scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+                    scale.value = withTiming(0, { duration: 500 });
+                    opacity.value = withTiming(0, { duration: 500 });
+                });
+            }
+        },
+        [scale, opacity, tapX, tapY]
+    );
 
     //Save duration video
     const handleVideoLoad = useCallback((id: string, duration: number) => {
@@ -70,6 +97,11 @@ const StateFeedTab = () => {
                 modalVideo={modalVideo}
                 activeVideoIds={activeVideoIds}
                 onArrowPress={() => setModalVideo(null)}
+                tapX={tapX}
+                tapY={tapY}
+                scale={scale}
+                opacity={opacity}
+                handleDoubleTap={(event) => handleDoubleTap(event)}
 
             />
         </>

@@ -28,7 +28,8 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
 
     const scale = useSharedValue(0);
     const opacity = useSharedValue(1);
-    const [tapPosition, setTapPosition] = useState({ x: 0, y: 0 });
+    const tapX = useSharedValue(0);
+    const tapY = useSharedValue(0);
 
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
@@ -77,7 +78,9 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
         (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
             if (event.nativeEvent.state === State.END) {
                 const { x, y } = event.nativeEvent;
-                runOnJS(setTapPosition)({ x, y });
+
+                tapX.value = x;
+                tapY.value = y;
 
                 scale.value = 1;
                 opacity.value = 1;
@@ -88,7 +91,7 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                 });
             }
         },
-        [opacity, scale]
+        [scale, opacity, tapX, tapY]
     );
 
     //Save duration video
@@ -132,7 +135,9 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                             source={item.file?.storagePath}
                             isActive={index === activeIndex}
                             videoHeight={videoHeight}
-                            tapPosition={tapPosition}
+                            // tapPosition={tapPosition}
+                            tapX={tapX}
+                            tapY={tapY}
                             scale={scale}
                             opacity={opacity}
                             handleSingleTap={(event) => handleSingleTap(event, item?.id)}
@@ -152,7 +157,9 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
         [
             activeIndex,
             videoHeight,
-            tapPosition,
+            // tapPosition
+            tapX,
+            tapY,
             scale,
             opacity,
             remainingSeconds,

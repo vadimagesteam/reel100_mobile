@@ -11,7 +11,9 @@ interface VideoItemProps {
     source: string;
     isActive: boolean
     videoHeight: number
-    tapPosition: { x: number, y: number };
+    // tapPosition: { x: number, y: number };
+    tapX: number
+    tapY: number
     scale: Animated.SharedValue<number>;
     opacity: Animated.SharedValue<number>;
     handleSingleTap: (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => void;
@@ -31,7 +33,8 @@ const VideoItem: React.FC<VideoItemProps> = ({
     source,
     isActive = false,
     videoHeight,
-    tapPosition,
+    tapX,
+    tapY,
     scale,
     opacity,
     handleSingleTap,
@@ -55,8 +58,10 @@ const VideoItem: React.FC<VideoItemProps> = ({
     // Animated style heart
     const animatedStyle = useAnimatedStyle(() => ({
         // position: 'absolute',
-        left: tapPosition.x,
-        top: tapPosition.y,
+        left: tapX.value - 40,
+        top: tapY.value - 40,
+        // left: tapPosition.x,
+        // top: tapPosition.y,
         opacity: opacity.value,
         transform: [{ scale: scale.value }],
     }));
