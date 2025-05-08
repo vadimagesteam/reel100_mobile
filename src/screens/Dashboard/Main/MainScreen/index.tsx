@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { colors, positionHelpers } from '../../../../styles';
 import DropdownMenu from '../../../../components/DropdownMenu';
-import { SvgIcon } from '../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../components/UI';
 import { states } from './mockData';
 import {
     RootState,
@@ -18,6 +18,7 @@ import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { onLogout } from '../../../../redux/AuthRedux/authSlice';
 import { getUserInfoAction } from '../../../../redux/AuthRedux/authAction';
 import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
+import MenuModal from '../../../../components/Modals/MemuModal';
 
 const MainScreen = () => {
     const dispatch = useReduxDispatch();
@@ -25,6 +26,8 @@ const MainScreen = () => {
     const [selectedState, setSelectedState] = useState<string | null>(null);
     const [_, setSelectedAutoState] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>('top_100');
+
+    const [visible, setVisible] = useState<boolean>(false);
 
     useEffect(() => {
         dispatch(getStatesAction());
@@ -75,8 +78,8 @@ const MainScreen = () => {
                         onSelect={setSelectedState}
                     />
                     <TouchableOpacity
-                        // onPress={() => true}
-                        onPress={() => dispatch(onLogout())}
+                        onPress={() => setVisible(true)}
+
                     >
                         {/* <BodyText fontSize={16} fontWeight={'bold'} color={'#fff'}>EXIT</BodyText> */}
                         <SvgIcon image="menu" />
@@ -86,6 +89,9 @@ const MainScreen = () => {
                 {/* TabView for Video */}
                 <TabViewVideo allVideo={videos} activeTab={activeTab} setActiveTab={setActiveTab} />
             </SafeAreaView >
+
+            {/* MenuModal */}
+            <MenuModal visible={visible} onVisible={() => setVisible(false)} />
         </>
     );
 };

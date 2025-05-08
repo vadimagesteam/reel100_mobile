@@ -4,13 +4,13 @@ import { colors, positionHelpers } from '../../../../styles';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { Input, LoaderIndicator, SvgIcon } from '../../../../components/UI';
 import { cs } from './styles';
-import { mockVideos } from '../../../../components/TabViewVideo/components/StateFeedTab/mockData';
 import { generateBlocks } from '../../../../components/TabViewVideo/components/StateFeedTab/helpers/generateBlocks';
 import { VideoItemType } from './types';
 import { debounce } from '../../../../utils/debounce';
 import FullVideoModal from '../../../../components/TabViewVideo/components/StateFeedTab/components/FullVideoModal';
 import RenderBlock from '../../../../components/TabViewVideo/components/StateFeedTab/components/RenderVideo';
 import { useReduxSelector } from '../../../../store/store';
+import MenuModal from '../../../../components/Modals/MemuModal';
 
 const FourUScreen = () => {
     const { videos } = useReduxSelector(state => state?.camera);
@@ -20,6 +20,7 @@ const FourUScreen = () => {
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [durations, setDurations] = useState<Record<string, number>>({});
+    const [visible, setVisible] = useState<boolean>(false);
 
     const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
 
@@ -54,7 +55,7 @@ const FourUScreen = () => {
                             <Input inputStyles={cs.input}
                                 placeholder="Search by user" />
                         </View>
-                        <TouchableOpacity onPress={() => true}>
+                        <TouchableOpacity onPress={() => setVisible(true)}>
                             <SvgIcon image="menu" />
                         </TouchableOpacity>
                     </View>
@@ -89,6 +90,9 @@ const FourUScreen = () => {
 
                 />
 
+
+                {/* MenuModal */}
+                <MenuModal visible={visible} onVisible={() => setVisible(false)} />
 
             </SafeAreaView >
         </>

@@ -19,6 +19,7 @@ export const colors = {
     silver3: '#d9d7d6',
     silver4: '#b3b3b3',
     silver5: '#5c5d5d',
+    silver6: '#727272',
     silverLight: '#F8F9FB',
     silver1Procent50: 'rgba(128, 128, 128, 0.5)',
 

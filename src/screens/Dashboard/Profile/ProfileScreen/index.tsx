@@ -16,6 +16,7 @@ import { VideoItemType } from '../../FourU/FourUScreen/types';
 import ProfileVideoModal from './components/ProfileVideoModal';
 import VideoAbsoluteInfo from '../../../../components/VideoAbsoluteInfo';
 import { formatTwoTime } from '../../../../utils/formatTime';
+import MenuModal from '../../../../components/Modals/MemuModal';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_MARGIN = 4;
@@ -30,15 +31,14 @@ const ProfileScreen = () => {
     const [activeVideoIds, setActiveVideoIds] = useState<string[]>([]);
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
     const [refreshing, setRefreshing] = useState(false);
+    const [visible, setVisible] = useState<boolean>(false);
 
-    console.log('user--', JSON.stringify(user, null, 2));
     useEffect(() => {
         dispatch(getUserVideosAction(user?.id));
     }, []);
 
     const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
 
-    // console.log('---filteredVideos-->', filteredVideos);
     const handleRefresh = async () => {
         setRefreshing(true);
         try {
@@ -135,7 +135,7 @@ const ProfileScreen = () => {
                         <View style={positionHelpers.fill}>
                             <Input inputStyles={cs.input} placeholder="Search by user" />
                         </View>
-                        <TouchableOpacity onPress={() => true}>
+                        <TouchableOpacity onPress={() => setVisible(true)}>
                             <SvgIcon image="menu" />
                         </TouchableOpacity>
                     </View>
@@ -183,6 +183,9 @@ const ProfileScreen = () => {
                 activeVideoIds={activeVideoIds}
                 onArrowPress={() => setModalVideo(null)}
             />
+
+            {/* MenuModal */}
+            <MenuModal visible={visible} onVisible={() => setVisible(false)} />
         </>
     );
 };
