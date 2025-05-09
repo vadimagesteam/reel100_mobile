@@ -24,7 +24,7 @@ const CustomHeader = ({
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
 
-    const paddingInsets = insets.top ? insets.top + 8 : 18;
+    const paddingInsets = insets.top ? insets.top + 8 : 17;
 
     return (
         <View

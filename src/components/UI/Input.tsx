@@ -72,7 +72,7 @@ const Input: React.FC<Props> = ({
                         styles.input,
                         inputStyles,
                         style,
-                        { color: colorText ? colorText : colors.black },
+                        { color: colorText ? colorText : colors.white },
                     ]}
                     placeholder={placeholder}
                     placeholderTextColor={
@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
     input: {
         padding: 25,
         backgroundColor: '#fff',
+        color: colors.white,
     },
     containerPhoneNumber: {
         height: '100%',

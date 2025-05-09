@@ -20,7 +20,7 @@ const CountdownClockHeader = () => {
 const styles = StyleSheet.create({
     container: {
         // backgroundColor: '#222831',
-        paddingVertical: 10,
+        // paddingVertical: 5,
         borderRadius: 10,
         elevation: 4,
 

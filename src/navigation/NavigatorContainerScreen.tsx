@@ -4,14 +4,23 @@ import { hideSplash } from 'react-native-splash-view';
 import Config from 'react-native-config';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useReduxDispatch, useReduxSelector } from '../store/store';
+import store, { useReduxDispatch, useReduxSelector } from '../store/store';
 import AuthStack from './Onboarding/AuthStack';
 import { onLogout, setIsAuth, setStatusRegister } from '../redux/AuthRedux/authSlice';
 import CustomTabNavigator from './CustomTabNavigator';
 import { tickAction } from '../redux/CoutdownClockRedux/countdownClockSlice';
-import { getUserInfoAction } from '../redux/AuthRedux/authAction';
 
 axios.defaults.baseURL = Config.APP_API_URL;
+
+axios.interceptors.response.use(
+    response => response,
+    async error => {
+        if (error.response?.status === 401) {
+            store.dispatch(onLogout());
+        }
+        return Promise.reject(error);
+    }
+);
 
 const TimerStarter = () => {
     const dispatch = useReduxDispatch();
