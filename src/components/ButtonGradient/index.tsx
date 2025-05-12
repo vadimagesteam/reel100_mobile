@@ -10,10 +10,11 @@ interface ButtonGradientProps {
     loading?: boolean
     colorIndicator?: string;
     buttonStyles?: StyleProp<ViewStyle>,
+    marginText?: number
     onPress: () => void
 }
 
-const ButtonGradient = ({ title, disabled, loading, colorIndicator, buttonStyles, onPress }: ButtonGradientProps) => {
+const ButtonGradient = ({ title, disabled, loading, colorIndicator, buttonStyles, marginText, onPress }: ButtonGradientProps) => {
     return (
         <>
             {loading ? (
@@ -45,7 +46,7 @@ const ButtonGradient = ({ title, disabled, loading, colorIndicator, buttonStyles
                         colors={[colors.blue1, colors.blue]}
                         style={positionHelpers.br5}
                     >
-                        <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={15}>{title}</BodyText>
+                        <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={marginText ? marginText : 15}>{title}</BodyText>
                     </LinearGradient>
                 </ButtonDefault>
             )}

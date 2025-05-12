@@ -5,12 +5,14 @@ import authReducer from './AuthRedux/authSlice';
 import statesReducer from './StatesRedux/statesSlice';
 import countdownClockReducer from './CoutdownClockRedux/countdownClockSlice';
 import cameraReducer from './CameraRedux/cameraSlice';
+import usersReducer from './UsersRedux/usersSlice';
 
 const rootReducer = combineReducers({
     auth: authReducer,
     states: statesReducer,
     countdownClock: countdownClockReducer,
     camera: cameraReducer,
+    users: usersReducer,
 });
 
 export default rootReducer;

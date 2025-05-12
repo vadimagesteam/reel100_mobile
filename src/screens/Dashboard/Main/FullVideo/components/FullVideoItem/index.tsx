@@ -1,8 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import Video from 'react-native-video';
 import { cs } from '../../styles';
 import VideoAbsoluteInfo from '../../../../../../components/VideoAbsoluteInfo';
+import { Dimensions, View } from 'react-native';
+
+const { height, width } = Dimensions.get('window');
 
 interface FullVideoItemProps {
     videoUri: string
@@ -16,7 +19,7 @@ interface FullVideoItemProps {
     onVideoRepeat?: () => void;
 }
 
-const FullVideoItem = ({
+const FullVideoItem = memo(({
     videoUri,
     videoAvatar,
     videoName,
@@ -29,6 +32,7 @@ const FullVideoItem = ({
 }: FullVideoItemProps) => {
     const navigation = useNavigation();
     const videoRef = useRef<any | null>(null);
+    const [aspectRatio, setAspectRatio] = useState(16 / 9); // Початкове значення
 
     useEffect(() => {
         if (paused && videoRef.current) {
@@ -41,12 +45,30 @@ const FullVideoItem = ({
             <Video
                 ref={videoRef}
                 source={{ uri: videoUri }}
-                style={cs.video}
+                // style={cs.video}
+                // style={{ width: '100%', height: '100%' }}
+                // resizeMode={'contain'}
+                // style={{ width: '100%', aspectRatio: 0.5625 }}
+                style={{
+
+                    // aspectRatio: 7 / 16,
+
+
+                    width: '100%',
+                    // aspectRatio: videoWidth / videoHeight,
+                    // width: '100%',
+                    height: '100%',
+                }}
                 resizeMode="cover"
                 repeat
                 paused={!paused}
                 onLoad={(data) => {
-                    onVideoLoad(Math.floor(data.duration));
+                    // const { width, height } = data.naturalSize;
+                    // if (width && height) {
+                    //     setAspectRatio(width / height);
+                    //     console.log('Video aspectRatio:', width / height);
+                    // }
+                    onVideoLoad(Math.floor(data?.duration));
                 }}
                 onEnd={() => {
                     videoRef.current?.seek(0);
@@ -67,6 +89,6 @@ const FullVideoItem = ({
             />
         </>
     );
-};
+});
 
 export default FullVideoItem;

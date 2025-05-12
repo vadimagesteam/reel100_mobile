@@ -4,6 +4,7 @@ import { DASHBOARD_ROUTES } from '../../routes';
 import ProfileScreen from '../../../screens/Dashboard/Profile/ProfileScreen';
 import VideoRecordScreen from '../../../screens/Dashboard/Profile/VideoRecordScreen';
 import PreviewVideoScreen from '../../../screens/Dashboard/Profile/PreviewVideoScreen';
+import UserProfileScreen from '../../../screens/Dashboard/UserProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,10 @@ const ProfileStack = () => {
             <Stack.Screen
                 name={DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN}
                 component={PreviewVideoScreen}
+            />
+            <Stack.Screen
+                name={DASHBOARD_ROUTES.USER_PROFILE_SCREEN}
+                component={UserProfileScreen}
             />
         </Stack.Navigator>
     );

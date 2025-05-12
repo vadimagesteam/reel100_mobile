@@ -11,6 +11,7 @@ import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import { formatTime } from '../../../../utils/formatTime';
 import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
 import { useReduxDispatch } from '../../../../store/store';
+import FullVideoScrollModal from '../../../Modals/FullVideoScrollModal';
 
 const { height } = Dimensions.get('screen');
 interface TopOneHundredTabProps {
@@ -34,6 +35,10 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
+
+    const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+    const [visible, setVisible] = useState<boolean>(false);
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -62,18 +67,24 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
 
             // console.log('selectedId-->', selectedId);
             if (event.nativeEvent.state === State.END) {
+
                 const index = allVideo.findIndex(video => video.id === selectedId);
                 // console.log('--index-->', index);
                 // dispatch(getVideosAction());
+                // navigation.navigate(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
+                //     // videos: allVideo,
+                //     selectedId,
+                //     index,
+                // });
                 // runOnJS(navigation.navigate)(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
                 //     // videos: allVideo,
+                //     selectedId,
                 //     index,
                 // });
             }
         },
         []
     );
-
     const handleDoubleTap = useCallback(
         (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
             if (event.nativeEvent.state === State.END) {
@@ -185,6 +196,12 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                 contentContainerStyle={positionHelpers.flexGrow}
                 decelerationRate="fast"
             />
+
+            {/* <FullVideoScrollModal
+                visible={visible}
+                selectedId={selectedVideoId}
+                onVisible={() => setVisible(false)}
+            /> */}
         </GestureHandlerRootView>
     );
 };

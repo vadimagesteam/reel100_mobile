@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { colors } from '../../styles';
 
 const LoaderIndicator = () => {
     return (
@@ -14,7 +15,7 @@ const cs = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: colors.black1,
         zIndex: 999,
     },
 });

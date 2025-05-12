@@ -11,12 +11,18 @@ import { VideoItemType } from './types';
 import { debounce } from '../../../../utils/debounce';
 import FullVideoModal from '../../../../components/TabViewVideo/components/StateFeedTab/components/FullVideoModal';
 import RenderBlock from '../../../../components/TabViewVideo/components/StateFeedTab/components/RenderVideo';
-import { useReduxSelector } from '../../../../store/store';
+import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
 import MenuModal from '../../../../components/Modals/MemuModal';
-import { usersData } from '../../Profile/ProfileScreen/mockData';
+import { usersDataMock } from '../../Profile/ProfileScreen/mockData';
+import { getUsersAction } from '../../../../redux/UsersRedux/usersAction';
+import { useNavigation } from '@react-navigation/native';
+import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 
 const FourUScreen = () => {
+    const navigation = useNavigation<any>();
+    const dispatch = useReduxDispatch();
     const { videos } = useReduxSelector(state => state?.camera);
+    const { usersData } = useReduxSelector((state: RootState) => state.users);
     const checkFileVideos = videos.filter(video => video?.file !== null);
     const blocks = generateBlocks(checkFileVideos);
     const inputRef = useRef(null);
@@ -86,6 +92,19 @@ const FourUScreen = () => {
         }
     }, [isSearchActive]);
 
+    const debouncedSearch = useRef(
+        debounce((text: string) => {
+            dispatch(getUsersAction(text));
+        }, 350)
+    ).current;
+
+    useEffect(() => {
+        if (searchQuery.trim()) {
+            debouncedSearch(searchQuery);
+        }
+    }, [searchQuery]);
+
+
     //Save duration video
     const handleVideoLoad = useCallback((id: string, duration: number) => {
         setDurations(prev => ({ ...prev, [id]: duration }));
@@ -100,8 +119,8 @@ const FourUScreen = () => {
         }, 100)
     );
 
-    const filteredUsers = usersData.filter(user =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredUsers = usersData?.filter(
+        (item) => item?.firstName?.trim() && item?.lastName?.trim()
     );
 
     const animatedOverlayStyle = useAnimatedStyle(() => ({
@@ -119,7 +138,7 @@ const FourUScreen = () => {
                         isSearchActive ? {} : positionHelpers.mb25,
                         {
                             backgroundColor: colors.black4,
-                            marginBottom: isSearchActive ? 0 : 70,
+                            marginBottom: isSearchActive ? 70 : 70,
                         },
                     ]}
                 >
@@ -140,6 +159,7 @@ const FourUScreen = () => {
                                     onFocus={() => setIsSearchActive(true)}
                                     onChangeText={setSearchQuery}
                                     value={searchQuery}
+                                    colorText={colors.white}
                                 />
                             </View>
                             {!isSearchActive && (
@@ -170,22 +190,29 @@ const FourUScreen = () => {
                             viewabilityConfig={viewabilityConfig}
                         />
                     )}
-                    {isSearchActive && (
 
-                        <Animated.View
-                            style={[
-                                {
-                                    ...StyleSheet.absoluteFillObject,
-                                    backgroundColor: colors.black4,
-                                    marginTop: inputY,
-                                    paddingHorizontal: 16,
-                                }, animatedOverlayStyle]}
-                        >
-                            {searchQuery ? (
-                                <FlatList
-                                    data={filteredUsers}
-                                    keyExtractor={(item) => item.id}
-                                    renderItem={({ item }) => (
+                </SafeAreaView >
+            </View >
+            {isSearchActive && (
+                <Animated.View
+                    style={[
+                        {
+                            ...StyleSheet.absoluteFillObject,
+                            backgroundColor: colors.black4,
+                            marginTop: inputY,
+                            paddingHorizontal: 16,
+                            marginBottom: 70,
+                        }, animatedOverlayStyle]}
+                >
+                    {searchQuery ? (
+                        <FlatList
+                            data={filteredUsers}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => {
+                                return (
+                                    <TouchableOpacity onPress={() => {
+                                        navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
+                                    }}>
                                         <BodyText
                                             paddingLeft={10}
                                             fontSize={16}
@@ -194,37 +221,34 @@ const FourUScreen = () => {
                                             borderBottomColor={colors.silver1Procent50}
                                             borderBottomWidth={1}
                                         >
-                                            {item.name}
+                                            {item.firstName} {item?.lastName}
                                         </BodyText>
-                                    )}
-
-
-                                    ListEmptyComponent={() => {
-                                        return (
-                                            <View style={[{
-                                                flex: 1,
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                paddingHorizontal: 20,
-                                            }]}>
-                                                <BodyText color={colors.white} >No results found</BodyText>
-                                            </View>
-                                        );
-                                    }}
-                                    contentContainerStyle={{ padding: 10, flexGrow: 1 }}
-                                />
-                            ) : (
-                                <View style={positionHelpers.fillCenter}>
-                                    <BodyText color={colors.white} >No results found</BodyText>
-                                </View>
-                            )}
-                        </Animated.View>
-
+                                    </TouchableOpacity>
+                                );
+                            }}
+                            ListEmptyComponent={() => {
+                                return (
+                                    <View style={[{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        paddingHorizontal: 20,
+                                    }]}>
+                                        <BodyText color={colors.white} >No results found</BodyText>
+                                    </View>
+                                );
+                            }}
+                            contentContainerStyle={{ padding: 10, flexGrow: 1 }}
+                        />
+                    ) : (
+                        <View style={positionHelpers.fillCenter}>
+                            <BodyText color={colors.white} >No results found</BodyText>
+                        </View>
                     )}
-                </SafeAreaView >
-            </View >
+                </Animated.View>
+            )}
             {/* Modal for show videos */}
-            < FullVideoModal
+            <FullVideoModal
                 modalVideo={modalVideo}
                 activeVideoIds={activeVideoIds}
                 onArrowPress={() => setModalVideo(null)}

@@ -4,8 +4,9 @@ const { height, width } = Dimensions.get('screen');
 
 export const cs = StyleSheet.create({
     videoWrapper: {
-        width: '100%',
-        height: '100%',
+        flex: 1,
+        // width: '100%',
+        // height: '100%',
     },
     video: {
         width,

@@ -20,6 +20,10 @@ export const DASHBOARD_ROUTES = {
     VIDEO_RECORD_SCREEN: 'Video_Record_Screen',
     PREVIEW_VIDEO_SCREEN: 'Preview_Video_Screen',
 
+    FOUR_U_SCREEN: 'Four_U_SCREEN',
+
+    USER_PROFILE_SCREEN: 'User_Profile_Screen',
+
 } as const;
 
 export type valueof<T> = T[keyof T];

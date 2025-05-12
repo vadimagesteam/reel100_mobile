@@ -19,7 +19,9 @@ import ProfileVideoModal from './components/ProfileVideoModal';
 import VideoAbsoluteInfo from '../../../../components/VideoAbsoluteInfo';
 import { formatTwoTime } from '../../../../utils/formatTime';
 import MenuModal from '../../../../components/Modals/MemuModal';
-import { usersData } from './mockData';
+import { getOneUserAction, getUsersAction } from '../../../../redux/UsersRedux/usersAction';
+import { usersDataMock } from './mockData';
+import { debounce } from './../../../../utils/debounce';
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -32,6 +34,7 @@ const ProfileScreen = () => {
     const dispatch = useReduxDispatch();
     const { userVideos } = useReduxSelector((state: RootState) => state.camera);
     const { user } = useReduxSelector((state: RootState) => state.auth);
+    const { usersData } = useReduxSelector((state: RootState) => state.users);
     const inputRef = useRef(null);
     const [activeVideoIds, setActiveVideoIds] = useState<string[]>([]);
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
@@ -48,8 +51,11 @@ const ProfileScreen = () => {
     const overlayTranslateY = useSharedValue(0);
     const [searchQuery, setSearchQuery] = useState<string>('');
 
+
+    // console.log('usersData-->', usersData);
     useEffect(() => {
         dispatch(getUserVideosAction(user?.id));
+        // dispatch(getUsersAction());
     }, []);
 
     useEffect(() => {
@@ -71,6 +77,18 @@ const ProfileScreen = () => {
             overlayTranslateY.value = withTiming(20, { duration: 200, easing: Easing.in(Easing.ease) });
         }
     }, [isSearchActive]);
+
+    const debouncedSearch = useRef(
+        debounce((text: string) => {
+            dispatch(getUsersAction(text));
+        }, 350)
+    ).current;
+
+    useEffect(() => {
+        if (searchQuery.trim()) {
+            debouncedSearch(searchQuery);
+        }
+    }, [searchQuery]);
 
 
     const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
@@ -153,7 +171,7 @@ const ProfileScreen = () => {
                         <VideoAbsoluteInfo
                             justInfo="SIMPLE"
                             avatar={''}
-                            name={'Name Lastname'}
+                            name={`${user?.firstName} ${user?.lastName}`}
                             // videoDuration={`${formatTwoTime(duration)}s`}
                             likesCount={item?.like_count}
                         />
@@ -177,8 +195,8 @@ const ProfileScreen = () => {
         );
     };
 
-    const filteredUsers = usersData.filter(user =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredUsers = usersData?.filter(
+        (item) => item?.firstName?.trim() && item?.lastName?.trim()
     );
 
     const animatedOverlayStyle = useAnimatedStyle(() => ({
@@ -216,6 +234,7 @@ const ProfileScreen = () => {
                                     onFocus={() => setIsSearchActive(true)}
                                     onChangeText={setSearchQuery}
                                     value={searchQuery}
+                                    colorText={colors.white}
                                 />
                             </View>
                             {!isSearchActive && (
@@ -245,78 +264,90 @@ const ProfileScreen = () => {
                         </ButtonDefault>
                     </View>
 
-                    <FlatList
-                        data={filteredVideos.reverse()}
-                        keyExtractor={(item) => item.id}
-                        numColumns={NUM_COLUMNS}
-                        refreshing={refreshing}
-                        onRefresh={handleRefresh}
-                        renderItem={renderVideoItem}
-                        contentContainerStyle={{
-                            paddingHorizontal: 16,
-                            paddingBottom: 10,
-                        }}
-                        initialNumToRender={6} // менше елементів на старт
-                        windowSize={5} // скільки блоків рендериться навколо екрану
-                        maxToRenderPerBatch={6}
-                        removeClippedSubviews={true} // видаляє елементи за межами екрану
-                    />
-                </SafeAreaView >
-
-                {isSearchActive && (
-
-                    <Animated.View
-                        style={[
-                            {
-                                ...StyleSheet.absoluteFillObject,
-                                backgroundColor: colors.black4,
-                                marginTop: inputY,
+                    {filteredVideos.length === 0 ? (
+                        <View style={positionHelpers.fillCenter}>
+                            <BodyText color={colors.white}>{'No video found'}</BodyText>
+                        </View>
+                    ) : (
+                        <FlatList
+                            data={filteredVideos.reverse()}
+                            keyExtractor={(item) => item.id}
+                            numColumns={NUM_COLUMNS}
+                            refreshing={refreshing}
+                            onRefresh={handleRefresh}
+                            renderItem={renderVideoItem}
+                            contentContainerStyle={{
                                 paddingHorizontal: 16,
-                            }, animatedOverlayStyle]}
-                    >
-                        {searchQuery ? (
-                            <FlatList
-                                data={filteredUsers}
-                                keyExtractor={(item) => item.id}
-                                renderItem={({ item }) => (
-                                    <BodyText
-                                        paddingLeft={10}
-                                        fontSize={16}
-                                        color={colors.white}
-                                        paddingVertical={12}
-                                        borderBottomColor={colors.silver1Procent50}
-                                        borderBottomWidth={1}
-                                    >
-                                        {item.name}
-                                    </BodyText>
-                                )}
-
-
-                                ListEmptyComponent={() => {
-                                    return (
-                                        <View style={[{
-                                            flex: 1,
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            paddingHorizontal: 20,
-                                        }]}>
-                                            <BodyText color={colors.white} >No results found</BodyText>
-                                        </View>
-                                    );
-                                }}
-                                contentContainerStyle={{ padding: 10, flexGrow: 1 }}
-                            />
-                        ) : (
-                            <View style={positionHelpers.fillCenter}>
-                                <BodyText color={colors.white} >No results found</BodyText>
-                            </View>
-                        )}
-                    </Animated.View>
-
-                )}
-
-
+                                paddingBottom: 10,
+                            }}
+                            initialNumToRender={6} // менше елементів на старт
+                            windowSize={5} // скільки блоків рендериться навколо екрану
+                            maxToRenderPerBatch={6}
+                            removeClippedSubviews={true} // видаляє елементи за межами екрану
+                        />
+                    )}
+                </SafeAreaView >
             </View >
+            {isSearchActive && (
+                <Animated.View
+                    style={[
+                        {
+                            ...StyleSheet.absoluteFillObject,
+                            backgroundColor: colors.black4,
+                            marginTop: inputY,
+                            paddingHorizontal: 16,
+                            marginBottom: 70,
+                        }, animatedOverlayStyle]}
+                >
+                    {searchQuery ? (
+                        <FlatList
+                            data={filteredUsers}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => {
+                                return (
+                                    <>
+                                        {
+                                            item?.firstName !== '' || item?.lastName !== '' ? (
+                                                <TouchableOpacity onPress={() => {
+                                                    navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
+                                                }}>
+                                                    <BodyText
+                                                        paddingLeft={10}
+                                                        fontSize={16}
+                                                        color={colors.white}
+                                                        paddingVertical={12}
+                                                        borderBottomColor={colors.silver1Procent50}
+                                                        borderBottomWidth={1}
+                                                    >
+                                                        {item.firstName} {item?.lastName}
+                                                    </BodyText>
+                                                </TouchableOpacity>
+                                            ) : null
+                                        }
+                                    </>
+                                );
+                            }}
+                            ListEmptyComponent={() => {
+                                return (
+                                    <View style={[{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        paddingHorizontal: 20,
+                                    }]}>
+                                        <BodyText color={colors.white} >No results found</BodyText>
+                                    </View>
+                                );
+                            }}
+                            contentContainerStyle={{ padding: 10, flexGrow: 1 }}
+                        />
+                    ) : (
+                        <View style={positionHelpers.fillCenter}>
+                            <BodyText color={colors.white} >No results found</BodyText>
+                        </View>
+                    )}
+                </Animated.View>
+            )}
             <ProfileVideoModal
                 modalVideo={modalVideo}
                 activeVideoIds={activeVideoIds}

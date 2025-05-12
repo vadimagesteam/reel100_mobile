@@ -7,7 +7,11 @@ export const cs = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.black4,
-        justifyContent: 'center',
+        // justifyContent: 'center',
+        // height: height,
     },
-    video: { width, height },
+    video: {
+        width: width,
+        height: height,
+    },
 });

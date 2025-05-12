@@ -6,6 +6,8 @@ import { cs } from './styles';
 import { BodyText, ButtonDefault } from '../../../components/UI';
 import { ONBOARDING_ROUTES, OnboardingRoutes } from '../../../navigation/routes';
 import ButtonGradient from '../../../components/ButtonGradient';
+import { useReduxDispatch } from '../../../store/store';
+import { clearErrors } from '../../../redux/AuthRedux/authSlice';
 
 const WELCOME_TEXT = 'Welcome';
 const SIGNUP_TEXT = 'Sign up';
@@ -13,6 +15,7 @@ const SIGNIN_TEXT = 'Sign in';
 
 
 const WelcomeScreen = () => {
+    const dispatch = useReduxDispatch();
     const navigation = useNavigation<NavigationProp<OnboardingRoutes>>();
 
     return (
@@ -20,10 +23,16 @@ const WelcomeScreen = () => {
             <View style={[positionHelpers.fill, positionHelpers.justifyCenter, cs.mh30]}>
                 <BodyText color={colors.white} fontSize={40} fontWeight={'bold'} textAlign="center" marginBottom={25}>{WELCOME_TEXT}</BodyText>
                 <View>
-                    <ButtonGradient title={SIGNUP_TEXT} onPress={() => navigation.navigate(ONBOARDING_ROUTES.SIGNUP_SCREEN)} />
+                    <ButtonGradient title={SIGNUP_TEXT} onPress={() => {
+                        dispatch(clearErrors());
+                        navigation.navigate(ONBOARDING_ROUTES.SIGNUP_SCREEN);
+                    }} />
                     <ButtonDefault
                         buttoStyles={[positionHelpers.buttonBorderStyle, positionHelpers.mt15]}
-                        onPress={() => navigation.navigate(ONBOARDING_ROUTES.LOGIN_SCREEN)}
+                        onPress={() => {
+                            dispatch(clearErrors());
+                            navigation.navigate(ONBOARDING_ROUTES.LOGIN_SCREEN);
+                        }}
                     >
                         <BodyText fontSize={18} fontWeight={'bold'} color={colors.white} textAlign="center" margin={15}>{SIGNIN_TEXT}</BodyText>
                     </ButtonDefault>

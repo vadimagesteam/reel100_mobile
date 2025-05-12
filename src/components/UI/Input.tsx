@@ -72,7 +72,7 @@ const Input: React.FC<Props> = ({
                         styles.input,
                         inputStyles,
                         style,
-                        { color: colorText ? colorText : colors.white },
+                        { color: colorText ? colorText : colors.black },
                     ]}
                     placeholder={placeholder}
                     placeholderTextColor={
