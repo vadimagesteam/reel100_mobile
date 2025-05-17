@@ -5,17 +5,20 @@ import axios, { AxiosError } from 'axios';
 export const setFollowAction = createAsyncThunk<any, void>(
     'follows/setFollow',
     async (dataFollow, thunkAPI) => {
+
+        console.log('---data follow-->', dataFollow);
+        console.log('---data dataFollow?.who?.id-->', dataFollow?.who?.id);
         try {
-            const token = await AsyncStorage.getItem('@token');
-            console.log('token--->', token);
-            const config = {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            };
-            const response = await axios.post('/api/follows', dataFollow, config);
+            // const token = await AsyncStorage.getItem('@token');
+            // console.log('token--->', token);
+            // const config = {
+            //     headers: {
+            //         Accept: 'application/json',
+            //         'Content-Type': 'application/json',
+            //         Authorization: `Bearer ${token}`,
+            //     },
+            // };
+            const response = await axios.post(`/api/follows?who[id]=${dataFollow?.who?.id}&whom[id]=${dataFollow?.whom?.id}`, dataFollow);
             console.log('response--setFollowAction--->>', response);
             thunkAPI.dispatch(getFollowAction());
             return response?.data;
@@ -62,20 +65,8 @@ export const getFollowAction = createAsyncThunk<any, void>(
 export const unFollowAction = createAsyncThunk<any, void>(
     'follows/unFollow',
     async (id, thunkAPI) => {
-
-        console.log('id--->', id);
         try {
-            const token = await AsyncStorage.getItem('@token');
-
-            console.log('token--->', token);
-            const config = {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            };
-            const response = await axios.delete(`/api/follows/${id}`, config);
+            const response = await axios.delete(`/api/follows/${id}`);
 
             console.log('response--unFollowAction--->>', response);
             return response?.data;

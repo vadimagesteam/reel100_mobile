@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Modal, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 import { colors, positionHelpers } from '../../../../../../styles';
 // import VideoAbsoluteInfo from '../../../../../VideoAbsoluteInfo';
@@ -138,9 +138,24 @@ const ProfileVideoModal = ({
                                 likesCount={modalVideo?.like_count}
                                 videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
                                 openComments={openComments}
+                                showComments={true}
                             />
                             {showComments && modalVideo?.id && (
+                                // <View style={{
+                                //     // position: 'absolute',
+                                //     // bottom: 0,
+                                //     // left: 0,
+                                //     // right: 0,
+                                //     // height: '70%',
+                                //     backgroundColor: '#000',
+                                //     borderTopLeftRadius: 20,
+                                //     borderTopRightRadius: 20,
+                                //     overflow: 'hidden',
+                                // }}>
+
                                 <CommentSection videoId={modalVideo.id} onClose={() => setShowComments(false)} />
+
+                                // </View>
                             )}
                         </>
                     )}

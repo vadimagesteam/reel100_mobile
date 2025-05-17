@@ -51,8 +51,6 @@ const ProfileScreen = () => {
     const overlayTranslateY = useSharedValue(0);
     const [searchQuery, setSearchQuery] = useState<string>('');
 
-
-    console.log('user ME-->', user);
     useEffect(() => {
         dispatch(getVideosMeAction(user?.id));
         // dispatch(getUsersAction());

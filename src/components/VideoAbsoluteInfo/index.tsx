@@ -20,6 +20,7 @@ interface VideoAbsoluteInfoProps {
     showChat?: boolean
     showReplay?: boolean
     fullLike?: boolean
+    showComments?: boolean
     openComments: () => void
 }
 
@@ -36,6 +37,7 @@ const VideoAbsoluteInfo = ({
     showChat = false,
     showReplay = false,
     fullLike = false,
+    showComments = false,
     openComments,
 }: VideoAbsoluteInfoProps) => {
     const insets = useSafeAreaInsets();
@@ -68,16 +70,20 @@ const VideoAbsoluteInfo = ({
                         <View style={cs.videoDurationContainer}>
                             <BodyText color={colors.white}>{videoDuration}</BodyText>
                         </View>
-                        <TouchableOpacity onPress={openComments} style={{
-                            position: 'absolute',
-                            top: 40,
-                            right: 5,
-                        }}>
-                            <BodyText style={{
-                                fontSize: 24,
-                                color: '#fff',
-                            }}>💬</BodyText>
-                        </TouchableOpacity>
+                        {
+                            showComments && (
+                                <TouchableOpacity onPress={openComments} style={{
+                                    position: 'absolute',
+                                    top: 40,
+                                    right: 5,
+                                }}>
+                                    <BodyText style={{
+                                        fontSize: 24,
+                                        color: '#fff',
+                                    }}>💬</BodyText>
+                                </TouchableOpacity>
+                            )
+                        }
                     </View>
 
                     {/* Likes */}

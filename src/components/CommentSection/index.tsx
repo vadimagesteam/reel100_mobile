@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, TextInput, TouchableOpacity, View, Platform, Modal, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native';
+import { FlatList, StyleSheet, TextInput, TouchableOpacity, View, Platform, Modal, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Dimensions } from 'react-native';
 import { BodyText } from '../UI';
-import { useReduxDispatch } from '../../store/store';
+import { useReduxDispatch, useReduxSelector } from '../../store/store';
 import { createVideoCommentAction, getVideoCommentsAction } from '../../redux/VideoRedux/videoAction';
 import { isIOS } from '../../utils/platformChecker';
 import { colors, positionHelpers } from '../../styles';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
+const { height } = Dimensions.get('window');
 
 type CommentSectionProps = {
     videoId: string;
@@ -15,7 +16,7 @@ type CommentSectionProps = {
 
 const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
     const dispatch = useReduxDispatch();
-    const [comments, setComments] = useState<any[]>([]);
+    const { videoComments } = useReduxSelector(state => state.video);
     const [newComment, setNewComment] = useState('');
 
     useEffect(() => {
@@ -31,55 +32,65 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
         }));
     };
 
-    return (
-        <>
-            <View style={styles.header}>
-                <BodyText fontSize={16} color={colors.white} fontWeight={'bold'}>Comments</BodyText>
-                <TouchableOpacity onPress={onClose}>
-                    <BodyText fontSize={18} color={colors.white}>✕</BodyText>
-                </TouchableOpacity>
+    const renderItem = ({ item }) => {
+        console.log('item-->', item);
+        return (
+            <View style={styles.commentItem}>
+                {/* <BodyText style={styles.user}>{item.user?.fullname}</BodyText>
+                <BodyText style={styles.text}>{item.text}</BodyText> */}
             </View>
-            <KeyboardAwareScrollView
-                enableOnAndroid
-                extraScrollHeight={20}
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ flexGrow: 1 }}
-            >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View style={positionHelpers.fill}>
-                        <View style={styles.container}>
+        );
+    };
 
-                            <FlatList
-                                data={comments}
-                                keyExtractor={(item) => item.id}
-                                renderItem={({ item }) => (
-                                    <View style={styles.commentItem}>
-                                        <BodyText style={styles.user}>{item.user.fullname}</BodyText>
-                                        <BodyText style={styles.text}>{item.text}</BodyText>
-                                    </View>
-                                )}
-                                contentContainerStyle={{ padding: 16 }}
-                            />
-                            <View style={styles.inputContainer}>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Add a comment..."
-                                    placeholderTextColor="#aaa"
-                                    value={newComment}
-                                    onChangeText={setNewComment}
-                                />
-                                <TouchableOpacity
-                                    onPress={postComment}
-                                    style={styles.sendButton}
-                                >
-                                    <BodyText fontWeight={'bold'} color={colors.white}>Send</BodyText>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
+    return (
+        <KeyboardAvoidingView
+            style={{ flex: 2.5, height: height * 0.7 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={{ flex: 1, backgroundColor: colors.black }}>
+                    <View style={styles.header}>
+                        <BodyText fontSize={16} color={colors.white} fontWeight={'bold'}>Comments</BodyText>
+                        <TouchableOpacity onPress={onClose}>
+                            <BodyText fontSize={18} color={colors.white}>✕</BodyText>
+                        </TouchableOpacity>
                     </View>
-                </TouchableWithoutFeedback>
-            </KeyboardAwareScrollView>
-        </>
+
+                    <View style={{ flex: 1 }}>
+                        {videoComments?.length === 0 ? (
+                            <View style={styles.emptyContainer}>
+                                <BodyText fontSize={14} color={colors.white}>Comments will appear here</BodyText>
+                            </View>
+                        ) : (
+                            <FlatList
+                                data={videoComments}
+                                keyExtractor={(item) => item.id}
+                                renderItem={renderItem}
+                                contentContainerStyle={{ padding: 16 }}
+                                keyboardShouldPersistTaps="handled"
+                                showsVerticalScrollIndicator={false}
+                            />
+                        )}
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Add a comment..."
+                            placeholderTextColor="#aaa"
+                            value={newComment}
+                            onChangeText={setNewComment}
+                        />
+                        <TouchableOpacity
+                            onPress={postComment}
+                            style={styles.sendButton}
+                        >
+                            <BodyText fontWeight={'bold'} color={colors.white}>Send</BodyText>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -108,6 +119,8 @@ const styles = StyleSheet.create({
         color: '#ccc',
     },
     inputContainer: {
+        // position: 'absolute',
+        // bottom: 0,
         flexDirection: 'row',
         alignItems: 'center',
         padding: 15,
@@ -130,5 +143,13 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         paddingHorizontal: 14,
         paddingVertical: 8,
+    },
+
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 16,
+
     },
 });

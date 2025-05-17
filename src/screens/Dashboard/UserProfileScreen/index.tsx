@@ -43,7 +43,6 @@ const UserProfileScreen = () => {
     const tapY = useSharedValue(0);
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
-    console.log('params-->', params);
     useEffect(() => {
         dispatch(getOneUserAction(params?.idUser));
         dispatch(getUserVideosAction(params?.idUser));
@@ -58,6 +57,16 @@ const UserProfileScreen = () => {
 
         return () => clearTimeout(timeout);
     }, []);
+
+    useEffect(() => {
+        if (followData && Array.isArray(followData)) {
+            const isFollowing = followData.some(follow =>
+                follow?.who?.id === user?.id &&
+                follow?.whom?.id === params?.idUser
+            );
+            setIsFollowing(isFollowing);
+        }
+    }, [followData, user?.id, params?.idUser]);
 
     const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
 
@@ -166,16 +175,6 @@ const UserProfileScreen = () => {
         );
     };
 
-    // console.log('followData', JSON.stringify(followData, null, 2));
-
-    // const checkFollowStatus = () => {
-    //     const follow = followData[0];
-
-    //     const isFollowing = follow?.who?.id === user?.id && follow?.whom?.id === params?.idUser;
-    //     setIsFollowing(isFollowing);
-    // };
-
-
     const followUserCallback = () => {
         const dataFollow = {
             who: { id: user?.id },
@@ -184,14 +183,22 @@ const UserProfileScreen = () => {
 
         console.log('dataFollow--->', dataFollow);
 
-        // if (isFollowing) {
+        if (isFollowing) {
+            const followRecord = followData.find(
+                f => f?.who?.id === user?.id && f?.whom?.id === params?.idUser
+            );
 
-        // dispatch(unFollowAction(params?.idUser));
-        // } else {
-        // Викликаємо action для підписки
-        dispatch(setFollowAction(dataFollow));
-        // }
-        // checkFollowStatus();
+            if (followRecord?.id) {
+                dispatch(unFollowAction(followRecord.id));
+            } else {
+                console.log('Не знайдено підписки для видалення');
+            }
+        } else {
+            dispatch(setFollowAction(dataFollow));
+        }
+
+        // Опціонально: відразу оновити стейт
+        setIsFollowing(!isFollowing);
 
 
     };
@@ -237,7 +244,7 @@ const UserProfileScreen = () => {
                                     buttonStyles={{ maxWidth: '30%' }}
                                     // marginText={8} title={'Follow'}
                                     marginText={8}
-                                    title={'Follow'}
+                                    title={isFollowing ? 'Unfollow' : 'Follow'}
                                     // title={isFollowing ? 'Unfollow' : 'Follow'}
                                     onPress={() => followUserCallback()}
                                 // onPress={() => true}
