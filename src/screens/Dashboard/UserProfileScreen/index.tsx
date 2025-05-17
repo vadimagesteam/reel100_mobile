@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, FlatList, Image, SafeAreaView, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, RefreshControl, SafeAreaView, TouchableOpacity, View } from 'react-native';
 import { colors, positionHelpers } from '../../../styles';
 import { BodyText, LoaderIndicator, SvgIcon } from '../../../components/UI';
 import MenuModal from '../../../components/Modals/MemuModal';
@@ -16,6 +16,7 @@ import { VideoItemType } from '../FourU/FourUScreen/types';
 import ProfileVideoModal from '../Profile/ProfileScreen/components/ProfileVideoModal';
 import { useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
+import { getFollowAction, setFollowAction, unFollowAction } from '../../../redux/FollowsRedux/followsActions';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_MARGIN = 4;
@@ -27,9 +28,11 @@ const UserProfileScreen = () => {
     const { params } = useRoute();
     const dispatch = useReduxDispatch();
     const { userOneData } = useReduxSelector((state: RootState) => state?.users);
-    const { userVideos, loading } = useReduxSelector((state: RootState) => state?.camera);
+    const { user } = useReduxSelector((state: RootState) => state?.auth);
+    const { userVideos } = useReduxSelector((state: RootState) => state?.camera);
+    const { followData } = useReduxSelector((state: RootState) => state?.follows);
     const [visible, setVisible] = useState<boolean>(false);
-    const [loader, setLoader] = useState(loading);
+    const [loader, setLoader] = useState(false);
 
     const [activeVideoIds, setActiveVideoIds] = useState<string[]>([]);
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
@@ -38,36 +41,37 @@ const UserProfileScreen = () => {
     const opacity = useSharedValue(1);
     const tapX = useSharedValue(0);
     const tapY = useSharedValue(0);
+    const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
     console.log('params-->', params);
     useEffect(() => {
         dispatch(getOneUserAction(params?.idUser));
         dispatch(getUserVideosAction(params?.idUser));
+        dispatch(getFollowAction(params?.idUser));
     }, []);
 
     useEffect(() => {
-        if (loading) {
-            setLoader(true);
-        } else {
-            const timeout = setTimeout(() => {
-                setLoader(false);
-            }, 1000);
+        setLoader(true);
+        const timeout = setTimeout(() => {
+            setLoader(false);
+        }, 1000);
 
-            return () => clearTimeout(timeout);
-        }
-    }, [loading]);
+        return () => clearTimeout(timeout);
+    }, []);
 
-    console.log('userOneData-->', userOneData);
-    console.log('userVideos-->', userVideos);
     const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        try {
-            await dispatch(getUserVideosAction(user?.id));
-        } finally {
+
+        setTimeout(async () => {
+            await dispatch(getUserVideosAction(params?.idUser));
+
             setRefreshing(false);
-        }
+        }, 1000);
+
+
+
     };
 
     const handleDoubleTap = useCallback(
@@ -161,11 +165,43 @@ const UserProfileScreen = () => {
             </TouchableOpacity>
         );
     };
+
+    // console.log('followData', JSON.stringify(followData, null, 2));
+
+    // const checkFollowStatus = () => {
+    //     const follow = followData[0];
+
+    //     const isFollowing = follow?.who?.id === user?.id && follow?.whom?.id === params?.idUser;
+    //     setIsFollowing(isFollowing);
+    // };
+
+
+    const followUserCallback = () => {
+        const dataFollow = {
+            who: { id: user?.id },
+            whom: { id: params?.idUser },
+        };
+
+        console.log('dataFollow--->', dataFollow);
+
+        // if (isFollowing) {
+
+        // dispatch(unFollowAction(params?.idUser));
+        // } else {
+        // Викликаємо action для підписки
+        dispatch(setFollowAction(dataFollow));
+        // }
+        // checkFollowStatus();
+
+
+    };
+
     return (
         <>
             {loader && (
                 <LoaderIndicator />
             )}
+
             {!loader && (
                 <>
                     <CustomHeader title="00:00:00" />
@@ -197,7 +233,16 @@ const UserProfileScreen = () => {
                             <View style={{ alignItems: 'center' }}>
                                 <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }} style={{ height: 70, width: 70 }} />
                                 <BodyText fontWeight={'700'} fontSize={20} color={colors.white} marginTop={5}>{userOneData?.firstName} {userOneData?.lastName}</BodyText>
-                                <ButtonGradient buttonStyles={{ maxWidth: '20%' }} marginText={8} title={'Follow'} onPress={() => true} />
+                                <ButtonGradient
+                                    buttonStyles={{ maxWidth: '30%' }}
+                                    // marginText={8} title={'Follow'}
+                                    marginText={8}
+                                    title={'Follow'}
+                                    // title={isFollowing ? 'Unfollow' : 'Follow'}
+                                    onPress={() => followUserCallback()}
+                                // onPress={() => true}
+                                />
+
                             </View>
 
                             <LinearGradient start={{ x: 0.1, y: 0.5 }}
@@ -266,8 +311,8 @@ const UserProfileScreen = () => {
                                 data={filteredVideos.reverse()}
                                 keyExtractor={(item) => item.id}
                                 numColumns={NUM_COLUMNS}
-                                refreshing={refreshing}
-                                onRefresh={handleRefresh}
+                                // refreshing={refreshing}
+                                // onRefresh={handleRefresh}
                                 renderItem={renderVideoItem}
                                 contentContainerStyle={{
                                     paddingHorizontal: 16,
@@ -277,6 +322,14 @@ const UserProfileScreen = () => {
                                 windowSize={5} // скільки блоків рендериться навколо екрану
                                 maxToRenderPerBatch={6}
                                 removeClippedSubviews={true} // видаляє елементи за межами екрану
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={refreshing}
+                                        onRefresh={handleRefresh}
+                                        colors={['#fff']} // Android (спінер)
+                                        tintColor="#fff" // iOS (спінер)
+                                    />
+                                }
                             />
                         )}
                     </SafeAreaView >

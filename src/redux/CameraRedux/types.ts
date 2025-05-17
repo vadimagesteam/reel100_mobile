@@ -3,6 +3,7 @@ export interface CameraState {
     customLoading: boolean
     videos: any[]
     userVideos: any[]
+    videosMeData: any[]
     prewievVideoUrl: string
     error: Error | null;
 }

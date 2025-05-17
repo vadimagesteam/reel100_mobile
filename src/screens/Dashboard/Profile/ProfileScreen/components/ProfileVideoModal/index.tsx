@@ -6,14 +6,15 @@ import { colors, positionHelpers } from '../../../../../../styles';
 import { formatTime } from '../../../../../../utils/formatTime';
 import VideoAbsoluteInfo from '../../../../../../components/VideoAbsoluteInfo';
 import { HandlerStateChangeEvent, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import CommentSection from '../../../../../../components/CommentSection';
 
 interface ProfileVideoModalProps {
     modalVideo: any
     activeVideoIds: string[]
     onArrowPress?: () => void
-    tapX: number
-    tapY: number
+    tapX: SharedValue<number>
+    tapY: SharedValue<number>
     scale: Animated.SharedValue<number>;
     opacity: Animated.SharedValue<number>;
     handleDoubleTap: (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => void;
@@ -33,6 +34,8 @@ const ProfileVideoModal = ({
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
+
+    const [showComments, setShowComments] = useState(false);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -92,6 +95,11 @@ const ProfileVideoModal = ({
         transform: [{ scale: scale.value }],
     }));
 
+    const openComments = () => {
+        // fetchComments();
+        setShowComments(true);
+    };
+
     return (
         <Modal visible={!!modalVideo} transparent={false} animationType="fade">
             <TapGestureHandler
@@ -129,7 +137,11 @@ const ProfileVideoModal = ({
                                 name={modalVideo?.fullname}
                                 likesCount={modalVideo?.like_count}
                                 videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
+                                openComments={openComments}
                             />
+                            {showComments && modalVideo?.id && (
+                                <CommentSection videoId={modalVideo.id} onClose={() => setShowComments(false)} />
+                            )}
                         </>
                     )}
                 </View>

@@ -19,7 +19,7 @@ const TabViewVideo = ({ allVideo, activeTab, setActiveTab }: TabViewVideoProps) 
 
     return (
         <>
-            <View style={[positionHelpers.rowAround, positionHelpers.mt8]}>
+            <View style={[positionHelpers.rowAround]}>
                 <TouchableOpacity
                     style={[
                         positionHelpers.fill,

@@ -12,7 +12,7 @@ export const createVideoAction = createAsyncThunk<any, any>(
         const { createVideo, file, navigation } = dataCreateVideo;
         thunkAPI.dispatch(setCustomLoading(true));
 
-        console.log('dataCreateVideo-->', dataCreateVideo);
+        // console.log('dataCreateVideo-->', dataCreateVideo);
         try {
             // const config = {
             //     headers: {
@@ -22,7 +22,7 @@ export const createVideoAction = createAsyncThunk<any, any>(
             // };
             const response = await axios.post('api/videos', createVideo);
 
-            console.log('response--->', JSON.stringify(response, null, 2));
+            // console.log('response--->', JSON.stringify(response, null, 2));
 
             if (response?.status === 201) {
                 const videoId = response.data.id;
@@ -146,6 +146,25 @@ export const getUserVideosAction = createAsyncThunk<any, string>(
         } catch (error) {
             if (error instanceof AxiosError) {
 
+                console.log('-getVideosAction-error->', error.response.data);
+                if (error.response && error.response.data) {
+                    return thunkAPI.rejectWithValue(error.response.data);
+                } else {
+                }
+            }
+        }
+    },
+);
+
+export const getVideosMeAction = createAsyncThunk<any, string>(
+    'camera/getVideosMe',
+    async (userId, thunkAPI) => {
+        try {
+            const response = await axios.get(`api/videos?where[user][id]=${userId}`);
+
+            return response?.data;
+        } catch (error) {
+            if (error instanceof AxiosError) {
                 console.log('-getVideosAction-error->', error.response.data);
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);

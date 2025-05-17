@@ -57,6 +57,7 @@ const NavigationContainerScreen = () => {
                     if (token && JSON.parse(isVerified) === true) {
                         axios.defaults.headers.common.Authorization = `Bearer ${token}`;
                         dispatch(setIsAuth(true));
+                        // dispatch()
                     } else {
                         dispatch(setIsAuth(false));
                     }

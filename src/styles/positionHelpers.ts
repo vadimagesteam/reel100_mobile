@@ -194,6 +194,10 @@ export const ph16: ViewStyle = {
     paddingHorizontal: 16,
 };
 
+export const ph20: ViewStyle = {
+    paddingHorizontal: 20,
+};
+
 export const ph25: ViewStyle = {
     paddingHorizontal: 25,
 };

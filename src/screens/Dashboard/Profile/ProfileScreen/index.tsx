@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, SafeAreaView, TouchableOpacity, ScrollView, Keyboard, FlatList, Dimensions, Image, StyleSheet } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, ScrollView, Keyboard, FlatList, Dimensions, Image, StyleSheet, RefreshControl } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { GestureHandlerRootView, HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
 import Animated, { Easing, useSharedValue, withSpring, withTiming, runOnJS, useAnimatedStyle } from 'react-native-reanimated';
@@ -11,7 +11,7 @@ import { BodyText, ButtonDefault, Input, SvgIcon } from '../../../../components/
 import ProfileInfo from './components/ProfileInfo';
 import { cs } from './styles';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
-import { getUserVideosAction, getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
+import { getUserVideosAction, getVideosAction, getVideosMeAction } from '../../../../redux/CameraRedux/cameraActions';
 import Video from 'react-native-video';
 import FullVideoModal from '../../../../components/TabViewVideo/components/StateFeedTab/components/FullVideoModal';
 import { VideoItemType } from '../../FourU/FourUScreen/types';
@@ -32,7 +32,7 @@ const ITEM_SIZE = (SCREEN_WIDTH - ITEM_MARGIN * (NUM_COLUMNS + 1) - 32) / NUM_CO
 const ProfileScreen = () => {
     const navigation = useNavigation<any>();
     const dispatch = useReduxDispatch();
-    const { userVideos } = useReduxSelector((state: RootState) => state.camera);
+    const { videosMeData } = useReduxSelector((state: RootState) => state.camera);
     const { user } = useReduxSelector((state: RootState) => state.auth);
     const { usersData } = useReduxSelector((state: RootState) => state.users);
     const inputRef = useRef(null);
@@ -52,9 +52,9 @@ const ProfileScreen = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
 
 
-    // console.log('usersData-->', usersData);
+    console.log('user ME-->', user);
     useEffect(() => {
-        dispatch(getUserVideosAction(user?.id));
+        dispatch(getVideosMeAction(user?.id));
         // dispatch(getUsersAction());
     }, []);
 
@@ -91,15 +91,16 @@ const ProfileScreen = () => {
     }, [searchQuery]);
 
 
-    const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
+    const filteredVideos = videosMeData.filter(v => v?.file?.storagePath);
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        try {
-            await dispatch(getUserVideosAction(user?.id));
-        } finally {
+
+        setTimeout(async () => {
+            await dispatch(getVideosMeAction(user?.id));
+
             setRefreshing(false);
-        }
+        }, 1000);
     };
 
     const handleDoubleTap = useCallback(
@@ -273,8 +274,8 @@ const ProfileScreen = () => {
                             data={filteredVideos.reverse()}
                             keyExtractor={(item) => item.id}
                             numColumns={NUM_COLUMNS}
-                            refreshing={refreshing}
-                            onRefresh={handleRefresh}
+                            // refreshing={refreshing}
+                            // onRefresh={handleRefresh}
                             renderItem={renderVideoItem}
                             contentContainerStyle={{
                                 paddingHorizontal: 16,
@@ -284,6 +285,14 @@ const ProfileScreen = () => {
                             windowSize={5} // скільки блоків рендериться навколо екрану
                             maxToRenderPerBatch={6}
                             removeClippedSubviews={true} // видаляє елементи за межами екрану
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={refreshing}
+                                    onRefresh={handleRefresh}
+                                    colors={['#fff']} // Android (спінер)
+                                    tintColor="#fff" // iOS (спінер)
+                                />
+                            }
                         />
                     )}
                 </SafeAreaView >
@@ -305,26 +314,20 @@ const ProfileScreen = () => {
                             keyExtractor={(item) => item.id}
                             renderItem={({ item }) => {
                                 return (
-                                    <>
-                                        {
-                                            item?.firstName !== '' || item?.lastName !== '' ? (
-                                                <TouchableOpacity onPress={() => {
-                                                    navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
-                                                }}>
-                                                    <BodyText
-                                                        paddingLeft={10}
-                                                        fontSize={16}
-                                                        color={colors.white}
-                                                        paddingVertical={12}
-                                                        borderBottomColor={colors.silver1Procent50}
-                                                        borderBottomWidth={1}
-                                                    >
-                                                        {item.firstName} {item?.lastName}
-                                                    </BodyText>
-                                                </TouchableOpacity>
-                                            ) : null
-                                        }
-                                    </>
+                                    <TouchableOpacity onPress={() => {
+                                        navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
+                                    }}>
+                                        <BodyText
+                                            paddingLeft={10}
+                                            fontSize={16}
+                                            color={colors.white}
+                                            paddingVertical={12}
+                                            borderBottomColor={colors.silver1Procent50}
+                                            borderBottomWidth={1}
+                                        >
+                                            {item.firstName} {item?.lastName}
+                                        </BodyText>
+                                    </TouchableOpacity>
                                 );
                             }}
                             ListEmptyComponent={() => {

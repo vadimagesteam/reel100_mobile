@@ -1,0 +1,58 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { VideoState } from './types';
+import { createVideoCommentAction, getVideoCommentsAction } from './videoAction';
+
+
+const initialState: VideoState = {
+    loading: false,
+    videoComments: [],
+    error: null,
+};
+
+export const videoSlice = createSlice({
+    name: 'video',
+    initialState,
+    reducers: {},
+    extraReducers: builder => {
+        builder
+            //get Users
+            .addCase(getVideoCommentsAction.pending, state => {
+                state.loading = true;
+            })
+            .addCase(
+                getVideoCommentsAction.fulfilled,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.videoComments = action?.payload;
+                },
+            )
+            .addCase(
+                getVideoCommentsAction.rejected,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                },
+            )
+            // Create Comment
+            .addCase(createVideoCommentAction.pending, state => {
+                state.loading = true;
+            })
+            .addCase(
+                createVideoCommentAction.fulfilled,
+                (state) => {
+                    state.loading = false;
+                },
+            )
+            .addCase(
+                createVideoCommentAction.rejected,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                },
+            );
+    },
+});
+
+// export const { } = videoSlice.actions;
+
+export default videoSlice.reducer;

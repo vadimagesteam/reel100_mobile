@@ -232,10 +232,13 @@ const MainScreen = () => {
 
     return (
         <>
-            <CustomHeader title="00:00:00" />
+            <CustomHeader title="00:00:00"
+            // showAnimationHeader={true}
+            // onMenuPress={() => setVisible(true)}
+            // dataStates={states}
+            />
             <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
                 <View style={[positionHelpers.ph16, positionHelpers.mt10, positionHelpers.rowFillCenter]}>
-                    {/* Dropdown menu(geolocation) */}
                     <DropdownMenu
                         data={states}
                         placeholder="Change Country"

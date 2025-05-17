@@ -1,12 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CameraState } from './types';
-import { createVideoAction, getUserVideosAction, getVideosAction } from './cameraActions';
+import { createVideoAction, getUserVideosAction, getVideosAction, getVideosMeAction } from './cameraActions';
 
 const initialState: CameraState = {
     loading: false,
     customLoading: false,
     videos: [],
     userVideos: [],
+    videosMeData: [],
     prewievVideoUrl: '',
     error: null,
 };
@@ -74,6 +75,24 @@ const cameraSlice = createSlice({
             )
             .addCase(
                 getUserVideosAction.rejected,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                },
+            )
+            //Get vidios me
+            .addCase(getVideosMeAction.pending, state => {
+                state.loading = true;
+            })
+            .addCase(
+                getVideosMeAction.fulfilled,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.videosMeData = action.payload;
+                },
+            )
+            .addCase(
+                getVideosMeAction.rejected,
                 (state, action: PayloadAction<any>) => {
                     state.loading = false;
                     state.error = action.payload;

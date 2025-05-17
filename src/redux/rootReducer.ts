@@ -6,6 +6,8 @@ import statesReducer from './StatesRedux/statesSlice';
 import countdownClockReducer from './CoutdownClockRedux/countdownClockSlice';
 import cameraReducer from './CameraRedux/cameraSlice';
 import usersReducer from './UsersRedux/usersSlice';
+import followsReducer from './FollowsRedux/followsSlice';
+import videoReducer from './VideoRedux/videoSlice';
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -13,6 +15,8 @@ const rootReducer = combineReducers({
     countdownClock: countdownClockReducer,
     camera: cameraReducer,
     users: usersReducer,
+    follows: followsReducer,
+    video: videoReducer,
 });
 
 export default rootReducer;
