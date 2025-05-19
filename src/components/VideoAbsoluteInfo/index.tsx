@@ -21,6 +21,7 @@ interface VideoAbsoluteInfoProps {
     showReplay?: boolean
     fullLike?: boolean
     showComments?: boolean
+    countComments?: number
     openComments: () => void
 }
 
@@ -38,6 +39,7 @@ const VideoAbsoluteInfo = ({
     showReplay = false,
     fullLike = false,
     showComments = false,
+    countComments,
     openComments,
 }: VideoAbsoluteInfoProps) => {
     const insets = useSafeAreaInsets();
@@ -72,16 +74,24 @@ const VideoAbsoluteInfo = ({
                         </View>
                         {
                             showComments && (
-                                <TouchableOpacity onPress={openComments} style={{
+                                <View style={{
                                     position: 'absolute',
                                     top: 40,
                                     right: 5,
+                                    alignItems: 'center',
                                 }}>
-                                    <BodyText style={{
-                                        fontSize: 24,
-                                        color: '#fff',
-                                    }}>💬</BodyText>
-                                </TouchableOpacity>
+                                    <TouchableOpacity onPress={openComments} style={{
+                                        // position: 'absolute',
+                                        // top: 40,
+                                        // right: 5,
+                                    }}>
+                                        <BodyText style={{
+                                            fontSize: 24,
+                                            color: '#fff',
+                                        }}>💬</BodyText>
+                                    </TouchableOpacity>
+                                    <BodyText fontWeight={'bold'} fontSize={14} color={colors.white}>{countComments}</BodyText>
+                                </View>
                             )
                         }
                     </View>

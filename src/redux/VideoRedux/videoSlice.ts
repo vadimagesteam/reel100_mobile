@@ -6,6 +6,7 @@ import { createVideoCommentAction, getVideoCommentsAction } from './videoAction'
 const initialState: VideoState = {
     loading: false,
     videoComments: [],
+    countComments: null,
     error: null,
 };
 
@@ -24,6 +25,7 @@ export const videoSlice = createSlice({
                 (state, action: PayloadAction<any>) => {
                     state.loading = false;
                     state.videoComments = action?.payload;
+                    state.countComments = action?.payload?.length;
                 },
             )
             .addCase(

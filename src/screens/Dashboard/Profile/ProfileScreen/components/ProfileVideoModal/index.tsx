@@ -8,6 +8,8 @@ import VideoAbsoluteInfo from '../../../../../../components/VideoAbsoluteInfo';
 import { HandlerStateChangeEvent, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
 import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import CommentSection from '../../../../../../components/CommentSection';
+import { RootState, useReduxDispatch, useReduxSelector } from '../../../../../../store/store';
+import { getVideoCommentsAction } from '../../../../../../redux/VideoRedux/videoAction';
 
 interface ProfileVideoModalProps {
     modalVideo: any
@@ -29,6 +31,8 @@ const ProfileVideoModal = ({
     tapY,
     scale,
     opacity }: ProfileVideoModalProps) => {
+    const dispatch = useReduxDispatch();
+    const { countComments } = useReduxSelector((state: RootState) => state.video);
     const videoRef = useRef<any | null>(null);
     const doubleTapRef = useRef<TapGestureHandler>(null);
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
@@ -36,6 +40,12 @@ const ProfileVideoModal = ({
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
 
     const [showComments, setShowComments] = useState(false);
+
+    useEffect(() => {
+        if (modalVideo && modalVideo?.id) {
+            dispatch(getVideoCommentsAction(modalVideo.id));
+        }
+    }, [modalVideo?.id]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -139,23 +149,10 @@ const ProfileVideoModal = ({
                                 videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
                                 openComments={openComments}
                                 showComments={true}
+                                countComments={countComments}
                             />
                             {showComments && modalVideo?.id && (
-                                // <View style={{
-                                //     // position: 'absolute',
-                                //     // bottom: 0,
-                                //     // left: 0,
-                                //     // right: 0,
-                                //     // height: '70%',
-                                //     backgroundColor: '#000',
-                                //     borderTopLeftRadius: 20,
-                                //     borderTopRightRadius: 20,
-                                //     overflow: 'hidden',
-                                // }}>
-
                                 <CommentSection videoId={modalVideo.id} onClose={() => setShowComments(false)} />
-
-                                // </View>
                             )}
                         </>
                     )}

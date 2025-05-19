@@ -2,25 +2,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 
-export const setFollowAction = createAsyncThunk<any, void>(
+export const setFollowAction = createAsyncThunk<any, any>(
     'follows/setFollow',
     async (dataFollow, thunkAPI) => {
-
-        console.log('---data follow-->', dataFollow);
-        console.log('---data dataFollow?.who?.id-->', dataFollow?.who?.id);
         try {
-            // const token = await AsyncStorage.getItem('@token');
-            // console.log('token--->', token);
-            // const config = {
-            //     headers: {
-            //         Accept: 'application/json',
-            //         'Content-Type': 'application/json',
-            //         Authorization: `Bearer ${token}`,
-            //     },
-            // };
             const response = await axios.post(`/api/follows?who[id]=${dataFollow?.who?.id}&whom[id]=${dataFollow?.whom?.id}`, dataFollow);
-            console.log('response--setFollowAction--->>', response);
-            thunkAPI.dispatch(getFollowAction());
+
+            if (response?.status === 201) {
+                thunkAPI.dispatch(getFollowAction());
+            }
+
             return response?.data;
         } catch (error) {
             console.log('response--setFollowAction--->>', error?.response?.data);
