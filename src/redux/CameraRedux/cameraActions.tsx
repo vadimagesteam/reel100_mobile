@@ -161,6 +161,7 @@ export const getVideosMeAction = createAsyncThunk<any, string>(
     async (userId, thunkAPI) => {
         try {
             const response = await axios.get(`api/videos?where[user][id]=${userId}`);
+            // &take=${take}&skip=${skip}&orderBy[createdAt]=desc
 
             return response?.data;
         } catch (error) {

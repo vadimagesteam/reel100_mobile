@@ -24,6 +24,9 @@ const cameraSlice = createSlice({
             state.prewievVideoUrl = action.payload;
             return state;
         },
+        clearVideos(state) {
+            state.videosMeData = [];
+        },
     },
     extraReducers: builder => {
         builder
@@ -88,7 +91,8 @@ const cameraSlice = createSlice({
                 getVideosMeAction.fulfilled,
                 (state, action: PayloadAction<any>) => {
                     state.loading = false;
-                    state.videosMeData = action.payload;
+                    state.videosMeData = action.payload.reverse();
+                    // state.videosMeData = [...state.videosMeData.reverse(), ...action.payload.reverse()];
                 },
             )
             .addCase(
@@ -103,5 +107,5 @@ const cameraSlice = createSlice({
 
 });
 
-export const { setCustomLoading, setPreviewVideoURL } = cameraSlice.actions;
+export const { setCustomLoading, setPreviewVideoURL, clearVideos } = cameraSlice.actions;
 export default cameraSlice.reducer;

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, SafeAreaView, TouchableOpacity, ScrollView, Keyboard, FlatList, Dimensions, Image, StyleSheet, RefreshControl } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, ScrollView, Keyboard, FlatList, Dimensions, Image, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { GestureHandlerRootView, HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
 import Animated, { Easing, useSharedValue, withSpring, withTiming, runOnJS, useAnimatedStyle } from 'react-native-reanimated';
@@ -22,6 +22,7 @@ import MenuModal from '../../../../components/Modals/MemuModal';
 import { getOneUserAction, getUsersAction } from '../../../../redux/UsersRedux/usersAction';
 import { usersDataMock } from './mockData';
 import { debounce } from './../../../../utils/debounce';
+import { clearVideos } from '../../../../redux/CameraRedux/cameraSlice';
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -32,7 +33,7 @@ const ITEM_SIZE = (SCREEN_WIDTH - ITEM_MARGIN * (NUM_COLUMNS + 1) - 32) / NUM_CO
 const ProfileScreen = () => {
     const navigation = useNavigation<any>();
     const dispatch = useReduxDispatch();
-    const { videosMeData } = useReduxSelector((state: RootState) => state.camera);
+    const { videosMeData, loading } = useReduxSelector((state: RootState) => state.camera);
     const { user } = useReduxSelector((state: RootState) => state.auth);
     const { usersData } = useReduxSelector((state: RootState) => state.users);
     const inputRef = useRef(null);
@@ -51,10 +52,21 @@ const ProfileScreen = () => {
     const overlayTranslateY = useSharedValue(0);
     const [searchQuery, setSearchQuery] = useState<string>('');
 
+    // const [page, setPage] = useState(0);
+    // const [loadingMoreVideo, setLoadingMoreVideo] = useState(false);
+    // const [hasMore, setHasMore] = useState(true);
+    // const TAKE = 10;
+
     useEffect(() => {
         dispatch(getVideosMeAction(user?.id));
         // dispatch(getUsersAction());
     }, []);
+
+    // useEffect(() => {
+    //     handleRefresh();
+    // }, []);
+
+    // console.log(videosMeData);
 
     useEffect(() => {
         if (isSearchActive && inputRef.current) {
@@ -90,6 +102,39 @@ const ProfileScreen = () => {
 
 
     const filteredVideos = videosMeData.filter(v => v?.file?.storagePath);
+
+    // const loadVideos = async (pageNumber: number) => {
+    //     if (!user?.id || !hasMore || loadingMoreVideo) { return; }
+
+    //     setLoadingMoreVideo(true);
+
+    //     const result = await dispatch(getVideosMeAction({
+    //         userId: user.id,
+    //         take: TAKE,
+    //         skip: pageNumber * TAKE,
+    //     }));
+
+    //     // Перевірити, чи є ще відео
+    //     if (result.payload?.length < TAKE) {
+    //         setHasMore(false);
+    //     }
+
+    //     setPage(pageNumber);
+    //     setLoadingMoreVideo(false);
+    // };
+
+    // const handleLoadMore = () => {
+    //     loadVideos(page + 1);
+    // };
+
+    // const handleRefresh = async () => {
+    //     setRefreshing(true);
+    //     setHasMore(true);
+    //     setPage(0);
+    //     dispatch(clearVideos());
+    //     await loadVideos(0);
+    //     setRefreshing(false);
+    // };
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -255,7 +300,7 @@ const ProfileScreen = () => {
                         </View>
                     ) : (
                         <FlatList
-                            data={filteredVideos.reverse()}
+                            data={filteredVideos}
                             keyExtractor={(item) => item.id}
                             numColumns={NUM_COLUMNS}
                             // refreshing={refreshing}
@@ -277,6 +322,9 @@ const ProfileScreen = () => {
                                     tintColor="#fff" // iOS (спінер)
                                 />
                             }
+                        // onEndReached={handleLoadMore}
+                        // onEndReachedThreshold={0.5}
+                        // ListFooterComponent={loadingMoreVideo ? <ActivityIndicator color="#fff" /> : null}
                         />
                     )}
                 </SafeAreaView >
