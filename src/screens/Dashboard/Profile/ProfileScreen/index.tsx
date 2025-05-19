@@ -142,20 +142,6 @@ const ProfileScreen = () => {
                 }}
                 onPress={() => setModalVideo(item)}
             >
-                {/* <Video
-                    source={{ uri: url }}
-                    style={{ width: '100%', height: '100%' }}
-                    resizeMode="cover"
-                    repeat
-                    muted
-                    paused
-                    ignoreSilentSwitch="ignore"
-                /> */}
-                {/* <Image
-                    source={{ uri: screenshot }}
-                    style={{ width: '100%', height: '100%' }}
-                    resizeMode="cover"
-                /> */}
                 {screenshot ? (
                     <>
                         <FastImage
