@@ -140,13 +140,11 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                             source={item.file?.storagePath}
                             isActive={index === activeIndex}
                             videoHeight={videoHeight}
-                            // tapPosition={tapPosition}
                             tapX={tapX}
                             tapY={tapY}
                             scale={scale}
                             opacity={opacity}
                             onSingleTap={(event) => handleSingleTap(event, item?.id)}
-                            // handleDoubleTap={(event) => handleDoubleTap(event)}
                             onDoubleTap={(event) => handleDoubleTap(event)}
                             avatar={item?.avatar}
                             name={item?.fullname}
@@ -163,7 +161,6 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
         [
             activeIndex,
             videoHeight,
-            // tapPosition
             tapX,
             tapY,
             scale,
