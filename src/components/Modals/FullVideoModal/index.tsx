@@ -1,38 +1,26 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, View } from 'react-native';
 import Video from 'react-native-video';
-import { colors, positionHelpers } from '../../../../../../styles';
-// import VideoAbsoluteInfo from '../../../../../VideoAbsoluteInfo';
-import { formatTime } from '../../../../../../utils/formatTime';
-import VideoAbsoluteInfo from '../../../../../../components/VideoAbsoluteInfo';
-import { HandlerStateChangeEvent, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
-import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
-import CommentSection from '../../../../../../components/CommentSection';
-import { RootState, useReduxDispatch, useReduxSelector } from '../../../../../../store/store';
-import { getVideoCommentsAction } from '../../../../../../redux/VideoRedux/videoAction';
+import { HandlerStateChangeEvent, State, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
+import Animated, { SharedValue, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
+import { getVideoCommentsAction } from '../../../redux/VideoRedux/videoAction';
+import { colors, positionHelpers } from '../../../styles';
+import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
+import { formatTime } from '../../../utils/formatTime';
+import CommentSection from '../../CommentSection';
 
-interface ProfileVideoModalProps {
-    modalVideo: any
-    activeVideoIds: string[]
+
+interface FullVideoModalProps {
     onArrowPress?: () => void
-    tapX: SharedValue<number>
-    tapY: SharedValue<number>
-    scale: Animated.SharedValue<number>;
-    opacity: Animated.SharedValue<number>;
-    handleDoubleTap: (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => void;
 }
 
-const ProfileVideoModal = ({
-    modalVideo,
-    activeVideoIds,
-    handleDoubleTap,
+const FullVideoModal = ({
     onArrowPress,
-    tapX,
-    tapY,
-    scale,
-    opacity }: ProfileVideoModalProps) => {
+}: FullVideoModalProps) => {
     const dispatch = useReduxDispatch();
-    const { countComments } = useReduxSelector((state: RootState) => state.video);
+    const { modalVideoVisible } = useReduxSelector((state: RootState) => state?.modals);
+    const { countComments, oneVideoData } = useReduxSelector((state: RootState) => state.video);
     const videoRef = useRef<any | null>(null);
     const doubleTapRef = useRef<TapGestureHandler>(null);
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
@@ -42,46 +30,42 @@ const ProfileVideoModal = ({
     const [durationReady, setDurationReady] = useState(false);
 
     const [showComments, setShowComments] = useState(false);
+    const scale = useSharedValue(0);
+    const opacity = useSharedValue(1);
+    const tapX = useSharedValue(0);
+    const tapY = useSharedValue(0);
+
+    console.log('oneVideoData--->', oneVideoData);
 
     useEffect(() => {
-        if (modalVideo && modalVideo?.id) {
-            dispatch(getVideoCommentsAction(modalVideo.id));
+        if (oneVideoData && oneVideoData?.id) {
+            dispatch(getVideoCommentsAction(oneVideoData.id));
             setIsVideoReady(false);
             setDurationReady(false);
         }
-    }, [modalVideo?.id]);
+    }, [oneVideoData?.id]);
 
     // console.log('modalVideo-->', modalVideo);
 
+    const handleDoubleTap = useCallback(
+        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
+            if (event.nativeEvent.state === State.END) {
+                const { x, y } = event.nativeEvent;
 
-    // useEffect(() => {
-    //     if (modalVideo?.id) {
-    //         const interval = setInterval(() => {
-    //             setRemainingSeconds(prev => {
-    //                 const updated = { ...prev };
+                tapX.value = x;
+                tapY.value = y;
 
+                scale.value = 1;
+                opacity.value = 1;
 
-    //                 const current = updated[modalVideo.id];
-    //                 if (current > 0) {
-    //                     updated[modalVideo.id] = current - 1;
-    //                 }
-
-
-    //                 activeVideoIds.forEach(key => {
-    //                     const current = updated[key];
-    //                     if (current > 0) {
-    //                         updated[key] = current - 1;
-    //                     }
-    //                 });
-
-    //                 return updated;
-    //             });
-    //         }, 1000);
-
-
-    //         return () => clearInterval(interval);
-    //     }
-    // }, [activeVideoIds, modalVideo?.id]);
+                scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+                    scale.value = withTiming(0, { duration: 500 });
+                    opacity.value = withTiming(0, { duration: 500 });
+                });
+            }
+        },
+        [scale, opacity, tapX, tapY]
+    );
 
 
     //Save duration video
@@ -110,7 +94,6 @@ const ProfileVideoModal = ({
 
     // Animated style heart
     const animatedStyle = useAnimatedStyle(() => ({
-        // position: 'absolute',
         left: tapX.value - 40,
         top: tapY.value - 40,
         opacity: opacity.value,
@@ -118,12 +101,11 @@ const ProfileVideoModal = ({
     }));
 
     const openComments = () => {
-        // fetchComments();
         setShowComments(true);
     };
 
     return (
-        <Modal visible={!!modalVideo} transparent={false} animationType="fade">
+        <Modal visible={modalVideoVisible} transparent={false} animationType="fade">
             <TapGestureHandler
                 onHandlerStateChange={handleDoubleTap}
                 numberOfTaps={2}
@@ -132,11 +114,11 @@ const ProfileVideoModal = ({
                     style={[positionHelpers.fill, { backgroundColor: colors.black }]}
 
                 >
-                    {modalVideo && (
+                    {oneVideoData && (
                         <>
                             <Video
                                 ref={videoRef}
-                                source={{ uri: modalVideo?.file?.storagePath }}
+                                source={{ uri: oneVideoData?.file?.storagePath }}
                                 style={positionHelpers.fill}
                                 resizeMode="cover"
                                 muted={false}
@@ -144,17 +126,17 @@ const ProfileVideoModal = ({
                                 paused={false}
                                 controls={false}
                                 onLoad={(data) => {
-                                    handleVideoLoadModal(modalVideo?.id, data?.duration);
+                                    handleVideoLoadModal(oneVideoData?.id, data?.duration);
                                 }}
                                 onProgress={({ currentTime }) => {
-                                    if (modalVideo?.id && durations[modalVideo.id]) {
-                                        const duration = durations[modalVideo.id];
+                                    if (oneVideoData?.id && durations[oneVideoData.id]) {
+                                        const duration = durations[oneVideoData.id];
                                         setRemainingSeconds(prev => {
                                             const newRemaining = duration - currentTime;
-                                            if (Math.abs((prev[modalVideo.id] ?? 0) - newRemaining) > 0.25) {
+                                            if (Math.abs((prev[oneVideoData.id] ?? 0) - newRemaining) > 0.25) {
                                                 return {
                                                     ...prev,
-                                                    [modalVideo.id]: newRemaining,
+                                                    [oneVideoData.id]: newRemaining,
                                                 };
                                             }
                                             return prev;
@@ -162,29 +144,29 @@ const ProfileVideoModal = ({
 
                                         if (currentTime >= duration) {
                                             videoRef.current?.seek(0);
-                                            onVideoRepeat(modalVideo.id);
+                                            onVideoRepeat(oneVideoData.id);
                                         }
                                     }
                                 }}
                             // onEnd={() => {
                             //     videoRef.current?.seek(0);
-                            //     onVideoRepeat(modalVideo?.id);
+                            //     onVideoRepeat(oneVideoData?.id);
                             // }}
                             />
                             <VideoAbsoluteInfo
                                 videoCheck={'FULL'}
                                 showArrow={true}
                                 onArrowBack={onArrowPress}
-                                avatar={modalVideo?.avatar}
-                                name={modalVideo?.fullname}
-                                likesCount={modalVideo?.like_count}
-                                videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
+                                avatar={oneVideoData?.avatar}
+                                name={oneVideoData?.fullname}
+                                likesCount={oneVideoData?.like_count}
+                                videoDuration={formatTime(oneVideoData ? remainingSeconds[oneVideoData.id] ?? 0 : 0)}
                                 openComments={openComments}
                                 showComments={true}
                                 countComments={countComments}
                             />
-                            {showComments && modalVideo?.id && (
-                                <CommentSection videoId={modalVideo.id} onClose={() => setShowComments(false)} />
+                            {showComments && oneVideoData?.id && (
+                                <CommentSection videoId={oneVideoData.id} onClose={() => setShowComments(false)} />
                             )}
                         </>
                     )}
@@ -205,4 +187,4 @@ const ProfileVideoModal = ({
     );
 };
 
-export default ProfileVideoModal;
+export default FullVideoModal;

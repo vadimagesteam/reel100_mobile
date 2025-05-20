@@ -11,9 +11,11 @@ export const cs = StyleSheet.create({
     smallBox: {
         width: half,
         height: half,
+        marginVertical: 3,
     },
     bigBox: {
         width: half,
         height: half * 2,
+        margin: 3,
     },
 });

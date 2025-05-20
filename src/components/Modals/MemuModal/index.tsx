@@ -8,20 +8,20 @@ import { useNavigation } from '@react-navigation/native';
 import { DASHBOARD_ROUTES } from '../../../navigation/routes';
 
 interface MenuModalProps {
-    visible: boolean,
     onVisible: (val: boolean) => void
 }
 
-const MenuModal = ({ visible, onVisible }: MenuModalProps) => {
+const MenuModal = ({ onVisible }: MenuModalProps) => {
     const navigation = useNavigation();
     const dispatch = useReduxDispatch();
     const { user } = useReduxSelector(state => state?.auth);
+    const { modalMenuVisible } = useReduxSelector(state => state?.modals);
 
     return (
         <Modal
             animationType="fade"
             transparent={false}
-            visible={visible}
+            visible={modalMenuVisible}
             onRequestClose={onVisible}
         >
             <View style={[positionHelpers.fill, {

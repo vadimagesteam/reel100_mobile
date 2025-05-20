@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, SafeAreaView, TouchableOpacity, ScrollView, Keyboard, FlatList, Dimensions, Image, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import { GestureHandlerRootView, HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
-import Animated, { Easing, useSharedValue, withSpring, withTiming, runOnJS, useAnimatedStyle } from 'react-native-reanimated';
+import { View, SafeAreaView, TouchableOpacity, Keyboard, FlatList, Dimensions, RefreshControl } from 'react-native';
+import { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 import { colors, positionHelpers } from '../../../../styles';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { useNavigation } from '@react-navigation/native';
@@ -11,19 +9,14 @@ import { BodyText, ButtonDefault, Input, SvgIcon } from '../../../../components/
 import ProfileInfo from './components/ProfileInfo';
 import { cs } from './styles';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
-import { getUserVideosAction, getVideosAction, getVideosMeAction } from '../../../../redux/CameraRedux/cameraActions';
-import Video from 'react-native-video';
-import FullVideoModal from '../../../../components/TabViewVideo/components/StateFeedTab/components/FullVideoModal';
+import { getVideosMeAction } from '../../../../redux/CameraRedux/cameraActions';
 import { VideoItemType } from '../../FourU/FourUScreen/types';
-import ProfileVideoModal from './components/ProfileVideoModal';
-import VideoAbsoluteInfo from '../../../../components/VideoAbsoluteInfo';
-import { formatTwoTime } from '../../../../utils/formatTime';
 import MenuModal from '../../../../components/Modals/MemuModal';
-import { getOneUserAction, getUsersAction } from '../../../../redux/UsersRedux/usersAction';
-import { usersDataMock } from './mockData';
-import { debounce } from './../../../../utils/debounce';
-import { clearVideos } from '../../../../redux/CameraRedux/cameraSlice';
-
+import VideoItem from '../../../../components/VideoItem';
+import { setMenuModal, setVideoModal } from '../../../../redux/ModalsRedux/modalSlice';
+import { getOneVideoAction } from '../../../../redux/VideoRedux/videoAction';
+import FullVideoModal from '../../../../components/Modals/FullVideoModal';
+import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedModal';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_MARGIN = 4;
@@ -33,40 +26,23 @@ const ITEM_SIZE = (SCREEN_WIDTH - ITEM_MARGIN * (NUM_COLUMNS + 1) - 32) / NUM_CO
 const ProfileScreen = () => {
     const navigation = useNavigation<any>();
     const dispatch = useReduxDispatch();
-    const { videosMeData, loading } = useReduxSelector((state: RootState) => state.camera);
+    const { videosMeData } = useReduxSelector((state: RootState) => state.camera);
     const { user } = useReduxSelector((state: RootState) => state.auth);
     const { usersData } = useReduxSelector((state: RootState) => state.users);
     const inputRef = useRef(null);
-    const [activeVideoIds, setActiveVideoIds] = useState<string[]>([]);
-    const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
     const [refreshing, setRefreshing] = useState(false);
-    const [isSearchActive, setIsSearchActive] = useState(false);
 
-    const scale = useSharedValue(0);
-    const opacity = useSharedValue(1);
-    const tapX = useSharedValue(0);
-    const tapY = useSharedValue(0);
-    const [visible, setVisible] = useState<boolean>(false);
+    //for SearchAnimatedModal
+    const [isSearchActive, setIsSearchActive] = useState(false);
+    const [searchQuery, setSearchQuery] = useState<string>('');
     const [inputY, setInputY] = useState<number>(0);
     const overlayOpacity = useSharedValue(0);
     const overlayTranslateY = useSharedValue(0);
-    const [searchQuery, setSearchQuery] = useState<string>('');
-
-    // const [page, setPage] = useState(0);
-    // const [loadingMoreVideo, setLoadingMoreVideo] = useState(false);
-    // const [hasMore, setHasMore] = useState(true);
-    // const TAKE = 10;
+    //
 
     useEffect(() => {
         dispatch(getVideosMeAction(user?.id));
-        // dispatch(getUsersAction());
     }, []);
-
-    // useEffect(() => {
-    //     handleRefresh();
-    // }, []);
-
-    // console.log(videosMeData);
 
     useEffect(() => {
         if (isSearchActive && inputRef.current) {
@@ -88,53 +64,7 @@ const ProfileScreen = () => {
         }
     }, [isSearchActive]);
 
-    const debouncedSearch = useRef(
-        debounce((text: string) => {
-            dispatch(getUsersAction(text));
-        }, 350)
-    ).current;
-
-    useEffect(() => {
-        if (searchQuery.trim()) {
-            debouncedSearch(searchQuery);
-        }
-    }, [searchQuery]);
-
-
     const filteredVideos = videosMeData.filter(v => v?.file?.storagePath);
-
-    // const loadVideos = async (pageNumber: number) => {
-    //     if (!user?.id || !hasMore || loadingMoreVideo) { return; }
-
-    //     setLoadingMoreVideo(true);
-
-    //     const result = await dispatch(getVideosMeAction({
-    //         userId: user.id,
-    //         take: TAKE,
-    //         skip: pageNumber * TAKE,
-    //     }));
-
-    //     // Перевірити, чи є ще відео
-    //     if (result.payload?.length < TAKE) {
-    //         setHasMore(false);
-    //     }
-
-    //     setPage(pageNumber);
-    //     setLoadingMoreVideo(false);
-    // };
-
-    // const handleLoadMore = () => {
-    //     loadVideos(page + 1);
-    // };
-
-    // const handleRefresh = async () => {
-    //     setRefreshing(true);
-    //     setHasMore(true);
-    //     setPage(0);
-    //     dispatch(clearVideos());
-    //     await loadVideos(0);
-    //     setRefreshing(false);
-    // };
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -146,93 +76,27 @@ const ProfileScreen = () => {
         }, 1000);
     };
 
-    const handleDoubleTap = useCallback(
-        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
-            if (event.nativeEvent.state === State.END) {
-                const { x, y } = event.nativeEvent;
 
-                tapX.value = x;
-                tapY.value = y;
-
-                scale.value = 1;
-                opacity.value = 1;
-
-                scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
-                    scale.value = withTiming(0, { duration: 500 });
-                    opacity.value = withTiming(0, { duration: 500 });
-                });
-            }
-        },
-        [scale, opacity, tapX, tapY]
-    );
-
-
-    const renderVideoItem = ({ item, index }: { item: VideoItemType; index: number }) => {
-        const url = item?.file?.storagePath;
+    const renderVideoItem = useCallback(({ item, index }: { item: VideoItemType; index: number }) => {
         const isLastInRow = (index + 1) % NUM_COLUMNS === 0;
         const screenshot =
             item.file?.variation?.[0]?.screenshots?.[0] ?? null;
-
         return (
-            <TouchableOpacity
-                key={item.id}
-                style={{
-                    width: ITEM_SIZE,
-                    height: 150,
-                    marginRight: isLastInRow ? 0 : ITEM_MARGIN,
-                    marginBottom: ITEM_MARGIN,
-                    borderRadius: 8,
-                    overflow: 'hidden',
-                    backgroundColor: '#000',
+            <VideoItem
+                key={item?.id}
+                item={item}
+                user={user}
+                screenshot={screenshot}
+                isLastInRow={isLastInRow}
+                ITEM_SIZE={ITEM_SIZE}
+                onVideoPress={() => {
+                    dispatch(getOneVideoAction(item?.id));
+                    dispatch(setVideoModal(true));
                 }}
-                onPress={() => setModalVideo(item)}
-            >
-                {screenshot ? (
-                    <>
-                        <FastImage
-                            style={{ width: '100%', height: '100%', borderRadius: 5 }}
-                            source={{
-                                uri: screenshot,
-                                priority: FastImage.priority.normal,
-                                cache: FastImage.cacheControl.immutable,
-                            }}
-                            resizeMode={FastImage.resizeMode.cover}
-                        />
-                        <VideoAbsoluteInfo
-                            justInfo="SIMPLE"
-                            avatar={''}
-                            name={`${user?.firstName} ${user?.lastName}`}
-                            // videoDuration={`${formatTwoTime(duration)}s`}
-                            likesCount={item?.like_count}
-                        />
-                    </>
-                ) : (
-                    <View
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            backgroundColor: 'black',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: 8,
-                        }}
-                    >
-                        <BodyText fontSize={10} color={colors.white}>No preview</BodyText>
-                    </View>
-                )}
-
-            </TouchableOpacity>
+            />
         );
-    };
+    }, []);
 
-    const filteredUsers = usersData?.filter(
-        (item) => item?.firstName?.trim() && item?.lastName?.trim()
-    );
-
-    const animatedOverlayStyle = useAnimatedStyle(() => ({
-        opacity: overlayOpacity.value,
-        transform: [{ translateY: overlayTranslateY.value }],
-    }));
     return (
         <>
             <View style={positionHelpers.fill}>
@@ -268,7 +132,7 @@ const ProfileScreen = () => {
                                 />
                             </View>
                             {!isSearchActive && (
-                                <TouchableOpacity style={{ marginLeft: 15 }} onPress={() => setVisible(true)}>
+                                <TouchableOpacity style={{ marginLeft: 15 }} onPress={() => dispatch(setMenuModal(true))}>
                                     <SvgIcon image="menu" />
                                 </TouchableOpacity>
                             )}
@@ -280,11 +144,7 @@ const ProfileScreen = () => {
                             buttoStyles={[
                                 positionHelpers.mt15,
                                 positionHelpers.alignCenter,
-                                {
-                                    backgroundColor: colors.white1,
-                                    padding: 16,
-                                    borderRadius: 10,
-                                },
+                                cs.uploadVideoButton,
                             ]}
                             onPress={() => navigation.navigate(DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN)}
                         >
@@ -330,72 +190,22 @@ const ProfileScreen = () => {
                 </SafeAreaView >
             </View >
             {isSearchActive && (
-                <Animated.View
-                    style={[
-                        {
-                            ...StyleSheet.absoluteFillObject,
-                            backgroundColor: colors.black4,
-                            marginTop: inputY,
-                            paddingHorizontal: 16,
-                            marginBottom: 70,
-                        }, animatedOverlayStyle]}
-                >
-                    {searchQuery ? (
-                        <FlatList
-                            data={filteredUsers}
-                            keyExtractor={(item) => item.id}
-                            renderItem={({ item }) => {
-                                return (
-                                    <TouchableOpacity onPress={() => {
-                                        navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
-                                    }}>
-                                        <BodyText
-                                            paddingLeft={10}
-                                            fontSize={16}
-                                            color={colors.white}
-                                            paddingVertical={12}
-                                            borderBottomColor={colors.silver1Procent50}
-                                            borderBottomWidth={1}
-                                        >
-                                            {item.firstName} {item?.lastName}
-                                        </BodyText>
-                                    </TouchableOpacity>
-                                );
-                            }}
-                            ListEmptyComponent={() => {
-                                return (
-                                    <View style={[{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        paddingHorizontal: 20,
-                                    }]}>
-                                        <BodyText color={colors.white} >No results found</BodyText>
-                                    </View>
-                                );
-                            }}
-                            contentContainerStyle={{ padding: 10, flexGrow: 1 }}
-                        />
-                    ) : (
-                        <View style={positionHelpers.fillCenter}>
-                            <BodyText color={colors.white} >No results found</BodyText>
-                        </View>
-                    )}
-                </Animated.View>
+                <SearchAnimatedModal
+                    usersData={usersData}
+                    searchQuery={searchQuery}
+                    inputY={inputY}
+                    overlayOpacity={overlayOpacity}
+                    overlayTranslateY={overlayTranslateY}
+                />
             )}
-            <ProfileVideoModal
-                modalVideo={modalVideo}
-                activeVideoIds={activeVideoIds}
-                onArrowPress={() => setModalVideo(null)}
-                tapX={tapX}
-                tapY={tapY}
-                scale={scale}
-                opacity={opacity}
-                handleDoubleTap={(event) => handleDoubleTap(event)}
+
+            {/* Video Full Modal */}
+            <FullVideoModal
+                onArrowPress={() => dispatch(setVideoModal(false))}
             />
 
             {/* MenuModal */}
-            <MenuModal visible={visible} onVisible={() => setVisible(false)} />
+            <MenuModal onVisible={() => dispatch(setMenuModal(false))} />
         </>
     );
 };

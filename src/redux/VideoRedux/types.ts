@@ -1,6 +1,7 @@
 export interface VideoState {
     loading: boolean;
     videoComments: any[]
-    countComments: number
+    oneVideoData: any[]
+    countComments: number | null
     error: Error | null;
 }
