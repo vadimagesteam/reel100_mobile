@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
@@ -7,7 +7,7 @@ import { colors, positionHelpers } from '../../../styles';
 import { DASHBOARD_ROUTES } from '../../../navigation/routes';
 import { debounce } from '../../../utils/debounce';
 import { useReduxDispatch } from '../../../store/store';
-import { getUsersAction } from '../../../redux/UsersRedux/usersAction';
+import { getOneUserAction, getUsersAction } from '../../../redux/UsersRedux/usersAction';
 
 interface SearchAnimatedModalProps {
     searchQuery: string
@@ -43,6 +43,26 @@ const SearchAnimatedModal = ({ searchQuery, usersData, inputY, overlayOpacity, o
         transform: [{ translateY: overlayTranslateY.value }],
     }));
 
+    const renderUser = useCallback(({ item }: { item: any }) => {
+        return (
+            <TouchableOpacity onPress={() => {
+                dispatch(getOneUserAction(item?.id));
+                navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
+            }}>
+                <BodyText
+                    paddingLeft={10}
+                    fontSize={16}
+                    color={colors.white}
+                    paddingVertical={12}
+                    borderBottomColor={colors.silver1Procent50}
+                    borderBottomWidth={1}
+                >
+                    {item.firstName} {item?.lastName}
+                </BodyText>
+            </TouchableOpacity>
+        );
+    }, []);
+
     return (
         <Animated.View
             style={[
@@ -51,31 +71,13 @@ const SearchAnimatedModal = ({ searchQuery, usersData, inputY, overlayOpacity, o
                     ...StyleSheet.absoluteFillObject,
                     backgroundColor: colors.black4,
                     marginTop: inputY,
-                    marginBottom: 70,
                 }, animatedOverlayStyle]}
         >
             {searchQuery ? (
                 <FlatList
                     data={filteredUsers}
                     keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => {
-                        return (
-                            <TouchableOpacity onPress={() => {
-                                navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
-                            }}>
-                                <BodyText
-                                    paddingLeft={10}
-                                    fontSize={16}
-                                    color={colors.white}
-                                    paddingVertical={12}
-                                    borderBottomColor={colors.silver1Procent50}
-                                    borderBottomWidth={1}
-                                >
-                                    {item.firstName} {item?.lastName}
-                                </BodyText>
-                            </TouchableOpacity>
-                        );
-                    }}
+                    renderItem={renderUser}
                     ListEmptyComponent={() => {
                         return (
                             <View style={[positionHelpers.fillCenter, positionHelpers.ph20]}>
@@ -83,15 +85,22 @@ const SearchAnimatedModal = ({ searchQuery, usersData, inputY, overlayOpacity, o
                             </View>
                         );
                     }}
-                    contentContainerStyle={{ padding: 10, flexGrow: 1 }}
+                    contentContainerStyle={cs.listContainer}
                 />
             ) : (
                 <View style={positionHelpers.fillCenter}>
-                    <BodyText color={colors.white} >No results found</BodyText>
+                    <BodyText color={colors.white}>No results found</BodyText>
                 </View>
             )}
         </Animated.View>
     );
 };
+
+const cs = StyleSheet.create({
+    listContainer: {
+        padding: 10,
+        flexGrow: 1,
+    },
+});
 
 export default SearchAnimatedModal;

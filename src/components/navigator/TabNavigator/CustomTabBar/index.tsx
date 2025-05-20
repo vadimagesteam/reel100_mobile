@@ -6,6 +6,7 @@ import CustomTabBarButton from '../CustomTabBarButton';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import { colors, positionHelpers } from '../../../../styles';
 import { cs } from './styles';
+import { RootState, useReduxSelector } from '../../../../store/store';
 
 const ICONS: Record<string, string> = {
     [DASHBOARD_ROUTES.MAIN_TAB]: 'homeNavTab',
@@ -15,6 +16,7 @@ const ICONS: Record<string, string> = {
 };
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
+    const { isSearchActive } = useReduxSelector((store: RootState) => store.modals);
     const currentRoute = state.routes[state.index];
     const nestedState = descriptors[currentRoute.key]?.navigation?.getState?.();
     const innerRoutes = nestedState?.routes?.[nestedState.index]?.state?.routes || [];
@@ -29,43 +31,41 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
         return null;
     }
     return (
-        <View style={cs.container}>
-            {state.routes.map((route, index) => {
-                const isFocused = state.index === index;
-                const widthAndHeightSize = isFocused ? 28 : 24;
+        <>
+            {!isSearchActive && (
+                <View style={cs.container}>
+                    {state.routes.map((route, index) => {
+                        const isFocused = state.index === index;
+                        const widthAndHeightSize = isFocused ? 28 : 24;
 
-                const onPress = () => {
-                    const event = navigation.emit({
-                        type: 'tabPress',
-                        target: route.key,
-                        canPreventDefault: true,
-                    });
+                        const onPress = () => {
 
-                    if (!isFocused && !event.defaultPrevented) {
-                        navigation.navigate(route.name);
-                    }
-                };
+                            const event = navigation.emit({
+                                type: 'tabPress',
+                                target: route.key,
+                                canPreventDefault: true,
+                            });
 
-                return (
-                    <CustomTabBarButton key={route.key} onPress={onPress}>
-                        {/* <LinearGradient
-                            start={{ x: 0.1, y: 0.5 }}
-                            end={{ x: 0.9, y: 0 }}
-                            colors={isFocused ? [colors.blue1, colors.blue] : ['transparent', 'transparent']}
-                            style={[positionHelpers.center, cs.br40]}
-                        > */}
-                        <View style={[positionHelpers.center, cs.br40, cs.p5, positionHelpers.mb10]}>
-                            <SvgIcon
-                                image={ICONS[route.name]}
-                                color={isFocused ? colors.blue2 : colors.white}
-                                style={{ width: widthAndHeightSize, height: widthAndHeightSize }}
-                            />
-                        </View>
-                        {/* </LinearGradient> */}
-                    </CustomTabBarButton>
-                );
-            })}
-        </View>
+                            if (!isFocused && !event.defaultPrevented) {
+                                navigation.navigate(route.name);
+                            }
+                        };
+
+                        return (
+                            <CustomTabBarButton key={route.key} onPress={onPress}>
+                                <View style={[positionHelpers.center, cs.br40, cs.p5, positionHelpers.mb10]}>
+                                    <SvgIcon
+                                        image={ICONS[route.name]}
+                                        color={isFocused ? colors.blue2 : colors.white}
+                                        style={{ width: widthAndHeightSize, height: widthAndHeightSize }}
+                                    />
+                                </View>
+                            </CustomTabBarButton>
+                        );
+                    })}
+                </View>
+            )}
+        </>
     );
 };
 

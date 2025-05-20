@@ -4,9 +4,10 @@ import { SvgIcon } from '../UI';
 import { positionHelpers } from '../../styles';
 import { cs } from './styles';
 import { StateFeedTab, TopOneHundredTab, TopVideoTab } from './components';
+import { VideoItemType } from '../../redux/CameraRedux/types';
 
 interface TabViewVideoProps {
-    allVideo: any
+    allVideo: VideoItemType[]
     activeTab: string
     setActiveTab: (val: string) => void
 }

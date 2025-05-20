@@ -59,6 +59,10 @@ export const cs = StyleSheet.create({
         backgroundColor: colors.silver3,
         opacity: 0.8,
     },
+    containerChat: {
+        top: 40,
+        right: 5,
+    },
 
     //SIMPLE
     containerNameSimple: {

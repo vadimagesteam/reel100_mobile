@@ -39,7 +39,6 @@ export const getOneVideoAction = createAsyncThunk<any, string>(
 
             return response?.data;
         } catch (error) {
-            console.log('getOneVideoAction --->', error?.response?.data);
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);

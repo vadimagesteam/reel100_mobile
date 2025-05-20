@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CameraState } from './types';
+import { CameraState, VideoItemType } from './types';
 import { createVideoAction, getUserVideosAction, getVideosAction, getVideosMeAction } from './cameraActions';
 
 const initialState: CameraState = {
@@ -53,7 +53,7 @@ const cameraSlice = createSlice({
             })
             .addCase(
                 getVideosAction.fulfilled,
-                (state, action: PayloadAction<any>) => {
+                (state, action: PayloadAction<VideoItemType[]>) => {
                     state.loading = false;
                     state.videos = action.payload;
                 },
@@ -71,7 +71,7 @@ const cameraSlice = createSlice({
             })
             .addCase(
                 getUserVideosAction.fulfilled,
-                (state, action: PayloadAction<any>) => {
+                (state, action: PayloadAction<VideoItemType[]>) => {
                     state.loading = false;
                     state.userVideos = action.payload;
                 },
@@ -89,7 +89,7 @@ const cameraSlice = createSlice({
             })
             .addCase(
                 getVideosMeAction.fulfilled,
-                (state, action: PayloadAction<any>) => {
+                (state, action: PayloadAction<VideoItemType[]>) => {
                     state.loading = false;
                     state.videosMeData = action.payload.reverse();
                     // state.videosMeData = [...state.videosMeData.reverse(), ...action.payload.reverse()];

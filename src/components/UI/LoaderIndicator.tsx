@@ -14,8 +14,7 @@ const cs = StyleSheet.create({
     container: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: colors.black1,
+        backgroundColor: colors.black,
         zIndex: 999,
     },
 });

@@ -9,11 +9,11 @@ import { cs } from './styles';
 interface VideoAbsoluteInfoProps {
     justInfo?: 'FULL' | 'SIMPLE'
     videoCheck?: 'FULL' | 'SIMPLE'
-    avatar: string;
-    name: string;
+    avatar?: string;
+    name?: string;
     videoNumber?: number | string;
-    videoDuration: string | number;
-    likesCount: number | string;
+    videoDuration?: string | number;
+    likesCount?: number | string;
 
     showArrow?: boolean
     onArrowBack?: () => void
@@ -21,8 +21,8 @@ interface VideoAbsoluteInfoProps {
     showReplay?: boolean
     fullLike?: boolean
     showComments?: boolean
-    countComments?: number
-    openComments: () => void
+    countComments?: number | null
+    openComments?: () => void
 }
 
 const VideoAbsoluteInfo = ({
@@ -43,18 +43,19 @@ const VideoAbsoluteInfo = ({
     openComments,
 }: VideoAbsoluteInfoProps) => {
     const insets = useSafeAreaInsets();
+    const videoCheckFull = videoCheck === 'FULL';
 
     return (
         <>
             {justInfo === 'FULL' ? (
                 <>
                     {showArrow && (<TouchableOpacity
-                        style={[positionHelpers.absolute, positionHelpers.alignItemsCenterRow, cs.containerName, { top: videoCheck === 'FULL' ? insets.top + 1 : 10, padding: 10 }]}
+                        style={[positionHelpers.absolute, positionHelpers.alignItemsCenterRow, cs.containerName, { top: videoCheckFull ? insets.top + 1 : 10, padding: 10 }]}
                         onPress={onArrowBack}
                     >
                         <SvgIcon image="backArrow" />
                     </TouchableOpacity>)}
-                    <View style={[positionHelpers.absolute, positionHelpers.alignItemsCenterRow, cs.containerName, { top: videoCheck === 'FULL' ? insets.top + 40 : 10 }]}>
+                    <View style={[positionHelpers.absolute, positionHelpers.alignItemsCenterRow, cs.containerName, { top: videoCheckFull ? insets.top + 40 : 10 }]}>
                         {avatar === '' ? (
                             <View style={cs.noAvatar} />
                         ) : (
@@ -64,7 +65,7 @@ const VideoAbsoluteInfo = ({
                     </View>
 
 
-                    <View style={[positionHelpers.absolute, positionHelpers.alignEnd, positionHelpers.flexRow, cs.containerDuration, { top: videoCheck === 'FULL' ? insets.top + 45 : 15 }]}>
+                    <View style={[positionHelpers.absolute, positionHelpers.alignEnd, positionHelpers.flexRow, cs.containerDuration, { top: videoCheckFull ? insets.top + 45 : 15 }]}>
                         {videoNumber && (<View style={cs.videoNumberContainer}>
                             <BodyText color={colors.white}>#{videoNumber}</BodyText>
                         </View>
@@ -74,21 +75,9 @@ const VideoAbsoluteInfo = ({
                         </View>
                         {
                             showComments && (
-                                <View style={{
-                                    position: 'absolute',
-                                    top: 40,
-                                    right: 5,
-                                    alignItems: 'center',
-                                }}>
-                                    <TouchableOpacity onPress={openComments} style={{
-                                        // position: 'absolute',
-                                        // top: 40,
-                                        // right: 5,
-                                    }}>
-                                        <BodyText style={{
-                                            fontSize: 24,
-                                            color: '#fff',
-                                        }}>💬</BodyText>
+                                <View style={[positionHelpers.absolute, positionHelpers.alignCenter, cs.containerChat]}>
+                                    <TouchableOpacity onPress={openComments} >
+                                        <BodyText fontSize={24} color={colors.white}>💬</BodyText>
                                     </TouchableOpacity>
                                     <BodyText fontWeight={'bold'} fontSize={14} color={colors.white}>{countComments}</BodyText>
                                 </View>

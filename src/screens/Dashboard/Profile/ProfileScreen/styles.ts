@@ -12,4 +12,13 @@ export const cs = StyleSheet.create({
         padding: 16,
         borderRadius: 10,
     },
+    mr15: {
+        marginRight: 15,
+    },
+    ml15: {
+        marginLeft: 15,
+    },
+    pb10: {
+        paddingBottom: 10,
+    },
 });

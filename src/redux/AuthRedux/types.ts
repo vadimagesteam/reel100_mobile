@@ -2,7 +2,7 @@ export interface AuthState {
     loading: boolean;
     isAuth: boolean;
     isStatus: StatusRegisterType | null
-    user: any[];
+    user: UserType | null;
     error: Error | null;
 }
 
@@ -60,3 +60,26 @@ export type ResetPassType = {
     },
     navigation: any
 }
+
+
+export type UserStatsType = {
+    followCount: number;
+    followerCount: number;
+    commentCount: number;
+    likeCount: number;
+};
+
+export type UserType = {
+    id: string | undefined;
+    username: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+    roles: string[];
+    status: 'Active' | 'Pending' | string;
+    createdAt: string;
+    updatedAt: string;
+    resetPasswordToken: string | null;
+    verificationToken: string | null | string;
+    stats: UserStatsType;
+};

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { ActivityIndicator, Modal, View } from 'react-native';
+import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
-import { HandlerStateChangeEvent, State, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
-import Animated, { SharedValue, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { getVideoCommentsAction } from '../../../redux/VideoRedux/videoAction';
 import { colors, positionHelpers } from '../../../styles';
@@ -10,24 +10,22 @@ import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
 import { formatTime } from '../../../utils/formatTime';
 import CommentSection from '../../CommentSection';
 
-
 interface FullVideoModalProps {
     onArrowPress?: () => void
+    modalVideo: any
 }
 
 const FullVideoModal = ({
+    modalVideo,
     onArrowPress,
 }: FullVideoModalProps) => {
     const dispatch = useReduxDispatch();
-    const { modalVideoVisible } = useReduxSelector((state: RootState) => state?.modals);
-    const { countComments, oneVideoData } = useReduxSelector((state: RootState) => state.video);
+    const { countComments } = useReduxSelector((state: RootState) => state.video);
     const videoRef = useRef<any | null>(null);
-    const doubleTapRef = useRef<TapGestureHandler>(null);
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
     const [isVideoReady, setIsVideoReady] = useState(false);
-    const [durationReady, setDurationReady] = useState(false);
 
     const [showComments, setShowComments] = useState(false);
     const scale = useSharedValue(0);
@@ -35,22 +33,19 @@ const FullVideoModal = ({
     const tapX = useSharedValue(0);
     const tapY = useSharedValue(0);
 
-    console.log('oneVideoData--->', oneVideoData);
-
     useEffect(() => {
-        if (oneVideoData && oneVideoData?.id) {
-            dispatch(getVideoCommentsAction(oneVideoData.id));
+        if (modalVideo && modalVideo?.id) {
+            dispatch(getVideoCommentsAction(modalVideo.id));
             setIsVideoReady(false);
-            setDurationReady(false);
         }
-    }, [oneVideoData?.id]);
+    }, [modalVideo?.id]);
 
-    // console.log('modalVideo-->', modalVideo);
 
-    const handleDoubleTap = useCallback(
-        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
-            if (event.nativeEvent.state === State.END) {
-                const { x, y } = event.nativeEvent;
+    const doubleTapGesture = Gesture.Tap()
+        .numberOfTaps(2)
+        .onEnd((event) => {
+            if (event) {
+                const { x, y } = event;
 
                 tapX.value = x;
                 tapY.value = y;
@@ -63,9 +58,7 @@ const FullVideoModal = ({
                     opacity.value = withTiming(0, { duration: 500 });
                 });
             }
-        },
-        [scale, opacity, tapX, tapY]
-    );
+        });
 
 
     //Save duration video
@@ -105,20 +98,18 @@ const FullVideoModal = ({
     };
 
     return (
-        <Modal visible={modalVideoVisible} transparent={false} animationType="fade">
-            <TapGestureHandler
-                onHandlerStateChange={handleDoubleTap}
-                numberOfTaps={2}
-                ref={doubleTapRef}>
+        <Modal visible={!!modalVideo} transparent={false} animationType="fade">
+            <GestureDetector gesture={doubleTapGesture}>
                 <View
                     style={[positionHelpers.fill, { backgroundColor: colors.black }]}
 
                 >
-                    {oneVideoData && (
+                    {modalVideo && (
                         <>
                             <Video
+                                key={modalVideo?.id}
                                 ref={videoRef}
-                                source={{ uri: oneVideoData?.file?.storagePath }}
+                                source={{ uri: modalVideo?.file?.storagePath }}
                                 style={positionHelpers.fill}
                                 resizeMode="cover"
                                 muted={false}
@@ -126,17 +117,17 @@ const FullVideoModal = ({
                                 paused={false}
                                 controls={false}
                                 onLoad={(data) => {
-                                    handleVideoLoadModal(oneVideoData?.id, data?.duration);
+                                    handleVideoLoadModal(modalVideo?.id, data?.duration);
                                 }}
                                 onProgress={({ currentTime }) => {
-                                    if (oneVideoData?.id && durations[oneVideoData.id]) {
-                                        const duration = durations[oneVideoData.id];
+                                    if (modalVideo?.id && durations[modalVideo.id]) {
+                                        const duration = durations[modalVideo.id];
                                         setRemainingSeconds(prev => {
                                             const newRemaining = duration - currentTime;
-                                            if (Math.abs((prev[oneVideoData.id] ?? 0) - newRemaining) > 0.25) {
+                                            if (Math.abs((prev[modalVideo.id] ?? 0) - newRemaining) > 0.25) {
                                                 return {
                                                     ...prev,
-                                                    [oneVideoData.id]: newRemaining,
+                                                    [modalVideo.id]: newRemaining,
                                                 };
                                             }
                                             return prev;
@@ -144,47 +135,47 @@ const FullVideoModal = ({
 
                                         if (currentTime >= duration) {
                                             videoRef.current?.seek(0);
-                                            onVideoRepeat(oneVideoData.id);
+                                            onVideoRepeat(modalVideo.id);
                                         }
                                     }
                                 }}
-                            // onEnd={() => {
-                            //     videoRef.current?.seek(0);
-                            //     onVideoRepeat(oneVideoData?.id);
-                            // }}
                             />
                             <VideoAbsoluteInfo
                                 videoCheck={'FULL'}
                                 showArrow={true}
                                 onArrowBack={onArrowPress}
-                                avatar={oneVideoData?.avatar}
-                                name={oneVideoData?.fullname}
-                                likesCount={oneVideoData?.like_count}
-                                videoDuration={formatTime(oneVideoData ? remainingSeconds[oneVideoData.id] ?? 0 : 0)}
+                                avatar={modalVideo?.avatar}
+                                name={modalVideo?.fullname}
+                                likesCount={modalVideo?.like_count}
+                                videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
                                 openComments={openComments}
                                 showComments={true}
                                 countComments={countComments}
                             />
-                            {showComments && oneVideoData?.id && (
-                                <CommentSection videoId={oneVideoData.id} onClose={() => setShowComments(false)} />
+                            {showComments && modalVideo?.id && (
+                                <CommentSection videoId={modalVideo.id} onClose={() => setShowComments(false)} />
                             )}
                         </>
                     )}
                 </View>
-            </TapGestureHandler>
+            </GestureDetector>
 
             {!isVideoReady && (
                 <View style={[positionHelpers.fill, { justifyContent: 'center', alignItems: 'center', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.black }]}>
                     <ActivityIndicator size="large" color="#fff" />
                 </View>
             )}
+
             {/* Heart animation */}
-            <Animated.Text style={[{
-                position: 'absolute',
-                fontSize: 50,
-            }, animatedStyle]}>❤️</Animated.Text>
+            <Animated.Text style={[positionHelpers.absolute, cs.animatedLike, animatedStyle]}>❤️</Animated.Text>
         </Modal>
     );
 };
+
+const cs = StyleSheet.create({
+    animatedLike: {
+        fontSize: 50,
+    },
+});
 
 export default FullVideoModal;

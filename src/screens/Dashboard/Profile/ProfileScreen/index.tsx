@@ -10,13 +10,12 @@ import ProfileInfo from './components/ProfileInfo';
 import { cs } from './styles';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
 import { getVideosMeAction } from '../../../../redux/CameraRedux/cameraActions';
-import { VideoItemType } from '../../FourU/FourUScreen/types';
 import MenuModal from '../../../../components/Modals/MemuModal';
 import VideoItem from '../../../../components/VideoItem';
-import { setMenuModal, setVideoModal } from '../../../../redux/ModalsRedux/modalSlice';
-import { getOneVideoAction } from '../../../../redux/VideoRedux/videoAction';
+import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 import FullVideoModal from '../../../../components/Modals/FullVideoModal';
 import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedModal';
+import { VideoItemType } from '../../../../redux/CameraRedux/types';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_MARGIN = 4;
@@ -29,11 +28,13 @@ const ProfileScreen = () => {
     const { videosMeData } = useReduxSelector((state: RootState) => state.camera);
     const { user } = useReduxSelector((state: RootState) => state.auth);
     const { usersData } = useReduxSelector((state: RootState) => state.users);
-    const inputRef = useRef(null);
-    const [refreshing, setRefreshing] = useState(false);
+    const { isSearchActive } = useReduxSelector((state: RootState) => state?.modals);
+    const inputRef = useRef<any | null>(null);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+
+    const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
 
     //for SearchAnimatedModal
-    const [isSearchActive, setIsSearchActive] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [inputY, setInputY] = useState<number>(0);
     const overlayOpacity = useSharedValue(0);
@@ -41,13 +42,15 @@ const ProfileScreen = () => {
     //
 
     useEffect(() => {
-        dispatch(getVideosMeAction(user?.id));
+        if (user?.id) {
+            dispatch(getVideosMeAction(user?.id));
+        }
     }, []);
 
     useEffect(() => {
         if (isSearchActive && inputRef.current) {
             setTimeout(() => {
-                inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+                inputRef.current.measure((height: number, pageY: number) => {
                     setInputY(pageY + height);
                 });
             }, 100);
@@ -70,7 +73,9 @@ const ProfileScreen = () => {
         setRefreshing(true);
 
         setTimeout(async () => {
-            await dispatch(getVideosMeAction(user?.id));
+            if (user?.id) {
+                await dispatch(getVideosMeAction(user?.id));
+            }
 
             setRefreshing(false);
         }, 1000);
@@ -81,6 +86,7 @@ const ProfileScreen = () => {
         const isLastInRow = (index + 1) % NUM_COLUMNS === 0;
         const screenshot =
             item.file?.variation?.[0]?.screenshots?.[0] ?? null;
+
         return (
             <VideoItem
                 key={item?.id}
@@ -89,10 +95,7 @@ const ProfileScreen = () => {
                 screenshot={screenshot}
                 isLastInRow={isLastInRow}
                 ITEM_SIZE={ITEM_SIZE}
-                onVideoPress={() => {
-                    dispatch(getOneVideoAction(item?.id));
-                    dispatch(setVideoModal(true));
-                }}
+                onVideoPress={() => setModalVideo(item)}
             />
         );
     }, []);
@@ -104,17 +107,15 @@ const ProfileScreen = () => {
                 <SafeAreaView
                     style={[
                         positionHelpers.fill,
-                        isSearchActive ? {} : positionHelpers.mb25,
                         {
                             backgroundColor: colors.black4,
-                            marginBottom: isSearchActive ? 0 : 70,
                         },
                     ]}
                 >
                     <View style={[positionHelpers.ph16, positionHelpers.mb10]}>
                         <View style={[positionHelpers.mt10, positionHelpers.alignItemsCenterRow]}>
-                            {isSearchActive && (< TouchableOpacity style={{ marginRight: 15 }} onPress={() => {
-                                setIsSearchActive(false);
+                            {isSearchActive && (< TouchableOpacity style={cs.mr15} onPress={() => {
+                                dispatch(setIsSearchActive(false));
                                 Keyboard.dismiss();
                                 setSearchQuery('');
                             }}>
@@ -125,14 +126,14 @@ const ProfileScreen = () => {
                                     ref={inputRef}
                                     inputStyles={cs.input}
                                     placeholder="Search by user"
-                                    onFocus={() => setIsSearchActive(true)}
+                                    onFocus={() => dispatch(setIsSearchActive(true))}
                                     onChangeText={setSearchQuery}
                                     value={searchQuery}
                                     colorText={colors.white}
                                 />
                             </View>
                             {!isSearchActive && (
-                                <TouchableOpacity style={{ marginLeft: 15 }} onPress={() => dispatch(setMenuModal(true))}>
+                                <TouchableOpacity style={cs.ml15} onPress={() => dispatch(setMenuModal(true))}>
                                     <SvgIcon image="menu" />
                                 </TouchableOpacity>
                             )}
@@ -163,13 +164,8 @@ const ProfileScreen = () => {
                             data={filteredVideos}
                             keyExtractor={(item) => item.id}
                             numColumns={NUM_COLUMNS}
-                            // refreshing={refreshing}
-                            // onRefresh={handleRefresh}
                             renderItem={renderVideoItem}
-                            contentContainerStyle={{
-                                paddingHorizontal: 16,
-                                paddingBottom: 10,
-                            }}
+                            contentContainerStyle={[positionHelpers.ph16, cs.pb10]}
                             initialNumToRender={6} // менше елементів на старт
                             windowSize={5} // скільки блоків рендериться навколо екрану
                             maxToRenderPerBatch={6}
@@ -201,7 +197,8 @@ const ProfileScreen = () => {
 
             {/* Video Full Modal */}
             <FullVideoModal
-                onArrowPress={() => dispatch(setVideoModal(false))}
+                modalVideo={modalVideo}
+                onArrowPress={() => setModalVideo(null)}
             />
 
             {/* MenuModal */}
