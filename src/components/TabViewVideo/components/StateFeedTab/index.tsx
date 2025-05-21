@@ -48,7 +48,7 @@ const StateFeedTab = () => {
             {/* Modal for show videos */}
             <FullVideoModal
                 modalVideo={modalVideo}
-                onArrowPress={() => setModalVideo(null)}
+                setModalVideo={setModalVideo}
             />
         </>
     );

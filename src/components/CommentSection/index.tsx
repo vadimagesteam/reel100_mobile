@@ -1,63 +1,20 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, StyleSheet, TextInput, TouchableOpacity, View, Platform, Modal, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Dimensions, Image, ListRenderItem } from 'react-native';
-import { formatDistanceToNow } from 'date-fns';
-import { BodyText, LoaderIndicator } from '../UI';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FlatList, StyleSheet, TextInput, TouchableOpacity, View, Platform, KeyboardAvoidingView, Image, ListRenderItem } from 'react-native';
+import { BodyText } from '../UI';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../store/store';
 import { createVideoCommentAction, getVideoCommentsAction } from '../../redux/VideoRedux/videoAction';
-import { isIOS } from '../../utils/platformChecker';
 import { colors, positionHelpers } from '../../styles';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
-const { height } = Dimensions.get('window');
+import { formatTimeAgo } from '../../utils/formatTime';
+import { CommentType } from '../../redux/VideoRedux/types';
 
 type CommentSectionProps = {
     videoId: string;
     onClose: () => void;
 };
 
-export const formatTimeAgo = (date: string): string => {
-    const now = new Date();
-    const then = new Date(date);
-    const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-
-    if (diffInSeconds < 45) {
-        return 'a few seconds ago';
-    }
-
-    if (diffInSeconds < 90) {
-        return 'a minute ago';
-    }
-
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) {
-        return diffInMinutes === 1 ? 'a minute ago' : `${diffInMinutes} minutes ago`;
-    }
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) {
-        return diffInHours === 1 ? '1 hour ago' : `${diffInHours} hours ago`;
-    }
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays === 1) {
-        return 'yesterday';
-    }
-    if (diffInDays < 30) {
-        return `${diffInDays} days ago`;
-    }
-
-    const diffInMonths = Math.floor(diffInDays / 30);
-    if (diffInMonths < 12) {
-        return diffInMonths === 1 ? 'a month ago' : `${diffInMonths} months ago`;
-    }
-
-    const diffInYears = Math.floor(diffInDays / 365);
-    return diffInYears === 1 ? 'a year ago' : `${diffInYears} years ago`;
-};
-
 const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
     const dispatch = useReduxDispatch();
-    const { videoComments, loading } = useReduxSelector(state => state.video);
+    const { videoComments } = useReduxSelector((state: RootState) => state.video);
     const { user } = useReduxSelector((state: RootState) => state?.auth);
     const inputRef = useRef<TextInput>(null);
     const [newComment, setNewComment] = useState('');
@@ -68,9 +25,11 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
     // const take = 10;
 
     useEffect(() => {
-        dispatch(getVideoCommentsAction(videoId));
+        dispatch(getVideoCommentsAction({ videoId, userId: user?.id }));
     }, []);
 
+
+    console.log('videoComments--->', videoComments);
     const postComment = () => {
         if (!newComment.trim()) { return; }
 
@@ -107,9 +66,9 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
         });
     };
 
-    const buildCommentTree = (comments) => {
-        const commentMap = {};
-        const rootComments = [];
+    const buildCommentTree = (comments: CommentType[]): CommentType[] => {
+        const commentMap: Record<string, CommentType & { replies: CommentType[] }> = {};
+        const rootComments: CommentType[] = [];
 
         comments.forEach(comment => {
             commentMap[comment.id] = { ...comment, replies: [] };
@@ -129,9 +88,8 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
         return rootComments;
     };
 
-    // Flatten tree
-    const flatListComments = (comments, level = 0) => {
-        let flat = [];
+    const flatListComments = (comments: CommentType[], level = 0): CommentType[] => {
+        let flat: CommentType[] = [];
 
         for (const comment of comments) {
             flat.push({ ...comment, level });
@@ -145,8 +103,9 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
 
     const structuredComments = useMemo(() => buildCommentTree(videoComments), [videoComments]);
     const flatComments = useMemo(() => flatListComments(structuredComments), [structuredComments]);
-    const visibleFlatComments = useMemo(() => {
-        const visible: any[] = [];
+
+    const visibleFlatComments: (CommentType & { level?: number })[] = useMemo(() => {
+        const visible: (CommentType & { level?: number })[] = [];
         const allowedParents = new Set<string>();
 
         flatComments.forEach(comment => {
@@ -155,13 +114,25 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
                 if (expandedComments.has(comment.id)) {
                     allowedParents.add(comment.id);
                 }
-            } else if (allowedParents.has(comment.replyTo)) {
+            } else if (allowedParents.has(comment.replyTo || '')) {
                 visible.push(comment);
             }
         });
 
         return visible;
     }, [flatComments, expandedComments]);
+
+    const handleReplyPress = useCallback((comment: CommentType) => {
+        setReplyToCommentId(comment.id);
+        setReplyingToUser(`${comment?.user?.firstName} ${comment?.user?.lastName}`);
+        setTimeout(() => inputRef.current?.focus(), 100);
+
+        setExpandedComments(prev => {
+            const newSet = new Set(prev);
+            newSet.add(comment.id);
+            return newSet;
+        });
+    }, []);
 
     const renderFlatComment: ListRenderItem<any> = ({ item }) => {
         return (
@@ -187,11 +158,7 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
                 {item.level === 0 && (
                     <View style={positionHelpers.rowFillCenter}>
                         <TouchableOpacity
-                            onPress={() => {
-                                setReplyToCommentId(item.id);
-                                setReplyingToUser(`${item?.user?.firstName} ${item?.user?.lastName}`);
-                                setTimeout(() => inputRef.current?.focus(), 100);
-                            }}
+                            onPress={() => handleReplyPress(item)}
                         >
                             <BodyText color={colors.white}>Reply</BodyText>
                         </TouchableOpacity>
@@ -214,6 +181,7 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
     };
 
 
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 2.5 }}
@@ -231,26 +199,26 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
                 <View
                     style={positionHelpers.fill}
                 >
-                    {
+                    {/* {
                         loading ? <LoaderIndicator /> : (
-                            <>
-                                {videoComments?.length === 0 ? (
-                                    <View style={styles.emptyContainer}>
-                                        <BodyText fontSize={14} color={colors.white}>Comments will appear here</BodyText>
-                                    </View>
-                                ) : (
-                                    <FlatList
-                                        data={visibleFlatComments}
-                                        keyExtractor={(item) => item.id}
-                                        renderItem={renderFlatComment}
-                                        contentContainerStyle={{ padding: 16 }}
-                                        keyboardShouldPersistTaps="handled"
-                                        showsVerticalScrollIndicator={false}
-                                    />
-                                )}
-                            </>
+                            <> */}
+                    {videoComments?.length === 0 ? (
+                        <View style={styles.emptyContainer}>
+                            <BodyText fontSize={14} color={colors.white}>Comments will appear here</BodyText>
+                        </View>
+                    ) : (
+                        <FlatList
+                            data={visibleFlatComments}
+                            keyExtractor={(item) => item.id}
+                            renderItem={renderFlatComment}
+                            contentContainerStyle={{ padding: 16 }}
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                        />
+                    )}
+                    {/* </>
                         )
-                    }
+                    } */}
 
                 </View>
 

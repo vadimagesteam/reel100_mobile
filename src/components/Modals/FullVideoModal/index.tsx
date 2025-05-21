@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
@@ -12,13 +12,13 @@ import CommentSection from '../../CommentSection';
 import { VideoItemType } from '../../../redux/CameraRedux/types';
 
 interface FullVideoModalProps {
-    onArrowPress?: () => void
-    modalVideo: VideoItemType
+    setModalVideo: (val: VideoItemType | null) => void | any
+    modalVideo: VideoItemType | null | any
 }
 
 const FullVideoModal = ({
     modalVideo,
-    onArrowPress,
+    setModalVideo,
 }: FullVideoModalProps) => {
     const dispatch = useReduxDispatch();
     const { countComments } = useReduxSelector((state: RootState) => state.video);
@@ -26,7 +26,6 @@ const FullVideoModal = ({
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
-    const [isVideoReady, setIsVideoReady] = useState(false);
 
     const [showComments, setShowComments] = useState(false);
     const scale = useSharedValue(0);
@@ -37,10 +36,8 @@ const FullVideoModal = ({
     useEffect(() => {
         if (modalVideo && modalVideo?.id) {
             dispatch(getVideoCommentsAction({ videoId: modalVideo.id, userId: modalVideo?.user?.id }));
-            setIsVideoReady(false);
         }
-    }, []);
-
+    }, [modalVideo]);
 
     const doubleTapGesture = Gesture.Tap()
         .numberOfTaps(2)
@@ -67,8 +64,6 @@ const FullVideoModal = ({
         setDurations(prev => ({ ...prev, [id]: duration }));
         setRemainingSeconds(prev => ({ ...prev, [id]: duration }));
         setVideoStartTimes(prev => ({ ...prev, [id]: 0 }));
-        setIsVideoReady(true);
-
     }, []);
 
     //Repeat duration video
@@ -145,10 +140,13 @@ const FullVideoModal = ({
                             <VideoAbsoluteInfo
                                 videoCheck={'FULL'}
                                 showArrow={true}
-                                onArrowBack={onArrowPress}
-                                avatar={modalVideo?.avatar}
-                                name={modalVideo?.fullname}
-                                likesCount={modalVideo?.like_count}
+                                onArrowBack={() => {
+                                    setModalVideo(null);
+                                    setShowComments(false);
+                                }}
+                                // avatar={modalVideo?.avatar}
+                                // name={modalVideo?.fullname}
+                                // likesCount={modalVideo?.like_count}
                                 videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
                                 openComments={openComments}
                                 showComments={true}
@@ -161,12 +159,6 @@ const FullVideoModal = ({
                     )}
                 </View>
             </GestureDetector>
-
-            {!isVideoReady && (
-                <View style={[positionHelpers.fill, { justifyContent: 'center', alignItems: 'center', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.black }]}>
-                    <ActivityIndicator size="large" color="#fff" />
-                </View>
-            )}
 
             {/* Heart animation */}
             <Animated.Text style={[positionHelpers.absolute, cs.animatedLike, animatedStyle]}>❤️</Animated.Text>

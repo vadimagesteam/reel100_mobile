@@ -152,7 +152,7 @@ const ProfileScreen = () => {
             {/* Video Full Modal */}
             <FullVideoModal
                 modalVideo={modalVideo}
-                onArrowPress={() => setModalVideo(null)}
+                setModalVideo={setModalVideo}
             />
 
             {/* MenuModal */}

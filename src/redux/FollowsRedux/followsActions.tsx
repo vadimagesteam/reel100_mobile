@@ -40,7 +40,6 @@ export const getFollowAction = createAsyncThunk<any, { myId: string | undefined,
                 },
             };
             const response = await axios.get(`/api/follows?where[who][id]=${myId}&where[whom][id]=${userId}`, config);
-            console.log('response--getFollowAction--->>', response);
             return response?.data;
         } catch (error) {
             if (error instanceof AxiosError) {

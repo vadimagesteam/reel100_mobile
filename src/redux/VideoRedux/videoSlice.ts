@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { VideoState } from './types';
-import { createVideoCommentAction, getOneVideoAction, getVideoCommentsAction, getVideoCommentsTwoAction } from './videoAction';
+import { CommentType, VideoState } from './types';
+import { createVideoCommentAction, getOneVideoAction, getVideoCommentsAction } from './videoAction';
 
 
 const initialState: VideoState = {
@@ -37,37 +37,18 @@ export const videoSlice = createSlice({
             )
             //get video comments all
             .addCase(getVideoCommentsAction.pending, state => {
-                state.loading = true;
+                state.loading = false;
             })
             .addCase(
                 getVideoCommentsAction.fulfilled,
-                (state, action: PayloadAction<any>) => {
+                (state, action: PayloadAction<CommentType[]>) => {
                     state.loading = false;
-                    state.videoComments = action?.payload;
+                    state.videoComments = action?.payload.reverse();
                     state.countComments = action?.payload?.length;
                 },
             )
             .addCase(
                 getVideoCommentsAction.rejected,
-                (state, action: PayloadAction<any>) => {
-                    state.loading = false;
-                    state.error = action.payload;
-                },
-            )
-            //get video comments all two
-            .addCase(getVideoCommentsTwoAction.pending, state => {
-                state.loading = false;
-            })
-            .addCase(
-                getVideoCommentsTwoAction.fulfilled,
-                (state, action: PayloadAction<any>) => {
-                    state.loading = false;
-                    state.videoComments = action?.payload;
-                    state.countComments = action?.payload?.length;
-                },
-            )
-            .addCase(
-                getVideoCommentsTwoAction.rejected,
                 (state, action: PayloadAction<any>) => {
                     state.loading = false;
                     state.error = action.payload;
