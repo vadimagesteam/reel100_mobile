@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { VideoState } from './types';
-import { createVideoCommentAction, getOneVideoAction, getVideoCommentsAction } from './videoAction';
+import { createVideoCommentAction, getOneVideoAction, getVideoCommentsAction, getVideoCommentsTwoAction } from './videoAction';
 
 
 const initialState: VideoState = {
@@ -49,6 +49,25 @@ export const videoSlice = createSlice({
             )
             .addCase(
                 getVideoCommentsAction.rejected,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                },
+            )
+            //get video comments all two
+            .addCase(getVideoCommentsTwoAction.pending, state => {
+                state.loading = false;
+            })
+            .addCase(
+                getVideoCommentsTwoAction.fulfilled,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.videoComments = action?.payload;
+                    state.countComments = action?.payload?.length;
+                },
+            )
+            .addCase(
+                getVideoCommentsTwoAction.rejected,
                 (state, action: PayloadAction<any>) => {
                     state.loading = false;
                     state.error = action.payload;

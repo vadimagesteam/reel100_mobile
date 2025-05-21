@@ -9,10 +9,11 @@ import { colors, positionHelpers } from '../../../styles';
 import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
 import { formatTime } from '../../../utils/formatTime';
 import CommentSection from '../../CommentSection';
+import { VideoItemType } from '../../../redux/CameraRedux/types';
 
 interface FullVideoModalProps {
     onArrowPress?: () => void
-    modalVideo: any
+    modalVideo: VideoItemType
 }
 
 const FullVideoModal = ({
@@ -35,10 +36,10 @@ const FullVideoModal = ({
 
     useEffect(() => {
         if (modalVideo && modalVideo?.id) {
-            dispatch(getVideoCommentsAction(modalVideo.id));
+            dispatch(getVideoCommentsAction({ videoId: modalVideo.id, userId: modalVideo?.user?.id }));
             setIsVideoReady(false);
         }
-    }, [modalVideo?.id]);
+    }, []);
 
 
     const doubleTapGesture = Gesture.Tap()
@@ -96,6 +97,7 @@ const FullVideoModal = ({
     const openComments = () => {
         setShowComments(true);
     };
+
 
     return (
         <Modal visible={!!modalVideo} transparent={false} animationType="fade">

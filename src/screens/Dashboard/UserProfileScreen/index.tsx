@@ -37,7 +37,8 @@ const UserProfileScreen = () => {
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
     // console.log('user--->', user);
-    console.log('followData--->', followData,);
+    // console.log('followData--->', followData,);
+
     useEffect(() => {
         dispatch(getOneUserAction(params?.idUser));
         dispatch(getUserVideosAction(params?.idUser));
@@ -53,27 +54,9 @@ const UserProfileScreen = () => {
         return () => clearTimeout(timeout);
     }, []);
 
-
-    //!!!!!!!
-    /// CHANGE SOLUTION
-    // If followData length > 0 ? follow : unfolo
-    ////
-    ///
-    ///
     useEffect(() => {
         setIsFollowing(Array.isArray(followData) && followData.length > 0);
     }, [followData]);
-
-
-    // useEffect(() => {
-    //     if (followData && Array.isArray(followData)) {
-    //         const isFollow = followData.some(follow =>
-    //             follow?.who?.id === user?.id &&
-    //             follow?.whom?.id === params?.idUser
-    //         );
-    //         setIsFollowing(isFollow);
-    //     }
-    // }, [followData]);
 
     const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
 

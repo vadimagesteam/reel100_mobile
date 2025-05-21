@@ -56,48 +56,48 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
         return () => clearInterval(interval);
     }, [activeIndex]);
 
-    const handleSingleTap = useCallback(
-        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>, selectedId: string) => {
+    // const handleSingleTap = useCallback(
+    //     (event: any, selectedId: string) => {
 
-            // console.log('selectedId-->', selectedId);
-            if (event.nativeEvent.state === State.END) {
+    //         // console.log('selectedId-->', selectedId);
 
-                const index = allVideo.findIndex(video => video.id === selectedId);
-                // console.log('--index-->', index);
-                // dispatch(getVideosAction());
-                // navigation.navigate(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
-                //     // videos: allVideo,
-                //     selectedId,
-                //     index,
-                // });
-                // runOnJS(navigation.navigate)(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
-                //     // videos: allVideo,
-                //     selectedId,
-                //     index,
-                // });
-            }
-        },
-        []
-    );
-    const handleDoubleTap = useCallback(
-        (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
-            if (event.nativeEvent.state === State.END) {
-                const { x, y } = event.nativeEvent;
 
-                tapX.value = x;
-                tapY.value = y;
+    //         const index = allVideo.findIndex(video => video.id === selectedId);
+    //         // console.log('--index-->', index);
+    //         // dispatch(getVideosAction());
+    //         // navigation.navigate(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
+    //         //     // videos: allVideo,
+    //         //     selectedId,
+    //         //     index,
+    //         // });
+    //         // runOnJS(navigation.navigate)(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
+    //         //     // videos: allVideo,
+    //         //     selectedId,
+    //         //     index,
+    //         // });
 
-                scale.value = 1;
-                opacity.value = 1;
+    //     },
+    //     []
+    // );
+    // const handleDoubleTap = useCallback(
+    //     (event: any) => {
 
-                scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
-                    scale.value = withTiming(0, { duration: 500 });
-                    opacity.value = withTiming(0, { duration: 500 });
-                });
-            }
-        },
-        [scale, opacity, tapX, tapY]
-    );
+    //         const { x, y } = event.nativeEvent;
+
+    //         tapX.value = x;
+    //         tapY.value = y;
+
+    //         scale.value = 1;
+    //         opacity.value = 1;
+
+    //         scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+    //             scale.value = withTiming(0, { duration: 500 });
+    //             opacity.value = withTiming(0, { duration: 500 });
+    //         });
+
+    //     },
+    //     [scale, opacity, tapX, tapY]
+    // );
 
     //Save duration video
     const handleVideoLoad = useCallback((id: string, duration: number) => {
@@ -144,10 +144,11 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                             tapY={tapY}
                             scale={scale}
                             opacity={opacity}
-                            onSingleTap={(event) => handleSingleTap(event, item?.id)}
-                            onDoubleTap={(event) => handleDoubleTap(event)}
+                            // onSingleTap={(event) => handleSingleTap(event, item?.id)}
+                            // onDoubleTap={(event) => handleDoubleTap(event)}
                             avatar={item?.avatar}
                             name={item?.fullname}
+                            videoId={item?.id}
                             videoNumber={item?.list_number}
                             videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
                             onVideoLoad={(duration) => handleVideoLoad(item.id, duration)}
@@ -166,8 +167,8 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
             scale,
             opacity,
             remainingSeconds,
-            handleSingleTap,
-            handleDoubleTap,
+            // handleSingleTap,
+            // handleDoubleTap,
             onVideoRepeat,
             handleVideoLoad,
         ]

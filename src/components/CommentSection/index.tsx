@@ -15,37 +15,43 @@ type CommentSectionProps = {
     onClose: () => void;
 };
 
-export const formatTimeAgo = (date: string) => {
+export const formatTimeAgo = (date: string): string => {
     const now = new Date();
     const then = new Date(date);
-
     const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    const diffInDays = Math.floor(diffInHours / 24);
-    const diffInMonths = Math.floor(diffInDays / 30);
-    const diffInYears = Math.floor(diffInDays / 365);
 
-    if (diffInSeconds < 60) {
-        return diffInSeconds <= 1 ? 'a few seconds ago' : `${diffInSeconds} seconds ago`;
+    if (diffInSeconds < 45) {
+        return 'a few seconds ago';
     }
 
+    if (diffInSeconds < 90) {
+        return 'a minute ago';
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) {
         return diffInMinutes === 1 ? 'a minute ago' : `${diffInMinutes} minutes ago`;
     }
 
+    const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) {
         return diffInHours === 1 ? '1 hour ago' : `${diffInHours} hours ago`;
     }
 
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) {
+        return 'yesterday';
+    }
     if (diffInDays < 30) {
-        return diffInDays === 1 ? 'yesterday' : `${diffInDays} days ago`;
+        return `${diffInDays} days ago`;
     }
 
+    const diffInMonths = Math.floor(diffInDays / 30);
     if (diffInMonths < 12) {
         return diffInMonths === 1 ? 'a month ago' : `${diffInMonths} months ago`;
     }
 
+    const diffInYears = Math.floor(diffInDays / 365);
     return diffInYears === 1 ? 'a year ago' : `${diffInYears} years ago`;
 };
 

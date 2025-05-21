@@ -49,8 +49,36 @@ export const getOneVideoAction = createAsyncThunk<any, string>(
     },
 );
 
-export const getVideoCommentsAction = createAsyncThunk<any, string>(
+export const getVideoCommentsAction = createAsyncThunk<any, { videoId: string, userId: string }>(
     'video/getVideoComments',
+    async ({ videoId, userId }, thunkAPI) => {
+        try {
+            const config = {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            };
+            const response = await axios.get(`/api/videos/${videoId}/comments?where[user][id]=${userId}`, config);
+
+
+            console.log('getVideoCommentsAction --->', response);
+
+            return response?.data;
+        } catch (error) {
+            console.log('getVideoCommentsAction --->', error);
+            if (error instanceof AxiosError) {
+                if (error.response && error.response.data) {
+                    return thunkAPI.rejectWithValue(error.response.data);
+                } else {
+                }
+            }
+        }
+    },
+);
+
+export const getVideoCommentsTwoAction = createAsyncThunk<any, string>(
+    'video/getVideoCommentsTwo',
     async (videoId, thunkAPI) => {
         try {
             const config = {
@@ -62,7 +90,7 @@ export const getVideoCommentsAction = createAsyncThunk<any, string>(
             const response = await axios.get(`/api/videos/${videoId}/comments`, config);
 
 
-            console.log('getVideoCommentsAction --->', response);
+            console.log('getVideoCommentsAction TWO--->', response);
 
             return response?.data;
         } catch (error) {
@@ -93,7 +121,7 @@ export const createVideoCommentAction = createAsyncThunk<any, any>(
 
             if (response?.status === 201) {
                 const videoId = commentData?.video?.id;
-                thunkAPI.dispatch(getVideoCommentsAction(videoId));
+                thunkAPI.dispatch(getVideoCommentsTwoAction(videoId));
                 setNewComment('');
                 setReplyToCommentId(null);
                 setReplyingToUser(null);

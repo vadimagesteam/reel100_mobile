@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import Video from 'react-native-video';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, { SharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, SharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { positionHelpers } from '../../../../../../styles';
 import { cs } from './styles';
 import VideoAbsoluteInfo from '../../../../../VideoAbsoluteInfo';
@@ -15,13 +15,14 @@ interface VideoItemProps {
     tapY: SharedValue<number>
     scale: SharedValue<number>
     opacity: SharedValue<number>
-    onSingleTap?: (e: any) => void;
-    onDoubleTap?: (e: any) => void;
+    // onSingleTap?: (event: { x: number; y: number }, id: string) => void;
+    // onDoubleTap?: (event: { x: number; y: number }) => void;
 
     avatar: string;
     name: string;
     videoNumber: number;
     videoDuration: string | number;
+    videoId: string
     onVideoLoad: (duration: number) => void;
     likesCount: number;
 
@@ -36,10 +37,11 @@ const VideoItem: React.FC<VideoItemProps> = ({
     tapY,
     scale,
     opacity,
-    onSingleTap,
-    onDoubleTap,
+    // onSingleTap,
+    // onDoubleTap,
     avatar,
     name,
+    videoId,
     videoNumber,
     videoDuration,
     onVideoLoad,
@@ -66,31 +68,43 @@ const VideoItem: React.FC<VideoItemProps> = ({
     }));
 
 
+    const handleSingleTap = (e: { x: number; y: number }) => {
+        // const index = allVideo.findIndex((video: any) => video.id === videoId);
+
+        // if (index !== -1) {
+        // navigation.navigate(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN as never, {
+        //     selectedId: videoId,
+        //     index,
+        // } as never);
+        // }
+    };
+
+    const handleDoubleTap = (e: { x: number; y: number }) => {
+        tapX.value = e.x;
+        tapY.value = e.y;
+
+        scale.value = 1;
+        opacity.value = 1;
+
+        scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+            scale.value = withTiming(0, { duration: 500 });
+            opacity.value = withTiming(0, { duration: 500 });
+        });
+    };
+
     const doubleTap = Gesture.Tap()
         .numberOfTaps(2)
         .onEnd((e) => {
             if (!e) { return; }
-
-            tapX.value = e.x;
-            tapY.value = e.y;
-
-            scale.value = 1;
-            opacity.value = 1;
-
-            scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
-                scale.value = withTiming(0, { duration: 500 });
-                opacity.value = withTiming(0, { duration: 500 });
-            });
-
-            onDoubleTap?.();
+            runOnJS(handleDoubleTap)(e);
         });
 
     const singleTap = Gesture.Tap()
         .numberOfTaps(1)
-        .onEnd(() => {
-            onSingleTap?.();
+        .onEnd((e) => {
+            runOnJS(handleSingleTap)(e);
         });
-    // .requireFailure(doubleTap);
+
 
     const gesture = Gesture.Exclusive(doubleTap, singleTap);
 
