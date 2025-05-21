@@ -1,26 +1,34 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+    Modal,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+    FlatList,
+    Pressable,
+    KeyboardAvoidingView,
+    Platform,
+    Keyboard,
+    SafeAreaView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
-import { BodyText } from '../../UI';
+import { BodyText, Input, SvgIcon } from '../../UI';
 import { colors, positionHelpers } from '../../../styles';
 import { DASHBOARD_ROUTES } from '../../../navigation/routes';
 import { debounce } from '../../../utils/debounce';
-import { useReduxDispatch } from '../../../store/store';
+import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { getOneUserAction, getUsersAction } from '../../../redux/UsersRedux/usersAction';
+import { setIsSearchActive } from '../../../redux/ModalsRedux/modalSlice';
 
-interface SearchAnimatedModalProps {
-    searchQuery: string
-    usersData: any[]
-    inputY: number,
-    overlayOpacity: SharedValue<number>
-    overlayTranslateY: SharedValue<number>
 
-}
-
-const SearchAnimatedModal = ({ searchQuery, usersData, inputY, overlayOpacity, overlayTranslateY }: SearchAnimatedModalProps) => {
+const SearchAnimatedModal = () => {
+    const { isSearchActive } = useReduxSelector((state: RootState) => state.modals);
+    const { usersData } = useReduxSelector((state: RootState) => state.users);
     const navigation = useNavigation<any>();
     const dispatch = useReduxDispatch();
+    const [query, setQuery] = useState('');
+
+    const inputRef = useRef<any>(null);
 
     const debouncedSearch = useRef(
         debounce((text: string) => {
@@ -29,26 +37,25 @@ const SearchAnimatedModal = ({ searchQuery, usersData, inputY, overlayOpacity, o
     ).current;
 
     useEffect(() => {
-        if (searchQuery.trim()) {
-            debouncedSearch(searchQuery);
+        if (query.trim()) {
+            debouncedSearch(query);
         }
-    }, [searchQuery]);
+    }, [query]);
 
     const filteredUsers = usersData?.filter(
         (item) => item?.firstName?.trim() && item?.lastName?.trim()
     );
 
-    const animatedOverlayStyle = useAnimatedStyle(() => ({
-        opacity: overlayOpacity.value,
-        transform: [{ translateY: overlayTranslateY.value }],
-    }));
-
     const renderUser = useCallback(({ item }: { item: any }) => {
         return (
-            <TouchableOpacity onPress={() => {
-                dispatch(getOneUserAction(item?.id));
-                navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
-            }}>
+            <TouchableOpacity
+                onPress={() => {
+                    dispatch(getOneUserAction(item?.id));
+                    dispatch(setIsSearchActive(false));
+                    navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item?.id });
+                    setQuery('');
+                }}
+            >
                 <BodyText
                     paddingLeft={10}
                     fontSize={16}
@@ -64,41 +71,105 @@ const SearchAnimatedModal = ({ searchQuery, usersData, inputY, overlayOpacity, o
     }, []);
 
     return (
-        <Animated.View
-            style={[
-                positionHelpers.ph16,
-                {
-                    ...StyleSheet.absoluteFillObject,
-                    backgroundColor: colors.black4,
-                    marginTop: inputY,
-                }, animatedOverlayStyle]}
+        <Modal
+            animationType="fade"
+            transparent
+            visible={isSearchActive}
+            onRequestClose={() => dispatch(setIsSearchActive(false))}
         >
-            {searchQuery ? (
-                <FlatList
-                    data={filteredUsers}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderUser}
-                    ListEmptyComponent={() => {
-                        return (
-                            <View style={[positionHelpers.fillCenter, positionHelpers.ph20]}>
-                                <BodyText color={colors.white} >No results found</BodyText>
+            <Pressable
+                style={[positionHelpers.fill, cs.overlay]}
+                onPress={() => {
+                    Keyboard.dismiss();
+                    dispatch(setIsSearchActive(false));
+                }}
+            >
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    style={positionHelpers.fill}
+                >
+                    <Pressable style={cs.inner} onPress={() => { }}>
+                        <SafeAreaView>
+                            {/* Input Field */}
+                            <View style={[positionHelpers.alignItemsCenterRow, cs.inputWrapper]}>
+                                <TouchableOpacity
+                                    style={cs.iconButton}
+                                    onPress={() => {
+                                        dispatch(setIsSearchActive(false));
+                                        setQuery('');
+                                        Keyboard.dismiss();
+                                    }}
+                                >
+                                    <SvgIcon image="backArrow" />
+                                </TouchableOpacity>
+
+                                <View style={positionHelpers.fill}>
+                                    <Input
+                                        ref={inputRef}
+                                        placeholder="Search by user"
+                                        value={query}
+                                        onChangeText={setQuery}
+                                        inputStyles={cs.input}
+                                        autoFocus
+                                        colorText={colors.white}
+                                    />
+                                </View>
                             </View>
-                        );
-                    }}
-                    contentContainerStyle={cs.listContainer}
-                />
-            ) : (
-                <View style={positionHelpers.fillCenter}>
-                    <BodyText color={colors.white}>No results found</BodyText>
-                </View>
-            )}
-        </Animated.View>
+
+                            {/* Results List */}
+                            {query ? (
+                                <FlatList
+                                    data={filteredUsers}
+                                    keyExtractor={(item) => item.id}
+                                    renderItem={renderUser}
+                                    ListEmptyComponent={() => (
+                                        <View style={[positionHelpers.fillCenter, positionHelpers.ph20]}>
+                                            <BodyText color={colors.white}>No results found</BodyText>
+                                        </View>
+                                    )}
+                                    contentContainerStyle={cs.listContainer}
+                                    keyboardShouldPersistTaps="handled"
+                                />
+                            ) : (
+                                <View style={positionHelpers.fillCenter}>
+                                    <BodyText color={colors.white}>Start typing to search</BodyText>
+                                </View>
+                            )}
+                        </SafeAreaView>
+                    </Pressable>
+                </KeyboardAvoidingView>
+            </Pressable>
+        </Modal>
     );
 };
 
 const cs = StyleSheet.create({
-    listContainer: {
+    overlay: {
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'flex-start',
+    },
+    inner: {
+        flex: 1,
+        backgroundColor: colors.black4,
+        paddingHorizontal: 16,
+        paddingTop: 20,
+    },
+    inputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+        marginTop: 10,
+    },
+    iconButton: {
+        marginRight: 10,
+    },
+    input: {
         padding: 10,
+        backgroundColor: '#1b1b1b',
+        borderRadius: 8,
+    },
+    listContainer: {
+        paddingBottom: 20,
         flexGrow: 1,
     },
 });

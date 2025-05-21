@@ -36,11 +36,13 @@ const UserProfileScreen = () => {
 
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
+    // console.log('user--->', user);
+    console.log('followData--->', followData,);
     useEffect(() => {
         dispatch(getOneUserAction(params?.idUser));
         dispatch(getUserVideosAction(params?.idUser));
-        dispatch(getFollowAction(params?.idUser));
-    }, []);
+        dispatch(getFollowAction({ myId: user?.id, userId: params?.idUser }));
+    }, [user?.id, params?.idUser]);
 
     useEffect(() => {
         setLoader(true);
@@ -51,18 +53,27 @@ const UserProfileScreen = () => {
         return () => clearTimeout(timeout);
     }, []);
 
-    console.log('user--', userVideos);
 
-
+    //!!!!!!!
+    /// CHANGE SOLUTION
+    // If followData length > 0 ? follow : unfolo
+    ////
+    ///
+    ///
     useEffect(() => {
-        if (followData && Array.isArray(followData)) {
-            const isFollow = followData.some(follow =>
-                follow?.who?.id === user?.id &&
-                follow?.whom?.id === params?.idUser
-            );
-            setIsFollowing(isFollow);
-        }
-    }, [followData, user?.id, params?.idUser]);
+        setIsFollowing(Array.isArray(followData) && followData.length > 0);
+    }, [followData]);
+
+
+    // useEffect(() => {
+    //     if (followData && Array.isArray(followData)) {
+    //         const isFollow = followData.some(follow =>
+    //             follow?.who?.id === user?.id &&
+    //             follow?.whom?.id === params?.idUser
+    //         );
+    //         setIsFollowing(isFollow);
+    //     }
+    // }, [followData]);
 
     const filteredVideos = userVideos.filter(v => v?.file?.storagePath);
 
@@ -102,12 +113,10 @@ const UserProfileScreen = () => {
         };
 
         if (isFollowing) {
-            const followRecord = followData.find(
-                f => f?.who?.id === user?.id && f?.whom?.id === params?.idUser
-            );
+            const followId = followData[0]?.id;
 
-            if (followRecord?.id) {
-                dispatch(unFollowAction(followRecord.id));
+            if (followId) {
+                dispatch(unFollowAction({ id: followId, myId: user?.id, userId: params?.idUser }));
             } else {
                 console.log('Не знайдено підписки для видалення');
             }
@@ -129,7 +138,6 @@ const UserProfileScreen = () => {
                     <SafeAreaView
                         style={[
                             positionHelpers.fill,
-                            positionHelpers.mb25,
                             cs.container,
                         ]}
                     >
@@ -150,6 +158,9 @@ const UserProfileScreen = () => {
                             {/* Profile header info */}
                             <ProfileUserInfo
                                 fullname={`${userOneData?.firstName} ${userOneData?.lastName}`}
+                                followerCount={userOneData?.stats?.followerCount}
+                                likeCount={userOneData?.stats?.likeCount}
+                                followCount={userOneData?.stats?.followCount}
                                 checkFollowButton={isFollowing ? 'Unfollow' : 'Follow'}
                                 onFollowPress={() => followUserCallback()}
                             />

@@ -8,11 +8,14 @@ import { cs } from './styles';
 
 interface ProfileUserInfoProps {
     fullname: string
+    followerCount: number | undefined
+    likeCount: number | undefined
+    followCount: number | undefined
     checkFollowButton: string
     onFollowPress: () => void
 }
 
-const ProfileUserInfo = ({ fullname, checkFollowButton, onFollowPress }: ProfileUserInfoProps) => {
+const ProfileUserInfo = ({ fullname, followerCount, likeCount, followCount, checkFollowButton, onFollowPress }: ProfileUserInfoProps) => {
     return (
         <>
             <View style={positionHelpers.alignCenter}>
@@ -31,15 +34,15 @@ const ProfileUserInfo = ({ fullname, checkFollowButton, onFollowPress }: Profile
                 colors={[colors.blue1, colors.blue]}
                 style={[positionHelpers.alignItemsCenterRow, cs.containerGradient]}>
                 <TouchableOpacity style={[positionHelpers.center, positionHelpers.fill, cs.h100]}>
-                    <BodyText fontWeight={'bold'} fontSize={20} color={colors.silver3}>0</BodyText>
+                    <BodyText fontWeight={'bold'} fontSize={20} color={colors.silver3}>{followerCount}</BodyText>
                     <BodyText fontWeight={'500'} fontSize={16} color={colors.silver3} marginTop={3}>Followers</BodyText>
                 </TouchableOpacity>
                 <TouchableOpacity style={[positionHelpers.center, positionHelpers.fill, cs.h100, cs.likeContainer]}>
-                    <BodyText fontWeight={'bold'} fontSize={20} color={colors.silver3}>0</BodyText>
+                    <BodyText fontWeight={'bold'} fontSize={20} color={colors.silver3}>{likeCount}</BodyText>
                     <BodyText fontWeight={'500'} fontSize={16} color={colors.silver3} marginTop={3}>Likes</BodyText>
                 </TouchableOpacity>
                 <TouchableOpacity style={[positionHelpers.center, positionHelpers.fill, cs.h100]}>
-                    <BodyText fontWeight={'bold'} fontSize={20} color={colors.silver3}>0</BodyText>
+                    <BodyText fontWeight={'bold'} fontSize={20} color={colors.silver3}>{followCount}</BodyText>
                     <BodyText fontWeight={'500'} fontSize={16} color={colors.silver3} marginTop={3}>Following</BodyText>
                 </TouchableOpacity>
 

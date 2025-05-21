@@ -1,15 +1,18 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { getOneUserAction } from '../UsersRedux/usersAction';
 
 export const setFollowAction = createAsyncThunk<any, any>(
     'follows/setFollow',
     async (dataFollow, thunkAPI) => {
         try {
-            const response = await axios.post(`/api/follows?who[id]=${dataFollow?.who?.id}&whom[id]=${dataFollow?.whom?.id}`, dataFollow);
+            const response = await axios.post('/api/follows', dataFollow);
+
+            console.log('response-setFollowAction-->', response);
 
             if (response?.status === 201) {
-                thunkAPI.dispatch(getFollowAction());
+                thunkAPI.dispatch(getFollowAction({ myId: dataFollow?.who?.id, userId: dataFollow?.whom?.id }));
+                thunkAPI.dispatch(getOneUserAction(dataFollow?.whom?.id));
             }
 
             return response?.data;
@@ -25,21 +28,18 @@ export const setFollowAction = createAsyncThunk<any, any>(
     },
 );
 
-export const getFollowAction = createAsyncThunk<any, void>(
+export const getFollowAction = createAsyncThunk<any, { myId: string | undefined, userId: string }>(
     'follows/getFollow',
-    async (_, thunkAPI) => {
+    async ({ myId, userId }, thunkAPI) => {
+        console.log('myId-->', myId, 'userId-->', userId);
         try {
-            const token = await AsyncStorage.getItem('@token');
-
-            console.log('token--->', token);
             const config = {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
             };
-            const response = await axios.get('/api/follows', config);
+            const response = await axios.get(`/api/follows?where[who][id]=${myId}&where[whom][id]=${userId}`, config);
             console.log('response--getFollowAction--->>', response);
             return response?.data;
         } catch (error) {
@@ -53,13 +53,19 @@ export const getFollowAction = createAsyncThunk<any, void>(
     },
 );
 
-export const unFollowAction = createAsyncThunk<any, void>(
+export const unFollowAction = createAsyncThunk<any, { id: string, myId: string | undefined, userId: string }>(
     'follows/unFollow',
-    async (id, thunkAPI) => {
+    async ({ id, myId, userId }, thunkAPI) => {
         try {
             const response = await axios.delete(`/api/follows/${id}`);
 
             console.log('response--unFollowAction--->>', response);
+
+            if (response?.status === 200) {
+                thunkAPI.dispatch(getFollowAction({ myId: myId, userId: userId }));
+                thunkAPI.dispatch(getOneUserAction(userId));
+            }
+
             return response?.data;
         } catch (error) {
             console.log('error--unFollowAction--->>', error?.response?.data);

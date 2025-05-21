@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, SafeAreaView, TouchableOpacity, Keyboard, FlatList, Dimensions, RefreshControl } from 'react-native';
-import { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, SafeAreaView, TouchableOpacity, FlatList, Dimensions, RefreshControl } from 'react-native';
 import { colors, positionHelpers } from '../../../../styles';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { useNavigation } from '@react-navigation/native';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
-import { BodyText, ButtonDefault, Input, SvgIcon } from '../../../../components/UI';
+import { BodyText, ButtonDefault, SvgIcon } from '../../../../components/UI';
 import ProfileInfo from './components/ProfileInfo';
 import { cs } from './styles';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
@@ -27,19 +26,9 @@ const ProfileScreen = () => {
     const dispatch = useReduxDispatch();
     const { videosMeData } = useReduxSelector((state: RootState) => state.camera);
     const { user } = useReduxSelector((state: RootState) => state.auth);
-    const { usersData } = useReduxSelector((state: RootState) => state.users);
-    const { isSearchActive } = useReduxSelector((state: RootState) => state?.modals);
-    const inputRef = useRef<any | null>(null);
     const [refreshing, setRefreshing] = useState<boolean>(false);
 
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
-
-    //for SearchAnimatedModal
-    const [searchQuery, setSearchQuery] = useState<string>('');
-    const [inputY, setInputY] = useState<number>(0);
-    const overlayOpacity = useSharedValue(0);
-    const overlayTranslateY = useSharedValue(0);
-    //
 
     useEffect(() => {
         if (user?.id) {
@@ -47,25 +36,6 @@ const ProfileScreen = () => {
         }
     }, []);
 
-    useEffect(() => {
-        if (isSearchActive && inputRef.current) {
-            setTimeout(() => {
-                inputRef.current.measure((height: number, pageY: number) => {
-                    setInputY(pageY + height);
-                });
-            }, 100);
-        }
-    }, [isSearchActive]);
-
-    useEffect(() => {
-        if (isSearchActive) {
-            overlayOpacity.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) });
-            overlayTranslateY.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) });
-        } else {
-            overlayOpacity.value = withTiming(0, { duration: 200, easing: Easing.in(Easing.ease) });
-            overlayTranslateY.value = withTiming(20, { duration: 200, easing: Easing.in(Easing.ease) });
-        }
-    }, [isSearchActive]);
 
     const filteredVideos = videosMeData.filter(v => v?.file?.storagePath);
 
@@ -103,7 +73,7 @@ const ProfileScreen = () => {
     return (
         <>
             <View style={positionHelpers.fill}>
-                {!isSearchActive && <CustomHeader title="00:00:00" />}
+                <CustomHeader title="00:00:00" />
                 <SafeAreaView
                     style={[
                         positionHelpers.fill,
@@ -114,32 +84,22 @@ const ProfileScreen = () => {
                 >
                     <View style={[positionHelpers.ph16, positionHelpers.mb10]}>
                         <View style={[positionHelpers.mt10, positionHelpers.alignItemsCenterRow]}>
-                            {isSearchActive && (< TouchableOpacity style={cs.mr15} onPress={() => {
-                                dispatch(setIsSearchActive(false));
-                                Keyboard.dismiss();
-                                setSearchQuery('');
-                            }}>
-                                <SvgIcon image="backArrow" />
-                            </TouchableOpacity>)}
                             <View style={positionHelpers.fill}>
-                                <Input
-                                    ref={inputRef}
-                                    inputStyles={cs.input}
-                                    placeholder="Search by user"
-                                    onFocus={() => dispatch(setIsSearchActive(true))}
-                                    onChangeText={setSearchQuery}
-                                    value={searchQuery}
-                                    colorText={colors.white}
-                                />
-                            </View>
-                            {!isSearchActive && (
-                                <TouchableOpacity style={cs.ml15} onPress={() => dispatch(setMenuModal(true))}>
-                                    <SvgIcon image="menu" />
+                                <TouchableOpacity style={cs.input} onPress={() => dispatch(setIsSearchActive(true))}>
+                                    <BodyText color={colors.silver1Procent50}>Search by user</BodyText>
                                 </TouchableOpacity>
-                            )}
+                            </View>
+                            <TouchableOpacity style={cs.ml15} onPress={() => dispatch(setMenuModal(true))}>
+                                <SvgIcon image="menu" />
+                            </TouchableOpacity>
                         </View>
 
-                        <ProfileInfo fullName={`${user?.firstName} ${user?.lastName}`} />
+                        <ProfileInfo
+                            fullName={`${user?.firstName} ${user?.lastName}`}
+                            followerCount={user?.stats?.followerCount}
+                            likeCount={user?.stats?.likeCount}
+                            followCount={user?.stats?.followCount}
+                        />
 
                         <ButtonDefault
                             buttoStyles={[
@@ -185,15 +145,9 @@ const ProfileScreen = () => {
                     )}
                 </SafeAreaView >
             </View >
-            {isSearchActive && (
-                <SearchAnimatedModal
-                    usersData={usersData}
-                    searchQuery={searchQuery}
-                    inputY={inputY}
-                    overlayOpacity={overlayOpacity}
-                    overlayTranslateY={overlayTranslateY}
-                />
-            )}
+
+            {/* Search Modal */}
+            <SearchAnimatedModal />
 
             {/* Video Full Modal */}
             <FullVideoModal
