@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import Video from 'react-native-video';
-import { HandlerStateChangeEvent, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, { SharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { positionHelpers } from '../../../../../../styles';
 import { cs } from './styles';
 import VideoAbsoluteInfo from '../../../../../VideoAbsoluteInfo';
@@ -11,13 +11,12 @@ interface VideoItemProps {
     source: string;
     isActive: boolean
     videoHeight: number
-    // tapPosition: { x: number, y: number };
-    tapX: number
-    tapY: number
-    scale: Animated.SharedValue<number>;
-    opacity: Animated.SharedValue<number>;
-    handleSingleTap: (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => void;
-    handleDoubleTap: (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => void;
+    tapX: SharedValue<number>
+    tapY: SharedValue<number>
+    scale: SharedValue<number>
+    opacity: SharedValue<number>
+    onSingleTap?: (e: any) => void;
+    onDoubleTap?: (e: any) => void;
 
     avatar: string;
     name: string;
@@ -37,8 +36,8 @@ const VideoItem: React.FC<VideoItemProps> = ({
     tapY,
     scale,
     opacity,
-    handleSingleTap,
-    handleDoubleTap,
+    onSingleTap,
+    onDoubleTap,
     avatar,
     name,
     videoNumber,
@@ -47,7 +46,7 @@ const VideoItem: React.FC<VideoItemProps> = ({
     likesCount,
     onVideoRepeat }) => {
     const videoRef = useRef<any | null>(null);
-    const doubleTapRef = useRef<TapGestureHandler>(null);
+    // const doubleTapRef = useRef<TapGestureHandler>(null);
 
     useEffect(() => {
         if (isActive && videoRef.current) {
@@ -67,49 +66,71 @@ const VideoItem: React.FC<VideoItemProps> = ({
     }));
 
 
-    return (
-        <View style={positionHelpers.fill}>
-            <TapGestureHandler
-                onHandlerStateChange={handleSingleTap}
-                waitFor={doubleTapRef}>
-                <TapGestureHandler
-                    onHandlerStateChange={handleDoubleTap}
-                    numberOfTaps={2}
-                    ref={doubleTapRef}>
-                    <View style={[positionHelpers.center, cs.videoWrapper]}>
-                        <Video
-                            ref={videoRef}
-                            source={{ uri: source }}
-                            style={[
-                                cs.video,
-                                { height: videoHeight },
-                            ]}
-                            resizeMode="cover"
-                            repeat
-                            muted
-                            paused={!isActive}
-                            onLoad={(data) => {
-                                onVideoLoad(Math.floor(data.duration));
-                            }}
-                            onEnd={() => {
-                                videoRef.current?.seek(0);
-                                onVideoRepeat?.();
-                            }}
-                        />
-                    </View>
-                </TapGestureHandler>
-            </TapGestureHandler>
-            <VideoAbsoluteInfo
-                avatar={avatar}
-                name={name}
-                videoNumber={videoNumber}
-                videoDuration={videoDuration}
-                likesCount={likesCount}
-            />
+    const doubleTap = Gesture.Tap()
+        .numberOfTaps(2)
+        .onEnd((e) => {
+            if (!e) { return; }
 
-            {/* Heart animation */}
-            <Animated.Text style={[cs.heart, animatedStyle]}>❤️</Animated.Text>
-        </View>
+            tapX.value = e.x;
+            tapY.value = e.y;
+
+            scale.value = 1;
+            opacity.value = 1;
+
+            scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+                scale.value = withTiming(0, { duration: 500 });
+                opacity.value = withTiming(0, { duration: 500 });
+            });
+
+            onDoubleTap?.();
+        });
+
+    const singleTap = Gesture.Tap()
+        .numberOfTaps(1)
+        .onEnd(() => {
+            onSingleTap?.();
+        });
+    // .requireFailure(doubleTap);
+
+    const gesture = Gesture.Exclusive(doubleTap, singleTap);
+
+
+    return (
+        <GestureDetector gesture={gesture}>
+            <View style={positionHelpers.fill}>
+                <View style={[positionHelpers.center, cs.videoWrapper]}>
+                    <Video
+                        ref={videoRef}
+                        source={{ uri: source }}
+                        style={[
+                            cs.video,
+                            { height: videoHeight },
+                        ]}
+                        resizeMode="cover"
+                        repeat
+                        muted
+                        paused={!isActive}
+                        onLoad={(data) => {
+                            onVideoLoad(Math.floor(data.duration));
+                        }}
+                        onEnd={() => {
+                            videoRef.current?.seek(0);
+                            onVideoRepeat?.();
+                        }}
+                    />
+                </View>
+                <VideoAbsoluteInfo
+                    avatar={avatar}
+                    name={name}
+                    videoNumber={videoNumber}
+                    videoDuration={videoDuration}
+                    likesCount={likesCount}
+                />
+
+                {/* Heart animation */}
+                <Animated.Text style={[cs.heart, animatedStyle]}>❤️</Animated.Text>
+            </View>
+        </GestureDetector>
     );
 };
 

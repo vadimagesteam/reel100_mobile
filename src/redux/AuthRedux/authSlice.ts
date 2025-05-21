@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthState, StatusRegisterType } from './types';
+import { AuthState, StatusRegisterType, UserType } from './types';
 import { forgotPasswordAction, getUserInfoAction, resendUserVerifyAction, resetPasswordAction, userLoginAction, userRegisterAction, userVerifyAction } from './authAction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -7,7 +7,7 @@ const initialState: AuthState = {
     loading: false,
     isAuth: false,
     isStatus: null,
-    user: [],
+    user: null,
     error: null,
 };
 
@@ -146,7 +146,7 @@ export const authSlice = createSlice({
             })
             .addCase(
                 getUserInfoAction.fulfilled,
-                (state, action: PayloadAction<any>) => {
+                (state, action: PayloadAction<UserType>) => {
                     state.loading = false;
                     state.user = action?.payload;
                 },

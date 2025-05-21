@@ -1,26 +1,24 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, Dimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+// import { useNavigation } from '@react-navigation/native';
 import { GestureHandlerRootView, HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
-import { useSharedValue, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
+import { useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import VideoItem from './components/VideoItem';
 import { positionHelpers } from '../../../../styles';
-import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
-// import { videoSources } from './mockData';
+
+
 import { formatTime } from '../../../../utils/formatTime';
-import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
-import { useReduxDispatch } from '../../../../store/store';
-import FullVideoScrollModal from '../../../Modals/FullVideoScrollModal';
+import { VideoItemType } from '../../../../redux/CameraRedux/types';
 
 const { height } = Dimensions.get('screen');
+
 interface TopOneHundredTabProps {
-    allVideo: any
+    allVideo: VideoItemType[]
 }
 
 const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
-    const navigation = useNavigation<any>();
-    const dispatch = useReduxDispatch();
+    // const navigation = useNavigation<any>();
     const flatListRef = useRef<FlatList>(null);
     const insets = useSafeAreaInsets();
     const tabNavigationHeight = Math.max(150, Math.min(height * 0.19, 250));
@@ -35,10 +33,6 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
-
-    const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-    const [visible, setVisible] = useState<boolean>(false);
-
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -146,13 +140,12 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                             source={item.file?.storagePath}
                             isActive={index === activeIndex}
                             videoHeight={videoHeight}
-                            // tapPosition={tapPosition}
                             tapX={tapX}
                             tapY={tapY}
                             scale={scale}
                             opacity={opacity}
-                            handleSingleTap={(event) => handleSingleTap(event, item?.id)}
-                            handleDoubleTap={(event) => handleDoubleTap(event)}
+                            onSingleTap={(event) => handleSingleTap(event, item?.id)}
+                            onDoubleTap={(event) => handleDoubleTap(event)}
                             avatar={item?.avatar}
                             name={item?.fullname}
                             videoNumber={item?.list_number}
@@ -168,7 +161,6 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
         [
             activeIndex,
             videoHeight,
-            // tapPosition
             tapX,
             tapY,
             scale,

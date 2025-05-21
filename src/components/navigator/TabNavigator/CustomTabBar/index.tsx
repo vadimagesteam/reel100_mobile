@@ -35,6 +35,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
                 const widthAndHeightSize = isFocused ? 28 : 24;
 
                 const onPress = () => {
+
                     const event = navigation.emit({
                         type: 'tabPress',
                         target: route.key,
@@ -48,12 +49,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
 
                 return (
                     <CustomTabBarButton key={route.key} onPress={onPress}>
-                        {/* <LinearGradient
-                            start={{ x: 0.1, y: 0.5 }}
-                            end={{ x: 0.9, y: 0 }}
-                            colors={isFocused ? [colors.blue1, colors.blue] : ['transparent', 'transparent']}
-                            style={[positionHelpers.center, cs.br40]}
-                        > */}
                         <View style={[positionHelpers.center, cs.br40, cs.p5, positionHelpers.mb10]}>
                             <SvgIcon
                                 image={ICONS[route.name]}
@@ -61,7 +56,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
                                 style={{ width: widthAndHeightSize, height: widthAndHeightSize }}
                             />
                         </View>
-                        {/* </LinearGradient> */}
                     </CustomTabBarButton>
                 );
             })}

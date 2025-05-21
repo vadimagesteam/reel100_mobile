@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 
-export const getUsersAction = createAsyncThunk<any, void>(
+export const getUsersAction = createAsyncThunk<any, string>(
     'users/getUsers',
     async (query, thunkAPI) => {
         try {
@@ -12,9 +12,6 @@ export const getUsersAction = createAsyncThunk<any, void>(
                 },
             };
             const response = await axios.get(`/api/users?where[any]=${query}`, config);
-
-
-            console.log('response--search data>', response);
 
             return response?.data;
         } catch (error) {
@@ -39,8 +36,6 @@ export const getOneUserAction = createAsyncThunk<any, string>(
                 },
             };
             const response = await axios.get(`/api/users/${id}`, config);
-
-            console.log('response-->', response);
 
             return response?.data;
         } catch (error) {

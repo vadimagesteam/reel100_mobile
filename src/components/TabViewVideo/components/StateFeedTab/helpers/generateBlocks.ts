@@ -1,20 +1,19 @@
-import { BlockType, VideoItemType } from '../components/RenderVideo/types';
+import { BlockType } from '../components/RenderVideo/types';
 
-export const generateBlocks = (videos: VideoItemType[]): BlockType[] => {
+export const generateBlocks = (videos: any[]): BlockType[] => {
     const blocks: BlockType[] = [];
     let i = 0;
     let toggle = true;
 
-    while (i + 5 <= videos.length) {
+    while (i + 3 <= videos.length) {
         blocks.push({
             type: toggle ? 'leftSmall_rightBig' : 'leftBig_rightSmall',
-            items: [videos[i], videos[i + 1], videos[i + 2], videos[i + 3], videos[i + 4]],
+            items: [videos[i], videos[i + 1], videos[i + 2]],
         });
         toggle = !toggle;
-        i += 5;
+        i += 3;
     }
 
-    // if 1-2 videos left
     while (i < videos.length) {
         blocks.push({
             type: 'single',

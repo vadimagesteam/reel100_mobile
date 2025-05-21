@@ -1,87 +1,64 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
-import { colors, positionHelpers } from '../../../../../../styles';
-// import VideoAbsoluteInfo from '../../../../../VideoAbsoluteInfo';
-import { formatTime } from '../../../../../../utils/formatTime';
-import VideoAbsoluteInfo from '../../../../../../components/VideoAbsoluteInfo';
-import { HandlerStateChangeEvent, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
-import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
-import CommentSection from '../../../../../../components/CommentSection';
-import { RootState, useReduxDispatch, useReduxSelector } from '../../../../../../store/store';
-import { getVideoCommentsAction } from '../../../../../../redux/VideoRedux/videoAction';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
+import { getVideoCommentsAction } from '../../../redux/VideoRedux/videoAction';
+import { colors, positionHelpers } from '../../../styles';
+import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
+import { formatTime } from '../../../utils/formatTime';
+import CommentSection from '../../CommentSection';
 
-interface ProfileVideoModalProps {
-    modalVideo: any
-    activeVideoIds: string[]
+interface FullVideoModalProps {
     onArrowPress?: () => void
-    tapX: SharedValue<number>
-    tapY: SharedValue<number>
-    scale: Animated.SharedValue<number>;
-    opacity: Animated.SharedValue<number>;
-    handleDoubleTap: (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => void;
+    modalVideo: any
 }
 
-const ProfileVideoModal = ({
+const FullVideoModal = ({
     modalVideo,
-    activeVideoIds,
-    handleDoubleTap,
     onArrowPress,
-    tapX,
-    tapY,
-    scale,
-    opacity }: ProfileVideoModalProps) => {
+}: FullVideoModalProps) => {
     const dispatch = useReduxDispatch();
     const { countComments } = useReduxSelector((state: RootState) => state.video);
     const videoRef = useRef<any | null>(null);
-    const doubleTapRef = useRef<TapGestureHandler>(null);
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
     const [isVideoReady, setIsVideoReady] = useState(false);
-    const [durationReady, setDurationReady] = useState(false);
 
     const [showComments, setShowComments] = useState(false);
+    const scale = useSharedValue(0);
+    const opacity = useSharedValue(1);
+    const tapX = useSharedValue(0);
+    const tapY = useSharedValue(0);
 
     useEffect(() => {
         if (modalVideo && modalVideo?.id) {
             dispatch(getVideoCommentsAction(modalVideo.id));
             setIsVideoReady(false);
-            setDurationReady(false);
         }
     }, [modalVideo?.id]);
 
-    // console.log('modalVideo-->', modalVideo);
 
+    const doubleTapGesture = Gesture.Tap()
+        .numberOfTaps(2)
+        .onEnd((event) => {
+            if (event) {
+                const { x, y } = event;
 
-    // useEffect(() => {
-    //     if (modalVideo?.id) {
-    //         const interval = setInterval(() => {
-    //             setRemainingSeconds(prev => {
-    //                 const updated = { ...prev };
+                tapX.value = x;
+                tapY.value = y;
 
+                scale.value = 1;
+                opacity.value = 1;
 
-    //                 const current = updated[modalVideo.id];
-    //                 if (current > 0) {
-    //                     updated[modalVideo.id] = current - 1;
-    //                 }
-
-
-    //                 activeVideoIds.forEach(key => {
-    //                     const current = updated[key];
-    //                     if (current > 0) {
-    //                         updated[key] = current - 1;
-    //                     }
-    //                 });
-
-    //                 return updated;
-    //             });
-    //         }, 1000);
-
-
-    //         return () => clearInterval(interval);
-    //     }
-    // }, [activeVideoIds, modalVideo?.id]);
+                scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+                    scale.value = withTiming(0, { duration: 500 });
+                    opacity.value = withTiming(0, { duration: 500 });
+                });
+            }
+        });
 
 
     //Save duration video
@@ -110,7 +87,6 @@ const ProfileVideoModal = ({
 
     // Animated style heart
     const animatedStyle = useAnimatedStyle(() => ({
-        // position: 'absolute',
         left: tapX.value - 40,
         top: tapY.value - 40,
         opacity: opacity.value,
@@ -118,16 +94,12 @@ const ProfileVideoModal = ({
     }));
 
     const openComments = () => {
-        // fetchComments();
         setShowComments(true);
     };
 
     return (
         <Modal visible={!!modalVideo} transparent={false} animationType="fade">
-            <TapGestureHandler
-                onHandlerStateChange={handleDoubleTap}
-                numberOfTaps={2}
-                ref={doubleTapRef}>
+            <GestureDetector gesture={doubleTapGesture}>
                 <View
                     style={[positionHelpers.fill, { backgroundColor: colors.black }]}
 
@@ -135,6 +107,7 @@ const ProfileVideoModal = ({
                     {modalVideo && (
                         <>
                             <Video
+                                key={modalVideo?.id}
                                 ref={videoRef}
                                 source={{ uri: modalVideo?.file?.storagePath }}
                                 style={positionHelpers.fill}
@@ -166,10 +139,6 @@ const ProfileVideoModal = ({
                                         }
                                     }
                                 }}
-                            // onEnd={() => {
-                            //     videoRef.current?.seek(0);
-                            //     onVideoRepeat(modalVideo?.id);
-                            // }}
                             />
                             <VideoAbsoluteInfo
                                 videoCheck={'FULL'}
@@ -189,20 +158,24 @@ const ProfileVideoModal = ({
                         </>
                     )}
                 </View>
-            </TapGestureHandler>
+            </GestureDetector>
 
             {!isVideoReady && (
                 <View style={[positionHelpers.fill, { justifyContent: 'center', alignItems: 'center', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.black }]}>
                     <ActivityIndicator size="large" color="#fff" />
                 </View>
             )}
+
             {/* Heart animation */}
-            <Animated.Text style={[{
-                position: 'absolute',
-                fontSize: 50,
-            }, animatedStyle]}>❤️</Animated.Text>
+            <Animated.Text style={[positionHelpers.absolute, cs.animatedLike, animatedStyle]}>❤️</Animated.Text>
         </Modal>
     );
 };
 
-export default ProfileVideoModal;
+const cs = StyleSheet.create({
+    animatedLike: {
+        fontSize: 50,
+    },
+});
+
+export default FullVideoModal;

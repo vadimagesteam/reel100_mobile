@@ -30,6 +30,25 @@ import axios, { AxiosError } from 'axios';
 //     },
 // );
 
+export const getOneVideoAction = createAsyncThunk<any, string>(
+    'video/getOneVideo',
+    async (videoId, thunkAPI) => {
+        try {
+            const response = await axios.get(`/api/videos/${videoId}`);
+            console.log('getOneVideoAction --->', response);
+
+            return response?.data;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                if (error.response && error.response.data) {
+                    return thunkAPI.rejectWithValue(error.response.data);
+                } else {
+                }
+            }
+        }
+    },
+);
+
 export const getVideoCommentsAction = createAsyncThunk<any, string>(
     'video/getVideoComments',
     async (videoId, thunkAPI) => {

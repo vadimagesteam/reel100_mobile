@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UsersState } from './types';
+import { UserOneDataType, UsersState, UsersType } from './types';
 import { getOneUserAction, getUsersAction } from './usersAction';
 
 const initialState: UsersState = {
     loading: false,
     usersData: [],
-    userOneData: [],
+    userOneData: null,
     error: null,
 };
 
@@ -21,7 +21,7 @@ export const usersSlice = createSlice({
             })
             .addCase(
                 getUsersAction.fulfilled,
-                (state, action: PayloadAction<any>) => {
+                (state, action: PayloadAction<UsersType[]>) => {
                     state.loading = false;
                     state.usersData = action?.payload;
                 },
@@ -39,7 +39,7 @@ export const usersSlice = createSlice({
             })
             .addCase(
                 getOneUserAction.fulfilled,
-                (state, action: PayloadAction<any>) => {
+                (state, action: PayloadAction<UserOneDataType>) => {
                     state.loading = false;
                     state.userOneData = action?.payload;
                 },

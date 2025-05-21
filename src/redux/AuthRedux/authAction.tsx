@@ -69,8 +69,8 @@ export const userVerifyAction = createAsyncThunk<any, VerifyUserType>(
 
             if (response?.status === 201 && response?.data?.accessToken) {
                 await AsyncStorage.setItem('@token', response.data.accessToken);
-                await AsyncStorage.setItem('@isVerified', JSON.stringify(true));
                 axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
+                await AsyncStorage.setItem('@isVerified', JSON.stringify(true));
 
                 thunkAPI.dispatch(setIsAuth(true));
                 thunkAPI.dispatch(clearErrors());
@@ -142,10 +142,9 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
             };
             const response = await axios.post('/api/login', dataLogin, config);
 
-            // console.log('-userLoginAction-->', JSON.stringify(response?.data));
-
             if (response?.status === 201) {
-                const isVerified = await AsyncStorage.getItem('@isVerified');
+                const isVerifiedRaw = await AsyncStorage.getItem('@isVerified');
+                const isVerified = isVerifiedRaw ? JSON.parse(isVerifiedRaw) : false;
                 if (JSON.parse(isVerified) !== true) {
                     Alert.alert(
                         'Please verify your email before logging in.',
@@ -163,17 +162,14 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
 
 
                 }
-
                 await AsyncStorage.setItem('@token', response.data.accessToken);
                 axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
-
                 thunkAPI.dispatch(setIsAuth(true));
                 thunkAPI.dispatch(clearErrors());
             }
 
             return response?.data;
         } catch (error) {
-            // console.log('-userLoginAction-error->', error);
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);
@@ -229,7 +225,6 @@ export const resetPasswordAction = createAsyncThunk<any, ResetPassType>(
             };
             const response = await axios.post('/api/resetPassword', resetPassData, config);
 
-            console.log('---resetPasswordAction--->', response?.data);
             if (response?.status === 201) {
                 navigation.dispatch(
                     CommonActions.reset({
@@ -240,9 +235,6 @@ export const resetPasswordAction = createAsyncThunk<any, ResetPassType>(
                         ],
                     })
                 );
-
-                // await AsyncStorage.setItem('@token', response.data.accessToken);
-                // axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
                 thunkAPI.dispatch(clearErrors());
             }
 
@@ -264,14 +256,7 @@ export const getUserInfoAction = createAsyncThunk<any, void>(
     'auth/getUserInfo',
     async (_, thunkAPI) => {
         try {
-            const token = await AsyncStorage.getItem('@token');
-            const response = await axios.get('/api/users/me', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
+            const response = await axios.get('/api/users/me');
             return response?.data;
         } catch (error) {
             if (error instanceof AxiosError) {

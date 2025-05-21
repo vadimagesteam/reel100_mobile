@@ -1,17 +1,12 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../../styles';
+import { colors } from '../../../styles';
 
 export const cs = StyleSheet.create({
     container: {
         backgroundColor: colors.black4,
     },
-    input: {
-        padding: 10,
-        backgroundColor: '#1b1b1b',
-        borderRadius: 8,
-    },
-    mr15: {
-        marginRight: 15,
+    pb10: {
+        paddingBottom: 10,
     },
     ml15: {
         marginLeft: 15,
