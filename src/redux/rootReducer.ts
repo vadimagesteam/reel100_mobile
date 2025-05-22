@@ -9,6 +9,7 @@ import usersReducer from './UsersRedux/usersSlice';
 import followsReducer from './FollowsRedux/followsSlice';
 import videoReducer from './VideoRedux/videoSlice';
 import modalsReducer from './ModalsRedux/modalSlice';
+import likesReducer from './LikesRedux/likesSclice';
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
     follows: followsReducer,
     video: videoReducer,
     modals: modalsReducer,
+    likes: likesReducer,
 });
 
 export default rootReducer;

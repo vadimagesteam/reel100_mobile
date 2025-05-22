@@ -13,6 +13,7 @@ interface VideoAbsoluteInfoProps {
     name?: string;
     videoNumber?: number | string;
     videoDuration?: string | number;
+    likeCheck?: boolean
     likesCount?: number | string;
 
     showArrow?: boolean
@@ -32,6 +33,7 @@ const VideoAbsoluteInfo = ({
     name,
     videoNumber,
     videoDuration,
+    likeCheck,
     likesCount,
     showArrow = false,
     onArrowBack,
@@ -104,10 +106,10 @@ const VideoAbsoluteInfo = ({
                             )}
                         </View>
                     ) : (
-                        <View style={[positionHelpers.absolute, cs.containerLikes, cs.left10]}>
+                        <View style={[positionHelpers.absolute, cs.containerLikes, cs.left16]}>
                             <View style={[positionHelpers.flexRow]}>
-                                <SvgIcon image="like_heart" />
-                                <BodyText fontSize={16} fontWeight={'700'} color={colors.white}>{likesCount}</BodyText>
+                                <SvgIcon image={likeCheck ? 'like_red_heart' : 'like_heart'} style={cs.iconFillLike} />
+                                <BodyText fontSize={16} fontWeight={'700'} color={colors.white} marginLeft={2}>{likesCount}</BodyText>
                             </View>
                         </View>
                     )}

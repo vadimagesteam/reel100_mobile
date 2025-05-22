@@ -1,23 +1,24 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { LikeResponseType, LikeBodyType, DeleteLikeParams, GetLikesParams } from './types';
+import { getUserInfoAction } from '../AuthRedux/authAction';
 import { getOneUserAction } from '../UsersRedux/usersAction';
 
-export const setFollowAction = createAsyncThunk<any, any>(
-    'follows/setFollow',
-    async (dataFollow, thunkAPI) => {
-        try {
-            const response = await axios.post('/api/follows', dataFollow);
 
-            console.log('response-setFollowAction-->', response);
+export const setLikeAction = createAsyncThunk<LikeResponseType, LikeBodyType>(
+    'likes/setLike',
+    async (likesBodyData, thunkAPI) => {
+        const { dataLike } = likesBodyData;
+        try {
+            const response = await axios.post('/api/reactions', dataLike);
 
             if (response?.status === 201) {
-                thunkAPI.dispatch(getFollowAction({ myId: dataFollow?.who?.id, userId: dataFollow?.whom?.id }));
-                thunkAPI.dispatch(getOneUserAction(dataFollow?.whom?.id));
+                thunkAPI.dispatch(getLikesAction({ userId: dataLike?.user?.id, videoId: dataLike?.video?.id }));
+                thunkAPI.dispatch(getUserInfoAction());
+                thunkAPI.dispatch(getOneUserAction(dataLike?.user?.id));
             }
-
             return response?.data;
         } catch (error) {
-            console.log('response--setFollowAction--->>', error?.response?.data);
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);
@@ -28,9 +29,9 @@ export const setFollowAction = createAsyncThunk<any, any>(
     },
 );
 
-export const getFollowAction = createAsyncThunk<any, { myId: string | undefined, userId: string }>(
-    'follows/getFollow',
-    async ({ myId, userId }, thunkAPI) => {
+export const getLikesAction = createAsyncThunk<LikeResponseType[], GetLikesParams>(
+    'likes/getLikes',
+    async ({ userId, videoId }, thunkAPI) => {
         try {
             const config = {
                 headers: {
@@ -38,7 +39,7 @@ export const getFollowAction = createAsyncThunk<any, { myId: string | undefined,
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.get(`/api/follows?where[who][id]=${myId}&where[whom][id]=${userId}`, config);
+            const response = await axios.get(`/api/reactions?where[typeField]=Like&where[user][id]=${userId}&where[video][id]=${videoId}`, config);
             return response?.data;
         } catch (error) {
             if (error instanceof AxiosError) {
@@ -51,22 +52,19 @@ export const getFollowAction = createAsyncThunk<any, { myId: string | undefined,
     },
 );
 
-export const unFollowAction = createAsyncThunk<any, { id: string, myId: string | undefined, userId: string }>(
-    'follows/unFollow',
-    async ({ id, myId, userId }, thunkAPI) => {
+export const deleteLikeAction = createAsyncThunk<LikeResponseType, DeleteLikeParams>(
+    'likes/setLike',
+    async ({ id, userId, videoId }, thunkAPI) => {
         try {
-            const response = await axios.delete(`/api/follows/${id}`);
-
-            console.log('response--unFollowAction--->>', response);
+            const response = await axios.delete(`/api/reactions/${id}`);
 
             if (response?.status === 200) {
-                thunkAPI.dispatch(getFollowAction({ myId: myId, userId: userId }));
+                thunkAPI.dispatch(getLikesAction({ userId: userId, videoId: videoId }));
+                thunkAPI.dispatch(getUserInfoAction());
                 thunkAPI.dispatch(getOneUserAction(userId));
             }
-
             return response?.data;
         } catch (error) {
-            console.log('error--unFollowAction--->>', error?.response?.data);
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);

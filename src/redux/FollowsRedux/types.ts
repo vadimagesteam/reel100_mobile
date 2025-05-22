@@ -3,3 +3,4 @@ export interface FollowsState {
     followData: any[]
     error: Error | null;
 }
+

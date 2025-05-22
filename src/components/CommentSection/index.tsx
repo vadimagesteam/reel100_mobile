@@ -9,13 +9,13 @@ import { CommentType } from '../../redux/VideoRedux/types';
 
 type CommentSectionProps = {
     videoId: string;
+    userMeId: string | undefined
     onClose: () => void;
 };
 
-const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
+const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => {
     const dispatch = useReduxDispatch();
     const { videoComments } = useReduxSelector((state: RootState) => state.video);
-    const { user } = useReduxSelector((state: RootState) => state?.auth);
     const inputRef = useRef<TextInput>(null);
     const [newComment, setNewComment] = useState('');
     const [replyToCommentId, setReplyToCommentId] = useState<string | null>(null);
@@ -25,7 +25,7 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
     // const take = 10;
 
     useEffect(() => {
-        dispatch(getVideoCommentsAction({ videoId, userId: user?.id }));
+        dispatch(getVideoCommentsAction({ videoId, userId: userMeId }));
     }, []);
 
 
@@ -38,7 +38,7 @@ const CommentSection = ({ videoId, onClose }: CommentSectionProps) => {
                 replyTo: replyToCommentId || '',
                 text: newComment,
                 user: {
-                    id: user?.id,
+                    id: userMeId,
                 },
                 video: {
                     id: videoId,

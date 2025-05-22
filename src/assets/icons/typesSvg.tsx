@@ -19,4 +19,5 @@ export type SvgIconsNames =
     | 'globalNavTab'
     | 'fourU_NavTab'
     | 'profileNavTab'
-    | 'like_heart';
+    | 'like_heart'
+    | 'like_red_heart';

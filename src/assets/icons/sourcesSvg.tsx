@@ -205,6 +205,25 @@ const like_heart = {
     viewBox: '0 0 16 15',
 };
 
+const like_red_heart = {
+    Draw: ({ color = colors.red }) => (
+        <>
+            <G filter="url(#a)">
+                <Path
+                    stroke={color}
+                    fill={color}
+                    d="M11.392 6.794 8 10.283 4.609 6.794l-.473-.486a2.266 2.266 0 0 1-.636-1.58c0-1.244.977-2.228 2.152-2.228.566 0 1.111.23 1.517.648l.473.486.358.369.358-.369.473-.486c.406-.417.951-.648 1.517-.648 1.175 0 2.152.984 2.152 2.228 0 .595-.23 1.163-.636 1.58l-.473.486Z"
+                    shapeRendering="crispEdges"
+                />
+            </G>
+            <Defs />
+        </>
+    ),
+    height: 20,
+    width: 19,
+    viewBox: '0 0 16 15',
+};
+
 const logoutIcon = {
     Draw: ({ color = colors.silver6 }) => (
         <>
@@ -233,5 +252,6 @@ export default {
     fourU_NavTab,
     profileNavTab,
     like_heart,
+    like_red_heart,
     logoutIcon,
 };

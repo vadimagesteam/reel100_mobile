@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { getVideoCommentsAction } from '../../../redux/VideoRedux/videoAction';
 import { colors, positionHelpers } from '../../../styles';
@@ -10,6 +10,7 @@ import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
 import { formatTime } from '../../../utils/formatTime';
 import CommentSection from '../../CommentSection';
 import { VideoItemType } from '../../../redux/CameraRedux/types';
+import { deleteLikeAction, getLikesAction, setLikeAction } from '../../../redux/LikesRedux/likesAction';
 
 interface FullVideoModalProps {
     setModalVideo: (val: VideoItemType | null) => void | any
@@ -22,6 +23,8 @@ const FullVideoModal = ({
 }: FullVideoModalProps) => {
     const dispatch = useReduxDispatch();
     const { countComments } = useReduxSelector((state: RootState) => state.video);
+    const { likesData } = useReduxSelector((state: RootState) => state.likes);
+    const { user } = useReduxSelector((state: RootState) => state?.auth);
     const videoRef = useRef<any | null>(null);
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
@@ -33,28 +36,50 @@ const FullVideoModal = ({
     const tapX = useSharedValue(0);
     const tapY = useSharedValue(0);
 
+    console.log('modalVideo', modalVideo);
+
     useEffect(() => {
         if (modalVideo && modalVideo?.id) {
             dispatch(getVideoCommentsAction({ videoId: modalVideo.id, userId: modalVideo?.user?.id }));
+            dispatch(getLikesAction({ userId: modalVideo?.user?.id, videoId: modalVideo?.id }));
         }
     }, [modalVideo]);
+
+    const handleDoubleTap = (x: number, y: number) => {
+        if (!modalVideo?.id || !modalVideo.user?.id) { return; }
+
+        tapX.value = x;
+        tapY.value = y;
+
+        scale.value = 1;
+        opacity.value = 1;
+
+        scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+            scale.value = withTiming(0, { duration: 500 });
+            opacity.value = withTiming(0, { duration: 500 });
+        });
+
+        const likesBodyData = {
+            dataLike: {
+                typeField: 'Like',
+                user: { id: modalVideo.user.id },
+                video: { id: modalVideo.id },
+            },
+        };
+
+        if (likesData.length > 0) {
+            dispatch(deleteLikeAction({ id: likesData[0].id, userId: modalVideo.user.id, videoId: modalVideo.id }));
+        } else {
+            dispatch(setLikeAction(likesBodyData));
+        }
+    };
+
 
     const doubleTapGesture = Gesture.Tap()
         .numberOfTaps(2)
         .onEnd((event) => {
-            if (event) {
-                const { x, y } = event;
-
-                tapX.value = x;
-                tapY.value = y;
-
-                scale.value = 1;
-                opacity.value = 1;
-
-                scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
-                    scale.value = withTiming(0, { duration: 500 });
-                    opacity.value = withTiming(0, { duration: 500 });
-                });
+            if (event && modalVideo?.id && modalVideo.user.id) {
+                runOnJS(handleDoubleTap)(event.x, event.y);
             }
         });
 
@@ -146,14 +171,15 @@ const FullVideoModal = ({
                                 }}
                                 // avatar={modalVideo?.avatar}
                                 // name={modalVideo?.fullname}
-                                // likesCount={modalVideo?.like_count}
+                                likeCheck={likesData.length > 0}
+                                likesCount={likesData.length}
                                 videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
                                 openComments={openComments}
                                 showComments={true}
                                 countComments={countComments}
                             />
                             {showComments && modalVideo?.id && (
-                                <CommentSection videoId={modalVideo.id} onClose={() => setShowComments(false)} />
+                                <CommentSection videoId={modalVideo.id} userMeId={user?.id} onClose={() => setShowComments(false)} />
                             )}
                         </>
                     )}
