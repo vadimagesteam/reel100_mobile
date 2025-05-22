@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, SafeAreaView, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, SafeAreaView, ScrollView, TouchableOpacity, FlatList, RefreshControl } from 'react-native';
 import { colors, positionHelpers } from '../../../../styles';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
-import { BodyText, LoaderIndicator, SvgIcon } from '../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../components/UI';
 import { cs } from './styles';
 import { generateBlocks } from '../../../../components/TabViewVideo/components/StateFeedTab/helpers/generateBlocks';
 import RenderBlock from '../../../../components/TabViewVideo/components/StateFeedTab/components/RenderVideo';
@@ -12,26 +12,22 @@ import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedMod
 import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 import FullVideoModal from '../../../../components/Modals/FullVideoModal';
 import { VideoItemType } from '../../../../redux/CameraRedux/types';
+import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
 
 const FourUScreen = () => {
     const dispatch = useReduxDispatch();
-    const { videos } = useReduxSelector(state => state?.camera);
-    const { isSearchActive } = useReduxSelector((state: RootState) => state?.modals);
+    const { videos } = useReduxSelector((state: RootState) => state?.camera);
     const checkFileVideos = videos.filter(video => video?.file !== null);
     const blocks = generateBlocks(checkFileVideos);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     // const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
 
     useEffect(() => {
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 1200);
+        dispatch(getVideosAction());
     }, []);
-
 
     //Save duration video
     const handleVideoLoad = useCallback((id: string, duration: number) => {
@@ -46,10 +42,22 @@ const FourUScreen = () => {
     //     }, 100)
     // );
 
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+
+        setTimeout(async () => {
+            await dispatch(getVideosAction());
+
+            setRefreshing(false);
+        }, 1000);
+
+    };
+
     return (
         <>
             <View style={positionHelpers.fill}>
-                {!isSearchActive && <CustomHeader title="00:00:00" />}
+                <CustomHeader title="00:00:00" />
                 <SafeAreaView
                     style={[
                         positionHelpers.fill,
@@ -68,27 +76,29 @@ const FourUScreen = () => {
                             </TouchableOpacity>
                         </View>
                     </ScrollView>
-
-                    {isLoading ? (
-                        <LoaderIndicator />
-                    ) : (
-                        <FlatList
-                            data={blocks}
-                            keyExtractor={(_, i) => i.toString()}
-                            renderItem={({ item, index }) => (
-                                <RenderBlock
-                                    block={item}
-                                    blockIndex={index}
-                                    videoDuration={durations}
-                                    onVideoPress={setModalVideo}
-                                    onVideoLoad={handleVideoLoad}
-                                />
-                            )}
-                        // onViewableItemsChanged={onViewableItemsChanged.current}
-                        // viewabilityConfig={viewabilityConfig}
-                        />
-                    )}
-
+                    <FlatList
+                        data={blocks}
+                        keyExtractor={(_, i) => i.toString()}
+                        renderItem={({ item, index }) => (
+                            <RenderBlock
+                                block={item}
+                                blockIndex={index}
+                                videoDuration={durations}
+                                onVideoPress={setModalVideo}
+                                onVideoLoad={handleVideoLoad}
+                            />
+                        )}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={handleRefresh}
+                                colors={['#fff']} // Android (спінер)
+                                tintColor="#fff" // iOS (спінер)
+                            />
+                        }
+                    // onViewableItemsChanged={onViewableItemsChanged.current}
+                    // viewabilityConfig={viewabilityConfig}
+                    />
                 </SafeAreaView >
             </View >
 

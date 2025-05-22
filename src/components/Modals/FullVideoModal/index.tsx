@@ -24,7 +24,6 @@ const FullVideoModal = ({
     const dispatch = useReduxDispatch();
     const { countComments } = useReduxSelector((state: RootState) => state.video);
     const { likesData } = useReduxSelector((state: RootState) => state.likes);
-    const { user } = useReduxSelector((state: RootState) => state?.auth);
     const videoRef = useRef<any | null>(null);
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
@@ -35,8 +34,6 @@ const FullVideoModal = ({
     const opacity = useSharedValue(1);
     const tapX = useSharedValue(0);
     const tapY = useSharedValue(0);
-
-    console.log('modalVideo', modalVideo);
 
     useEffect(() => {
         if (modalVideo && modalVideo?.id) {
@@ -169,8 +166,8 @@ const FullVideoModal = ({
                                     setModalVideo(null);
                                     setShowComments(false);
                                 }}
-                                // avatar={modalVideo?.avatar}
-                                // name={modalVideo?.fullname}
+                                avatar={''}
+                                name={`${modalVideo?.user?.firstName} ${modalVideo?.user?.lastName}`}
                                 likeCheck={likesData.length > 0}
                                 likesCount={likesData.length}
                                 videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
@@ -179,7 +176,7 @@ const FullVideoModal = ({
                                 countComments={countComments}
                             />
                             {showComments && modalVideo?.id && (
-                                <CommentSection videoId={modalVideo.id} userMeId={user?.id} onClose={() => setShowComments(false)} />
+                                <CommentSection videoId={modalVideo.id} userId={modalVideo.user.id} onClose={() => setShowComments(false)} />
                             )}
                         </>
                     )}

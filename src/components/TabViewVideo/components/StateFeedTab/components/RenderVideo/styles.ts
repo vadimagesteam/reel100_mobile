@@ -11,7 +11,7 @@ export const cs = StyleSheet.create({
     smallBox: {
         width: half,
         height: half,
-        marginVertical: 3,
+        margin: 1,
     },
     bigBox: {
         width: half,

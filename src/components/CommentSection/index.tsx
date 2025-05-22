@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, StyleSheet, TextInput, TouchableOpacity, View, Platform, KeyboardAvoidingView, Image, ListRenderItem } from 'react-native';
+import { FlatList, TextInput, TouchableOpacity, View, Platform, KeyboardAvoidingView, Image, ListRenderItem } from 'react-native';
 import { BodyText } from '../UI';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../store/store';
 import { createVideoCommentAction, getVideoCommentsAction } from '../../redux/VideoRedux/videoAction';
 import { colors, positionHelpers } from '../../styles';
 import { formatTimeAgo } from '../../utils/formatTime';
 import { CommentType } from '../../redux/VideoRedux/types';
+import { cs } from './styles';
 
 type CommentSectionProps = {
     videoId: string;
-    userMeId: string | undefined
+    userId: string | undefined
     onClose: () => void;
 };
 
-const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => {
+const CommentSection = ({ videoId, userId, onClose }: CommentSectionProps) => {
     const dispatch = useReduxDispatch();
     const { videoComments } = useReduxSelector((state: RootState) => state.video);
     const inputRef = useRef<TextInput>(null);
@@ -25,11 +26,9 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
     // const take = 10;
 
     useEffect(() => {
-        dispatch(getVideoCommentsAction({ videoId, userId: userMeId }));
+        dispatch(getVideoCommentsAction({ videoId, userId }));
     }, []);
 
-
-    console.log('videoComments--->', videoComments);
     const postComment = () => {
         if (!newComment.trim()) { return; }
 
@@ -38,7 +37,7 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
                 replyTo: replyToCommentId || '',
                 text: newComment,
                 user: {
-                    id: userMeId,
+                    id: userId,
                 },
                 video: {
                     id: videoId,
@@ -136,20 +135,20 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
 
     const renderFlatComment: ListRenderItem<any> = ({ item }) => {
         return (
-            <View style={{ marginLeft: item.level * 20, marginTop: 10 }}>
-                <View style={[styles.commentItem, { flexDirection: 'row', justifyContent: 'space-between' }]}>
+            <View style={[positionHelpers.mt10, { marginLeft: item.level * 20 }]}>
+                <View style={[positionHelpers.rowFill, cs.commentItem]}>
                     <View>
                         <View style={[positionHelpers.alignItemsCenterRow]}>
                             <Image
                                 source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }}
-                                style={{ height: 30, width: 30 }}
+                                style={cs.avatarStyle}
                             />
                             <BodyText fontWeight={'bold'} marginLeft={5} fontSize={16} color={colors.silver4}>
                                 {`${item?.user?.firstName} ${item?.user?.lastName}`}
                             </BodyText>
                         </View>
-                        <View style={{ marginLeft: 45 }}>
-                            <BodyText style={styles.text}>{item?.text}</BodyText>
+                        <View style={cs.ml45}>
+                            <BodyText color={colors.silver1}>{item?.text}</BodyText>
                         </View>
                     </View>
                     <BodyText fontSize={9} color={colors.white}>{formatTimeAgo(item?.createdAt)}</BodyText>
@@ -167,7 +166,7 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
                                 onPress={() => {
                                     toggleReplies(item.id);
                                 }}
-                                style={{ flexDirection: 'row', alignItems: 'center' }}
+                                style={positionHelpers.alignItemsCenterRow}
                             >
                                 <BodyText color={colors.silver4} marginLeft={5}>
                                     {item.replies.length} Comments
@@ -184,12 +183,12 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 2.5 }}
+            style={cs.container}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-            <View style={{ flex: 1, backgroundColor: colors.black }}>
-                <View style={styles.header}>
+
+            <View style={[positionHelpers.fill, { backgroundColor: colors.black }]}>
+                <View style={cs.header}>
                     <BodyText fontSize={16} color={colors.white} fontWeight={'bold'}>{videoComments?.length} Comments</BodyText>
                     <TouchableOpacity onPress={onClose}>
                         <BodyText fontSize={18} color={colors.white}>✕</BodyText>
@@ -199,11 +198,8 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
                 <View
                     style={positionHelpers.fill}
                 >
-                    {/* {
-                        loading ? <LoaderIndicator /> : (
-                            <> */}
                     {videoComments?.length === 0 ? (
-                        <View style={styles.emptyContainer}>
+                        <View style={cs.emptyContainer}>
                             <BodyText fontSize={14} color={colors.white}>Comments will appear here</BodyText>
                         </View>
                     ) : (
@@ -211,19 +207,15 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
                             data={visibleFlatComments}
                             keyExtractor={(item) => item.id}
                             renderItem={renderFlatComment}
-                            contentContainerStyle={{ padding: 16 }}
+                            contentContainerStyle={cs.p16}
                             keyboardShouldPersistTaps="handled"
                             showsVerticalScrollIndicator={false}
                         />
                     )}
-                    {/* </>
-                        )
-                    } */}
-
                 </View>
 
                 {replyToCommentId && (
-                    <View style={[positionHelpers.rowFillCenter, { paddingHorizontal: 10, padding: 10, backgroundColor: colors.black1 }]}>
+                    <View style={[positionHelpers.rowFillCenter, cs.replayCommentContainer]}>
                         <BodyText color={colors.silver4}>Replying to {replyingToUser}</BodyText>
                         <TouchableOpacity onPress={() => {
                             setReplyToCommentId(null);
@@ -235,10 +227,10 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
                     </View>
                 )}
 
-                <View style={styles.inputContainer}>
+                <View style={cs.inputContainer}>
                     <TextInput
                         ref={inputRef}
-                        style={styles.input}
+                        style={cs.input}
                         placeholder="Add a comment..."
                         placeholderTextColor="#aaa"
                         value={newComment}
@@ -246,76 +238,15 @@ const CommentSection = ({ videoId, userMeId, onClose }: CommentSectionProps) => 
                     />
                     <TouchableOpacity
                         onPress={postComment}
-                        style={styles.sendButton}
+                        style={cs.sendButton}
                     >
                         <BodyText fontWeight={'bold'} color={colors.white}>Send</BodyText>
                     </TouchableOpacity>
                 </View>
             </View>
-            {/* </TouchableWithoutFeedback> */}
         </KeyboardAvoidingView>
     );
 };
 
 export default CommentSection;
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#111',
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#222',
-    },
-    commentItem: {
-        marginBottom: 5,
-        padding: 10,
-        borderRadius: 10,
-        backgroundColor: '#1c1c1b',
-    },
-    user: {
-        fontWeight: '600',
-        color: '#fff',
-    },
-    text: {
-        color: '#ccc',
-    },
-    inputContainer: {
-        // position: 'absolute',
-        // bottom: 0,
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 15,
-        borderTopWidth: 1,
-        borderTopColor: '#333',
-        paddingBottom: 25,
-        backgroundColor: colors.black1,
-    },
-    input: {
-        flex: 1,
-        height: 40,
-        backgroundColor: '#222',
-        borderRadius: 20,
-        paddingHorizontal: 12,
-        color: '#fff',
-    },
-    sendButton: {
-        marginLeft: 8,
-        backgroundColor: colors.blue,
-        borderRadius: 20,
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-    },
-
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 16,
-
-    },
-});
