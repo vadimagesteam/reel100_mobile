@@ -18,6 +18,7 @@ interface VideoAbsoluteInfoProps {
 
     showArrow?: boolean
     onArrowBack?: () => void
+    onNameClick?: () => void
     showChat?: boolean
     showReplay?: boolean
     fullLike?: boolean
@@ -37,6 +38,7 @@ const VideoAbsoluteInfo = ({
     likesCount,
     showArrow = false,
     onArrowBack,
+    onNameClick,
     showChat = false,
     showReplay = false,
     fullLike = false,
@@ -57,14 +59,17 @@ const VideoAbsoluteInfo = ({
                     >
                         <SvgIcon image="backArrow" />
                     </TouchableOpacity>)}
-                    <View style={[positionHelpers.absolute, positionHelpers.alignItemsCenterRow, cs.containerName, { top: videoCheckFull ? insets.top + 40 : 10 }]}>
+                    <TouchableOpacity
+                        style={[positionHelpers.absolute, positionHelpers.alignItemsCenterRow, cs.containerName, { top: videoCheckFull ? insets.top + 40 : 10 }]}
+                        onPress={onNameClick}
+                    >
                         {avatar === '' ? (
                             <View style={cs.noAvatar} />
                         ) : (
                             <Image source={{ uri: avatar }} style={cs.avatar} />
                         )}
                         <BodyText fontWeight={'700'} color={colors.white} paddingLeft={5}>{name}</BodyText>
-                    </View>
+                    </TouchableOpacity>
 
 
                     <View style={[positionHelpers.absolute, positionHelpers.alignEnd, positionHelpers.flexRow, cs.containerDuration, { top: videoCheckFull ? insets.top + 45 : 15 }]}>

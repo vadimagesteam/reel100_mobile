@@ -1,20 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, SafeAreaView, TouchableOpacity, FlatList, Dimensions, RefreshControl } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, FlatList, Dimensions, RefreshControl, ActivityIndicator } from 'react-native';
 import { colors, positionHelpers } from '../../../../styles';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { useNavigation } from '@react-navigation/native';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
-import { BodyText, ButtonDefault, SvgIcon } from '../../../../components/UI';
+import { BodyText, ButtonDefault, LoaderIndicator, SvgIcon } from '../../../../components/UI';
 import ProfileInfo from './components/ProfileInfo';
 import { cs } from './styles';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
-import { getVideosMeAction } from '../../../../redux/CameraRedux/cameraActions';
+import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
 import MenuModal from '../../../../components/Modals/MemuModal';
 import VideoItem from '../../../../components/VideoItem';
 import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 import FullVideoModal from '../../../../components/Modals/FullVideoModal';
 import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedModal';
 import { VideoItemType } from '../../../../redux/CameraRedux/types';
+import EmptyContent from '../../../../components/EmptyContent';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_MARGIN = 4;
@@ -24,33 +25,49 @@ const ITEM_SIZE = (SCREEN_WIDTH - ITEM_MARGIN * (NUM_COLUMNS + 1) - 32) / NUM_CO
 const ProfileScreen = () => {
     const navigation = useNavigation<any>();
     const dispatch = useReduxDispatch();
-    const { videosMeData } = useReduxSelector((state: RootState) => state.camera);
+    const { loading } = useReduxSelector((state: RootState) => state.camera);
     const { user } = useReduxSelector((state: RootState) => state.auth);
     const [refreshing, setRefreshing] = useState<boolean>(false);
+    const [videos, setVideos] = useState<VideoItemType[]>([]);
+    const [page, setPage] = useState(0);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const TAKE = 15;
 
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
 
     useEffect(() => {
         if (user?.id) {
-            dispatch(getVideosMeAction(user?.id));
+            fetchVideos(true);
         }
-    }, []);
+    }, [user?.id]);
 
+    const fetchVideos = async (reset = false) => {
+        const skip = reset ? 0 : page * TAKE;
 
-    const filteredVideos = videosMeData.filter(v => v?.file?.storagePath);
+        const resultAction = await dispatch(getVideosAction({
+            userId: user?.id,
+            where: {},
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: TAKE,
+        }));
 
-    const handleRefresh = async () => {
-        setRefreshing(true);
+        const newVideos = resultAction?.payload || [];
 
-        setTimeout(async () => {
-            if (user?.id) {
-                await dispatch(getVideosMeAction(user?.id));
-            }
+        if (reset) {
+            setVideos(newVideos);
+            setPage(1);
+        } else {
+            setVideos((prev) => [...prev, ...newVideos]);
+            setPage((prev) => prev + 1);
+        }
 
-            setRefreshing(false);
-        }, 1000);
+        setHasMore(newVideos.length === TAKE);
     };
 
+
+    const filteredVideos = videos.filter(v => v?.file?.storagePath);
 
     const renderVideoItem = useCallback(({ item, index }: { item: VideoItemType; index: number }) => {
         const isLastInRow = (index + 1) % NUM_COLUMNS === 0;
@@ -69,6 +86,25 @@ const ProfileScreen = () => {
             />
         );
     }, []);
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        setTimeout(async () => {
+            if (user?.id) {
+                await fetchVideos(true);
+            }
+
+            setRefreshing(false);
+        }, 800);
+    };
+
+    const handleLoadMore = async () => {
+        if (!loadingMore && hasMore) {
+            setLoadingMore(true);
+            await fetchVideos();
+            setLoadingMore(false);
+        }
+    };
 
     return (
         <>
@@ -115,34 +151,35 @@ const ProfileScreen = () => {
                         </ButtonDefault>
                     </View>
 
-                    {filteredVideos.length === 0 ? (
-                        <View style={positionHelpers.fillCenter}>
-                            <BodyText color={colors.white}>{'No video found'}</BodyText>
-                        </View>
-                    ) : (
-                        <FlatList
-                            data={filteredVideos}
-                            keyExtractor={(item) => item.id}
-                            numColumns={NUM_COLUMNS}
-                            renderItem={renderVideoItem}
-                            contentContainerStyle={[positionHelpers.ph16, cs.pb10]}
-                            initialNumToRender={6} // менше елементів на старт
-                            windowSize={5} // скільки блоків рендериться навколо екрану
-                            maxToRenderPerBatch={6}
-                            removeClippedSubviews={true} // видаляє елементи за межами екрану
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={refreshing}
-                                    onRefresh={handleRefresh}
-                                    colors={['#fff']} // Android (спінер)
-                                    tintColor="#fff" // iOS (спінер)
-                                />
-                            }
-                        // onEndReached={handleLoadMore}
-                        // onEndReachedThreshold={0.5}
-                        // ListFooterComponent={loadingMoreVideo ? <ActivityIndicator color="#fff" /> : null}
-                        />
-                    )}
+                    {loading && filteredVideos.length === 0 ? (
+                        <LoaderIndicator variantTwo />
+                    ) :
+                        filteredVideos.length === 0 ? (
+                            <EmptyContent />
+                        ) : (
+                            <FlatList
+                                data={filteredVideos}
+                                keyExtractor={(item) => item.id}
+                                numColumns={NUM_COLUMNS}
+                                renderItem={renderVideoItem}
+                                contentContainerStyle={[positionHelpers.ph16, cs.pb10]}
+                                initialNumToRender={6} // менше елементів на старт
+                                windowSize={5} // скільки блоків рендериться навколо екрану
+                                maxToRenderPerBatch={6}
+                                removeClippedSubviews={true} // видаляє елементи за межами екрану
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={refreshing}
+                                        onRefresh={handleRefresh}
+                                        colors={['#fff']} // Android (спінер)
+                                        tintColor="#fff" // iOS (спінер)
+                                    />
+                                }
+                                onEndReached={handleLoadMore}
+                                onEndReachedThreshold={0.5}
+                                ListFooterComponent={loadingMore && hasMore ? <ActivityIndicator color="#fff" /> : null}
+                            />
+                        )}
                 </SafeAreaView >
             </View >
 

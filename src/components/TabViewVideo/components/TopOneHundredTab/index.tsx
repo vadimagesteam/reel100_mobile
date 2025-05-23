@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, Dimensions } from 'react-native';
+import { FlatList, Dimensions, View } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
-import { GestureHandlerRootView, HandlerStateChangeEvent, State, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
-import { useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import VideoItem from './components/VideoItem';
 import { positionHelpers } from '../../../../styles';
@@ -10,20 +10,24 @@ import { positionHelpers } from '../../../../styles';
 
 import { formatTime } from '../../../../utils/formatTime';
 import { VideoItemType } from '../../../../redux/CameraRedux/types';
+import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
+import { useReduxDispatch } from '../../../../store/store';
+import { LoaderIndicator } from '../../../UI';
+import FullVideoModal from '../../../Modals/FullVideoModal';
 
 const { height } = Dimensions.get('screen');
+const TAKE = 10;
 
-interface TopOneHundredTabProps {
-    allVideo: VideoItemType[]
-}
-
-const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
+const TopOneHundredTab = () => {
+    const dispatch = useReduxDispatch();
     // const navigation = useNavigation<any>();
     const flatListRef = useRef<FlatList>(null);
     const insets = useSafeAreaInsets();
-    const tabNavigationHeight = Math.max(150, Math.min(height * 0.19, 250));
+    // const tabNavigationHeight = 70;
+    const tabNavigationHeight = Math.max(150, Math.min(height * 0.17, 250));
     const videoHeight = height - insets.top - insets.bottom - tabNavigationHeight;
-    const [activeIndex, setActiveIndex] = useState<number | null>();
+    const [activeIndex, setActiveIndex] = useState<number | null>(null);
+    const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
 
     const scale = useSharedValue(0);
     const opacity = useSharedValue(1);
@@ -34,10 +38,41 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
 
+    const [videos, setVideos] = useState<VideoItemType[]>([]);
+    const [page, setPage] = useState(1);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
+    useEffect(() => {
+        fetchVideos(true);
+    }, []);
+
+    const fetchVideos = async (reset = false) => {
+        const skip = reset ? 0 : page * TAKE;
+
+        const result = await dispatch(getVideosAction({
+            skip,
+            take: TAKE,
+            orderBy: { createdAt: 'desc' },
+        }));
+
+        const newVideos = result?.payload || [];
+
+        if (reset) {
+            setVideos(newVideos);
+            setPage(1);
+        } else {
+            setVideos(prev => [...prev, ...newVideos]);
+            setPage(prev => prev + 1);
+        }
+
+        setHasMore(newVideos.length === TAKE);
+    };
+
     useEffect(() => {
         const interval = setInterval(() => {
             if (activeIndex !== null) {
-                const id = allVideo[activeIndex]?.id;
+                const id = videos[activeIndex]?.id;
                 if (id) {
                     setRemainingSeconds(prev => {
                         const current = prev[id];
@@ -55,49 +90,6 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
 
         return () => clearInterval(interval);
     }, [activeIndex]);
-
-    // const handleSingleTap = useCallback(
-    //     (event: any, selectedId: string) => {
-
-    //         // console.log('selectedId-->', selectedId);
-
-
-    //         const index = allVideo.findIndex(video => video.id === selectedId);
-    //         // console.log('--index-->', index);
-    //         // dispatch(getVideosAction());
-    //         // navigation.navigate(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
-    //         //     // videos: allVideo,
-    //         //     selectedId,
-    //         //     index,
-    //         // });
-    //         // runOnJS(navigation.navigate)(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
-    //         //     // videos: allVideo,
-    //         //     selectedId,
-    //         //     index,
-    //         // });
-
-    //     },
-    //     []
-    // );
-    // const handleDoubleTap = useCallback(
-    //     (event: any) => {
-
-    //         const { x, y } = event.nativeEvent;
-
-    //         tapX.value = x;
-    //         tapY.value = y;
-
-    //         scale.value = 1;
-    //         opacity.value = 1;
-
-    //         scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
-    //             scale.value = withTiming(0, { duration: 500 });
-    //             opacity.value = withTiming(0, { duration: 500 });
-    //         });
-
-    //     },
-    //     [scale, opacity, tapX, tapY]
-    // );
 
     //Save duration video
     const handleVideoLoad = useCallback((id: string, duration: number) => {
@@ -133,6 +125,7 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
     //TYPE FOR 'ITEM' !!!!!
     const renderItem = useCallback(
         ({ item, index }: { item: any, index: number }) => {
+            const fullName = `${item?.user?.firstName} ${item?.user?.lastName}`;
             return (
                 <>
                     {item?.file !== null ? (
@@ -144,17 +137,17 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                             tapY={tapY}
                             scale={scale}
                             opacity={opacity}
-                            // onSingleTap={(event) => handleSingleTap(event, item?.id)}
-                            // onDoubleTap={(event) => handleDoubleTap(event)}
-                            avatar={item?.avatar}
-                            name={item?.fullname}
+                            avatar={''}
+                            name={fullName}
                             videoId={item?.id}
                             videoNumber={item?.list_number}
                             videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
                             onVideoLoad={(duration) => handleVideoLoad(item.id, duration)}
                             likesCount={item?.like_count}
                             onVideoRepeat={() => onVideoRepeat(item?.id)}
+                        // onVideoPress={() => setModalVideo(item)}
                         />
+
                     ) : null}
                 </>
             );
@@ -167,18 +160,23 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
             scale,
             opacity,
             remainingSeconds,
-            // handleSingleTap,
-            // handleDoubleTap,
             onVideoRepeat,
             handleVideoLoad,
         ]
     );
 
+    const handleLoadMore = async () => {
+        if (!loadingMore && hasMore) {
+            setLoadingMore(true);
+            await fetchVideos(false);
+            setLoadingMore(false);
+        }
+    };
     return (
         <GestureHandlerRootView style={positionHelpers.fill}>
             <FlatList
                 ref={flatListRef}
-                data={allVideo}
+                data={videos}
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 pagingEnabled
@@ -188,6 +186,17 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                 snapToInterval={videoHeight}
                 contentContainerStyle={positionHelpers.flexGrow}
                 decelerationRate="fast"
+                initialNumToRender={6}
+                windowSize={6}
+                maxToRenderPerBatch={6}
+                removeClippedSubviews={true}
+                onEndReached={handleLoadMore}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={
+                    loadingMore && hasMore ? (<View style={positionHelpers.mt30}>
+                        <LoaderIndicator variantTwo />
+                    </View>) : null
+                }
             />
 
             {/* <FullVideoScrollModal
@@ -195,6 +204,11 @@ const TopOneHundredTab = ({ allVideo }: TopOneHundredTabProps) => {
                 selectedId={selectedVideoId}
                 onVisible={() => setVisible(false)}
             /> */}
+            {/* Video Full Modal */}
+            <FullVideoModal
+                modalVideo={modalVideo}
+                setModalVideo={setModalVideo}
+            />
         </GestureHandlerRootView>
     );
 };

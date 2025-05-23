@@ -13,7 +13,7 @@ import Reanimated, { Extrapolation, interpolate, runOnJS, useAnimatedGestureHand
 import Animated from 'react-native-reanimated';
 import { colors, positionHelpers } from '../../../../styles';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
-import { BodyText } from '../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../components/UI';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { isIOS } from '../../../../utils/platformChecker';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
@@ -88,6 +88,18 @@ const VideoRecordScreen = () => {
     // const [devices, setDevices] = useState<CameraDevice | null>(null);
     const [torchOn, setTorchOn] = useState(false);
     const [frameRate, setFrameRate] = useState<30 | 60>(60);
+
+    useEffect(() => {
+        if (CustomAudioSessionManager.activateVideoRecordingAudioSession) {
+            CustomAudioSessionManager.activateVideoRecordingAudioSession();
+        }
+
+        return () => {
+            if (CustomAudioSessionManager.deactivateAudioSession) {
+                CustomAudioSessionManager.deactivateAudioSession();
+            }
+        };
+    }, []);
 
     // const device = Platform.OS === 'ios'
     //     ? (isFrontCamera ? frontCamera : backCamera)
@@ -329,6 +341,7 @@ const VideoRecordScreen = () => {
         }
     };
 
+
     const stopRecording = async () => {
         if (!camera.current || !isRecording) {
             console.log('🛑 stopRecording: Recording already stopped.');
@@ -503,13 +516,18 @@ const VideoRecordScreen = () => {
 
             <View style={styles.optionsContainer}>
                 <TouchableOpacity style={[positionHelpers.center, styles.optionsButton]}
-                    onPress={() => setCameraPosition(prev => (prev === 'back' ? 'front' : 'back'))}
+                    onPress={() => {
+                        setTorchOn(false);
+                        setCameraPosition(prev => (prev === 'back' ? 'front' : 'back'));
+                    }}
                 >
-                    <BodyText fontSize={10} >icon 1</BodyText>
+                    <SvgIcon image="switchCameraIcon" />
                 </TouchableOpacity>
-                <TouchableOpacity style={[positionHelpers.center, styles.optionsButton]}
+                <TouchableOpacity
+                    disabled={cameraPosition === 'front'}
+                    style={[positionHelpers.center, styles.optionsButton]}
                     onPress={() => setTorchOn(prev => !prev)}>
-                    <BodyText fontSize={10}>{torchOn ? 'icon 2' : '2 icon'}</BodyText>
+                    <SvgIcon image={torchOn ? 'flashIcon' : 'flashNoIcon'} />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[positionHelpers.center, styles.optionsButton]}
@@ -520,7 +538,7 @@ const VideoRecordScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity style={[positionHelpers.center, styles.optionsButton]}
                     onPress={pickVideoFromGallery}>
-                    <BodyText fontSize={10} >icon 4</BodyText>
+                    <SvgIcon image="gellaryCameraIcon" />
                 </TouchableOpacity>
             </View>
 

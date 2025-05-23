@@ -1,12 +1,23 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { colors } from '../../styles';
+import { colors, positionHelpers } from '../../styles';
 
-const LoaderIndicator = () => {
+interface LoaderIndicatorProps {
+    variantTwo?: boolean
+}
+const LoaderIndicator = ({ variantTwo }: LoaderIndicatorProps) => {
     return (
-        <View style={cs.container}>
-            <ActivityIndicator size="small" color="#fff" />
-        </View>
+        <>
+            {variantTwo ? (
+                <View style={positionHelpers.fillCenter}>
+                    <ActivityIndicator size="small" color="#fff" />
+                </View>
+            ) : (
+                <View style={cs.container}>
+                    <ActivityIndicator size="small" color="#fff" />
+                </View>
+            )}
+        </>
     );
 };
 

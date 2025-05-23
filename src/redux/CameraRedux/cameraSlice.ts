@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CameraState, VideoItemType } from './types';
-import { createVideoAction, getUserVideosAction, getVideosAction, getVideosMeAction } from './cameraActions';
+import { createVideoAction, getVideosAction } from './cameraActions';
 
 const initialState: CameraState = {
     loading: false,
@@ -47,7 +47,7 @@ const cameraSlice = createSlice({
                     state.error = action.payload;
                 },
             )
-            //Get vidios
+            //Get videos
             .addCase(getVideosAction.pending, state => {
                 state.loading = true;
             })
@@ -55,48 +55,17 @@ const cameraSlice = createSlice({
                 getVideosAction.fulfilled,
                 (state, action: PayloadAction<VideoItemType[]>) => {
                     state.loading = false;
-                    state.videos = action.payload;
+                    const userId = action.meta.arg.userId;
+
+                    if (userId === state.authUserId) {
+                        state.videosMeData = action.payload;
+                    } else {
+                        state.userVideos = action.payload;
+                    }
                 },
             )
             .addCase(
                 getVideosAction.rejected,
-                (state, action: PayloadAction<any>) => {
-                    state.loading = false;
-                    state.error = action.payload;
-                },
-            )
-            //Get vidios
-            .addCase(getUserVideosAction.pending, state => {
-                state.loading = true;
-            })
-            .addCase(
-                getUserVideosAction.fulfilled,
-                (state, action: PayloadAction<VideoItemType[]>) => {
-                    state.loading = false;
-                    state.userVideos = action.payload;
-                },
-            )
-            .addCase(
-                getUserVideosAction.rejected,
-                (state, action: PayloadAction<any>) => {
-                    state.loading = false;
-                    state.error = action.payload;
-                },
-            )
-            //Get vidios me
-            .addCase(getVideosMeAction.pending, state => {
-                state.loading = true;
-            })
-            .addCase(
-                getVideosMeAction.fulfilled,
-                (state, action: PayloadAction<VideoItemType[]>) => {
-                    state.loading = false;
-                    state.videosMeData = action.payload.reverse();
-                    // state.videosMeData = [...state.videosMeData.reverse(), ...action.payload.reverse()];
-                },
-            )
-            .addCase(
-                getVideosMeAction.rejected,
                 (state, action: PayloadAction<any>) => {
                     state.loading = false;
                     state.error = action.payload;

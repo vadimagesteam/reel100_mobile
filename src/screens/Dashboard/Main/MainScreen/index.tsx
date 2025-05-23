@@ -5,36 +5,25 @@ import { colors, positionHelpers } from '../../../../styles';
 import DropdownMenu from '../../../../components/DropdownMenu';
 import { SvgIcon } from '../../../../components/UI';
 import { states } from './mockData';
-import {
-    RootState,
-    useReduxDispatch,
-    useReduxSelector,
-    // useReduxSelector
-} from '../../../../store/store';
+import { useReduxDispatch } from '../../../../store/store';
 import { getStatesAction } from '../../../../redux/StatesRedux/statesAction';
 import { requestLocationPermission, getStateFromCoords } from './helpers';
 import TabViewVideo from '../../../../components/TabViewVideo';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { getUserInfoAction } from '../../../../redux/AuthRedux/authAction';
-import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
 import MenuModal from '../../../../components/Modals/MemuModal';
-// import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import { setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 
 const MainScreen = () => {
     const dispatch = useReduxDispatch();
-    const { videos } = useReduxSelector((state: RootState) => state?.camera);
     const [selectedState, setSelectedState] = useState<string | null>(null);
     const [_, setSelectedAutoState] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>('top_100');
 
-
     useEffect(() => {
         dispatch(getStatesAction());
         dispatch(getUserInfoAction());
-        dispatch(getVideosAction());
     }, []);
-
 
     useEffect(() => {
         const getUserLocation = async () => {
@@ -85,7 +74,10 @@ const MainScreen = () => {
                 </View>
 
                 {/* TabView for Video */}
-                <TabViewVideo allVideo={videos} activeTab={activeTab} setActiveTab={setActiveTab} />
+                <TabViewVideo
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                />
             </SafeAreaView >
 
             {/* MenuModal */}

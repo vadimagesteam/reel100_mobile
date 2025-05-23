@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios';
 import { setCustomLoading, setPreviewVideoURL } from './cameraSlice';
 import { DASHBOARD_ROUTES } from '../../navigation/routes';
 import { getMimeType } from '../../utils/getMimeType';
+import { GetVideosParams } from './types';
 
 
 export const createVideoAction = createAsyncThunk<any, any>(
@@ -86,11 +87,24 @@ export const uploadVideoAction = createAsyncThunk<any, any>(
     },
 );
 
-export const getVideosAction = createAsyncThunk<any, void>(
+export const getVideosAction = createAsyncThunk<any, GetVideosParams>(
     'camera/getVideos',
-    async (_, thunkAPI) => {
+    async (params, thunkAPI) => {
         try {
-            const response = await axios.get('api/videos');
+            const { userId, skip = 0, take = 15, orderBy = {} } = params;
+
+            const queryParams = new URLSearchParams();
+            queryParams.append('skip', String(skip));
+            queryParams.append('take', String(take));
+            Object.entries(orderBy).forEach(([key, value]) => {
+                queryParams.append(`orderBy[${key}]`, value);
+            });
+
+            if (userId) {
+                queryParams.append('where[user][id]', userId);
+            }
+
+            const response = await axios.get(`api/videos?${queryParams.toString()}`);
 
             // console.log('getVideosAction--->', JSON.stringify(response?.data, null, 2));
             return response?.data;
@@ -105,39 +119,83 @@ export const getVideosAction = createAsyncThunk<any, void>(
     },
 );
 
-export const getUserVideosAction = createAsyncThunk<any, string>(
-    'camera/getUserVideos',
-    async (userId, thunkAPI) => {
-        try {
-            const response = await axios.get(`api/videos?where[user][id]=${userId}`);
+// export const getUserVideosAction = createAsyncThunk<any, GetVideosParams>(
+//     'camera/getUserVideos',
+//     async (params, thunkAPI) => {
+//         try {
+//             const { userId, skip = 0, take = 15, orderBy = {}, where = {} } = params;
 
-            return response?.data;
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                if (error.response && error.response.data) {
-                    return thunkAPI.rejectWithValue(error.response.data);
-                } else {
-                }
-            }
-        }
-    },
-);
+//             const fullWhere = { ...where, user: { id: userId } };
 
-export const getVideosMeAction = createAsyncThunk<any, string>(
-    'camera/getVideosMe',
-    async (userId, thunkAPI) => {
-        try {
-            const response = await axios.get(`api/videos?where[user][id]=${userId}`);
-            // &take=${take}&skip=${skip}&orderBy[createdAt]=desc
+//             const queryParams = new URLSearchParams();
 
-            return response?.data;
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                if (error.response && error.response.data) {
-                    return thunkAPI.rejectWithValue(error.response.data);
-                } else {
-                }
-            }
-        }
-    },
-);
+//             queryParams.append('skip', String(skip));
+//             queryParams.append('take', String(take));
+
+//             Object.entries(orderBy).forEach(([key, value]) => {
+//                 queryParams.append(`orderBy[${key}]`, value);
+//             });
+
+//             Object.entries(fullWhere).forEach(([key, value]) => {
+//                 if (typeof value === 'object' && value !== null) {
+//                     Object.entries(value).forEach(([subKey, subVal]) => {
+//                         queryParams.append(`where[${key}][${subKey}]`, String(subVal));
+//                     });
+//                 } else {
+//                     queryParams.append(`where[${key}]`, String(value));
+//                 }
+//             });
+//             const response = await axios.get(`api/videos?${queryParams.toString()}`);
+
+//             return response?.data;
+//         } catch (error) {
+//             if (error instanceof AxiosError) {
+//                 if (error.response && error.response.data) {
+//                     return thunkAPI.rejectWithValue(error.response.data);
+//                 } else {
+//                 }
+//             }
+//         }
+//     },
+// );
+
+// export const getVideosMeAction = createAsyncThunk<any, GetVideosParams>(
+//     'camera/getVideosMe',
+//     async (params, thunkAPI) => {
+//         try {
+//             const { userId, skip = 0, take = 15, orderBy = {}, where = {} } = params;
+
+//             const fullWhere = { ...where, user: { id: userId } };
+
+//             const queryParams = new URLSearchParams();
+
+//             queryParams.append('skip', String(skip));
+//             queryParams.append('take', String(take));
+
+//             Object.entries(orderBy).forEach(([key, value]) => {
+//                 queryParams.append(`orderBy[${key}]`, value);
+//             });
+
+//             Object.entries(fullWhere).forEach(([key, value]) => {
+//                 if (typeof value === 'object' && value !== null) {
+//                     Object.entries(value).forEach(([subKey, subVal]) => {
+//                         queryParams.append(`where[${key}][${subKey}]`, String(subVal));
+//                     });
+//                 } else {
+//                     queryParams.append(`where[${key}]`, String(value));
+//                 }
+//             });
+
+//             const response = await axios.get(`api/videos?${queryParams.toString()}`);
+
+//             return response?.data;
+//         } catch (error) {
+//             if (error instanceof AxiosError) {
+//                 if (error.response && error.response.data) {
+//                     return thunkAPI.rejectWithValue(error.response.data);
+//                 } else {
+//                 }
+//             }
+//         }
+//     },
+// );

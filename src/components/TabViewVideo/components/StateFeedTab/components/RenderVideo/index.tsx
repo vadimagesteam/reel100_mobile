@@ -3,10 +3,11 @@ import { View, TouchableOpacity, Dimensions } from 'react-native';
 import VideoAbsoluteInfo from '../../../../../VideoAbsoluteInfo';
 // import { formatTwoTime } from '../../../../../../utils/formatTime';
 import { cs } from './styles';
-import { BlockType, VideoItemType } from './types';
+import { BlockType } from './types';
 import FastImage from 'react-native-fast-image';
 import { BodyText } from '../../../../../UI';
 import { colors, positionHelpers } from '../../../../../../styles';
+import { VideoItemType } from '../../../../../../redux/CameraRedux/types';
 
 const { width: screenWidth } = Dimensions.get('window');
 const half = screenWidth / 2;
@@ -15,7 +16,7 @@ type RenderBlockProps = {
     block: BlockType;
     blockIndex: number;
     videoDuration: Record<string, number>;
-    onVideoPress: (video: VideoItemType) => void;
+    onVideoPress: (video: VideoItemType | null) => void;
     onVideoLoad: (id: string, duration: number) => void;
 };
 
@@ -29,6 +30,8 @@ const RenderBlock = ({
 
     const renderVideo = (item: any, style: any, uniqueKey: string) => {
         const screenshot = item?.file?.variation?.[0]?.screenshots?.[0];
+        const fullName = `${item?.user?.firstName} ${item?.user?.lastName}`;
+
 
         return (
             <TouchableOpacity onPress={() => onVideoPress(item)}
@@ -47,8 +50,8 @@ const RenderBlock = ({
                         />
                         <VideoAbsoluteInfo
                             justInfo="SIMPLE"
-                            avatar={item?.avatar}
-                            name={item?.fullname}
+                            avatar={''}
+                            name={fullName}
                             // videoDuration={`${formatTwoTime(duration)}s`}
                             likesCount={item?.like_count}
 

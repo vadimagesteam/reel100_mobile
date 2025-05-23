@@ -15,8 +15,6 @@ interface VideoItemProps {
     tapY: SharedValue<number>
     scale: SharedValue<number>
     opacity: SharedValue<number>
-    // onSingleTap?: (event: { x: number; y: number }, id: string) => void;
-    // onDoubleTap?: (event: { x: number; y: number }) => void;
 
     avatar: string;
     name: string;
@@ -27,6 +25,7 @@ interface VideoItemProps {
     likesCount: number;
 
     onVideoRepeat?: () => void;
+    // onVideoPress?: () => void
 }
 
 const VideoItem: React.FC<VideoItemProps> = ({
@@ -37,8 +36,6 @@ const VideoItem: React.FC<VideoItemProps> = ({
     tapY,
     scale,
     opacity,
-    // onSingleTap,
-    // onDoubleTap,
     avatar,
     name,
     videoId,
@@ -46,7 +43,8 @@ const VideoItem: React.FC<VideoItemProps> = ({
     videoDuration,
     onVideoLoad,
     likesCount,
-    onVideoRepeat }) => {
+    onVideoRepeat,
+}) => {
     const videoRef = useRef<any | null>(null);
     // const doubleTapRef = useRef<TapGestureHandler>(null);
 

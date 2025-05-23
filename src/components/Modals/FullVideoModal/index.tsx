@@ -11,6 +11,10 @@ import { formatTime } from '../../../utils/formatTime';
 import CommentSection from '../../CommentSection';
 import { VideoItemType } from '../../../redux/CameraRedux/types';
 import { deleteLikeAction, getLikesAction, setLikeAction } from '../../../redux/LikesRedux/likesAction';
+import { LoaderIndicator } from '../../UI';
+import { useNavigation } from '@react-navigation/native';
+import { DASHBOARD_ROUTES } from '../../../navigation/routes';
+import { getOneUserAction } from '../../../redux/UsersRedux/usersAction';
 
 interface FullVideoModalProps {
     setModalVideo: (val: VideoItemType | null) => void | any
@@ -21,15 +25,18 @@ const FullVideoModal = ({
     modalVideo,
     setModalVideo,
 }: FullVideoModalProps) => {
+    const navigation = useNavigation<any>();
     const dispatch = useReduxDispatch();
     const { countComments } = useReduxSelector((state: RootState) => state.video);
     const { likesData } = useReduxSelector((state: RootState) => state.likes);
+    const { user } = useReduxSelector((state: RootState) => state.auth);
     const videoRef = useRef<any | null>(null);
     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
+    const [isVideoLoading, setIsVideoLoading] = useState<boolean>(true);
 
-    const [showComments, setShowComments] = useState(false);
+    const [showComments, setShowComments] = useState<boolean>(false);
     const scale = useSharedValue(0);
     const opacity = useSharedValue(1);
     const tapX = useSharedValue(0);
@@ -39,6 +46,7 @@ const FullVideoModal = ({
         if (modalVideo && modalVideo?.id) {
             dispatch(getVideoCommentsAction({ videoId: modalVideo.id, userId: modalVideo?.user?.id }));
             dispatch(getLikesAction({ userId: modalVideo?.user?.id, videoId: modalVideo?.id }));
+            setIsVideoLoading(true);
         }
     }, [modalVideo]);
 
@@ -115,7 +123,6 @@ const FullVideoModal = ({
         setShowComments(true);
     };
 
-
     return (
         <Modal visible={!!modalVideo} transparent={false} animationType="fade">
             <GestureDetector gesture={doubleTapGesture}>
@@ -123,7 +130,10 @@ const FullVideoModal = ({
                     style={[positionHelpers.fill, { backgroundColor: colors.black }]}
 
                 >
-                    {modalVideo && (
+                    {isVideoLoading && (
+                        <LoaderIndicator />
+                    )}
+                    {modalVideo?.file?.storagePath && (
                         <>
                             <Video
                                 key={modalVideo?.id}
@@ -137,6 +147,11 @@ const FullVideoModal = ({
                                 controls={false}
                                 onLoad={(data) => {
                                     handleVideoLoadModal(modalVideo?.id, data?.duration);
+                                    setIsVideoLoading(false);
+
+                                    setTimeout(() => {
+                                        videoRef.current?.seek(0);
+                                    }, 100);
                                 }}
                                 onProgress={({ currentTime }) => {
                                     if (modalVideo?.id && durations[modalVideo.id]) {
@@ -165,6 +180,13 @@ const FullVideoModal = ({
                                 onArrowBack={() => {
                                     setModalVideo(null);
                                     setShowComments(false);
+                                }}
+                                onNameClick={() => {
+                                    if (user?.id !== modalVideo.user.id) {
+                                        dispatch(getOneUserAction(modalVideo.user.id));
+                                        navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: modalVideo.user.id });
+                                        setModalVideo(null);
+                                    }
                                 }}
                                 avatar={''}
                                 name={`${modalVideo?.user?.firstName} ${modalVideo?.user?.lastName}`}

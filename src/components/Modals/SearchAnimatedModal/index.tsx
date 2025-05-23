@@ -19,6 +19,7 @@ import { debounce } from '../../../utils/debounce';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { getOneUserAction, getUsersAction } from '../../../redux/UsersRedux/usersAction';
 import { setIsSearchActive } from '../../../redux/ModalsRedux/modalSlice';
+import EmptyContent from '../../EmptyContent';
 
 
 const SearchAnimatedModal = () => {
@@ -122,11 +123,7 @@ const SearchAnimatedModal = () => {
                                     data={filteredUsers}
                                     keyExtractor={(item) => item.id}
                                     renderItem={renderUser}
-                                    ListEmptyComponent={() => (
-                                        <View style={[positionHelpers.fillCenter, positionHelpers.ph20]}>
-                                            <BodyText color={colors.white}>No results found</BodyText>
-                                        </View>
-                                    )}
+                                    ListEmptyComponent={() => <EmptyContent text="No results found" />}
                                     contentContainerStyle={cs.listContainer}
                                     keyboardShouldPersistTaps="handled"
                                 />

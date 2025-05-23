@@ -44,3 +44,12 @@ export interface VideoVariationType {
     qualityType: string;
     screenshots: string[];
 }
+
+
+export type GetVideosParams = {
+    userId?: string | undefined;
+    skip?: number;
+    take?: number;
+    orderBy?: Record<string, 'asc' | 'desc'>;
+    where?: Record<string, any>;
+};

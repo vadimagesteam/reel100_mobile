@@ -18,4 +18,7 @@ export const cs = StyleSheet.create({
         height: half * 2,
         margin: 3,
     },
+    margin10: {
+        margin: 10,
+    },
 });

@@ -4,15 +4,16 @@ import { SvgIcon } from '../UI';
 import { positionHelpers } from '../../styles';
 import { cs } from './styles';
 import { StateFeedTab, TopOneHundredTab, TopVideoTab } from './components';
-import { VideoItemType } from '../../redux/CameraRedux/types';
 
 interface TabViewVideoProps {
-    allVideo: VideoItemType[]
     activeTab: string
     setActiveTab: (val: string) => void
 }
 
-const TabViewVideo = ({ allVideo, activeTab, setActiveTab }: TabViewVideoProps) => {
+const TabViewVideo = ({
+    activeTab,
+    setActiveTab,
+}: TabViewVideoProps) => {
 
     const handleTabPress = useCallback((tab: string) => {
         setActiveTab(tab);
@@ -51,7 +52,7 @@ const TabViewVideo = ({ allVideo, activeTab, setActiveTab }: TabViewVideoProps) 
             </View>
             <>
                 {activeTab === 'top_100' && (
-                    <TopOneHundredTab allVideo={allVideo} />
+                    <TopOneHundredTab />
                 )}
 
                 {activeTab === 'state_feed' && (
