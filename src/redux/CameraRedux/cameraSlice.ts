@@ -68,30 +68,28 @@ const cameraSlice = createSlice({
                 },
             )
             //Get videos
-            // .addCase(getVideosAction.pending, (state) => {
-            //     state.loading = true;
-            // })
-            // .addCase(getVideosAction.fulfilled, (state, action) => {
-            //     state.loading = false;
-            //     const PAGE_SIZE = 5;
-            //     const newVideos = action.payload || [];
-            //     if (state.page === 1) {
-            //         state.videos = newVideos;
-            //     } else {
-            //         state.videos = [...state.videos, ...newVideos];
-            //     }
-            //     state.hasMore = newVideos.length === PAGE_SIZE;
-            //     // Визначаємо, чи є ще сторінки
-            //     state.hasMore = newVideos.length === PAGE_SIZE;
-            // })
-            // .addCase(getVideosAction.rejected, (state) => {
-            //     state.loading = false;
-            // })
+            .addCase(getVideosAction.pending, state => {
+                state.loading = true;
+            })
+            .addCase(
+                getVideosAction.fulfilled,
+                (state, action: PayloadAction<VideoItemType[]>) => {
+                    state.loading = false;
+                    state.videos = action.payload;
+                },
+            )
+            .addCase(
+                getVideosAction.rejected,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                },
+            )
             //Get Top100 videos
             .addCase(getVideosTopAction.pending, (state) => {
                 state.loadingTopTab = true;
             })
-            .addCase(getVideosTopAction.fulfilled, (state, action) => {
+            .addCase(getVideosTopAction.fulfilled, (state, action: PayloadAction<VideoItemType[]>) => {
                 state.loadingTopTab = false;
                 const PAGE_SIZE = 5;
                 const newVideos = action.payload || [];

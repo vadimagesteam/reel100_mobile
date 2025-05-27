@@ -32,12 +32,11 @@ const StateFeedTab = () => {
     const fetchVideos = async (reset = false) => {
         const skip = reset ? 0 : page * TAKE;
 
-        const result = await true;
-        // const result = await dispatch(getVideosAction({
-        //     skip,
-        //     take: TAKE,
-        //     orderBy: { createdAt: 'desc' },
-        // }));
+        const result = await dispatch(getVideosAction({
+            skip,
+            take: TAKE,
+            orderBy: { createdAt: 'desc' },
+        }));
 
         const newVideos = result?.payload || [];
 

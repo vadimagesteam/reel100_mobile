@@ -85,7 +85,7 @@ const ProfileScreen = () => {
                 onVideoPress={() => setModalVideo(item)}
             />
         );
-    }, []);
+    }, [user]);
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -164,10 +164,10 @@ const ProfileScreen = () => {
                                 numColumns={NUM_COLUMNS}
                                 renderItem={renderVideoItem}
                                 contentContainerStyle={[positionHelpers.ph16, cs.pb10]}
-                                initialNumToRender={6} // менше елементів на старт
-                                windowSize={5} // скільки блоків рендериться навколо екрану
+                                initialNumToRender={6}
+                                windowSize={5}
                                 maxToRenderPerBatch={6}
-                                removeClippedSubviews={true} // видаляє елементи за межами екрану
+                                removeClippedSubviews={true}
                                 refreshControl={
                                     <RefreshControl
                                         refreshing={refreshing}
