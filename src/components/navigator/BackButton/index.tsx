@@ -1,15 +1,16 @@
 import React from 'react';
-import { } from 'react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 import { ButtonDefault, SvgIcon } from '../../UI';
 import { cs } from './styles';
 
 interface BackButtonProps {
+    buttonStyle?: StyleProp<ViewStyle>
     onPress: () => void
 }
 
-const BackButton = ({ onPress }: BackButtonProps) => {
+const BackButton = ({ buttonStyle, onPress }: BackButtonProps) => {
     return (
-        <ButtonDefault buttoStyles={cs.backArrow} onPress={onPress}>
+        <ButtonDefault buttoStyles={[cs.backArrow, buttonStyle]} onPress={onPress}>
             <SvgIcon image="backArrow" />
         </ButtonDefault>
     );

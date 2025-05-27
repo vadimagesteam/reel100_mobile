@@ -135,6 +135,7 @@ const ProfileScreen = () => {
                             followerCount={user?.stats?.followerCount}
                             likeCount={user?.stats?.likeCount}
                             followCount={user?.stats?.followCount}
+                            onChatPress={() => navigation.navigate(DASHBOARD_ROUTES.CHAT_LIST_SCREEN)}
                         />
 
                         <ButtonDefault

@@ -91,7 +91,39 @@ export const getVideosAction = createAsyncThunk<any, GetVideosParams>(
     'camera/getVideos',
     async (params, thunkAPI) => {
         try {
-            const { userId, skip = 0, take = 15, orderBy = {} } = params;
+            const { userId, skip = 0, take, orderBy = {} } = params;
+
+            const queryParams = new URLSearchParams();
+            queryParams.append('skip', String(skip));
+            queryParams.append('take', String(take));
+            Object.entries(orderBy).forEach(([key, value]) => {
+                queryParams.append(`orderBy[${key}]`, value);
+            });
+
+            if (userId) {
+                queryParams.append('where[user][id]', userId);
+            }
+
+            const response = await axios.get(`api/videos?${queryParams.toString()}`);
+
+            // console.log('getVideosAction--->', JSON.stringify(response?.data, null, 2));
+            return response?.data;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                if (error.response && error.response.data) {
+                    return thunkAPI.rejectWithValue(error.response.data);
+                } else {
+                }
+            }
+        }
+    },
+);
+
+export const getVideosTopAction = createAsyncThunk<any, GetVideosParams>(
+    'camera/getVideosTop100',
+    async (params, thunkAPI) => {
+        try {
+            const { userId, skip = 0, take, orderBy = {} } = params;
 
             const queryParams = new URLSearchParams();
             queryParams.append('skip', String(skip));

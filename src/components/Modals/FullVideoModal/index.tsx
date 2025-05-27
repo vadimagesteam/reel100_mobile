@@ -67,13 +67,16 @@ const FullVideoModal = ({
         const likesBodyData = {
             dataLike: {
                 typeField: 'Like',
-                user: { id: modalVideo.user.id },
+                user: { id: user?.id },
                 video: { id: modalVideo.id },
             },
+            userId: modalVideo.user.id,
         };
 
-        if (likesData.length > 0) {
-            dispatch(deleteLikeAction({ id: likesData[0].id, userId: modalVideo.user.id, videoId: modalVideo.id }));
+        const existingUserLike = likesData.find(like => like?.user?.id === user?.id);
+
+        if (existingUserLike) {
+            dispatch(deleteLikeAction({ id: existingUserLike.id, userId: modalVideo.user.id, videoId: modalVideo.id }));
         } else {
             dispatch(setLikeAction(likesBodyData));
         }
@@ -190,7 +193,7 @@ const FullVideoModal = ({
                                 }}
                                 avatar={''}
                                 name={`${modalVideo?.user?.firstName} ${modalVideo?.user?.lastName}`}
-                                likeCheck={likesData.length > 0}
+                                likeCheck={likesData.some(like => like?.user?.id === user?.id)}
                                 likesCount={likesData.length}
                                 videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
                                 openComments={openComments}

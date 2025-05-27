@@ -23,7 +23,8 @@ export const DASHBOARD_ROUTES = {
     FOUR_U_SCREEN: 'Four_U_SCREEN',
 
     USER_PROFILE_SCREEN: 'User_Profile_Screen',
-
+    CHAT_LIST_SCREEN: 'CHAT_LIST_SCREEN',
+    CHAT_SCREEN: 'CHAT_SCREEN',
 } as const;
 
 export type valueof<T> = T[keyof T];

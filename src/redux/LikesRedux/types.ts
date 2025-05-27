@@ -21,18 +21,19 @@ export type LikeBodyType = {
     dataLike: {
         typeField: 'Like' | string;
         user: {
-            id: string;
+            id: string | undefined;
         };
         video: {
             id: string;
         };
     }
+    userId: string | undefined
 };
 
 export type ActionFieldType = 'Like'
 
 export type GetLikesParams = {
-    userId: string;
+    userId: string | undefined;
     videoId: string;
 };
 

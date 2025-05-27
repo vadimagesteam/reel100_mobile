@@ -8,14 +8,20 @@ interface ProfileInfoProps {
     followerCount: number | undefined
     likeCount: number | undefined
     followCount: number | undefined
+    onChatPress: () => void
 }
 
-const ProfileInfo = ({ fullName, followerCount, likeCount, followCount }: ProfileInfoProps) => {
+const ProfileInfo = ({ fullName, followerCount, likeCount, followCount, onChatPress }: ProfileInfoProps) => {
     return (
         <>
-            <View style={[positionHelpers.mt20, positionHelpers.alignItemsCenterRow]}>
-                <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }} style={{ height: 60, width: 60 }} />
-                <BodyText fontWeight={'bold'} marginLeft={5} fontSize={16} color={colors.silver4}>{fullName}</BodyText>
+            <View style={[positionHelpers.mt20, positionHelpers.rowFillCenter]}>
+                <View style={positionHelpers.alignItemsCenterRow}>
+                    <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }} style={{ height: 60, width: 60 }} />
+                    <BodyText fontWeight={'bold'} marginLeft={5} fontSize={16} color={colors.silver4}>{fullName}</BodyText>
+                </View>
+                <TouchableOpacity onPress={onChatPress}>
+                    <BodyText color={colors.white}>Chat</BodyText>
+                </TouchableOpacity>
             </View>
 
             <View style={[positionHelpers.mt15, positionHelpers.alignItemsCenterRow, cs.containerStats]}>

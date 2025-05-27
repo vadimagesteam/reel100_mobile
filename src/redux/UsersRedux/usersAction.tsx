@@ -25,7 +25,7 @@ export const getUsersAction = createAsyncThunk<any, string>(
     },
 );
 
-export const getOneUserAction = createAsyncThunk<any, string>(
+export const getOneUserAction = createAsyncThunk<any, string | undefined>(
     'users/getOneUser',
     async (id, thunkAPI) => {
         try {

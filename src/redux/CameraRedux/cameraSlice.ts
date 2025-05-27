@@ -1,14 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CameraState, VideoItemType } from './types';
-import { createVideoAction, getVideosAction } from './cameraActions';
+import { createVideoAction, getVideosAction, getVideosTopAction } from './cameraActions';
 
 const initialState: CameraState = {
     loading: false,
     customLoading: false,
     videos: [],
+    videosTop100: [],
     userVideos: [],
     videosMeData: [],
     prewievVideoUrl: '',
+
+    loadingTopTab: false,
+    page: 1,
+    hasMore: true,
     error: null,
 };
 
@@ -26,6 +31,21 @@ const cameraSlice = createSlice({
         },
         clearVideos(state) {
             state.videosMeData = [];
+        },
+
+        resetVideos(state) {
+            state.videos = [];
+            state.page = 1;
+            state.hasMore = true;
+        },
+        appendVideos(state, action: PayloadAction<VideoItemType[]>) {
+            state.videos.push(...action.payload);
+        },
+        setPage(state, action: PayloadAction<number>) {
+            state.page = action.payload;
+        },
+        setHasMore(state, action: PayloadAction<boolean>) {
+            state.hasMore = action.payload;
         },
     },
     extraReducers: builder => {
@@ -48,33 +68,48 @@ const cameraSlice = createSlice({
                 },
             )
             //Get videos
-            .addCase(getVideosAction.pending, state => {
-                state.loading = true;
+            // .addCase(getVideosAction.pending, (state) => {
+            //     state.loading = true;
+            // })
+            // .addCase(getVideosAction.fulfilled, (state, action) => {
+            //     state.loading = false;
+            //     const PAGE_SIZE = 5;
+            //     const newVideos = action.payload || [];
+            //     if (state.page === 1) {
+            //         state.videos = newVideos;
+            //     } else {
+            //         state.videos = [...state.videos, ...newVideos];
+            //     }
+            //     state.hasMore = newVideos.length === PAGE_SIZE;
+            //     // Визначаємо, чи є ще сторінки
+            //     state.hasMore = newVideos.length === PAGE_SIZE;
+            // })
+            // .addCase(getVideosAction.rejected, (state) => {
+            //     state.loading = false;
+            // })
+            //Get Top100 videos
+            .addCase(getVideosTopAction.pending, (state) => {
+                state.loadingTopTab = true;
             })
-            .addCase(
-                getVideosAction.fulfilled,
-                (state, action: PayloadAction<VideoItemType[]>) => {
-                    state.loading = false;
-                    const userId = action.meta.arg.userId;
-
-                    if (userId === state.authUserId) {
-                        state.videosMeData = action.payload;
-                    } else {
-                        state.userVideos = action.payload;
-                    }
-                },
-            )
-            .addCase(
-                getVideosAction.rejected,
-                (state, action: PayloadAction<any>) => {
-                    state.loading = false;
-                    state.error = action.payload;
-                },
-            );
+            .addCase(getVideosTopAction.fulfilled, (state, action) => {
+                state.loadingTopTab = false;
+                const PAGE_SIZE = 5;
+                const newVideos = action.payload || [];
+                if (state.page === 1) {
+                    state.videosTop100 = newVideos;
+                } else {
+                    state.videosTop100 = [...state.videosTop100, ...newVideos];
+                }
+                state.hasMore = newVideos.length === PAGE_SIZE;
+                state.page += 1;
+            })
+            .addCase(getVideosTopAction.rejected, (state) => {
+                state.loadingTopTab = false;
+            });
     },
 
 
 });
 
-export const { setCustomLoading, setPreviewVideoURL, clearVideos } = cameraSlice.actions;
+export const { setCustomLoading, setPreviewVideoURL, clearVideos, resetVideos, appendVideos, setPage, setHasMore } = cameraSlice.actions;
 export default cameraSlice.reducer;

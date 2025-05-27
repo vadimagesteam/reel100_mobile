@@ -22,6 +22,7 @@ interface VideoAbsoluteInfoProps {
     showChat?: boolean
     showReplay?: boolean
     fullLike?: boolean
+    showLike?: boolean
     showComments?: boolean
     countComments?: number | null
     openComments?: () => void
@@ -43,6 +44,7 @@ const VideoAbsoluteInfo = ({
     showReplay = false,
     fullLike = false,
     showComments = false,
+    showLike = true,
     countComments,
     openComments,
 }: VideoAbsoluteInfoProps) => {
@@ -93,30 +95,34 @@ const VideoAbsoluteInfo = ({
                     </View>
 
                     {/* Likes */}
-                    {fullLike ? (
-                        <View style={[positionHelpers.absolute, positionHelpers.rowCenter, cs.containerLikes]}>
-                            {showChat && (
-                                <TouchableOpacity style={[positionHelpers.alignCenter, cs.circleButton]}>
-                                    <SvgIcon image="eyeShow" color={colors.white} />
-                                </TouchableOpacity>
-                            )}
+                    {showLike && (
+                        <>
+                            {fullLike ? (
+                                <View style={[positionHelpers.absolute, positionHelpers.rowCenter, cs.containerLikes]}>
+                                    {showChat && (
+                                        <TouchableOpacity style={[positionHelpers.alignCenter, cs.circleButton]}>
+                                            <SvgIcon image="eyeShow" color={colors.white} />
+                                        </TouchableOpacity>
+                                    )}
 
-                            <View style={[positionHelpers.alignCenter, cs.likeCountContainer]}>
-                                <BodyText fontSize={16} fontWeight={'bold'} color={colors.white}>{likesCount}</BodyText>
-                            </View>
-                            {showReplay && (
-                                <TouchableOpacity style={[positionHelpers.alignCenter, cs.circleButton]}>
-                                    <SvgIcon image="eyeShow" color={colors.white} />
-                                </TouchableOpacity>
+                                    <View style={[positionHelpers.alignCenter, cs.likeCountContainer]}>
+                                        <BodyText fontSize={16} fontWeight={'bold'} color={colors.white}>{likesCount}</BodyText>
+                                    </View>
+                                    {showReplay && (
+                                        <TouchableOpacity style={[positionHelpers.alignCenter, cs.circleButton]}>
+                                            <SvgIcon image="eyeShow" color={colors.white} />
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                            ) : (
+                                <View style={[positionHelpers.absolute, cs.containerLikes, cs.left16]}>
+                                    <View style={[positionHelpers.flexRow]}>
+                                        <SvgIcon image={likeCheck ? 'like_red_heart' : 'like_heart'} style={cs.iconFillLike} />
+                                        <BodyText fontSize={16} fontWeight={'700'} color={colors.white} marginLeft={2}>{likesCount}</BodyText>
+                                    </View>
+                                </View>
                             )}
-                        </View>
-                    ) : (
-                        <View style={[positionHelpers.absolute, cs.containerLikes, cs.left16]}>
-                            <View style={[positionHelpers.flexRow]}>
-                                <SvgIcon image={likeCheck ? 'like_red_heart' : 'like_heart'} style={cs.iconFillLike} />
-                                <BodyText fontSize={16} fontWeight={'700'} color={colors.white} marginLeft={2}>{likesCount}</BodyText>
-                            </View>
-                        </View>
+                        </>
                     )}
                 </>
             ) : (
