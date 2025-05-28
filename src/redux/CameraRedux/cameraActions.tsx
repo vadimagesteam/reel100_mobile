@@ -137,9 +137,12 @@ export const getVideosTopAction = createAsyncThunk<any, GetVideosParams>(
             }
 
             const response = await axios.get(`api/videos?${queryParams.toString()}`);
+            const cleanedData = (response?.data || []).filter(
+                (video: any) => video?.file && typeof video.file === 'object' && video.file?.storagePath
+            );
 
             // console.log('getVideosAction--->', JSON.stringify(response?.data, null, 2));
-            return response?.data;
+            return cleanedData;
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response && error.response.data) {

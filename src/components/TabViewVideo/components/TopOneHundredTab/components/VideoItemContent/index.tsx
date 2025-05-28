@@ -1,18 +1,21 @@
 // VideoItemComponent.tsx
 import React, { ReactNode, useEffect, useRef } from 'react';
-import { View } from 'react-native';
+import { StyleProp, View, ViewStyle } from 'react-native';
 import Video from 'react-native-video';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { VideoItemType } from '../../../../../../redux/CameraRedux/types';
+import { positionHelpers } from '../../../../../../styles';
 
 type VideoItemContentProps = {
     item: VideoItemType;
     isActive: boolean;
-    videoHeight: number;
+    videoHeight?: number;
     onLoad: (data: { duration: number }) => void;
     onProgress: (data: { currentTime: number }) => void;
     gesture: any;
+    muted?: boolean
     renderOverlay: () => ReactNode;
+    videoStyle?: StyleProp<ViewStyle>
 };
 
 const VideoItemContent = ({
@@ -22,7 +25,9 @@ const VideoItemContent = ({
     onLoad,
     onProgress,
     gesture,
+    muted = true,
     renderOverlay,
+    videoStyle,
 }: VideoItemContentProps) => {
     const videoRef = useRef<any>(null);
 
@@ -34,17 +39,19 @@ const VideoItemContent = ({
 
     return (
         <GestureDetector gesture={gesture}>
-            <View style={{ height: videoHeight, backgroundColor: 'black' }}>
+            <View
+                style={[{ height: videoHeight, backgroundColor: 'black' }, videoStyle]}
+            >
                 <Video
                     ref={videoRef}
                     source={{ uri: item.file?.storagePath }}
                     paused={!isActive}
                     resizeMode="cover"
                     repeat
-                    muted
+                    muted={muted}
                     onLoad={onLoad}
                     onProgress={onProgress}
-                    style={{ height: videoHeight, width: '100%' }}
+                    style={[{ height: videoHeight, width: '100%' }, videoStyle]}
                 />
                 {renderOverlay()}
             </View>

@@ -15,6 +15,7 @@ import { VideoItemType } from '../../../../redux/CameraRedux/types';
 import { getOneUserAction } from '../../../../redux/UsersRedux/usersAction';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import VideoItemContent from './components/VideoItemContent';
+import { getVideoCommentsAction } from '../../../../redux/VideoRedux/videoAction';
 
 const { height } = Dimensions.get('window');
 const TAKE = 5;
@@ -52,7 +53,7 @@ const TopOneHundredTab = () => {
         ) {
             loadVideos(page);
         }
-    }, [currentIndex, videosTop100.length, hasMore, loadingMore, page]);
+    }, [currentIndex, hasMore, loadingMore, page]);
 
     const loadVideos = async (pageNumber: number) => {
         if (loadingMore || !hasMore) { return; }
@@ -101,12 +102,14 @@ const TopOneHundredTab = () => {
         setTimeLefts((prev) => ({ ...prev, [id]: Math.floor(data.duration) }));
     };
 
-    const handleSingleTap = (index: number) => {
-        return true;
-        // navigation.navigate(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
-        //     initialIndex: index,
-        //     videos: videosTop100,
-        // });
+    const handleSingleTap = (item: VideoItemType, index: number) => {
+        dispatch(getVideoCommentsAction({ videoId: item?.id, userId: item?.user.id }));
+        navigation.navigate(DASHBOARD_ROUTES.FULL_VIDEO_SCREEN, {
+            initialIndex: index,
+            videos: [...videosTop100],
+            videoIdParam: item?.id,
+            userIdParam: item?.user?.id,
+        });
     };
 
     const handleDoubleTap = (x: number, y: number, videoId: string, videoOwnerId: string) => {
@@ -150,7 +153,7 @@ const TopOneHundredTab = () => {
             .maxDelay(250)
             .numberOfTaps(1)
             .onEnd(() => {
-                runOnJS(handleSingleTap)(index);
+                runOnJS(handleSingleTap)(item, index);
             });
 
     const doubleTapGesture = (videoId: string, videoOwnerId: string) =>
@@ -176,41 +179,43 @@ const TopOneHundredTab = () => {
 
         return (
             <>
-                <VideoItemContent
-                    item={item}
-                    isActive={isActive}
-                    videoHeight={videoHeight}
-                    onLoad={(data) => handleLoad(item.id, data)}
-                    onProgress={(data) => {
-                        if (isActive) {
-                            currentTimeRef.current = data.currentTime;
-                            const duration = durations[item.id] || 0;
-                            setTimeLefts((prev) => ({
-                                ...prev,
-                                [item.id]: Math.max(0, Math.floor(duration - data.currentTime)),
-                            }));
-                        }
-                    }}
-                    gesture={combinedGesture(item, index)}
-                    renderOverlay={() => (
-                        <VideoAbsoluteInfo
-                            avatar={''}
-                            name={`${item?.user?.firstName} ${item?.user?.lastName}`}
-                            videoDuration={formatTime(timeLefts[item.id] || 0)}
-                            likeCheck={likesData.some(like => like?.user?.id === user?.id)}
-                            likesCount={likesData?.length}
-                            videoNumber={index + 1}
-                            onNameClick={() => {
-                                if (user?.id !== item.user.id) {
-                                    dispatch(getOneUserAction(item.user.id));
-                                    navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, {
-                                        idUser: item.user.id,
-                                    });
-                                }
-                            }}
-                        />
-                    )}
-                />
+                {item.file !== null ? (
+                    <VideoItemContent
+                        item={item}
+                        isActive={isActive}
+                        videoHeight={videoHeight}
+                        onLoad={(data) => handleLoad(item.id, data)}
+                        onProgress={(data) => {
+                            if (isActive) {
+                                currentTimeRef.current = data.currentTime;
+                                const duration = durations[item.id] || 0;
+                                setTimeLefts((prev) => ({
+                                    ...prev,
+                                    [item.id]: Math.max(0, Math.floor(duration - data.currentTime)),
+                                }));
+                            }
+                        }}
+                        gesture={combinedGesture(item, index)}
+                        renderOverlay={() => (
+                            <VideoAbsoluteInfo
+                                avatar={''}
+                                name={`${item?.user?.firstName} ${item?.user?.lastName}`}
+                                videoDuration={formatTime(timeLefts[item.id] || 0)}
+                                likeCheck={likesData.some(like => like?.user?.id === user?.id)}
+                                likesCount={likesData?.length}
+                                videoNumber={index + 1}
+                                onNameClick={() => {
+                                    if (user?.id !== item.user.id) {
+                                        dispatch(getOneUserAction(item.user.id));
+                                        navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, {
+                                            idUser: item.user.id,
+                                        });
+                                    }
+                                }}
+                            />
+                        )}
+                    />
+                ) : null}
                 {/* Heart animation */}
                 <Animated.Text style={[positionHelpers.absolute, cs.animatedHeart, animatedStyle]}>❤️</Animated.Text>
             </>

@@ -40,7 +40,7 @@ export const getLikesAction = createAsyncThunk<LikeResponseType[], GetLikesParam
                 },
             };
             const response = await axios.get(`/api/reactions?where[typeField]=Like&where[video][id]=${videoId}`, config);
-            console.log('response --Likes-->', response);
+            // console.log('response --Likes-->', response);
             return response?.data;
         } catch (error) {
             if (error instanceof AxiosError) {
