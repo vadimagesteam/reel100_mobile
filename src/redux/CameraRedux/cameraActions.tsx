@@ -141,7 +141,7 @@ export const getVideosTopAction = createAsyncThunk<any, GetVideosParams>(
                 (video: any) => video?.file && typeof video.file === 'object' && video.file?.storagePath
             );
 
-            // console.log('getVideosAction--->', JSON.stringify(response?.data, null, 2));
+            console.log('getVideosAction--->', cleanedData, null, 2);
             return cleanedData;
         } catch (error) {
             if (error instanceof AxiosError) {

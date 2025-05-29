@@ -19,6 +19,8 @@ export interface VideoItemType {
     createdAt: string;
     updatedAt: string;
     file: VideoFileType | null;
+    commentsCount: number
+    likesCount: number
     user: {
         firstName: string
         id: string;

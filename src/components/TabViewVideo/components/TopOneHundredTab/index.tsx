@@ -202,7 +202,7 @@ const TopOneHundredTab = () => {
                                 name={`${item?.user?.firstName} ${item?.user?.lastName}`}
                                 videoDuration={formatTime(timeLefts[item.id] || 0)}
                                 likeCheck={likesData.some(like => like?.user?.id === user?.id)}
-                                likesCount={likesData?.length}
+                                likesCount={item?.likesCount}
                                 videoNumber={index + 1}
                                 onNameClick={() => {
                                     if (user?.id !== item.user.id) {
@@ -243,7 +243,6 @@ const TopOneHundredTab = () => {
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
             initialScrollIndex={scrollIndexRef.current}
-
             onEndReached={onEndReached}
             onEndReachedThreshold={0.5}
             ListFooterComponent={renderFooter}

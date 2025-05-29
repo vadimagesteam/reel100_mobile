@@ -17,4 +17,11 @@ export const cs = StyleSheet.create({
     animatedLike: {
         fontSize: 35,
     },
+    animatedHeart: {
+        fontSize: 35,
+    },
+    loadingStyle: {
+        padding: 10,
+        marginTop: 20,
+    },
 });

@@ -21,6 +21,7 @@ import { getVideosTopAction } from '../../../../redux/CameraRedux/cameraActions'
 
 
 const { height } = Dimensions.get('window');
+const TAKE = 5;
 
 const FullVideoScreen = () => {
     const dispatch = useReduxDispatch();
@@ -28,10 +29,11 @@ const FullVideoScreen = () => {
     const route = useRoute<any>();
     const isFocused = useIsFocused();
 
-    const { videos, initialIndex, videoIdParam, userIdParam } = route.params;
+    const { initialIndex, videoIdParam, userIdParam } = route.params;
     const { countComments } = useReduxSelector((state: RootState) => state.video);
     const { likesData } = useReduxSelector((state) => state.likes);
     const { user } = useReduxSelector((state) => state.auth);
+    const { videosTop100, page, hasMore } = useReduxSelector((state: RootState) => state.camera);
 
     const videoHeight = height;
 
@@ -51,6 +53,7 @@ const FullVideoScreen = () => {
     const opacity = useSharedValue(1);
     const tapX = useSharedValue(0);
     const tapY = useSharedValue(0);
+    const [loadingMore, setLoadingMore] = useState(false);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -60,10 +63,45 @@ const FullVideoScreen = () => {
     }, []);
 
     useEffect(() => {
-        const currentVideo = videos[currentIndex];
+        if (
+            hasMore &&
+            !loadingMore &&
+            currentIndex >= videosTop100.length - 2
+        ) {
+            loadVideos(page);
+        }
+    }, [currentIndex, hasMore, loadingMore, page]);
+
+    const loadVideos = async (pageNumber: number) => {
+        if (loadingMore || !hasMore) { return; }
+
+        setLoadingMore(true);
+        try {
+            const skip = (pageNumber - 1) * TAKE;
+            const response = await dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
+            const newVideos = response?.payload || [];
+
+            if (newVideos.length < TAKE) {
+                dispatch(setHasMore(false));
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoadingMore(false);
+        }
+    };
+
+    const onEndReached = () => {
+        if (!loadingMore && hasMore) {
+            loadVideos(page);
+        }
+    };
+
+    useEffect(() => {
+        const currentVideo = videosTop100[currentIndex];
         if (currentVideo && user?.id) {
-            dispatch(getVideoCommentsAction({ videoId: currentVideo.id, userId: videos[currentIndex]?.user?.id }));
-            dispatch(getLikesAction({ userId: videos[currentIndex]?.user?.id, videoId: currentVideo.id }));
+            // dispatch(getVideoCommentsAction({ videoId: currentVideo.id, userId: videos[currentIndex]?.user?.id }));
+            dispatch(getLikesAction({ userId: videosTop100[currentIndex]?.user?.id, videoId: currentVideo.id }));
         }
     }, [currentIndex]);
 
@@ -165,11 +203,12 @@ const FullVideoScreen = () => {
                             name={`${item.user?.firstName} ${item.user?.lastName}`}
                             videoDuration={formatTime(timeLefts[item.id] || 0)}
                             likeCheck={likesData.some(like => like.user?.id === user?.id)}
-                            likesCount={likesData?.length}
+                            likesCount={item?.likesCount}
+                            // likesCount={likesData?.length}
                             videoNumber={index + 1}
                             openComments={openComments}
                             showComments={true}
-                            countComments={countComments}
+                            countComments={item?.commentsCount}
                             showArrow
                             onArrowBack={() => navigation.goBack()}
                             onNameClick={() => {
@@ -183,10 +222,19 @@ const FullVideoScreen = () => {
                         />
                     )}
                 />
-                <Animated.Text style={[positionHelpers.absolute, styles.animatedHeart, animatedStyle]}>
+                <Animated.Text style={[positionHelpers.absolute, cs.animatedHeart, animatedStyle]}>
                     ❤️
                 </Animated.Text>
             </View >
+        );
+    };
+
+    const renderFooter = () => {
+        if (!loadingMore) { return null; }
+        return (
+            <View style={cs.loadingStyle}>
+                <ActivityIndicator size="small" color="#fff" />
+            </View>
         );
     };
 
@@ -195,14 +243,14 @@ const FullVideoScreen = () => {
             {initialLoading && <LoaderIndicator />}
             <FlatList
                 ref={flatListRef}
-                data={videos}
+                data={videosTop100}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={renderItem}
                 pagingEnabled
                 snapToInterval={videoHeight}
                 decelerationRate="fast"
                 showsVerticalScrollIndicator={false}
-                initialScrollIndex={videos.length > initialIndex ? initialIndex : 0}
+                initialScrollIndex={videosTop100.length > initialIndex ? initialIndex : 0}
                 getItemLayout={(data, index) => ({
                     length: videoHeight,
                     offset: videoHeight * index,
@@ -216,12 +264,15 @@ const FullVideoScreen = () => {
                 }}
                 scrollEnabled={!showComments}
                 style={positionHelpers.fill}
+                onEndReached={onEndReached}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={renderFooter}
             />
 
             {showComments && (
                 <CommentSection
-                    videoId={videos[currentIndex]?.id}
-                    userId={videos[currentIndex]?.user?.id}
+                    videoId={videosTop100[currentIndex]?.id}
+                    userId={videosTop100[currentIndex]?.user?.id}
                     onClose={() => setShowComments(false)}
                 />
             )}
@@ -229,10 +280,5 @@ const FullVideoScreen = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    animatedHeart: {
-        fontSize: 35,
-    },
-});
 
 export default FullVideoScreen;
