@@ -203,7 +203,7 @@ const FullVideoScreen = () => {
                             name={`${item.user?.firstName} ${item.user?.lastName}`}
                             videoDuration={formatTime(timeLefts[item.id] || 0)}
                             likeCheck={likesData.some(like => like.user?.id === user?.id)}
-                            likesCount={item?.likesCount}
+                            likesCount={likesData.length}
                             // likesCount={likesData?.length}
                             videoNumber={index + 1}
                             openComments={openComments}
