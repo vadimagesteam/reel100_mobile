@@ -13,8 +13,8 @@ import { VideoItemType } from '../../../../redux/CameraRedux/types';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import { getVideoCommentsAction } from '../../../../redux/VideoRedux/videoAction';
 import { LoaderIndicator } from '../../../UI';
-import { useHeartAnimatedStyle } from './helpers/animatedHeartStyle';
-import VideoListItem from './components/VideoListItem';
+import VideoListItem from '../../../VideoScrollList/VideoListItem';
+import { useHeartAnimatedStyle } from '../../../../utils/animatedHeartStyle';
 
 const { height } = Dimensions.get('window');
 const TAKE = 5;
@@ -33,7 +33,7 @@ const TopOneHundredTab = () => {
     const tabNavigationHeight = Math.max(150, Math.min(height * 0.17, 250));
     const videoHeight = height - insets.top - insets.bottom - tabNavigationHeight;
 
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [durations, setDurations] = useState<{ [key: string]: number }>({});
     const [timeLefts, setTimeLefts] = useState<{ [key: string]: number }>({});
 
@@ -78,6 +78,11 @@ const TopOneHundredTab = () => {
             scrollIndexRef.current = index;
         }
     }).current;
+
+    const handleLoad = (id: string, data: { duration: number }) => {
+        setDurations((prev) => ({ ...prev, [id]: data.duration }));
+        setTimeLefts((prev) => ({ ...prev, [id]: Math.floor(data.duration) }));
+    };
 
     const handleSingleTap = (item: VideoItemType, index: number) => {
         dispatch(getVideoCommentsAction({ videoId: item?.id, userId: item?.user.id }));
@@ -157,8 +162,8 @@ const TopOneHundredTab = () => {
                         isActive={isActive}
                         videoHeight={videoHeight}
                         gesture={combinedGesture(item, index)}
+                        onLoad={(data) => handleLoad(item.id, data)}
                         durations={durations}
-                        setDurations={setDurations}
                         setTimeLefts={setTimeLefts}
                         timeLeft={timeLefts[item.id] || 0}
                         likesData={likesData}

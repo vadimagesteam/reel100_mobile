@@ -24,8 +24,10 @@ interface VideoAbsoluteInfoProps {
     fullLike?: boolean
     showLike?: boolean
     showComments?: boolean
+    showShare?: boolean
     countComments?: number | null
     openComments?: () => void
+    onShare?: () => void
 }
 
 const VideoAbsoluteInfo = ({
@@ -44,9 +46,11 @@ const VideoAbsoluteInfo = ({
     showReplay = false,
     fullLike = false,
     showComments = false,
+    showShare = false,
     showLike = true,
     countComments,
     openComments,
+    onShare,
 }: VideoAbsoluteInfoProps) => {
     const insets = useSafeAreaInsets();
     const videoCheckFull = videoCheck === 'FULL';
@@ -55,6 +59,7 @@ const VideoAbsoluteInfo = ({
         <>
             {justInfo === 'FULL' ? (
                 <>
+
                     {showArrow && (<TouchableOpacity
                         style={[positionHelpers.absolute, positionHelpers.alignItemsCenterRow, cs.containerName, { top: videoCheckFull ? insets.top + 1 : 10, padding: 10 }]}
                         onPress={onArrowBack}
@@ -86,10 +91,17 @@ const VideoAbsoluteInfo = ({
                             showComments && (
                                 <View style={[positionHelpers.absolute, positionHelpers.alignCenter, cs.containerChat]}>
                                     <TouchableOpacity onPress={openComments} >
-                                        <BodyText fontSize={24} color={colors.white}>💬</BodyText>
+                                        <SvgIcon image="commentIcon" color={colors.white} style={{ height: 24, width: 24 }} />
                                     </TouchableOpacity>
                                     <BodyText fontWeight={'bold'} fontSize={14} color={colors.white}>{countComments}</BodyText>
                                 </View>
+                            )
+                        }
+                        {
+                            showShare && (
+                                <TouchableOpacity style={[positionHelpers.absolute, positionHelpers.alignCenter, cs.containerShare]} onPress={onShare} >
+                                    <SvgIcon image="shareIcon" color={colors.white} style={{ height: 24, width: 24 }} />
+                                </TouchableOpacity>
                             )
                         }
                     </View>

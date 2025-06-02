@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useRef } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import Video from 'react-native-video';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { VideoItemType } from '../../../../../../redux/CameraRedux/types';
+import { VideoItemType } from '../../../redux/CameraRedux/types';
 import { cs } from './styles';
 
 type VideoItemContentProps = {
@@ -32,7 +32,11 @@ const VideoItemContent = ({
 
     useEffect(() => {
         if (isActive && videoRef.current) {
-            videoRef.current.seek(0);
+            const timeout = setTimeout(() => {
+                videoRef.current.seek(0);
+            }, 50);
+            return () => clearTimeout(timeout);
+
         }
     }, [isActive]);
 

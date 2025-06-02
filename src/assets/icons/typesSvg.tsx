@@ -20,4 +20,7 @@ export type SvgIconsNames =
     | 'fourU_NavTab'
     | 'profileNavTab'
     | 'like_heart'
-    | 'like_red_heart';
+    | 'like_red_heart'
+    | 'commentIcon'
+    | 'shareIcon'
+    | 'playIcon';

@@ -67,6 +67,10 @@ export const cs = StyleSheet.create({
         top: 40,
         right: 5,
     },
+    containerShare: {
+        top: 40 * 2 + 15,
+        right: 5,
+    },
 
     //SIMPLE
     containerNameSimple: {

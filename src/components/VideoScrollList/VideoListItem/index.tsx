@@ -1,26 +1,34 @@
 import React from 'react';
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
-import { formatTime } from '../../../../../../utils/formatTime';
-import VideoAbsoluteInfo from '../../../../../VideoAbsoluteInfo';
-import VideoItemContent from '../VideoItemContent';
-import { positionHelpers } from '../../../../../../styles';
+import { formatTime } from '../../../utils/formatTime';
+import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
+import VideoItemContent from './../VideoItemContent';
+import { positionHelpers } from '../../../styles';
 import { StyleSheet } from 'react-native';
-import { VideoItemType } from '../../../../../../redux/CameraRedux/types';
-import { ExclusiveGesture } from 'react-native-gesture-handler';
-import { LikeResponseType } from '../../../../../../redux/LikesRedux/types';
+import { VideoItemType } from '../../../redux/CameraRedux/types';
+import { LikeResponseType } from '../../../redux/LikesRedux/types';
 
 export interface VideoListItemProps {
     item: VideoItemType;
     index: number;
     isActive: boolean;
     videoHeight: number;
-    gesture: ExclusiveGesture;
+    gesture: any;
     durations: { [key: string]: number };
-    setDurations: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
     setTimeLefts: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
     likesData: LikeResponseType[];
     likeCheck: boolean;
     timeLeft: number;
+
+    videoCheck?: 'FULL' | 'SIMPLE' | undefined
+    openComments?: () => void
+    showComments?: boolean
+    countComments?: number
+    showArrow?: boolean
+    onArrowBack?: () => void
+    onNameClick?: () => void
+    onLoad: (data: any) => void
+    showShare?: boolean
     animatedStyle: AnimatedStyle;
 }
 
@@ -31,11 +39,19 @@ export const VideoListItem = ({
     videoHeight,
     gesture,
     durations,
-    setDurations,
     setTimeLefts,
     likesData,
     likeCheck,
     timeLeft,
+    videoCheck,
+    openComments,
+    showComments,
+    countComments,
+    showArrow,
+    onArrowBack,
+    onNameClick,
+    onLoad,
+    showShare,
     animatedStyle,
 }: VideoListItemProps) => (
     <>
@@ -43,7 +59,7 @@ export const VideoListItem = ({
             item={item}
             isActive={isActive}
             videoHeight={videoHeight}
-            onLoad={(data) => setDurations(prev => ({ ...prev, [item.id]: data.duration }))}
+            onLoad={onLoad}
             onProgress={({ currentTime }) => {
                 if (isActive) {
                     const duration = durations[item.id] || 0;
@@ -53,12 +69,20 @@ export const VideoListItem = ({
             gesture={gesture}
             renderOverlay={() => (
                 <VideoAbsoluteInfo
+                    videoCheck={videoCheck}
                     avatar={''}
                     name={`${item?.user?.firstName} ${item?.user?.lastName}`}
                     videoDuration={formatTime(timeLeft)}
                     likeCheck={likeCheck}
                     likesCount={likesData.length}
                     videoNumber={index + 1}
+                    openComments={openComments}
+                    showComments={showComments}
+                    countComments={countComments}
+                    showArrow={showArrow}
+                    onArrowBack={onArrowBack}
+                    onNameClick={onNameClick}
+                    showShare={showShare}
                 />
             )}
         />

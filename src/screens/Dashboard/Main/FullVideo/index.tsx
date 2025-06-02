@@ -1,33 +1,81 @@
+
+
+// const handleLoad = (id: string, data: { duration: number }) => {
+//     setDurations((prev) => ({ ...prev, [id]: data.duration }));
+//     setTimeLefts((prev) => ({ ...prev, [id]: Math.floor(data.duration) }));
+// };
+// <View style={{ height: videoHeight }}>
+//     <VideoItemContent
+//         item={item}
+//         isActive={isActive}
+//         videoStyle={positionHelpers.fill}
+//         onLoad={(data) => handleLoad(item.id, data)}
+//         muted={false}
+//         onProgress={(data) => {
+//             if (isActive) {
+//                 if (initialLoading && data.currentTime > 0.1) {
+//                     setInitialLoading(false);
+//                 }
+//                 currentTimeRef.current = data.currentTime;
+//                 const duration = durations[item.id] || 0;
+//                 setTimeLefts((prev) => ({
+//                     ...prev,
+//                     [item.id]: Math.max(0, Math.floor(duration - data.currentTime)),
+//                 }));
+//             }
+//         }}
+//         gesture={doubleTapGesture(item.id, item.user.id)}
+//         renderOverlay={() => (
+//             <VideoAbsoluteInfo
+//                 videoCheck="FULL"
+//                 avatar={''}
+//                 name={`${item.user?.firstName} ${item.user?.lastName}`}
+//                 videoDuration={formatTime(timeLefts[item.id] || 0)}
+//                 likeCheck={likesData.some(like => like.user?.id === user?.id)}
+//                 likesCount={item?.likesCount}
+//                 // likesCount={likesData?.length}
+//                 videoNumber={index + 1}
+//                 openComments={openComments}
+//                 showComments={true}
+//                 countComments={item?.commentsCount}
+//                 showArrow
+//                 onArrowBack={() => navigation.goBack()}
+//                 onNameClick={() => {
+//                     if (user?.id !== item.user.id) {
+//                         dispatch(getOneUserAction(item.user.id));
+//                         navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, {
+//                             idUser: item.user.id,
+//                         });
+//                     }
+//                 }}
+
+
 import React, { useRef, useState, useEffect } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, StyleSheet, View } from 'react-native';
-import Video from 'react-native-video';
+import { Dimensions, FlatList } from 'react-native';
 import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture } from 'react-native-gesture-handler';
+import { runOnJS, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import CommentSection from '../../../../components/CommentSection';
-import { colors, positionHelpers } from '../../../../styles';
+import { positionHelpers } from '../../../../styles';
 import { LoaderIndicator } from '../../../../components/UI';
-import { formatTime } from '../../../../utils/formatTime';
 import { getOneUserAction } from '../../../../redux/UsersRedux/usersAction';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
-import VideoAbsoluteInfo from '../../../../components/VideoAbsoluteInfo';
 import { deleteLikeAction, getLikesAction, setLikeAction } from '../../../../redux/LikesRedux/likesAction';
-import { cs } from './styles';
-import VideoItemContent from '../../../../components/TabViewVideo/components/TopOneHundredTab/components/VideoItemContent';
 import { setPage } from '../../../../redux/CameraRedux/cameraSlice';
 import { getVideosTopAction } from '../../../../redux/CameraRedux/cameraActions';
-
+import { useHeartAnimatedStyle } from '../../../../utils/animatedHeartStyle';
+import VideoListItem from '../../../../components/VideoScrollList/VideoListItem';
+import { VideoItemType } from '../../../../redux/CameraRedux/types';
 
 const { height } = Dimensions.get('window');
 const TAKE = 5;
 
 const FullVideoScreen = () => {
     const dispatch = useReduxDispatch();
+    const isFocused = useIsFocused();
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
-    const isFocused = useIsFocused();
-
     const { initialIndex } = route.params;
     const { likesData } = useReduxSelector((state) => state.likes);
     const { user } = useReduxSelector((state) => state.auth);
@@ -37,13 +85,12 @@ const FullVideoScreen = () => {
 
     const flatListRef = useRef<FlatList>(null);
     const scrollIndexRef = useRef(initialIndex);
-    const currentTimeRef = useRef(0);
-    const videoRef = useRef<any | null>(null);
 
-    const [currentIndex, setCurrentIndex] = useState(initialIndex);
-    const [durations, setDurations] = useState({});
-    const [timeLefts, setTimeLefts] = useState({});
+    const [currentIndex, setCurrentIndex] = useState<number>(initialIndex);
+    const [durations, setDurations] = useState<{ [key: string]: number }>({});
+    const [timeLefts, setTimeLefts] = useState<{ [key: string]: number }>({});
     const [initialLoading, setInitialLoading] = useState(true);
+    const [pausedVideo, setPausedVideo] = useState<boolean>(false);
 
     const [showComments, setShowComments] = useState<boolean>(false);
     // Heart animation
@@ -51,6 +98,8 @@ const FullVideoScreen = () => {
     const opacity = useSharedValue(1);
     const tapX = useSharedValue(0);
     const tapY = useSharedValue(0);
+
+    const animatedStyle = useHeartAnimatedStyle(tapX, tapY, scale, opacity);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -90,6 +139,8 @@ const FullVideoScreen = () => {
         setTimeLefts((prev) => ({ ...prev, [id]: Math.floor(data.duration) }));
     };
 
+
+
     const handleDoubleTap = (x: number, y: number, videoId: string, videoOwnerId: string) => {
         if (!videoId || !user?.id) { return; }
 
@@ -121,6 +172,12 @@ const FullVideoScreen = () => {
         }
     };
 
+    // const singleTapGesture = Gesture.Tap()
+    //     .maxDuration(250)
+    //     .onEnd(() => {
+    //         runOnJS(setPausedVideo)((prev) => !prev);
+    //     });
+
     const doubleTapGesture = (videoId: string, videoOwnerId: string) =>
         Gesture.Tap()
             .numberOfTaps(2)
@@ -128,14 +185,7 @@ const FullVideoScreen = () => {
                 runOnJS(handleDoubleTap)(event.x, event.y, videoId, videoOwnerId);
             });
 
-    const animatedStyle = useAnimatedStyle(() => ({
-        left: tapX.value - 40,
-        top: tapY.value - 40,
-        opacity: opacity.value,
-        transform: [{ scale: scale.value }],
-    }));
-
-    const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
         if (viewableItems.length > 0) {
             const index = viewableItems[0].index;
             setCurrentIndex(index);
@@ -147,74 +197,51 @@ const FullVideoScreen = () => {
         setShowComments(true);
     };
 
-    const renderItem = ({ item, index }) => {
+    const renderItem = ({ item, index }: { item: VideoItemType; index: number }) => {
         const isActive = index === currentIndex && isFocused;
-
-        if (!item?.file) {
-            return <View style={{ height: videoHeight, backgroundColor: 'black' }} />;
-        }
+        const itemFile = item.file !== null;
 
         return (
-            <View style={{ height: videoHeight }}>
-                <VideoItemContent
-                    item={item}
-                    isActive={isActive}
-                    videoStyle={positionHelpers.fill}
-                    onLoad={(data) => handleLoad(item.id, data)}
-                    muted={false}
-                    onProgress={(data) => {
-                        if (isActive) {
-                            if (initialLoading && data.currentTime > 0.1) {
-                                setInitialLoading(false);
+            <>
+                {itemFile ? (
+                    <VideoListItem
+                        item={item}
+                        index={index}
+                        isActive={isActive}
+                        videoHeight={videoHeight}
+                        gesture={doubleTapGesture(item.id, item.user.id)}
+                        onLoad={(data) => handleLoad(item.id, data)}
+                        durations={durations}
+                        setTimeLefts={setTimeLefts}
+                        timeLeft={timeLefts[item.id] || 0}
+                        likesData={likesData}
+                        likeCheck={likesData.some(like => like?.user?.id === user?.id)}
+                        videoCheck="FULL"
+                        openComments={openComments}
+                        showComments={true}
+                        countComments={item?.commentsCount}
+                        showArrow
+                        onArrowBack={() => navigation.goBack()}
+                        onNameClick={() => {
+                            if (user?.id !== item.user.id) {
+                                dispatch(getOneUserAction(item.user.id));
+                                navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, {
+                                    idUser: item.user.id,
+                                });
                             }
-                            currentTimeRef.current = data.currentTime;
-                            const duration = durations[item.id] || 0;
-                            setTimeLefts((prev) => ({
-                                ...prev,
-                                [item.id]: Math.max(0, Math.floor(duration - data.currentTime)),
-                            }));
-                        }
-                    }}
-                    gesture={doubleTapGesture(item.id, item.user.id)}
-                    renderOverlay={() => (
-                        <VideoAbsoluteInfo
-                            videoCheck="FULL"
-                            avatar={''}
-                            name={`${item.user?.firstName} ${item.user?.lastName}`}
-                            videoDuration={formatTime(timeLefts[item.id] || 0)}
-                            likeCheck={likesData.some(like => like.user?.id === user?.id)}
-                            likesCount={item?.likesCount}
-                            // likesCount={likesData?.length}
-                            videoNumber={index + 1}
-                            openComments={openComments}
-                            showComments={true}
-                            countComments={item?.commentsCount}
-                            showArrow
-                            onArrowBack={() => navigation.goBack()}
-                            onNameClick={() => {
-                                if (user?.id !== item.user.id) {
-                                    dispatch(getOneUserAction(item.user.id));
-                                    navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, {
-                                        idUser: item.user.id,
-                                    });
-                                }
-                            }}
-                        />
-                    )}
-                />
-                <Animated.Text style={[positionHelpers.absolute, cs.animatedHeart, animatedStyle]}>
-                    ❤️
-                </Animated.Text>
-            </View >
+                        }}
+                        showShare={true}
+                        animatedStyle={animatedStyle}
+                    />
+                ) : null}
+            </>
         );
     };
 
     const renderFooter = () => {
         if (!loadingTopTab) { return null; }
         return (
-            <View style={cs.loadingStyle}>
-                <ActivityIndicator size="small" color="#fff" />
-            </View>
+            <LoaderIndicator variantTwo />
         );
     };
 
@@ -248,7 +275,6 @@ const FullVideoScreen = () => {
                 onEndReachedThreshold={0.5}
                 ListFooterComponent={renderFooter}
             />
-
             {showComments && (
                 <CommentSection
                     videoId={videosTop100[currentIndex]?.id}

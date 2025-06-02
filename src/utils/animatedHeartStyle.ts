@@ -13,4 +13,3 @@ export const useHeartAnimatedStyle = (
         transform: [{ scale: scale.value }],
     }));
 };
-
