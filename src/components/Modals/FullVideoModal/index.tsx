@@ -4,7 +4,6 @@ import Video from 'react-native-video';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
-import { getVideoCommentsAction } from '../../../redux/VideoRedux/videoAction';
 import { colors, positionHelpers } from '../../../styles';
 import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
 import { formatTime } from '../../../utils/formatTime';
@@ -27,7 +26,6 @@ const FullVideoModal = ({
 }: FullVideoModalProps) => {
     const navigation = useNavigation<any>();
     const dispatch = useReduxDispatch();
-    const { countComments } = useReduxSelector((state: RootState) => state.video);
     const { likesData } = useReduxSelector((state: RootState) => state.likes);
     const { user } = useReduxSelector((state: RootState) => state.auth);
     const videoRef = useRef<any | null>(null);
@@ -35,6 +33,7 @@ const FullVideoModal = ({
     const [durations, setDurations] = useState<Record<string, number>>({});
     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
     const [isVideoLoading, setIsVideoLoading] = useState<boolean>(true);
+    const [pausedVideo, setPausedVideo] = useState<boolean>(false);
 
     const [showComments, setShowComments] = useState<boolean>(false);
     const scale = useSharedValue(0);
@@ -44,11 +43,15 @@ const FullVideoModal = ({
 
     useEffect(() => {
         if (modalVideo && modalVideo?.id) {
-            dispatch(getVideoCommentsAction({ videoId: modalVideo.id, userId: modalVideo?.user?.id }));
             dispatch(getLikesAction({ userId: modalVideo?.user?.id, videoId: modalVideo?.id }));
             setIsVideoLoading(true);
+            setPausedVideo(false);
         }
     }, [modalVideo]);
+
+    const handleSingleTap = useCallback(() => {
+        setPausedVideo((prev) => !prev);
+    }, []);
 
     const handleDoubleTap = (x: number, y: number) => {
         if (!modalVideo?.id || !modalVideo.user?.id) { return; }
@@ -82,6 +85,12 @@ const FullVideoModal = ({
         }
     };
 
+    const singleTapGesture = Gesture.Tap()
+        .maxDuration(250)
+        .onEnd(() => {
+            runOnJS(handleSingleTap)();
+        });
+
 
     const doubleTapGesture = Gesture.Tap()
         .numberOfTaps(2)
@@ -90,6 +99,8 @@ const FullVideoModal = ({
                 runOnJS(handleDoubleTap)(event.x, event.y);
             }
         });
+
+    const combinedGesture = Gesture.Exclusive(doubleTapGesture, singleTapGesture);
 
 
     //Save duration video
@@ -128,85 +139,90 @@ const FullVideoModal = ({
 
     return (
         <Modal visible={!!modalVideo} transparent={false} animationType="fade">
-            <GestureDetector gesture={doubleTapGesture}>
-                <View
-                    style={[positionHelpers.fill, { backgroundColor: colors.black }]}
 
-                >
-                    {isVideoLoading && (
-                        <LoaderIndicator />
-                    )}
-                    {modalVideo?.file?.storagePath && (
-                        <>
-                            <Video
-                                key={modalVideo?.id}
-                                ref={videoRef}
-                                source={{ uri: modalVideo?.file?.storagePath }}
-                                style={positionHelpers.fill}
-                                resizeMode="cover"
-                                muted={false}
-                                repeat
-                                paused={false}
-                                controls={false}
-                                onLoad={(data) => {
-                                    handleVideoLoadModal(modalVideo?.id, data?.duration);
-                                    setIsVideoLoading(false);
+            <View
+                style={[positionHelpers.fill, { backgroundColor: colors.black }]}
 
-                                    setTimeout(() => {
-                                        videoRef.current?.seek(0);
-                                    }, 100);
-                                }}
-                                onProgress={({ currentTime }) => {
-                                    if (modalVideo?.id && durations[modalVideo.id]) {
-                                        const duration = durations[modalVideo.id];
-                                        setRemainingSeconds(prev => {
-                                            const newRemaining = duration - currentTime;
-                                            if (Math.abs((prev[modalVideo.id] ?? 0) - newRemaining) > 0.25) {
-                                                return {
-                                                    ...prev,
-                                                    [modalVideo.id]: newRemaining,
-                                                };
-                                            }
-                                            return prev;
-                                        });
+            >
+                {isVideoLoading && (
+                    <LoaderIndicator />
+                )}
+                {modalVideo?.file?.storagePath && (
+                    <>
+                        <GestureDetector gesture={combinedGesture}>
+                            <View style={positionHelpers.fill}>
+                                <Video
+                                    key={modalVideo?.id}
+                                    ref={videoRef}
+                                    source={{ uri: modalVideo?.file?.storagePath }}
+                                    style={positionHelpers.fill}
+                                    resizeMode="cover"
+                                    muted={false}
+                                    repeat
+                                    paused={pausedVideo}
+                                    controls={false}
+                                    onLoad={(data) => {
+                                        handleVideoLoadModal(modalVideo?.id, data?.duration);
+                                        setIsVideoLoading(false);
 
-                                        if (currentTime >= duration) {
+                                        setTimeout(() => {
                                             videoRef.current?.seek(0);
-                                            onVideoRepeat(modalVideo.id);
+                                        }, 100);
+                                    }}
+                                    onProgress={({ currentTime }) => {
+                                        if (modalVideo?.id && durations[modalVideo.id]) {
+                                            const duration = durations[modalVideo.id];
+                                            setRemainingSeconds(prev => {
+                                                const newRemaining = duration - currentTime;
+                                                if (Math.abs((prev[modalVideo.id] ?? 0) - newRemaining) > 0.25) {
+                                                    return {
+                                                        ...prev,
+                                                        [modalVideo.id]: newRemaining,
+                                                    };
+                                                }
+                                                return prev;
+                                            });
+
+                                            if (currentTime >= duration) {
+                                                videoRef.current?.seek(0);
+                                                onVideoRepeat(modalVideo.id);
+                                            }
                                         }
-                                    }
-                                }}
-                            />
-                            <VideoAbsoluteInfo
-                                videoCheck={'FULL'}
-                                showArrow={true}
-                                onArrowBack={() => {
+                                    }}
+                                />
+                            </View>
+                        </GestureDetector>
+                        <VideoAbsoluteInfo
+                            videoCheck={'FULL'}
+                            showArrow={true}
+                            onArrowBack={() => {
+                                setModalVideo(null);
+                                setShowComments(false);
+                            }}
+                            onNameClick={() => {
+                                if (user?.id !== modalVideo.user.id) {
+                                    dispatch(getOneUserAction(modalVideo.user.id));
+                                    navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: modalVideo.user.id });
                                     setModalVideo(null);
-                                    setShowComments(false);
-                                }}
-                                onNameClick={() => {
-                                    if (user?.id !== modalVideo.user.id) {
-                                        dispatch(getOneUserAction(modalVideo.user.id));
-                                        navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: modalVideo.user.id });
-                                        setModalVideo(null);
-                                    }
-                                }}
-                                avatar={''}
-                                name={`${modalVideo?.user?.firstName} ${modalVideo?.user?.lastName}`}
-                                likeCheck={likesData.some(like => like?.user?.id === user?.id)}
-                                likesCount={likesData.length}
-                                videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
-                                openComments={openComments}
-                                showComments={true}
-                                countComments={countComments}
-                            />
-                            {showComments && modalVideo?.id && (
-                                <CommentSection videoId={modalVideo.id} userId={modalVideo.user.id} onClose={() => setShowComments(false)} />
-                            )}
-                        </>
-                    )}
-                </View>
-            </GestureDetector>
+                                }
+                            }}
+                            avatar={''}
+                            name={`${modalVideo?.user?.firstName} ${modalVideo?.user?.lastName}`}
+                            likeCheck={likesData.some(like => like?.user?.id === user?.id)}
+                            likesCount={likesData.length}
+                            videoDuration={formatTime(modalVideo ? remainingSeconds[modalVideo.id] ?? 0 : 0)}
+                            openComments={openComments}
+                            showComments={true}
+                            countComments={modalVideo?.commentsCount}
+                            paused={pausedVideo}
+                        />
+                        {showComments && modalVideo?.id && (
+                            <CommentSection videoId={modalVideo.id} userId={modalVideo.user.id} onClose={() => setShowComments(false)} />
+                        )}
+                    </>
+                )}
+            </View>
+
 
             {/* Heart animation */}
             <Animated.Text style={[positionHelpers.absolute, cs.animatedLike, animatedStyle]}>❤️</Animated.Text>

@@ -4,7 +4,7 @@ import { formatTime } from '../../../utils/formatTime';
 import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
 import VideoItemContent from './../VideoItemContent';
 import { positionHelpers } from '../../../styles';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { VideoItemType } from '../../../redux/CameraRedux/types';
 import { LikeResponseType } from '../../../redux/LikesRedux/types';
 
@@ -30,6 +30,8 @@ export interface VideoListItemProps {
     onLoad: (data: any) => void
     showShare?: boolean
     animatedStyle: AnimatedStyle;
+    paused?: boolean
+    muted?: boolean
 }
 
 export const VideoListItem = ({
@@ -53,11 +55,15 @@ export const VideoListItem = ({
     onLoad,
     showShare,
     animatedStyle,
+    paused,
+    muted,
 }: VideoListItemProps) => (
     <>
         <VideoItemContent
             item={item}
             isActive={isActive}
+            paused={paused}
+            muted={muted}
             videoHeight={videoHeight}
             onLoad={onLoad}
             onProgress={({ currentTime }) => {
@@ -83,6 +89,7 @@ export const VideoListItem = ({
                     onArrowBack={onArrowBack}
                     onNameClick={onNameClick}
                     showShare={showShare}
+                    paused={paused}
                 />
             )}
         />

@@ -1,56 +1,4 @@
-
-
-// const handleLoad = (id: string, data: { duration: number }) => {
-//     setDurations((prev) => ({ ...prev, [id]: data.duration }));
-//     setTimeLefts((prev) => ({ ...prev, [id]: Math.floor(data.duration) }));
-// };
-// <View style={{ height: videoHeight }}>
-//     <VideoItemContent
-//         item={item}
-//         isActive={isActive}
-//         videoStyle={positionHelpers.fill}
-//         onLoad={(data) => handleLoad(item.id, data)}
-//         muted={false}
-//         onProgress={(data) => {
-//             if (isActive) {
-//                 if (initialLoading && data.currentTime > 0.1) {
-//                     setInitialLoading(false);
-//                 }
-//                 currentTimeRef.current = data.currentTime;
-//                 const duration = durations[item.id] || 0;
-//                 setTimeLefts((prev) => ({
-//                     ...prev,
-//                     [item.id]: Math.max(0, Math.floor(duration - data.currentTime)),
-//                 }));
-//             }
-//         }}
-//         gesture={doubleTapGesture(item.id, item.user.id)}
-//         renderOverlay={() => (
-//             <VideoAbsoluteInfo
-//                 videoCheck="FULL"
-//                 avatar={''}
-//                 name={`${item.user?.firstName} ${item.user?.lastName}`}
-//                 videoDuration={formatTime(timeLefts[item.id] || 0)}
-//                 likeCheck={likesData.some(like => like.user?.id === user?.id)}
-//                 likesCount={item?.likesCount}
-//                 // likesCount={likesData?.length}
-//                 videoNumber={index + 1}
-//                 openComments={openComments}
-//                 showComments={true}
-//                 countComments={item?.commentsCount}
-//                 showArrow
-//                 onArrowBack={() => navigation.goBack()}
-//                 onNameClick={() => {
-//                     if (user?.id !== item.user.id) {
-//                         dispatch(getOneUserAction(item.user.id));
-//                         navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, {
-//                             idUser: item.user.id,
-//                         });
-//                     }
-//                 }}
-
-
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Dimensions, FlatList } from 'react-native';
 import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { Gesture } from 'react-native-gesture-handler';
@@ -90,7 +38,7 @@ const FullVideoScreen = () => {
     const [durations, setDurations] = useState<{ [key: string]: number }>({});
     const [timeLefts, setTimeLefts] = useState<{ [key: string]: number }>({});
     const [initialLoading, setInitialLoading] = useState(true);
-    const [pausedVideo, setPausedVideo] = useState<boolean>(false);
+    const [pausedById, setPausedById] = useState<{ [key: string]: boolean }>({});
 
     const [showComments, setShowComments] = useState<boolean>(false);
     // Heart animation
@@ -139,9 +87,14 @@ const FullVideoScreen = () => {
         setTimeLefts((prev) => ({ ...prev, [id]: Math.floor(data.duration) }));
     };
 
+    const handleSingleTap = useCallback((videoId: string) => {
+        setPausedById(prev => ({
+            ...prev,
+            [videoId]: !prev[videoId],
+        }));
+    }, []);
 
-
-    const handleDoubleTap = (x: number, y: number, videoId: string, videoOwnerId: string) => {
+    const handleDoubleTap = useCallback((x: number, y: number, videoId: string, videoOwnerId: string) => {
         if (!videoId || !user?.id) { return; }
 
         tapX.value = x;
@@ -170,26 +123,34 @@ const FullVideoScreen = () => {
                 userId: videoOwnerId,
             }));
         }
-    };
+    }, [likesData, user?.id]);
 
-    // const singleTapGesture = Gesture.Tap()
-    //     .maxDuration(250)
-    //     .onEnd(() => {
-    //         runOnJS(setPausedVideo)((prev) => !prev);
-    //     });
+    const singleTapGesture = useCallback((videoId: string) =>
+        Gesture.Tap()
+            .maxDuration(250)
+            .onEnd(() => {
+                runOnJS(handleSingleTap)(videoId);
+            }), [handleSingleTap]);
 
-    const doubleTapGesture = (videoId: string, videoOwnerId: string) =>
+    const doubleTapGesture = useCallback((videoId: string, videoOwnerId: string) =>
         Gesture.Tap()
             .numberOfTaps(2)
             .onEnd((event) => {
                 runOnJS(handleDoubleTap)(event.x, event.y, videoId, videoOwnerId);
-            });
+            }), [handleDoubleTap]);
+
+    const combinedGesture = useCallback((item: VideoItemType) =>
+        Gesture.Exclusive(
+            doubleTapGesture(item.id, item.user.id),
+            singleTapGesture(item.id)
+        ), [doubleTapGesture, singleTapGesture]);
 
     const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
         if (viewableItems.length > 0) {
             const index = viewableItems[0].index;
             setCurrentIndex(index);
             scrollIndexRef.current = index;
+            setPausedById({});
         }
     }).current;
 
@@ -208,8 +169,9 @@ const FullVideoScreen = () => {
                         item={item}
                         index={index}
                         isActive={isActive}
+                        paused={pausedById[item.id] ?? false}
                         videoHeight={videoHeight}
-                        gesture={doubleTapGesture(item.id, item.user.id)}
+                        gesture={combinedGesture(item)}
                         onLoad={(data) => handleLoad(item.id, data)}
                         durations={durations}
                         setTimeLefts={setTimeLefts}

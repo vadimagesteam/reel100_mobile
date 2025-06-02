@@ -26,6 +26,7 @@ interface VideoAbsoluteInfoProps {
     showComments?: boolean
     showShare?: boolean
     countComments?: number | null
+    paused?: boolean
     openComments?: () => void
     onShare?: () => void
 }
@@ -49,6 +50,7 @@ const VideoAbsoluteInfo = ({
     showShare = false,
     showLike = true,
     countComments,
+    paused,
     openComments,
     onShare,
 }: VideoAbsoluteInfoProps) => {
@@ -59,7 +61,13 @@ const VideoAbsoluteInfo = ({
         <>
             {justInfo === 'FULL' ? (
                 <>
-
+                    {
+                        paused && (
+                            <View style={cs.playContainer}>
+                                <SvgIcon image="playIcon" color="white" style={cs.iconPlayStyle} />
+                            </View>
+                        )
+                    }
                     {showArrow && (<TouchableOpacity
                         style={[positionHelpers.absolute, positionHelpers.alignItemsCenterRow, cs.containerName, { top: videoCheckFull ? insets.top + 1 : 10, padding: 10 }]}
                         onPress={onArrowBack}
@@ -91,7 +99,7 @@ const VideoAbsoluteInfo = ({
                             showComments && (
                                 <View style={[positionHelpers.absolute, positionHelpers.alignCenter, cs.containerChat]}>
                                     <TouchableOpacity onPress={openComments} >
-                                        <SvgIcon image="commentIcon" color={colors.white} style={{ height: 24, width: 24 }} />
+                                        <SvgIcon image="commentIcon" color={colors.white} style={cs.iconStyle24} />
                                     </TouchableOpacity>
                                     <BodyText fontWeight={'bold'} fontSize={14} color={colors.white}>{countComments}</BodyText>
                                 </View>
@@ -100,11 +108,14 @@ const VideoAbsoluteInfo = ({
                         {
                             showShare && (
                                 <TouchableOpacity style={[positionHelpers.absolute, positionHelpers.alignCenter, cs.containerShare]} onPress={onShare} >
-                                    <SvgIcon image="shareIcon" color={colors.white} style={{ height: 24, width: 24 }} />
+                                    <SvgIcon image="shareIcon" color={colors.white} style={cs.iconStyle24} />
                                 </TouchableOpacity>
                             )
                         }
+
                     </View>
+
+
 
                     {/* Likes */}
                     {showLike && (
@@ -136,6 +147,7 @@ const VideoAbsoluteInfo = ({
                             )}
                         </>
                     )}
+
                 </>
             ) : (
                 <>
@@ -157,7 +169,8 @@ const VideoAbsoluteInfo = ({
                         <BodyText fontSize={16} fontWeight={'700'} color={colors.white}>{likesCount}</BodyText>
                     </View>
                 </>
-            )}
+            )
+            }
 
         </>
     );

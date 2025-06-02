@@ -15,6 +15,8 @@ type VideoItemContentProps = {
     muted?: boolean
     renderOverlay: () => ReactNode;
     videoStyle?: StyleProp<ViewStyle>
+    paused?: boolean
+    setPaused?: (val: boolean) => void
 };
 
 const VideoItemContent = ({
@@ -24,9 +26,10 @@ const VideoItemContent = ({
     onLoad,
     onProgress,
     gesture,
-    muted = true,
+    muted = false,
     renderOverlay,
     videoStyle,
+    paused,
 }: VideoItemContentProps) => {
     const videoRef = useRef<any>(null);
 
@@ -36,7 +39,6 @@ const VideoItemContent = ({
                 videoRef.current.seek(0);
             }, 50);
             return () => clearTimeout(timeout);
-
         }
     }, [isActive]);
 
@@ -46,7 +48,7 @@ const VideoItemContent = ({
                 <Video
                     ref={videoRef}
                     source={{ uri: item.file?.storagePath }}
-                    paused={!isActive}
+                    paused={!isActive || paused}
                     resizeMode="cover"
                     repeat
                     muted={muted}

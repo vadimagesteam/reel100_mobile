@@ -71,6 +71,23 @@ export const cs = StyleSheet.create({
         top: 40 * 2 + 15,
         right: 5,
     },
+    playContainer: {
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        position: 'absolute',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    iconPlayStyle: {
+        height: 50,
+        width: 50,
+    },
+    iconStyle24: {
+        height: 24,
+        width: 24,
+    },
 
     //SIMPLE
     containerNameSimple: {

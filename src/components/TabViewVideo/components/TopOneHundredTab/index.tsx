@@ -160,6 +160,7 @@ const TopOneHundredTab = () => {
                         item={item}
                         index={index}
                         isActive={isActive}
+                        muted={true}
                         videoHeight={videoHeight}
                         gesture={combinedGesture(item, index)}
                         onLoad={(data) => handleLoad(item.id, data)}
