@@ -149,3 +149,24 @@ export const getVideosTopAction = createAsyncThunk<any, GetVideosParams>(
         }
     },
 );
+
+
+export const videoTrackAction = createAsyncThunk<any, any>(
+    'camera/videoTrack',
+    async (videoId, thunkAPI) => {
+        try {
+            const response = await axios.patch(`api/videos/${videoId}/file`);
+
+            console.log('uploadVideoAction--->', JSON.stringify(response, null, 2));
+
+            return response?.data;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                if (error.response && error.response.data) {
+                    return thunkAPI.rejectWithValue(error.response.data);
+                } else {
+                }
+            }
+        }
+    },
+);

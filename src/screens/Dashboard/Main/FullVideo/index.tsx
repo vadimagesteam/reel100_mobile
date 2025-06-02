@@ -11,7 +11,7 @@ import { getOneUserAction } from '../../../../redux/UsersRedux/usersAction';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import { deleteLikeAction, getLikesAction, setLikeAction } from '../../../../redux/LikesRedux/likesAction';
 import { setPage } from '../../../../redux/CameraRedux/cameraSlice';
-import { getVideosTopAction } from '../../../../redux/CameraRedux/cameraActions';
+import { getVideosTopAction, videoTrackAction } from '../../../../redux/CameraRedux/cameraActions';
 import { useHeartAnimatedStyle } from '../../../../utils/animatedHeartStyle';
 import VideoListItem from '../../../../components/VideoScrollList/VideoListItem';
 import { VideoItemType } from '../../../../redux/CameraRedux/types';
@@ -77,7 +77,7 @@ const FullVideoScreen = () => {
     useEffect(() => {
         const currentVideo = videosTop100[currentIndex];
         if (currentVideo && user?.id) {
-            // dispatch(getVideoCommentsAction({ videoId: currentVideo.id, userId: videos[currentIndex]?.user?.id }));
+            dispatch(videoTrackAction(currentVideo.id));
             dispatch(getLikesAction({ userId: videosTop100[currentIndex]?.user?.id, videoId: currentVideo.id }));
         }
     }, [currentIndex]);
