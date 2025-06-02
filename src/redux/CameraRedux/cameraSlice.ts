@@ -93,13 +93,21 @@ const cameraSlice = createSlice({
                 state.loadingTopTab = false;
                 const PAGE_SIZE = 5;
                 const newVideos = action.payload || [];
-                if (state.page === 1) {
-                    state.videosTop100 = newVideos;
+
+                const uniqueNewVideos = newVideos.filter(
+                    v => !state.videosTop100.some(existing => existing.id === v.id)
+                );
+                const filteredData = uniqueNewVideos.filter(
+                    (video: any) => video?.file != null && typeof video.file === 'object' && !!video.file.storagePath
+                );
+
+                if (state.videosTop100.length === 0) {
+                    state.videosTop100 = filteredData;
                 } else {
-                    state.videosTop100 = [...state.videosTop100, ...newVideos];
+                    state.videosTop100 = [...state.videosTop100, ...filteredData];
                 }
+
                 state.hasMore = newVideos.length === PAGE_SIZE;
-                state.page += 1;
             })
             .addCase(getVideosTopAction.rejected, (state) => {
                 state.loadingTopTab = false;

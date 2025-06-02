@@ -1,21 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, FlatList, Dimensions, StyleSheet, ActivityIndicator } from 'react-native';
+import { FlatList, Dimensions } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { runOnJS, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { Gesture } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
 import { getVideosTopAction } from '../../../../redux/CameraRedux/cameraActions';
 import { positionHelpers } from '../../../../styles';
-import { formatTime } from '../../../../utils/formatTime';
 import { deleteLikeAction, getLikesAction, setLikeAction } from '../../../../redux/LikesRedux/likesAction';
-import { setHasMore } from '../../../../redux/CameraRedux/cameraSlice';
-import VideoAbsoluteInfo from '../../../VideoAbsoluteInfo';
+import { setPage } from '../../../../redux/CameraRedux/cameraSlice';
 import { VideoItemType } from '../../../../redux/CameraRedux/types';
-import { getOneUserAction } from '../../../../redux/UsersRedux/usersAction';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
-import VideoItemContent from './components/VideoItemContent';
 import { getVideoCommentsAction } from '../../../../redux/VideoRedux/videoAction';
+import { LoaderIndicator } from '../../../UI';
+import { useHeartAnimatedStyle } from './helpers/animatedHeartStyle';
+import VideoListItem from './components/VideoListItem';
 
 const { height } = Dimensions.get('window');
 const TAKE = 5;
@@ -26,10 +25,8 @@ const TopOneHundredTab = () => {
     const dispatch = useReduxDispatch();
     const { likesData } = useReduxSelector((state: RootState) => state.likes);
     const { user } = useReduxSelector((state: RootState) => state.auth);
-    const { videosTop100, page, hasMore } = useReduxSelector<any>((state: RootState) => state.camera);
+    const { videosTop100, page, hasMore, loadingTopTab } = useReduxSelector<any>((state: RootState) => state.camera);
     const scrollIndexRef = useRef(0);
-    const currentTimeRef = useRef(0);
-    const [loadingMore, setLoadingMore] = useState(false);
 
     const insets = useSafeAreaInsets();
     // const tabNavigationHeight = 70;
@@ -45,34 +42,17 @@ const TopOneHundredTab = () => {
     const tapX = useSharedValue(0);
     const tapY = useSharedValue(0);
 
+    const animatedStyle = useHeartAnimatedStyle(tapX, tapY, scale, opacity);
+
     useEffect(() => {
         if (
             hasMore &&
-            !loadingMore &&
             currentIndex >= videosTop100.length - 2
         ) {
-            loadVideos(page);
+            const skip = (page - 1) * TAKE;
+            dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
         }
-    }, [currentIndex, hasMore, loadingMore, page]);
-
-    const loadVideos = async (pageNumber: number) => {
-        if (loadingMore || !hasMore) { return; }
-
-        setLoadingMore(true);
-        try {
-            const skip = (pageNumber - 1) * TAKE;
-            const response = await dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
-            const newVideos = response?.payload || [];
-
-            if (newVideos.length < TAKE) {
-                dispatch(setHasMore(false));
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoadingMore(false);
-        }
-    };
+    }, [currentIndex, hasMore, page]);
 
     useEffect(() => {
         if (videosTop100.length === 0) { return; }
@@ -83,8 +63,10 @@ const TopOneHundredTab = () => {
     }, [currentIndex, user?.id, videosTop100]);
 
     const onEndReached = () => {
-        if (!loadingMore && hasMore) {
-            loadVideos(page);
+        if (!loadingTopTab && hasMore) {
+            const skip = (page - 1) * TAKE;
+            dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
+            dispatch(setPage(page + 1));
         }
     };
 
@@ -96,11 +78,6 @@ const TopOneHundredTab = () => {
             scrollIndexRef.current = index;
         }
     }).current;
-
-    const handleLoad = (id: string, data: { duration: number }) => {
-        setDurations((prev) => ({ ...prev, [id]: data.duration }));
-        setTimeLefts((prev) => ({ ...prev, [id]: Math.floor(data.duration) }));
-    };
 
     const handleSingleTap = (item: VideoItemType, index: number) => {
         dispatch(getVideoCommentsAction({ videoId: item?.id, userId: item?.user.id }));
@@ -115,7 +92,7 @@ const TopOneHundredTab = () => {
     const handleDoubleTap = (x: number, y: number, videoId: string, videoOwnerId: string) => {
         if (!videoId || !user?.id) { return; }
 
-        // Анімація серця
+        // animation heart
         tapX.value = x;
         tapY.value = y;
 
@@ -166,68 +143,37 @@ const TopOneHundredTab = () => {
     const combinedGesture = (item: VideoItemType, index: number) =>
         Gesture.Exclusive(doubleTapGesture(item.id, item.user.id), singleTapGesture(item, index));
 
-    // Animated style heart
-    const animatedStyle = useAnimatedStyle(() => ({
-        left: tapX.value - 40,
-        top: tapY.value - 40,
-        opacity: opacity.value,
-        transform: [{ scale: scale.value }],
-    }));
 
     const renderItem = ({ item, index }: { item: VideoItemType; index: number }) => {
         const isActive = index === currentIndex && isFocused;
+        const itemFile = item.file !== null;
 
         return (
             <>
-                {item.file !== null ? (
-                    <VideoItemContent
+                {itemFile ? (
+                    <VideoListItem
                         item={item}
+                        index={index}
                         isActive={isActive}
                         videoHeight={videoHeight}
-                        onLoad={(data) => handleLoad(item.id, data)}
-                        onProgress={(data) => {
-                            if (isActive) {
-                                currentTimeRef.current = data.currentTime;
-                                const duration = durations[item.id] || 0;
-                                setTimeLefts((prev) => ({
-                                    ...prev,
-                                    [item.id]: Math.max(0, Math.floor(duration - data.currentTime)),
-                                }));
-                            }
-                        }}
                         gesture={combinedGesture(item, index)}
-                        renderOverlay={() => (
-                            <VideoAbsoluteInfo
-                                avatar={''}
-                                name={`${item?.user?.firstName} ${item?.user?.lastName}`}
-                                videoDuration={formatTime(timeLefts[item.id] || 0)}
-                                likeCheck={likesData.some(like => like?.user?.id === user?.id)}
-                                likesCount={likesData.length}
-                                videoNumber={index + 1}
-                                onNameClick={() => {
-                                    if (user?.id !== item.user.id) {
-                                        dispatch(getOneUserAction(item.user.id));
-                                        navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, {
-                                            idUser: item.user.id,
-                                        });
-                                    }
-                                }}
-                            />
-                        )}
+                        durations={durations}
+                        setDurations={setDurations}
+                        setTimeLefts={setTimeLefts}
+                        timeLeft={timeLefts[item.id] || 0}
+                        likesData={likesData}
+                        likeCheck={likesData.some(like => like?.user?.id === user?.id)}
+                        animatedStyle={animatedStyle}
                     />
                 ) : null}
-                {/* Heart animation */}
-                <Animated.Text style={[positionHelpers.absolute, cs.animatedHeart, animatedStyle]}>❤️</Animated.Text>
             </>
         );
     };
 
     const renderFooter = () => {
-        if (!loadingMore) { return null; }
+        if (!loadingTopTab) { return null; }
         return (
-            <View style={cs.loadingStyle}>
-                <ActivityIndicator size="small" color="#fff" />
-            </View>
+            <LoaderIndicator variantTwo />
         );
     };
 
@@ -244,22 +190,12 @@ const TopOneHundredTab = () => {
             viewabilityConfig={viewabilityConfig}
             initialScrollIndex={scrollIndexRef.current}
             onEndReached={onEndReached}
-            onEndReachedThreshold={0.5}
+            onEndReachedThreshold={0.3}
             ListFooterComponent={renderFooter}
             style={positionHelpers.fill}
         />
     );
 };
-
-const cs = StyleSheet.create({
-    animatedHeart: {
-        fontSize: 35,
-    },
-    loadingStyle: {
-        padding: 10,
-        marginTop: 20,
-    },
-});
 
 export default TopOneHundredTab;
 

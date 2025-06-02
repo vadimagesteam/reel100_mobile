@@ -14,9 +14,8 @@ import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 import VideoAbsoluteInfo from '../../../../components/VideoAbsoluteInfo';
 import { deleteLikeAction, getLikesAction, setLikeAction } from '../../../../redux/LikesRedux/likesAction';
 import { cs } from './styles';
-import { getVideoCommentsAction } from '../../../../redux/VideoRedux/videoAction';
 import VideoItemContent from '../../../../components/TabViewVideo/components/TopOneHundredTab/components/VideoItemContent';
-import { setHasMore } from '../../../../redux/CameraRedux/cameraSlice';
+import { setPage } from '../../../../redux/CameraRedux/cameraSlice';
 import { getVideosTopAction } from '../../../../redux/CameraRedux/cameraActions';
 
 
@@ -29,11 +28,10 @@ const FullVideoScreen = () => {
     const route = useRoute<any>();
     const isFocused = useIsFocused();
 
-    const { initialIndex, videoIdParam, userIdParam } = route.params;
-    const { countComments } = useReduxSelector((state: RootState) => state.video);
+    const { initialIndex } = route.params;
     const { likesData } = useReduxSelector((state) => state.likes);
     const { user } = useReduxSelector((state) => state.auth);
-    const { videosTop100, page, hasMore } = useReduxSelector((state: RootState) => state.camera);
+    const { videosTop100, page, hasMore, loadingTopTab } = useReduxSelector((state: RootState) => state.camera);
 
     const videoHeight = height;
 
@@ -53,7 +51,6 @@ const FullVideoScreen = () => {
     const opacity = useSharedValue(1);
     const tapX = useSharedValue(0);
     const tapY = useSharedValue(0);
-    const [loadingMore, setLoadingMore] = useState(false);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -65,35 +62,18 @@ const FullVideoScreen = () => {
     useEffect(() => {
         if (
             hasMore &&
-            !loadingMore &&
             currentIndex >= videosTop100.length - 2
         ) {
-            loadVideos(page);
+            const skip = (page - 1) * TAKE;
+            dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
         }
-    }, [currentIndex, hasMore, loadingMore, page]);
-
-    const loadVideos = async (pageNumber: number) => {
-        if (loadingMore || !hasMore) { return; }
-
-        setLoadingMore(true);
-        try {
-            const skip = (pageNumber - 1) * TAKE;
-            const response = await dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
-            const newVideos = response?.payload || [];
-
-            if (newVideos.length < TAKE) {
-                dispatch(setHasMore(false));
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoadingMore(false);
-        }
-    };
+    }, [currentIndex, hasMore, page]);
 
     const onEndReached = () => {
-        if (!loadingMore && hasMore) {
-            loadVideos(page);
+        if (!loadingTopTab && hasMore) {
+            const skip = (page - 1) * TAKE;
+            dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
+            dispatch(setPage(page + 1));
         }
     };
 
@@ -203,7 +183,7 @@ const FullVideoScreen = () => {
                             name={`${item.user?.firstName} ${item.user?.lastName}`}
                             videoDuration={formatTime(timeLefts[item.id] || 0)}
                             likeCheck={likesData.some(like => like.user?.id === user?.id)}
-                            likesCount={likesData.length}
+                            likesCount={item?.likesCount}
                             // likesCount={likesData?.length}
                             videoNumber={index + 1}
                             openComments={openComments}
@@ -230,7 +210,7 @@ const FullVideoScreen = () => {
     };
 
     const renderFooter = () => {
-        if (!loadingMore) { return null; }
+        if (!loadingTopTab) { return null; }
         return (
             <View style={cs.loadingStyle}>
                 <ActivityIndicator size="small" color="#fff" />
