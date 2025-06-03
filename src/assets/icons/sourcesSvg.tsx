@@ -340,6 +340,60 @@ const gellaryCameraIcon = {
     viewBox: '0 0 24 24',
 };
 
+const commentIcon = {
+    Draw: ({ color = colors.black }) => (
+        <Path
+            fill={color}
+            d="M16 7.5c0 3.59-3.581 6.5-8 6.5a9.613 9.613 0 0 1-2.8-.41L.5 15l1.278-3.412C.666 10.472 0 9.05 0 7.5 0 3.91 3.581 1 8 1c4.419 0 8 2.91 8 6.5Zm-12 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm4 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm5-1a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"
+        />
+    ),
+    height: 16,
+    width: 16,
+    viewBox: '0 0 16 16',
+};
+
+const shareIcon = {
+    Draw: ({ color = colors.black }) => (
+        <>
+            <G clipPath="url(#a)">
+                <Path
+                    fill={color}
+                    d="M13 10h-1V7H10.953A2.953 2.953 0 0 0 8 9.953C8 11.181 9 12 9 12s-4-1.228-4-4.5C5 5.016 7.016 3 9.5 3H12V0h1l5 5-5 5ZM0 1h5v2H2v11h11v-2h2v4H0V1Z"
+                />
+            </G>
+            <Defs>
+                <ClipPath id="a">
+                    <Path fill="#fff" d="M0 0h18v16H0z" />
+                </ClipPath>
+            </Defs>
+        </>
+    ),
+    height: 16,
+    width: 18,
+    viewBox: '0 0 18 16',
+};
+
+const playIcon = {
+    Draw: ({ color = colors.black }) => (
+        <>
+            <G clipPath="url(#a)">
+                <Path
+                    fill={color}
+                    d="M8 16A8 8 0 1 0 8-.001 8 8 0 0 0 8 16Zm4-8-6.5 4V4L12 8Z"
+                />
+            </G>
+            <Defs>
+                <ClipPath id="a">
+                    <Path fill="#fff" d="M0 0h16v16H0z" />
+                </ClipPath>
+            </Defs>
+        </>
+    ),
+    height: 16,
+    width: 16,
+    viewBox: '0 0 16 16',
+};
+
 export default {
     backArrow,
     eyeShow,
@@ -361,4 +415,7 @@ export default {
     flashIcon,
     flashNoIcon,
     gellaryCameraIcon,
+    commentIcon,
+    shareIcon,
+    playIcon,
 };

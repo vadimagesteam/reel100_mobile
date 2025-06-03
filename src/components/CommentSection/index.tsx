@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, TextInput, TouchableOpacity, View, Platform, KeyboardAvoidingView, Image, ListRenderItem } from 'react-native';
-import { BodyText } from '../UI';
+import { BodyText, LoaderIndicator } from '../UI';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../store/store';
 import { createVideoCommentAction, getVideoCommentsAction } from '../../redux/VideoRedux/videoAction';
 import { colors, positionHelpers } from '../../styles';
@@ -24,6 +24,14 @@ const CommentSection = ({ videoId, userId, onClose }: CommentSectionProps) => {
     const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
     // const [skip, setSkip] = useState(0);
     // const take = 10;
+    const [initialLoading, setInitialLoading] = useState(true);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setInitialLoading(false);
+        }, 800);
+        return () => clearTimeout(timeout);
+    }, []);
 
     useEffect(() => {
         dispatch(getVideoCommentsAction({ videoId, userId }));
@@ -198,20 +206,24 @@ const CommentSection = ({ videoId, userId, onClose }: CommentSectionProps) => {
                 <View
                     style={positionHelpers.fill}
                 >
-                    {videoComments?.length === 0 ? (
-                        <View style={cs.emptyContainer}>
-                            <BodyText fontSize={14} color={colors.white}>Comments will appear here</BodyText>
-                        </View>
-                    ) : (
-                        <FlatList
-                            data={visibleFlatComments}
-                            keyExtractor={(item) => item.id}
-                            renderItem={renderFlatComment}
-                            contentContainerStyle={cs.p16}
-                            keyboardShouldPersistTaps="handled"
-                            showsVerticalScrollIndicator={false}
-                        />
-                    )}
+                    {initialLoading ?
+                        <LoaderIndicator /> : (
+                            <>
+                                {videoComments?.length === 0 ? (
+                                    <View style={cs.emptyContainer}>
+                                        <BodyText fontSize={14} color={colors.white}>Comments will appear here</BodyText>
+                                    </View>
+                                ) : (
+                                    <FlatList
+                                        data={visibleFlatComments}
+                                        keyExtractor={(item) => item.id}
+                                        renderItem={renderFlatComment}
+                                        contentContainerStyle={cs.p16}
+                                        keyboardShouldPersistTaps="handled"
+                                        showsVerticalScrollIndicator={false}
+                                    />
+                                )}
+                            </>)}
                 </View>
 
                 {replyToCommentId && (

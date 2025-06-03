@@ -7,7 +7,6 @@ const initialState: VideoState = {
     loading: false,
     videoComments: [],
     oneVideoData: [],
-    countComments: null,
     error: null,
 };
 
@@ -44,7 +43,6 @@ export const videoSlice = createSlice({
                 (state, action: PayloadAction<CommentType[]>) => {
                     state.loading = false;
                     state.videoComments = action?.payload.reverse();
-                    state.countComments = action?.payload?.length;
                 },
             )
             .addCase(

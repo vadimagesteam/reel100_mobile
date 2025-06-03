@@ -2,7 +2,6 @@ export interface VideoState {
     loading: boolean;
     videoComments: CommentType[]
     oneVideoData: any[]
-    countComments: number | null
     error: Error | null;
 }
 

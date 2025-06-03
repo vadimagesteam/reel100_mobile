@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { DASHBOARD_ROUTES } from '../../routes';
 import UserProfileScreen from '../../../screens/Dashboard/UserProfileScreen';
 import FourUScreen from '../../../screens/Dashboard/FourU/FourUScreen';
+import ChatScreen from '../../../screens/Dashboard/Chat/ChatScreen';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,10 @@ const FourUStack = () => {
             <Stack.Screen
                 name={DASHBOARD_ROUTES.USER_PROFILE_SCREEN}
                 component={UserProfileScreen}
+            />
+            <Stack.Screen
+                name={DASHBOARD_ROUTES.CHAT_SCREEN}
+                component={ChatScreen}
             />
         </Stack.Navigator>
     );

@@ -1,360 +1,252 @@
-// import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-// import { View, Dimensions, FlatList, ActivityIndicator, InteractionManager } from 'react-native';
-// import { useRoute } from '@react-navigation/native';
-// import { cs } from './styles';
-// import FullVideoItem from './components/FullVideoItem';
-// import { formatTime } from '../../../../utils/formatTime';
-// import { RootState, useReduxSelector } from '../../../../store/store';
-// import { debounce } from '../../../../utils/debounce';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { Dimensions, FlatList } from 'react-native';
+import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { Gesture } from 'react-native-gesture-handler';
+import { runOnJS, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
+import CommentSection from '../../../../components/CommentSection';
+import { positionHelpers } from '../../../../styles';
+import { LoaderIndicator } from '../../../../components/UI';
+import { getOneUserAction } from '../../../../redux/UsersRedux/usersAction';
+import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
+import { deleteLikeAction, getLikesAction, setLikeAction } from '../../../../redux/LikesRedux/likesAction';
+import { setPage } from '../../../../redux/CameraRedux/cameraSlice';
+import { getVideosTopAction, videoTrackAction } from '../../../../redux/CameraRedux/cameraActions';
+import { useHeartAnimatedStyle } from '../../../../utils/animatedHeartStyle';
+import VideoListItem from '../../../../components/VideoScrollList/VideoListItem';
+import { VideoItemType } from '../../../../redux/CameraRedux/types';
 
-// const { height } = Dimensions.get('window');
-// const screenWidth = Dimensions.get('window').width;
-// const videoHeight = screenWidth / 0.5625;
-
-
-// const FullVideoScreen = () => {
-//     const { params } = useRoute<any>();
-//     const { selectedId, index: initialIndex } = params;
-//     const flatListRef = useRef(null);
-//     const { videos } = useReduxSelector((state: RootState) => state?.camera);
-//     // const validIndex = initialIndex >= 0 && initialIndex < videos.length ? initialIndex : 0;
-//     // const [currentIndex, setCurrentIndex] = React.useState(validIndex);
-//     const [currentIndex, setCurrentIndex] = useState<number>(initialIndex);
-//     const [_, setVideoStartTimes] = useState<Record<string, number>>({});
-//     const [durations, setDurations] = useState<Record<string, number>>({});
-//     const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
-//     const [isReady, setIsReady] = useState<boolean>(false);
-
-//     const [listReady, setListReady] = useState(false);
-//     const [layoutHeight, setLayoutHeight] = useState(0);
-
-//     const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
-//     console.log('videos--FULL>>>>>', videos, selectedId);
-
-//     // useEffect(() => {
-//     //     if (!selectedId || !videos.length || layoutHeight === 0) { return; }
-
-//     //     const index = videos.findIndex((v) => v.id === selectedId);
-//     //     if (index === -1) { return; }
-
-//     //     setCurrentIndex(index);
-
-//     //     InteractionManager.runAfterInteractions(() => {
-//     //         setTimeout(() => {
-//     //             flatListRef.current?.scrollToIndex({ index, animated: false });
-//     //             setListReady(true); // тільки тепер рендеримо відео
-//     //         }, 300);
-//     //     });
-//     // }, [selectedId, videos, layoutHeight]);
-
-//     useEffect(() => {
-//         const interval = setInterval(() => {
-//             if (currentIndex !== null) {
-//                 const id = videos[currentIndex]?.id;
-//                 if (id) {
-//                     setRemainingSeconds(prev => {
-//                         const current = prev[id];
-//                         if (current > 0) {
-//                             return {
-//                                 ...prev,
-//                                 [id]: current - 1,
-//                             };
-//                         }
-//                         return prev;
-//                     });
-//                 }
-//             }
-//         }, 1000);
-
-//         return () => clearInterval(interval);
-//     }, [currentIndex]);
-
-//     const reorderedVideos = useMemo(() => {
-//         if (!selectedId) { return videos; }
-
-//         const index = videos.findIndex(video => video.id === selectedId);
-//         if (index === -1) { return videos; }
-
-//         return [...videos.slice(index), ...videos.slice(0, index)];
-//     }, [videos, selectedId]);
-
-//     const idToOriginalIndex = useMemo(() => {
-//         const map: Record<string, number> = {};
-//         videos.forEach((v, i) => {
-//             map[v.id] = i;
-//         });
-//         return map;
-//     }, [videos]);
-
-//     //Save duration video
-//     const handleVideoLoad = useCallback((id: string, duration: number) => {
-//         setDurations(prev => ({ ...prev, [id]: duration }));
-//         setRemainingSeconds(prev => ({ ...prev, [id]: Math.floor(duration) }));
-//         setVideoStartTimes(prev => ({ ...prev, [id]: 0 }));
-//     }, []);
-
-//     //Repeat duration video
-//     const onVideoRepeat = useCallback((id: string) => {
-//         const duration = durations[id];
-//         if (duration) {
-//             setRemainingSeconds(prev => ({
-//                 ...prev,
-//                 [id]: Math.floor(duration),
-//             }));
-//             setVideoStartTimes(prev => ({
-//                 ...prev,
-//                 [id]: 0,
-//             }));
-//         }
-//     }, [durations]);
-
-//     const onViewableItemsChanged = useRef(
-//         debounce(({ viewableItems }: { viewableItems: any[] }) => {
-//             const newIndex = viewableItems[0].index;
-//             const newId = viewableItems[0].item.id;
-//             // const visibleIds = viewableItems.flatMap(({ item, index }) =>
-//             //     item.items.map((video: any, videoIndex: number) => `${index}-${videoIndex}-${video.id}`)
-//             // );
-//             setCurrentIndex(newIndex);
-//             onVideoRepeat(newId);
-//         }, 100)
-//     );
-
-
-//     // const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
-//     //     if (viewableItems.length > 0) {
-//     //         const newIndex = viewableItems[0].index;
-//     //         const newId = viewableItems[0].item.id;
-//     //         setCurrentIndex(newIndex);
-//     //         onVideoRepeat(newId);
-//     //     }
-//     // }, [onVideoRepeat]);
-
-//     // const viewabilityConfig = {
-//     //     itemVisiblePercentThreshold: 50,
-//     // };
-
-//     const renderItem = ({ item, index }: { item: any, index: number }) => {
-//         if (!listReady) { return null; } // рендеримо тільки коли список готовий
-
-//         const isFocused = index !== currentIndex;
-//         return (
-//             <>
-//                 {item.file !== null && Math.abs(index - currentIndex) <= 1 ? (
-//                     <FullVideoItem
-//                         videoUri={item.file?.storagePath}
-//                         videoAvatar={item?.avatar}
-//                         videoName={item?.fullname}
-//                         videoNumber={item?.list_number}
-//                         videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
-//                         onVideoLoad={(duration) => {
-//                             setIsReady(true);
-//                             handleVideoLoad(item.id, duration);
-//                         }}
-//                         likesCount={item?.like_count}
-//                         // paused={index === currentIndex}
-//                         // paused={index === currentIndex}
-//                         paused={!isFocused}
-//                         // paused={index !== currentIndex}
-//                         onVideoRepeat={() => onVideoRepeat(item?.id)}
-//                     />
-//                 ) : null}
-
-//             </>
-//         );
-//     };
-
-//     return (
-//         <View style={cs.container} onLayout={(e) => {
-//             setLayoutHeight(e.nativeEvent.layout.height); // визначаємо height
-//         }}>
-//             {/* <FlatList
-//                 ref={flatListRef}
-//                 data={videos}
-//                 keyExtractor={(item) => item.id}
-//                 renderItem={renderItem}
-//                 horizontal={false}
-//                 pagingEnabled
-//                 // initialScrollIndex={initialIndex}
-//                 onViewableItemsChanged={onViewableItemsChanged}
-//                 viewabilityConfig={viewabilityConfig}
-//                 showsVerticalScrollIndicator={false}
-//                 getItemLayout={(_, index) => ({
-//                     length: height,
-//                     offset: height * index,
-//                     index,
-//                 })}
-//             /> */}
-//             {!isReady && (
-//                 <ActivityIndicator size="large" color="#fff" style={{ position: 'absolute', top: '50%', left: '50%' }} />
-//             )}
-//             <FlatList
-//                 ref={flatListRef}
-//                 data={reorderedVideos}
-//                 keyExtractor={(item) => item.id}
-//                 renderItem={renderItem}
-//                 pagingEnabled
-//                 showsVerticalScrollIndicator={false}
-//                 initialNumToRender={3}
-//                 windowSize={5}
-//                 getItemLayout={(_, index) => ({
-//                     length: height,
-//                     offset: height * index,
-//                     index,
-//                 })}
-
-//                 // // initialScrollIndex={selectedId}
-//                 // onViewableItemsChanged={idToOriginalIndex}
-//                 onViewableItemsChanged={onViewableItemsChanged.current}
-//                 viewabilityConfig={viewabilityConfig}
-//                 onScrollToIndexFailed={({ index }) => {
-//                     setTimeout(() => {
-//                         flatListRef.current?.scrollToIndex({ index, animated: false });
-//                     }, 100);
-//                 }}
-
-//             />
-
-//         </View>
-//     );
-// };
-
-// export default FullVideoScreen;
-
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, ActivityIndicator, useWindowDimensions, InteractionManager } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { cs } from './styles';
-import FullVideoItem from './components/FullVideoItem';
-import { formatTime } from '../../../../utils/formatTime';
-import { RootState, useReduxSelector } from '../../../../store/store';
-import { debounce } from '../../../../utils/debounce';
+const { height } = Dimensions.get('window');
+const TAKE = 5;
 
 const FullVideoScreen = () => {
-    const { params } = useRoute<any>();
-    const { selectedId } = params;
+    const dispatch = useReduxDispatch();
+    const isFocused = useIsFocused();
+    const navigation = useNavigation<any>();
+    const route = useRoute<any>();
+    const { initialIndex } = route.params;
+    const { likesData } = useReduxSelector((state) => state.likes);
+    const { user } = useReduxSelector((state) => state.auth);
+    const { videosTop100, page, hasMore, loadingTopTab } = useReduxSelector((state: RootState) => state.camera);
+
+    const videoHeight = height;
+
     const flatListRef = useRef<FlatList>(null);
-    const { videos } = useReduxSelector((state: RootState) => state?.camera);
+    const scrollIndexRef = useRef(initialIndex);
 
-    const [currentIndex, setCurrentIndex] = useState<number>(0);
-    const [videoStartTimes, setVideoStartTimes] = useState<Record<string, number>>({});
-    const [durations, setDurations] = useState<Record<string, number>>({});
-    const [remainingSeconds, setRemainingSeconds] = useState<Record<string, number>>({});
-    const [isReady, setIsReady] = useState(false);
-    const [listReady, setListReady] = useState(false);
-    const [layoutHeight, setLayoutHeight] = useState(0);
-    const { height } = useWindowDimensions();
+    const [currentIndex, setCurrentIndex] = useState<number>(initialIndex);
+    const [durations, setDurations] = useState<{ [key: string]: number }>({});
+    const [timeLefts, setTimeLefts] = useState<{ [key: string]: number }>({});
+    const [initialLoading, setInitialLoading] = useState(true);
+    const [pausedById, setPausedById] = useState<{ [key: string]: boolean }>({});
 
-    const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
+    const [showComments, setShowComments] = useState<boolean>(false);
+    // Heart animation
+    const scale = useSharedValue(0);
+    const opacity = useSharedValue(1);
+    const tapX = useSharedValue(0);
+    const tapY = useSharedValue(0);
 
-    // Find the initial index of the selected video
-    const initialIndex = useMemo(() => {
-        return selectedId ? videos.findIndex((v) => v.id === selectedId) : 0;
-    }, [selectedId, videos]);
+    const animatedStyle = useHeartAnimatedStyle(tapX, tapY, scale, opacity);
 
-    // Scroll to the selected video after measuring the layout
     useEffect(() => {
-        if (!videos.length || layoutHeight === 0) { return; }
-
-        const validIndex = initialIndex >= 0 && initialIndex < videos.length ? initialIndex : 0;
-        setCurrentIndex(validIndex);
-
-        InteractionManager.runAfterInteractions(() => {
-            setTimeout(() => {
-                // Calculate the offset based on the index
-                const offset = validIndex * height;
-                flatListRef.current?.scrollToOffset({ offset, animated: false });
-                setListReady(true);
-            }, 300);
-        });
-    }, [initialIndex, videos, layoutHeight]);
-
-    // Handle video load to set the video duration and remaining seconds
-    const handleVideoLoad = useCallback((id: string, duration: number) => {
-        setDurations(prev => ({ ...prev, [id]: duration }));
-        setRemainingSeconds(prev => ({ ...prev, [id]: Math.floor(duration) }));
-        setVideoStartTimes(prev => ({ ...prev, [id]: 0 }));
+        const timeout = setTimeout(() => {
+            setInitialLoading(false);
+        }, 1000);
+        return () => clearTimeout(timeout);
     }, []);
 
-    // Handle video repeat action by resetting the remaining time
-    const onVideoRepeat = useCallback((id: string) => {
-        const duration = durations[id];
-        if (duration) {
-            setRemainingSeconds(prev => ({ ...prev, [id]: Math.floor(duration) }));
-            setVideoStartTimes(prev => ({ ...prev, [id]: 0 }));
+    useEffect(() => {
+        if (
+            hasMore &&
+            currentIndex >= videosTop100.length - 2
+        ) {
+            const skip = (page - 1) * TAKE;
+            dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
         }
-    }, [durations]);
+    }, [currentIndex, hasMore, page]);
 
-    // Viewable items changed handler with debouncing
-    const onViewableItemsChanged = useRef(
-        debounce(({ viewableItems }: { viewableItems: any[] }) => {
-            if (viewableItems.length > 0) {
-                const newIndex = viewableItems[0].index ?? 0;
-                setCurrentIndex(newIndex);
-            }
-        }, 100)
-    );
+    const onEndReached = () => {
+        if (!loadingTopTab && hasMore) {
+            const skip = (page - 1) * TAKE;
+            dispatch(getVideosTopAction({ skip, take: TAKE, orderBy: { createdAt: 'desc' } }));
+            dispatch(setPage(page + 1));
+        }
+    };
 
-    const renderItem = ({ item, index }: { item: any; index: number }) => {
-        if (!listReady) { return null; }
+    useEffect(() => {
+        const currentVideo = videosTop100[currentIndex];
+        if (currentVideo && user?.id) {
+            dispatch(videoTrackAction(currentVideo.id));
+            dispatch(getLikesAction({ userId: videosTop100[currentIndex]?.user?.id, videoId: currentVideo.id }));
+        }
+    }, [currentIndex]);
 
-        const isFocused = index !== currentIndex;
+    const handleLoad = (id: string, data: { duration: number }) => {
+        setDurations((prev) => ({ ...prev, [id]: data.duration }));
+        setTimeLefts((prev) => ({ ...prev, [id]: Math.floor(data.duration) }));
+    };
+
+    const handleSingleTap = useCallback((videoId: string) => {
+        setPausedById(prev => ({
+            ...prev,
+            [videoId]: !prev[videoId],
+        }));
+    }, []);
+
+    const handleDoubleTap = useCallback((x: number, y: number, videoId: string, videoOwnerId: string) => {
+        if (!videoId || !user?.id) { return; }
+
+        tapX.value = x;
+        tapY.value = y;
+        scale.value = 1;
+        opacity.value = 1;
+
+        scale.value = withSpring(1.2, { damping: 5, stiffness: 100 }, () => {
+            scale.value = withTiming(0, { duration: 500 });
+            opacity.value = withTiming(0, { duration: 500 });
+        });
+
+        const existingLike = likesData.find(
+            (like) => like.user?.id === user.id && like.video?.id === videoId
+        );
+
+        if (existingLike) {
+            dispatch(deleteLikeAction({ id: existingLike.id, userId: videoOwnerId, videoId }));
+        } else {
+            dispatch(setLikeAction({
+                dataLike: {
+                    typeField: 'Like',
+                    user: { id: user.id },
+                    video: { id: videoId },
+                },
+                userId: videoOwnerId,
+            }));
+        }
+    }, [likesData, user?.id]);
+
+    const singleTapGesture = useCallback((videoId: string) =>
+        Gesture.Tap()
+            .maxDuration(250)
+            .onEnd(() => {
+                runOnJS(handleSingleTap)(videoId);
+            }), [handleSingleTap]);
+
+    const doubleTapGesture = useCallback((videoId: string, videoOwnerId: string) =>
+        Gesture.Tap()
+            .numberOfTaps(2)
+            .onEnd((event) => {
+                runOnJS(handleDoubleTap)(event.x, event.y, videoId, videoOwnerId);
+            }), [handleDoubleTap]);
+
+    const combinedGesture = useCallback((item: VideoItemType) =>
+        Gesture.Exclusive(
+            doubleTapGesture(item.id, item.user.id),
+            singleTapGesture(item.id)
+        ), [doubleTapGesture, singleTapGesture]);
+
+    const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+        if (viewableItems.length > 0) {
+            const index = viewableItems[0].index;
+            setCurrentIndex(index);
+            scrollIndexRef.current = index;
+            setPausedById({});
+        }
+    }).current;
+
+    const openComments = () => {
+        setShowComments(true);
+    };
+
+    const renderItem = ({ item, index }: { item: VideoItemType; index: number }) => {
+        const isActive = index === currentIndex && isFocused;
+        const itemFile = item.file !== null;
+
         return (
-            item.file && Math.abs(index - currentIndex) <= 1 && (
-                <FullVideoItem
-                    videoUri={item.file?.storagePath}
-                    videoAvatar={item?.avatar}
-                    videoName={item?.fullname}
-                    videoNumber={item?.list_number}
-                    videoDuration={formatTime(remainingSeconds[item.id] ?? 0)}
-                    onVideoLoad={(duration) => {
-                        setIsReady(true);
-                        handleVideoLoad(item.id, duration);
-                    }}
-                    likesCount={item?.like_count}
-                    paused={!isFocused}
-                    onVideoRepeat={() => onVideoRepeat(item?.id)}
-                />
-            )
+            <>
+                {itemFile ? (
+                    <VideoListItem
+                        item={item}
+                        index={index}
+                        isActive={isActive}
+                        paused={pausedById[item.id] ?? false}
+                        videoHeight={videoHeight}
+                        gesture={combinedGesture(item)}
+                        onLoad={(data) => handleLoad(item.id, data)}
+                        durations={durations}
+                        setTimeLefts={setTimeLefts}
+                        timeLeft={timeLefts[item.id] || 0}
+                        likesData={likesData}
+                        likeCheck={likesData.some(like => like?.user?.id === user?.id)}
+                        videoCheck="FULL"
+                        openComments={openComments}
+                        showComments={true}
+                        countComments={item?.commentsCount}
+                        showArrow
+                        onArrowBack={() => navigation.goBack()}
+                        onNameClick={() => {
+                            if (user?.id !== item.user.id) {
+                                dispatch(getOneUserAction(item.user.id));
+                                navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, {
+                                    idUser: item.user.id,
+                                });
+                            }
+                        }}
+                        showShare={true}
+                        animatedStyle={animatedStyle}
+                    />
+                ) : null}
+            </>
+        );
+    };
+
+    const renderFooter = () => {
+        if (!loadingTopTab) { return null; }
+        return (
+            <LoaderIndicator variantTwo />
         );
     };
 
     return (
-        <View style={cs.container} onLayout={(e) => setLayoutHeight(e.nativeEvent.layout.height)}>
-            {!isReady && (
-                <ActivityIndicator
-                    size="large"
-                    color="#fff"
-                    style={{ position: 'absolute', top: '50%', left: '50%' }}
-                />
-            )}
-
+        <>
+            {initialLoading && <LoaderIndicator />}
             <FlatList
                 ref={flatListRef}
-                data={videos}
-                keyExtractor={(item) => item.id}
+                data={videosTop100}
+                keyExtractor={(item) => item.id.toString()}
                 renderItem={renderItem}
                 pagingEnabled
+                snapToInterval={videoHeight}
+                decelerationRate="fast"
                 showsVerticalScrollIndicator={false}
-                initialNumToRender={3}
-                windowSize={5}
-                initialScrollIndex={currentIndex}
-                getItemLayout={(_, index) => ({
-                    length: height,
-                    offset: height * index,
+                initialScrollIndex={videosTop100.length > initialIndex ? initialIndex : 0}
+                getItemLayout={(data, index) => ({
+                    length: videoHeight,
+                    offset: videoHeight * index,
                     index,
                 })}
-                onViewableItemsChanged={onViewableItemsChanged.current}
-                viewabilityConfig={viewabilityConfig}
+                onViewableItemsChanged={onViewableItemsChanged}
                 onScrollToIndexFailed={({ index }) => {
                     setTimeout(() => {
-                        flatListRef.current?.scrollToOffset({ offset: index * height, animated: false });
+                        flatListRef.current?.scrollToIndex({ index, animated: false });
                     }, 100);
                 }}
+                scrollEnabled={!showComments}
+                style={positionHelpers.fill}
+                onEndReached={onEndReached}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={renderFooter}
             />
-        </View>
+            {showComments && (
+                <CommentSection
+                    videoId={videosTop100[currentIndex]?.id}
+                    userId={videosTop100[currentIndex]?.user?.id}
+                    onClose={() => setShowComments(false)}
+                />
+            )}
+        </>
     );
 };
 
-export default FullVideoScreen;
 
+export default FullVideoScreen;

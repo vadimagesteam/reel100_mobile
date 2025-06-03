@@ -10,8 +10,18 @@ export const cs = StyleSheet.create({
         height: 70,
         borderRadius: 10,
     },
-    maxWidth30: {
-        maxWidth: '30%',
+    minWidth60: {
+        width: 120,
+    },
+    containerChat: {
+        justifyContent: 'flex-end',
+        paddingBottom: 20,
+        paddingRight: 20,
+
+    },
+    chatIcon: {
+        height: 25,
+        width: 25,
     },
     h100: {
         height: '100%',

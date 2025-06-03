@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { BodyText } from '../../../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../../../components/UI';
 import { colors, positionHelpers } from '../../../../../../styles';
 
 interface ProfileInfoProps {
@@ -8,14 +8,20 @@ interface ProfileInfoProps {
     followerCount: number | undefined
     likeCount: number | undefined
     followCount: number | undefined
+    onChatPress: () => void
 }
 
-const ProfileInfo = ({ fullName, followerCount, likeCount, followCount }: ProfileInfoProps) => {
+const ProfileInfo = ({ fullName, followerCount, likeCount, followCount, onChatPress }: ProfileInfoProps) => {
     return (
         <>
-            <View style={[positionHelpers.mt20, positionHelpers.alignItemsCenterRow]}>
-                <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }} style={{ height: 60, width: 60 }} />
-                <BodyText fontWeight={'bold'} marginLeft={5} fontSize={16} color={colors.silver4}>{fullName}</BodyText>
+            <View style={[positionHelpers.mt20, positionHelpers.rowFillCenter]}>
+                <View style={positionHelpers.alignItemsCenterRow}>
+                    <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }} style={{ height: 60, width: 60 }} />
+                    <BodyText fontWeight={'bold'} marginLeft={5} fontSize={16} color={colors.silver4}>{fullName}</BodyText>
+                </View>
+                <TouchableOpacity onPress={onChatPress}>
+                    <SvgIcon image="commentIcon" color={colors.white} style={cs.chatIcon} />
+                </TouchableOpacity>
             </View>
 
             <View style={[positionHelpers.mt15, positionHelpers.alignItemsCenterRow, cs.containerStats]}>
@@ -44,6 +50,10 @@ const cs = StyleSheet.create({
     },
     h100: {
         height: '100%',
+    },
+    chatIcon: {
+        height: 25,
+        width: 25,
     },
 });
 export default ProfileInfo;

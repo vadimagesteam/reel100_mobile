@@ -23,6 +23,10 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
         (r) =>
             r.name === DASHBOARD_ROUTES.FULL_VIDEO_SCREEN ||
             r.name === DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN
+        // ||
+        // r.name === DASHBOARD_ROUTES.CHAT_LIST_SCREEN ||
+        // r.name === DASHBOARD_ROUTES.CHAT_SCREEN ||
+        // r.name === DASHBOARD_ROUTES.CHAT_USER_SCREEN
     );
 
     if (isHiddenScreens) {

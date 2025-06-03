@@ -8,14 +8,14 @@ import { getOneUserAction } from '../UsersRedux/usersAction';
 export const setLikeAction = createAsyncThunk<LikeResponseType, LikeBodyType>(
     'likes/setLike',
     async (likesBodyData, thunkAPI) => {
-        const { dataLike } = likesBodyData;
+        const { dataLike, userId } = likesBodyData;
         try {
             const response = await axios.post('/api/reactions', dataLike);
 
             if (response?.status === 201) {
-                thunkAPI.dispatch(getLikesAction({ userId: dataLike?.user?.id, videoId: dataLike?.video?.id }));
+                thunkAPI.dispatch(getLikesAction({ userId: userId, videoId: dataLike?.video?.id }));
                 thunkAPI.dispatch(getUserInfoAction());
-                thunkAPI.dispatch(getOneUserAction(dataLike?.user?.id));
+                thunkAPI.dispatch(getOneUserAction(userId));
             }
             return response?.data;
         } catch (error) {
@@ -40,6 +40,7 @@ export const getLikesAction = createAsyncThunk<LikeResponseType[], GetLikesParam
                 },
             };
             const response = await axios.get(`/api/reactions?where[typeField]=Like&where[video][id]=${videoId}`, config);
+            // console.log('response --Likes-->', response);
             return response?.data;
         } catch (error) {
             if (error instanceof AxiosError) {

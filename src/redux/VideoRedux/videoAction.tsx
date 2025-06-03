@@ -95,8 +95,6 @@ export const createVideoCommentAction = createAsyncThunk<any, any>(
                 setReplyToCommentId(null);
                 setReplyingToUser(null);
             }
-
-
             console.log('createVideoCommentAction --->', response);
 
             return response?.data;

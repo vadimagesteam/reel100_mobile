@@ -2,9 +2,13 @@ export interface CameraState {
     loading: boolean;
     customLoading: boolean
     videos: VideoItemType[]
+    videosTop100: VideoItemType[]
     userVideos: VideoItemType[]
     videosMeData: VideoItemType[]
     prewievVideoUrl: string
+    page: number;
+    hasMore: boolean;
+    loadingTopTab: boolean
     error: Error | null;
 }
 
@@ -15,8 +19,12 @@ export interface VideoItemType {
     createdAt: string;
     updatedAt: string;
     file: VideoFileType | null;
+    commentsCount: number
+    likesCount: number
     user: {
+        firstName: string
         id: string;
+        lastName: string
     };
 }
 
