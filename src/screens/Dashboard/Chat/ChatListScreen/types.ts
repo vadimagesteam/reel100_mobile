@@ -10,9 +10,10 @@ export interface ChatMessage {
 
 export interface ChatPreview {
     id: string;
-    name: string;
     lastMessage: string;
     timestamp: string;
     avatar: string;
     unreadCount?: number;
+    firstName: string,
+    lastName: string
 }

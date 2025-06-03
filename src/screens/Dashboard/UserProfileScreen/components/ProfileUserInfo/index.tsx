@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Image, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, positionHelpers } from '../../../../../styles';
-import { BodyText } from '../../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../../components/UI';
 import ButtonGradient from '../../../../../components/ButtonGradient';
 import { cs } from './styles';
 
@@ -13,20 +13,33 @@ interface ProfileUserInfoProps {
     followCount: number | undefined
     checkFollowButton: string
     onFollowPress: () => void
+    onChatPress: () => void
 }
 
-const ProfileUserInfo = ({ fullname, followerCount, likeCount, followCount, checkFollowButton, onFollowPress }: ProfileUserInfoProps) => {
+const ProfileUserInfo = ({ fullname, followerCount, likeCount, followCount, checkFollowButton, onFollowPress, onChatPress }: ProfileUserInfoProps) => {
     return (
         <>
-            <View style={positionHelpers.alignCenter}>
-                <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }} style={cs.avatarStyle} />
-                <BodyText fontWeight={'700'} fontSize={20} color={colors.white} marginTop={5}>{fullname}</BodyText>
-                <ButtonGradient
-                    buttonStyles={cs.maxWidth30}
-                    marginText={8}
-                    title={checkFollowButton}
-                    onPress={onFollowPress}
-                />
+            <View style={[positionHelpers.rowFill]}>
+                <TouchableOpacity disabled={true}
+                    style={positionHelpers.opacity0}
+                    onPress={() => true}>
+                    <SvgIcon image="commentIcon" style={cs.chatIcon} color={colors.white} />
+                </TouchableOpacity>
+                <View style={positionHelpers.alignCenter}>
+                    <View style={positionHelpers.alignCenter}>
+                        <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }} style={cs.avatarStyle} />
+                        <BodyText fontWeight={'700'} fontSize={20} color={colors.white} marginTop={5}>{fullname}</BodyText>
+                    </View>
+                    <ButtonGradient
+                        buttonStyles={cs.minWidth60}
+                        marginText={8}
+                        title={checkFollowButton}
+                        onPress={onFollowPress}
+                    />
+                </View>
+                <TouchableOpacity style={[cs.containerChat]} onPress={onChatPress}>
+                    <SvgIcon image="commentIcon" color={colors.white} style={cs.chatIcon} />
+                </TouchableOpacity>
 
             </View>
             <LinearGradient start={{ x: 0.1, y: 0.5 }}

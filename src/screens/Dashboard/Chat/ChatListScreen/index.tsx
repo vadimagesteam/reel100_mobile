@@ -3,7 +3,7 @@ import { FlatList, Image, SafeAreaView, StyleSheet, TouchableOpacity, View } fro
 import { useNavigation } from '@react-navigation/native';
 import { useReduxDispatch } from '../../../../store/store';
 import { ChatPreview } from './types';
-import { BodyText, SvgIcon } from '../../../../components/UI';
+import { BodyText, Input, SvgIcon } from '../../../../components/UI';
 import { colors, positionHelpers } from '../../../../styles';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
@@ -21,13 +21,13 @@ const ChatListScreen = () => {
         return (
             <TouchableOpacity
                 style={cs.itemContainer}
-                onPress={() => true}
-            // onPress={() => navigation.navigate(DASHBOARD_ROUTES.CHAT_SCREEN, { chatId: item.id })}
+                // onPress={() => true}
+                onPress={() => navigation.navigate(DASHBOARD_ROUTES.CHAT_SCREEN, { firstName: item?.firstName, lastName: item?.lastName })}
             >
                 {item.avatar !== '' ? <Image source={{ uri: item.avatar }} style={cs.avatar} /> : <View style={{ height: 50, width: 50, borderRadius: '80%', backgroundColor: 'silver' }} />}
                 <View style={cs.textContainer}>
                     <View style={cs.row}>
-                        <BodyText fontWeight={'bold'} fontSize={16} color={colors.white} marginLeft={5}>{item.name}</BodyText>
+                        <BodyText fontWeight={'bold'} fontSize={16} color={colors.white} marginLeft={5}>{`${item.firstName} ${item?.lastName}`}</BodyText>
                         <BodyText fontSize={12} color={colors.silver2}>{formatTime(item.timestamp)}</BodyText>
                     </View>
                     <View style={cs.row}>
@@ -52,7 +52,7 @@ const ChatListScreen = () => {
 
     return (
         <>
-            <View style={positionHelpers.fill}>
+            <View style={[positionHelpers.fill, { backgroundColor: colors.black4 }]}>
                 <CustomHeader title="00:00:00" showBackArrow />
                 <SafeAreaView
                     style={[
@@ -65,9 +65,17 @@ const ChatListScreen = () => {
                     <View style={[positionHelpers.ph16, positionHelpers.mb10]}>
                         <View style={[positionHelpers.mt10, positionHelpers.alignItemsCenterRow]}>
                             <View style={positionHelpers.fill}>
-                                <TouchableOpacity style={cs.input} onPress={() => dispatch(setIsSearchActive(true))}>
-                                    <BodyText color={colors.silver1Procent50}>Search by user</BodyText>
-                                </TouchableOpacity>
+
+                                <Input
+                                    // ref={inputRef}
+                                    placeholder="Search by user"
+                                    value={''}
+                                    onChangeText={() => console.log()}
+                                    inputStyles={cs.input}
+                                    // autoFocus
+                                    colorText={colors.white}
+                                />
+
                             </View>
                             <TouchableOpacity style={cs.ml15} onPress={() => dispatch(setMenuModal(true))}>
                                 <SvgIcon image="menu" />
@@ -113,11 +121,9 @@ const ChatListScreen = () => {
                 </SafeAreaView >
             </View >
 
-            {/* Search Modal */}
-            <SearchAnimatedModal />
 
-            {/* MenuModal */}
-            <MenuModal onVisible={() => dispatch(setMenuModal(false))} />
+
+
         </>
     );
 };

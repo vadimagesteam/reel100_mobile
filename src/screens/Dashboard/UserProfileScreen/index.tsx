@@ -16,6 +16,8 @@ import ProfileUserInfo from './components/ProfileUserInfo';
 import { cs } from './styles';
 import { VideoItemType } from '../../../redux/CameraRedux/types';
 import EmptyContent from '../../../components/EmptyContent';
+import { DASHBOARD_ROUTES } from '../../../navigation/routes';
+import { getInitialsName } from '../../../utils/getInitialsName';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const ITEM_MARGIN = 4;
@@ -23,7 +25,7 @@ const NUM_COLUMNS = 3;
 const ITEM_SIZE = (SCREEN_WIDTH - ITEM_MARGIN * (NUM_COLUMNS + 1) - 32) / NUM_COLUMNS;
 
 const UserProfileScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     const { params } = useRoute<any>();
     const dispatch = useReduxDispatch();
     const { userOneData } = useReduxSelector((state: RootState) => state?.users);
@@ -105,11 +107,15 @@ const UserProfileScreen = () => {
         );
     }, [userOneData]);
 
+    console.log('data user--->', userOneData);
+    console.log('followData[0]?.id', followData[0]?.id);
     const followUserCallback = () => {
         const dataFollow = {
             who: { id: user?.id },
             whom: { id: params?.idUser },
         };
+
+        console.log('dataFollow-->', dataFollow);
 
         if (isFollowing) {
             const followId = followData[0]?.id;
@@ -141,7 +147,6 @@ const UserProfileScreen = () => {
             setLoadingMore(false);
         }
     };
-
 
     return (
         <>
@@ -178,6 +183,7 @@ const UserProfileScreen = () => {
                                 followCount={userOneData?.stats?.followCount}
                                 checkFollowButton={isFollowing ? 'Unfollow' : 'Follow'}
                                 onFollowPress={() => followUserCallback()}
+                                onChatPress={() => navigation.navigate(DASHBOARD_ROUTES.CHAT_SCREEN, { firstName: userOneData?.firstName, lastName: userOneData?.lastName })}
                             />
                         </View>
                         {loading && filteredVideos.length === 0 ? (

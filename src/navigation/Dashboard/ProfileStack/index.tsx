@@ -12,10 +12,13 @@ const Stack = createStackNavigator();
 
 const ProfileStack = () => {
     return (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator screenOptions={{
+            headerShown: false,
+        }}>
             <Stack.Screen
                 name={DASHBOARD_ROUTES.PROFILE_SCREEN}
                 component={ProfileScreen}
+
             />
             <Stack.Screen
                 name={DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN}

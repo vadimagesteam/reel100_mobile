@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { BodyText } from '../../../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../../../components/UI';
 import { colors, positionHelpers } from '../../../../../../styles';
 
 interface ProfileInfoProps {
@@ -20,7 +20,7 @@ const ProfileInfo = ({ fullName, followerCount, likeCount, followCount, onChatPr
                     <BodyText fontWeight={'bold'} marginLeft={5} fontSize={16} color={colors.silver4}>{fullName}</BodyText>
                 </View>
                 <TouchableOpacity onPress={onChatPress}>
-                    <BodyText color={colors.white}>Chat</BodyText>
+                    <SvgIcon image="commentIcon" color={colors.white} style={cs.chatIcon} />
                 </TouchableOpacity>
             </View>
 
@@ -50,6 +50,10 @@ const cs = StyleSheet.create({
     },
     h100: {
         height: '100%',
+    },
+    chatIcon: {
+        height: 25,
+        width: 25,
     },
 });
 export default ProfileInfo;

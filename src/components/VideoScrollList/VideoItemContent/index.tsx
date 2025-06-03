@@ -43,22 +43,26 @@ const VideoItemContent = ({
     }, [isActive]);
 
     return (
-        <GestureDetector gesture={gesture}>
-            <View style={[cs.container, { height: videoHeight }, videoStyle]}>
-                <Video
-                    ref={videoRef}
-                    source={{ uri: item.file?.storagePath }}
-                    paused={!isActive || paused}
-                    resizeMode="cover"
-                    repeat
-                    muted={muted}
-                    onLoad={onLoad}
-                    onProgress={onProgress}
-                    style={[{ height: videoHeight }, cs.width100, videoStyle]}
-                />
-                {renderOverlay()}
-            </View>
-        </GestureDetector>
+
+        <View style={[cs.container, { height: videoHeight }, videoStyle]}>
+            <GestureDetector gesture={gesture}>
+                <View>
+                    <Video
+                        ref={videoRef}
+                        source={{ uri: item.file?.storagePath }}
+                        paused={!isActive || paused}
+                        resizeMode="cover"
+                        repeat
+                        muted={muted}
+                        onLoad={onLoad}
+                        onProgress={onProgress}
+                        style={[{ height: videoHeight }, cs.width100, videoStyle]}
+                    />
+                </View>
+            </GestureDetector>
+            {renderOverlay()}
+        </View>
+
     );
 };
 

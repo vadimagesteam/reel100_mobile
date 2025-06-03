@@ -25,6 +25,7 @@ export const DASHBOARD_ROUTES = {
     USER_PROFILE_SCREEN: 'User_Profile_Screen',
     CHAT_LIST_SCREEN: 'CHAT_LIST_SCREEN',
     CHAT_SCREEN: 'CHAT_SCREEN',
+    CHAT_USER_SCREEN: 'CHAT_USER_SCREEN',
 } as const;
 
 export type valueof<T> = T[keyof T];
