@@ -32,6 +32,7 @@ export const authSlice = createSlice({
             state.isAuth = false;
             state.user = null;
             state.error = null;
+            // TODO: add clear navigation stack
         },
 
     },

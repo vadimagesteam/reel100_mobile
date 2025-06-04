@@ -40,7 +40,7 @@ const ProfileScreen = () => {
         if (user?.id) {
             fetchVideos(true);
         }
-    }, [user?.id]);
+    }, [fetchVideos, user?.id]);
 
     const fetchVideos = async (reset = false) => {
         const skip = reset ? 0 : page * TAKE;
