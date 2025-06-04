@@ -15,6 +15,9 @@ import { getVideoCommentsAction } from '../../../../redux/VideoRedux/videoAction
 import { LoaderIndicator } from '../../../UI';
 import VideoListItem from '../../../VideoScrollList/VideoListItem';
 import { useHeartAnimatedStyle } from '../../../../utils/animatedHeartStyle';
+import {getOneUserAction} from '../../../../redux/UsersRedux/usersAction.tsx';
+
+const MemoVideoListItem = React.memo(VideoListItem);
 
 const { height } = Dimensions.get('window');
 const TAKE = 5;
@@ -156,7 +159,7 @@ const TopOneHundredTab = () => {
         return (
             <>
                 {itemFile ? (
-                    <VideoListItem
+                    <MemoVideoListItem
                         item={item}
                         index={index}
                         isActive={isActive}
@@ -170,6 +173,12 @@ const TopOneHundredTab = () => {
                         likesData={likesData}
                         likeCheck={likesData.some(like => like?.user?.id === user?.id)}
                         animatedStyle={animatedStyle}
+                        onNameClick={() => {
+                          if (user?.id !== item.user.id) {
+                            dispatch(getOneUserAction(item.user.id));
+                            navigation.navigate(DASHBOARD_ROUTES.USER_PROFILE_SCREEN, { idUser: item.user.id });
+                          }
+                        }}
                     />
                 ) : null}
             </>
@@ -203,5 +212,4 @@ const TopOneHundredTab = () => {
     );
 };
 
-export default TopOneHundredTab;
-
+export default React.memo(TopOneHundredTab);

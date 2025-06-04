@@ -11,6 +11,7 @@ import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store
 import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
 import MenuModal from '../../../../components/Modals/MenuModal';
 import VideoItem from '../../../../components/VideoItem';
+const MemoVideoItem = React.memo(VideoItem);
 import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 import FullVideoModal from '../../../../components/Modals/FullVideoModal';
 import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedModal';
@@ -22,7 +23,7 @@ const ITEM_MARGIN = 4;
 const NUM_COLUMNS = 3;
 const ITEM_SIZE = (SCREEN_WIDTH - ITEM_MARGIN * (NUM_COLUMNS + 1) - 32) / NUM_COLUMNS;
 
-const ProfileScreen = (callback: T, deps: React.DependencyList) => {
+const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const dispatch = useReduxDispatch();
   const {loading} = useReduxSelector((state: RootState) => state.camera);
@@ -68,7 +69,10 @@ const ProfileScreen = (callback: T, deps: React.DependencyList) => {
     setHasMore(newVideos.length === TAKE);
   });
 
-  const filteredVideos = videos.filter(v => v?.file?.storagePath);
+  const filteredVideos = React.useMemo(
+    () => videos.filter(v => v?.file?.storagePath),
+    [videos],
+  );
 
   const renderVideoItem = useCallback(
     ({item, index}: {item: VideoItemType; index: number}) => {
@@ -76,7 +80,7 @@ const ProfileScreen = (callback: T, deps: React.DependencyList) => {
       const screenshot = item.file?.variation?.[0]?.screenshots?.[0] ?? null;
 
       return (
-        <VideoItem
+        <MemoVideoItem
           key={item?.id}
           item={item}
           user={user}
@@ -90,24 +94,21 @@ const ProfileScreen = (callback: T, deps: React.DependencyList) => {
     [user],
   );
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(async () => {
-      if (user?.id) {
-        await fetchVideos(true);
-      }
+    if (user?.id) {
+      await fetchVideos(true);
+    }
+    setRefreshing(false);
+  }, [user?.id, fetchVideos]);
 
-      setRefreshing(false);
-    }, 800);
-  };
-
-  const handleLoadMore = async () => {
+  const handleLoadMore = useCallback(async () => {
     if (!loadingMore && hasMore) {
       setLoadingMore(true);
       await fetchVideos();
       setLoadingMore(false);
     }
-  };
+  }, [loadingMore, hasMore, fetchVideos]);
 
   return (
     <>
@@ -214,4 +215,4 @@ const ProfileScreen = (callback: T, deps: React.DependencyList) => {
   );
 };
 
-export default ProfileScreen;
+export default React.memo(ProfileScreen);
