@@ -4,7 +4,7 @@ import { formatTime } from '../../../utils/formatTime';
 import VideoAbsoluteInfo from '../../VideoAbsoluteInfo';
 import VideoItemContent from './../VideoItemContent';
 import { positionHelpers } from '../../../styles';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { VideoItemType } from '../../../redux/CameraRedux/types';
 import { LikeResponseType } from '../../../redux/LikesRedux/types';
 
@@ -103,4 +103,4 @@ const cs = StyleSheet.create({
     },
 });
 
-export default VideoListItem;
+export default React.memo(VideoListItem);

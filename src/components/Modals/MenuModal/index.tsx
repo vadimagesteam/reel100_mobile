@@ -4,7 +4,7 @@ import { BodyText, SvgIcon } from '../../UI';
 import { colors, positionHelpers } from '../../../styles';
 import { useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { onLogout } from '../../../redux/AuthRedux/authSlice';
-import { useNavigation } from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import { DASHBOARD_ROUTES } from '../../../navigation/routes';
 
 interface MenuModalProps {
@@ -16,6 +16,16 @@ const MenuModal = ({ onVisible }: MenuModalProps) => {
     const dispatch = useReduxDispatch();
     const { user } = useReduxSelector(state => state?.auth);
     const { modalMenuVisible } = useReduxSelector(state => state?.modals);
+
+    const handleLogout = () => {
+        dispatch(onLogout());
+
+        CommonActions.reset({      // 2️⃣ blow away history
+          index: 0,
+          routes: [{ name: 'Auth' }],  // first screen in your AuthStack
+        });
+
+    }
 
     return (
         <Modal
@@ -51,7 +61,7 @@ const MenuModal = ({ onVisible }: MenuModalProps) => {
                         <SvgIcon color={colors.silver6} image="homeNavTab" />
                         <BodyText fontSize={18} color={colors.silver6} marginLeft={10}>Home</BodyText>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[positionHelpers.alignItemsCenterRow, positionHelpers.mt30]} onPress={() => dispatch(onLogout())}>
+                    <TouchableOpacity style={[positionHelpers.alignItemsCenterRow, positionHelpers.mt30]} onPress={handleLogout}>
                         <SvgIcon image="logoutIcon" />
                         <BodyText fontSize={18} color={colors.silver6} marginLeft={10}>Logout</BodyText>
                     </TouchableOpacity>

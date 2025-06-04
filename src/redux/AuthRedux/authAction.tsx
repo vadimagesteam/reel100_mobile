@@ -70,7 +70,7 @@ export const userVerifyAction = createAsyncThunk<any, VerifyUserType>(
             if (response?.status === 201 && response?.data?.accessToken) {
                 await AsyncStorage.setItem('@token', response.data.accessToken);
                 axios.defaults.headers.common.Authorization = `Bearer ${response.data.accessToken}`;
-                await AsyncStorage.setItem('@isVerified', JSON.stringify(true));
+                // await AsyncStorage.setItem('@isVerified', JSON.stringify(true));
 
                 thunkAPI.dispatch(setIsAuth(true));
                 thunkAPI.dispatch(clearErrors());
@@ -142,10 +142,10 @@ export const userLoginAction = createAsyncThunk<any, LoginDataType>(
             };
             const response = await axios.post('/api/login', dataLogin, config);
 
+
             if (response?.status === 201) {
-                const isVerifiedRaw = await AsyncStorage.getItem('@isVerified');
-                const isVerified = isVerifiedRaw ? JSON.parse(isVerifiedRaw) : false;
-                if (JSON.parse(isVerified) !== true) {
+                const isVerified = response.data.status === 'Active';
+                if (isVerified !== true) {
                     Alert.alert(
                         'Please verify your email before logging in.',
                         'This account is already registered. Please check your email and enter the verification code to confirm your email address.',

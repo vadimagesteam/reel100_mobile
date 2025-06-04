@@ -5,6 +5,10 @@ import { positionHelpers } from '../../styles';
 import { cs } from './styles';
 import { StateFeedTab, TopOneHundredTab, TopVideoTab } from './components';
 
+const MemoTopOneHundredTab = React.memo(TopOneHundredTab);
+const MemoStateFeedTab    = React.memo(StateFeedTab);
+const MemoTopVideoTab     = React.memo(TopVideoTab);
+
 interface TabViewVideoProps {
     activeTab: string
     setActiveTab: (val: string) => void
@@ -52,14 +56,14 @@ const TabViewVideo = ({
             </View>
             <>
                 {activeTab === 'top_100' && (
-                    <TopOneHundredTab />
+                    <MemoTopOneHundredTab />
                 )}
 
                 {activeTab === 'state_feed' && (
-                    <StateFeedTab />
+                    <MemoStateFeedTab />
                 )}
                 {activeTab === 'top_video' && (
-                    <TopVideoTab />
+                    <MemoTopVideoTab />
                 )}
 
             </>
@@ -67,4 +71,4 @@ const TabViewVideo = ({
     );
 };
 
-export default TabViewVideo;
+export default React.memo(TabViewVideo);
