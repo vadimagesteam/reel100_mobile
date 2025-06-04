@@ -11,7 +11,7 @@ import { requestLocationPermission, getStateFromCoords } from './helpers';
 import TabViewVideo from '../../../../components/TabViewVideo';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { getUserInfoAction } from '../../../../redux/AuthRedux/authAction';
-import MenuModal from '../../../../components/Modals/MemuModal';
+import MenuModal from '../../../../components/Modals/MenuModal';
 import { setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 
 const MainScreen = () => {
