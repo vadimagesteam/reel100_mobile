@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, RefreshControl, SafeAreaView, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, FlatList, RefreshControl, SafeAreaView, TouchableOpacity, View } from 'react-native';
 import { positionHelpers } from '../../../styles';
 import { LoaderIndicator, SvgIcon } from '../../../components/UI';
 import MenuModal from '../../../components/Modals/MemuModal';
@@ -31,7 +31,7 @@ const UserProfileScreen = () => {
     const { userOneData } = useReduxSelector((state: RootState) => state?.users);
     const { user } = useReduxSelector((state: RootState) => state?.auth);
     const { loading } = useReduxSelector((state: RootState) => state?.camera);
-    const { followData } = useReduxSelector((state: RootState) => state?.follows);
+    const { followData, error } = useReduxSelector((state: RootState) => state?.follows);
     const [loader, setLoader] = useState(false);
     const [modalVideo, setModalVideo] = useState<VideoItemType | null>(null);
     const [refreshing, setRefreshing] = useState(false);
@@ -107,7 +107,7 @@ const UserProfileScreen = () => {
         );
     }, [userOneData]);
 
-    console.log('data user--->', userOneData);
+    console.log('error--->', error);
     console.log('followData[0]?.id', followData[0]?.id);
     const followUserCallback = () => {
         const dataFollow = {
@@ -126,10 +126,16 @@ const UserProfileScreen = () => {
                 console.log('Не знайдено підписки для видалення');
             }
         } else {
-            dispatch(setFollowAction(dataFollow));
+            const resultAction = dispatch(setFollowAction(dataFollow));
+
+            if (setFollowAction.fulfilled.match(resultAction)) {
+                setIsFollowing(true);
+            } else if (resultAction.payload?.statusCode === 500) {
+                Alert.alert(String(resultAction.payload.statusCode), resultAction.payload.message);
+            }
         }
 
-        setIsFollowing(!isFollowing);
+        // setIsFollowing(!isFollowing);
     };
 
     const handleRefresh = async () => {

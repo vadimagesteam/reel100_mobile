@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { getOneUserAction } from '../UsersRedux/usersAction';
+import { Alert } from 'react-native';
 
 export const setFollowAction = createAsyncThunk<any, any>(
     'follows/setFollow',
@@ -19,6 +20,13 @@ export const setFollowAction = createAsyncThunk<any, any>(
         } catch (error) {
             console.log('response--setFollowAction--->>', error?.response?.data);
             if (error instanceof AxiosError) {
+                const errorData = error.response?.data;
+
+                // Покажи алерт, якщо статус 500
+                if (errorData?.statusCode === 500) {
+                    Alert.alert(errorData.message);
+                }
+
                 if (error.response && error.response.data) {
                     return thunkAPI.rejectWithValue(error.response.data);
                 } else {

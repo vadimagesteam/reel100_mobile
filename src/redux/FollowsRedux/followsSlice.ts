@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FollowsState } from './types';
-import { getFollowAction } from './followsActions';
+import { getFollowAction, setFollowAction } from './followsActions';
 
 const initialState: FollowsState = {
     loading: false,
@@ -27,6 +27,24 @@ export const followsSlice = createSlice({
             )
             .addCase(
                 getFollowAction.rejected,
+                (state, action: PayloadAction<any>) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                },
+            )
+            // set Follows
+            .addCase(setFollowAction.pending, state => {
+                state.loading = true;
+            })
+            .addCase(
+                setFollowAction.fulfilled,
+                (state) => {
+                    state.loading = false;
+
+                },
+            )
+            .addCase(
+                setFollowAction.rejected,
                 (state, action: PayloadAction<any>) => {
                     state.loading = false;
                     state.error = action.payload;
