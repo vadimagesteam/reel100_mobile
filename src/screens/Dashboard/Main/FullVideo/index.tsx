@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Dimensions, FlatList } from 'react-native';
 import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { Gesture } from 'react-native-gesture-handler';
+import Share from 'react-native-share';
 import { runOnJS, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
 import CommentSection from '../../../../components/CommentSection';
@@ -154,11 +155,38 @@ const FullVideoScreen = () => {
         }
     }).current;
 
-    const openComments = () => {
+    const openComments = useCallback(() => {
         setShowComments(true);
-    };
+    }, []);
 
-    const renderItem = ({ item, index }: { item: VideoItemType; index: number }) => {
+    const openShare = useCallback(async () => {
+        const currentVideo = videosTop100[currentIndex]?.file?.storagePath;
+        if (!currentVideo) {
+            console.warn('URL video not available');
+            return;
+        }
+
+        let shareUrl = currentVideo;
+        if (!shareUrl.startsWith('http://') && !shareUrl.startsWith('https://') && !shareUrl.startsWith('file://')) {
+            shareUrl = 'file://' + shareUrl;
+        }
+
+        const options = {
+            // title: '',
+            // message: '',
+            url: shareUrl,
+            failOnCancel: false,
+        };
+
+        try {
+            const result = await Share.open(options);
+            console.log('Share result:', result);
+        } catch (error) {
+            console.error('Share error:', error);
+        }
+    }, [videosTop100, currentIndex]);
+
+    const renderItem = useCallback(({ item, index }: { item: VideoItemType; index: number }) => {
         const isActive = index === currentIndex && isFocused;
         const itemFile = item.file !== null;
 
@@ -193,12 +221,13 @@ const FullVideoScreen = () => {
                             }
                         }}
                         showShare={true}
+                        onShare={() => openShare()}
                         animatedStyle={animatedStyle}
                     />
                 ) : null}
             </>
         );
-    };
+    }, [combinedGesture, currentIndex, isFocused, pausedById, durations, timeLefts, likesData, user?.id]);
 
     const renderFooter = () => {
         if (!loadingTopTab) { return null; }

@@ -28,6 +28,7 @@ export interface VideoListItemProps {
     onArrowBack?: () => void
     onNameClick?: () => void
     onLoad: (data: any) => void
+    onShare: () => void
     showShare?: boolean
     animatedStyle: AnimatedStyle;
     paused?: boolean
@@ -53,6 +54,7 @@ export const VideoListItem = ({
     onArrowBack,
     onNameClick,
     onLoad,
+    onShare,
     showShare,
     animatedStyle,
     paused,
@@ -89,6 +91,7 @@ export const VideoListItem = ({
                     onArrowBack={onArrowBack}
                     onNameClick={onNameClick}
                     showShare={showShare}
+                    onShare={onShare}
                     paused={paused}
                 />
             )}
