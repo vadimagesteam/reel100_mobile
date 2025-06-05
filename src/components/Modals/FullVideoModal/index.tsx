@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Share from 'react-native-share';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { colors, positionHelpers } from '../../../styles';
@@ -133,9 +134,36 @@ const FullVideoModal = ({
         transform: [{ scale: scale.value }],
     }));
 
-    const openComments = () => {
+    const openComments = useCallback(() => {
         setShowComments(true);
-    };
+    }, []);
+
+    const openShare = useCallback(async () => {
+        const currentVideo = modalVideo?.file?.storagePath;
+        if (!currentVideo) {
+            console.warn('URL video not available');
+            return;
+        }
+
+        let shareUrl = currentVideo;
+        if (!shareUrl.startsWith('http://') && !shareUrl.startsWith('https://') && !shareUrl.startsWith('file://')) {
+            shareUrl = 'file://' + shareUrl;
+        }
+
+        const options = {
+            // title: '',
+            // message: '',
+            url: shareUrl,
+            failOnCancel: false,
+        };
+
+        try {
+            const result = await Share.open(options);
+            console.log('Share result:', result);
+        } catch (error) {
+            console.error('Share error:', error);
+        }
+    }, [modalVideo]);
 
     return (
         <Modal visible={!!modalVideo} transparent={false} animationType="fade">
@@ -215,6 +243,8 @@ const FullVideoModal = ({
                             showComments={true}
                             countComments={modalVideo?.commentsCount}
                             paused={pausedVideo}
+                            showShare={true}
+                            onShare={openShare}
                         />
                         {showComments && modalVideo?.id && (
                             <CommentSection videoId={modalVideo.id} userId={modalVideo.user.id} onClose={() => setShowComments(false)} />

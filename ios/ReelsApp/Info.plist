@@ -44,6 +44,17 @@
 	</dict> -->
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to record videos.</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>mailto</string>
+		<string>instagram</string>
+		<string>instagram-stories</string>
+		<string>fb</string>
+		<string>facebook-stories</string>
+	</array>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>Access to the documents folder is required</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
