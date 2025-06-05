@@ -176,4 +176,4 @@ const VideoAbsoluteInfo = ({
     );
 };
 
-export default VideoAbsoluteInfo;
+export default React.memo(VideoAbsoluteInfo);

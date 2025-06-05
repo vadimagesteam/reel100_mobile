@@ -11,13 +11,18 @@ import { requestLocationPermission, getStateFromCoords } from './helpers';
 import TabViewVideo from '../../../../components/TabViewVideo';
 import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { getUserInfoAction } from '../../../../redux/AuthRedux/authAction';
-import MenuModal from '../../../../components/Modals/MemuModal';
+import MenuModal from '../../../../components/Modals/MenuModal';
 import { setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
+
+const MemoizedDropdownMenu = React.memo(DropdownMenu);
+const MemoizedTabViewVideo = React.memo(TabViewVideo);
 
 const MainScreen = () => {
     const dispatch = useReduxDispatch();
+    const openMenu = React.useCallback(() => {
+        dispatch(setMenuModal(true));
+    }, [dispatch]);
     const [selectedState, setSelectedState] = useState<string | null>(null);
-    const [_, setSelectedAutoState] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>('top_100');
 
     useEffect(() => {
@@ -39,7 +44,6 @@ const MainScreen = () => {
 
                     const state = await getStateFromCoords(latitude, longitude);
                     if (state) {
-                        setSelectedAutoState(state);
                         setSelectedState(prevState => prevState ?? state);
                     } else {
                         console.log('Не вдалося отримати штат через Nominatim');
@@ -60,21 +64,21 @@ const MainScreen = () => {
             <CustomHeader title="00:00:00" />
             <SafeAreaView style={[positionHelpers.fill, { backgroundColor: colors.black4 }]} >
                 <View style={[positionHelpers.ph16, positionHelpers.mt10, positionHelpers.rowFillCenter]}>
-                    <DropdownMenu
+                    <MemoizedDropdownMenu
                         data={states}
                         placeholder="Change Country"
                         selectedValue={selectedState}
                         onSelect={setSelectedState}
                     />
                     <TouchableOpacity
-                        onPress={() => dispatch(setMenuModal(true))}
+                        onPress={openMenu}
                     >
                         <SvgIcon image="menu" />
                     </TouchableOpacity>
                 </View>
 
                 {/* TabView for Video */}
-                <TabViewVideo
+                <MemoizedTabViewVideo
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
                 />

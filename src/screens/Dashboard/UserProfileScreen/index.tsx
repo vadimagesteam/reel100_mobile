@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, FlatList, RefreshControl, SafeAreaView, TouchableOpacity, View } from 'react-native';
 import { positionHelpers } from '../../../styles';
 import { LoaderIndicator, SvgIcon } from '../../../components/UI';
-import MenuModal from '../../../components/Modals/MemuModal';
+import MenuModal from '../../../components/Modals/MenuModal';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CustomHeader from '../../../components/navigator/CustomHeader';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';

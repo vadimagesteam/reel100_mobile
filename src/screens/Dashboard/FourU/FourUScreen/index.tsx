@@ -7,7 +7,7 @@ import { cs } from './styles';
 import { generateBlocks } from '../../../../components/TabViewVideo/components/StateFeedTab/helpers/generateBlocks';
 import RenderBlock from '../../../../components/TabViewVideo/components/StateFeedTab/components/RenderVideo';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
-import MenuModal from '../../../../components/Modals/MemuModal';
+import MenuModal from '../../../../components/Modals/MenuModal';
 import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedModal';
 import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 import FullVideoModal from '../../../../components/Modals/FullVideoModal';

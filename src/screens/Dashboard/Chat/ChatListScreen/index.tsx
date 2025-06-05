@@ -9,7 +9,7 @@ import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 import { mockChatList } from './mockData';
 import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedModal';
-import MenuModal from '../../../../components/Modals/MemuModal';
+import MenuModal from '../../../../components/Modals/MenuModal';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 
 
