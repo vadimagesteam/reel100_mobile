@@ -13,7 +13,7 @@ import DropdownMenu from '../../DropdownMenu';
 const { width } = Dimensions.get('window');
 
 interface CustomHeaderProps {
-    title: string;
+    title?: string;
     showBackArrow?: boolean;
     showBackArrowPress?: boolean;
     showAnimationHeader?: boolean

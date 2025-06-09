@@ -3,11 +3,10 @@ import { TouchableOpacity, View } from 'react-native';
 import { SvgIcon } from '../UI';
 import { positionHelpers } from '../../styles';
 import { cs } from './styles';
-import { StateFeedTab, TopOneHundredTab, TopVideoTab } from './components';
+import { StateFeedTab, TopOneHundredTab } from './components';
 
 const MemoTopOneHundredTab = React.memo(TopOneHundredTab);
 const MemoStateFeedTab    = React.memo(StateFeedTab);
-const MemoTopVideoTab     = React.memo(TopVideoTab);
 
 interface TabViewVideoProps {
     activeTab: string
@@ -63,7 +62,7 @@ const TabViewVideo = ({
                     <MemoStateFeedTab />
                 )}
                 {activeTab === 'top_video' && (
-                    <MemoTopVideoTab />
+                    <MemoTopOneHundredTab withCalendar={true} />
                 )}
 
             </>
