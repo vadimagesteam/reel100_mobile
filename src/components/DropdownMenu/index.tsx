@@ -17,14 +17,14 @@ const DropdownMenu = ({
 }: DropdownMenuProps) => {
     const dropdownVisible = useSharedValue(0);
 
-    const selectedItem = useMemo(() => data.find((item) => item.label === selectedValue), [data, selectedValue]);
+    const selectedItem = useMemo(() => data.find((item) => item.value === selectedValue), [data, selectedValue]);
 
     const toggleDropdown = useCallback(() => {
         dropdownVisible.value = withTiming(dropdownVisible.value === 0 ? 1 : 0, { duration: 200 });
     }, []);
 
-    const handleSelect = useCallback((label: string | null) => {
-        onSelect?.(label);
+    const handleSelect = useCallback((value: string | null) => {
+        onSelect?.(value);
         dropdownVisible.value = withTiming(0, { duration: 200 });
     }, [onSelect]);
 

@@ -22,7 +22,7 @@ const MainScreen = () => {
     const openMenu = React.useCallback(() => {
         dispatch(setMenuModal(true));
     }, [dispatch]);
-    const [selectedState, setSelectedState] = useState<string | null>(null);
+    const [selectedState, setSelectedState] = useState<string | null>('FL');
     const [activeTab, setActiveTab] = useState<string>('top_100');
 
     useEffect(() => {

@@ -5,11 +5,10 @@ import { colors, positionHelpers } from '../../../../styles';
 import { cs } from '../../styles';
 import { BodyText } from '../../../UI';
 import { DropdownItem } from '../../types';
-import { isIOS } from '../../../../utils/platformChecker';
 
 interface DropdownListProps {
     data: DropdownItem[];
-    onSelect: (label: string | null) => void;
+    onSelect: (value: string | null) => void;
     animatedStyle: any;
     selectedValue: string | null
     dropdownVisible: number
@@ -21,9 +20,9 @@ const DropdownList = ({ data, onSelect, animatedStyle, selectedValue }: Dropdown
             data={data}
             keyExtractor={(item) => item.value ?? 'default'}
             renderItem={({ item }) => (
-                <TouchableOpacity style={[positionHelpers.rowFillCenter, cs.option]} onPress={() => onSelect(item.label)}>
+                <TouchableOpacity style={[positionHelpers.rowFillCenter, cs.option]} onPress={() => onSelect(item.value)}>
                     <BodyText fontSize={16} color={colors.silver2}>{item.label}</BodyText>
-                    {item?.label === selectedValue && <View style={cs.selectedDot} />}
+                    {item?.value === selectedValue && <View style={cs.selectedDot} />}
                 </TouchableOpacity>
             )}
             keyboardShouldPersistTaps="handled"

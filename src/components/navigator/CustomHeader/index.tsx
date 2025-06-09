@@ -102,8 +102,7 @@ const CustomHeader = ({
                             }}>
                                 {expanded ? (
                                     <DropdownMenu
-                                        data={dataStates}
-                                        selectedValue={''}
+                                        data={dataStates || []}
                                         onSelect={() => true}
                                         placeholder="Change Country"
                                     />
