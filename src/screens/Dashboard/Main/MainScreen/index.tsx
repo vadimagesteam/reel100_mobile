@@ -13,6 +13,7 @@ import CustomHeader from '../../../../components/navigator/CustomHeader';
 import { getUserInfoAction } from '../../../../redux/AuthRedux/authAction';
 import MenuModal from '../../../../components/Modals/MenuModal';
 import { setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MemoizedDropdownMenu = React.memo(DropdownMenu);
 const MemoizedTabViewVideo = React.memo(TabViewVideo);
@@ -28,6 +29,12 @@ const MainScreen = () => {
     useEffect(() => {
         dispatch(getStatesAction());
         dispatch(getUserInfoAction());
+        (async()=>{
+          const stateFromStorage = await AsyncStorage.getItem('STATE');
+          if(stateFromStorage){
+            setSelectedState(stateFromStorage);
+          }
+        })()
     }, []);
 
     useEffect(() => {
@@ -46,7 +53,7 @@ const MainScreen = () => {
                     if (state) {
                         setSelectedState(prevState => prevState ?? state);
                     } else {
-                        console.log('Не вдалося отримати штат через Nominatim');
+                        console.log('Can not get state from Nominatim');
                     }
                 },
                 async (error) => {
@@ -58,6 +65,12 @@ const MainScreen = () => {
 
         getUserLocation();
     }, []);
+
+  useEffect(() => {
+    if(selectedState) {
+      AsyncStorage.setItem('STATE', selectedState);
+    }
+  }, [selectedState]);
 
     return (
         <>

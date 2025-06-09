@@ -44,34 +44,36 @@ const UserProfileScreen = () => {
 
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
+  const fetchVideos = useCallback(async (reset = false) => {
+    const skip = reset ? 0 : page * TAKE;
+
+    const result = await dispatch(getVideosAction({
+      userId: params?.idUser,
+      skip,
+      take: TAKE,
+      orderBy: { createdAt: 'desc' },
+    }));
+
+    const newVideos = result?.payload || [];
+
+    if (reset) {
+      setVideos(newVideos);
+      setPage(1);
+    } else {
+      setVideos(prev => [...prev, ...newVideos]);
+      setPage(prev => prev + 1);
+    }
+
+    setHasMore(newVideos.length === TAKE);
+  });
+
     useEffect(() => {
         dispatch(getOneUserAction(params?.idUser));
         dispatch(getFollowAction({ myId: user?.id, userId: params?.idUser }));
         fetchVideos(true);
-    }, [user?.id, params?.idUser]);
+    }, [user?.id, params?.idUser, dispatch, fetchVideos]);
 
-    const fetchVideos = async (reset = false) => {
-        const skip = reset ? 0 : page * TAKE;
 
-        const result = await dispatch(getVideosAction({
-            userId: params?.idUser,
-            skip,
-            take: TAKE,
-            orderBy: { createdAt: 'desc' },
-        }));
-
-        const newVideos = result?.payload || [];
-
-        if (reset) {
-            setVideos(newVideos);
-            setPage(1);
-        } else {
-            setVideos(prev => [...prev, ...newVideos]);
-            setPage(prev => prev + 1);
-        }
-
-        setHasMore(newVideos.length === TAKE);
-    };
 
 
     useEffect(() => {
