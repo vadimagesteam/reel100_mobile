@@ -33,6 +33,7 @@ import HeaderCalendar from './components/HeaderCalendar';
 import {useCalendarModal} from './hooks/useCalendarModal.ts';
 import {setMenuModal} from '../../../../redux/ModalsRedux/modalSlice.ts';
 import CalendarModal from '../../../CalendarModal';
+import MenuModal from '../../../Modals/MenuModal';
 
 const MemoVideoListItem = React.memo(VideoListItem);
 const MemoizedHeaderCalendar = React.memo(HeaderCalendar);
@@ -42,12 +43,13 @@ const TAKE = 5;
 
 export interface TopOneHundredTabProps {
   withCalendar?: boolean;
+  withMenu?: boolean;
 }
 
-const TopOneHundredTab = (props: TopOneHundredTabProps) => {
+const TopOneHundredTab = ({withCalendar = false, withMenu = false}: TopOneHundredTabProps) => {
   const navigation = useNavigation<any>();
 
-  const {withCalendar} = props;
+  // const {withCalendar, withMenu} = props;
 
   const isFocused = useIsFocused();
 
@@ -268,7 +270,7 @@ const TopOneHundredTab = (props: TopOneHundredTabProps) => {
             openMenu={openMenu}
             markerDate={selectedDate}
             onCalendar={open}
-            showMenu={false}
+            showMenu={withMenu}
           />
         </SafeAreaView>
       )}
@@ -297,6 +299,9 @@ const TopOneHundredTab = (props: TopOneHundredTabProps) => {
           onCancelPress={cancel}
           onSubmitPress={confirm}
         />
+      )}
+      {withMenu && (
+        <MenuModal onVisible={() => dispatch(setMenuModal(false))} />
       )}
     </>
   );

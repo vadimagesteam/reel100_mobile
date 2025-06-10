@@ -1,6 +1,7 @@
 export interface DropdownItem {
     label: string;
-    value: string | null;
+    slug: string | null;
+    id: string;
 }
 
 export interface DropdownMenuProps {
