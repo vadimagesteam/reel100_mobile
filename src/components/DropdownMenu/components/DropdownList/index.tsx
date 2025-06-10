@@ -18,11 +18,11 @@ const DropdownList = ({ data, onSelect, animatedStyle, selectedValue }: Dropdown
     <Animated.View style={[positionHelpers.absolute, cs.dropdownList, animatedStyle]}>
         <FlatList
             data={data}
-            keyExtractor={(item) => item.value ?? 'default'}
+            keyExtractor={(item) => item.id ?? 'default'}
             renderItem={({ item }) => (
-                <TouchableOpacity style={[positionHelpers.rowFillCenter, cs.option]} onPress={() => onSelect(item.value)}>
+                <TouchableOpacity style={[positionHelpers.rowFillCenter, cs.option]} onPress={() => onSelect(item.id)}>
                     <BodyText fontSize={16} color={colors.silver2}>{item.label}</BodyText>
-                    {item?.value === selectedValue && <View style={cs.selectedDot} />}
+                    {(item?.id === selectedValue || item?.slug === selectedValue ) && <View style={cs.selectedDot} />}
                 </TouchableOpacity>
             )}
             keyboardShouldPersistTaps="handled"

@@ -4,6 +4,7 @@ import { setCustomLoading, setPreviewVideoURL } from './cameraSlice';
 import { DASHBOARD_ROUTES } from '../../navigation/routes';
 import { getMimeType } from '../../utils/getMimeType';
 import { GetVideosParams } from './types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export const createVideoAction = createAsyncThunk<any, any>(
@@ -18,6 +19,10 @@ export const createVideoAction = createAsyncThunk<any, any>(
 
             if (response?.status === 201) {
                 const videoId = response.data.id;
+
+                const state = await AsyncStorage.getItem('STATE');
+
+                await axios.post(`api/videos/${videoId}/states`, [state]);
 
                 const formData = new FormData();
                 const { type, name } = getMimeType(file);

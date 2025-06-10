@@ -17,7 +17,7 @@ const DropdownMenu = ({
 }: DropdownMenuProps) => {
     const dropdownVisible = useSharedValue(0);
 
-    const selectedItem = useMemo(() => data.find((item) => item.value === selectedValue), [data, selectedValue]);
+    const selectedItem = useMemo(() => data.find((item) => item.slug === selectedValue || item.id === selectedValue), [data, selectedValue]);
 
     const toggleDropdown = useCallback(() => {
         dropdownVisible.value = withTiming(dropdownVisible.value === 0 ? 1 : 0, { duration: 200 });
