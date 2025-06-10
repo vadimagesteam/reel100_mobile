@@ -61,7 +61,8 @@ const MainScreen = () => {
 
           const state = await getStateFromCoords(latitude, longitude);
           if (state) {
-            setSelectedState(prevState => prevState ?? state);
+            const storedState = states.find((item) => item.slug.toUpper() === state.toUpper());
+            setSelectedState(prevState => prevState ?? storedState.id);
           } else {
             console.log('Can not get state from Nominatim');
           }
