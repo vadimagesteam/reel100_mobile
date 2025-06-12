@@ -153,12 +153,14 @@ export const getVideosTopAction = createAsyncThunk<any, GetVideosParams>(
 
       const response = await axios.get(`api/videos?${queryParams.toString()}`);
 
+      console.log('Video response: ', response?.data);
+
       // Only return videos with a valid file storagePath (defensive for backend data)
       const cleanedData = (response?.data || []).filter(
         (video: any) =>
           video?.file &&
           typeof video.file === 'object' &&
-          !!video.file.storagePath,
+          !!video.file.hlsUrl,
       );
 
       return cleanedData;
