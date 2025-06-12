@@ -38,6 +38,7 @@ export interface VideoFileType {
     mimetype: string;
     storagePath: string;
     uuid: string;
+    hlsUrl: string;
     variation: VideoVariationType[] | null;
 }
 
