@@ -22,6 +22,8 @@ const TabViewVideo = ({
         setActiveTab(tab);
     }, [setActiveTab]);
 
+  console.log('Render tab view Video');
+
     return (
         <>
             <View style={[positionHelpers.rowAround]}>
