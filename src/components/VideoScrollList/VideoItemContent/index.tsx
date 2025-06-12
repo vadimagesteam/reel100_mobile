@@ -1,5 +1,5 @@
-import React, { memo, ReactNode, useEffect, useMemo, useRef } from 'react';
-import { StyleProp, View, ViewStyle } from 'react-native';
+import React, {memo, ReactNode, useEffect, useMemo, useRef} from 'react';
+import {StyleProp, View, ViewStyle} from 'react-native';
 import Video, {
   OnBandwidthUpdateData,
   OnPlaybackStateChangedData,
@@ -9,16 +9,16 @@ import Video, {
   ResizeMode,
   SelectedVideoTrackType,
 } from 'react-native-video';
-import { GestureDetector } from 'react-native-gesture-handler';
-import { VideoItemType } from '../../../redux/CameraRedux/types';
-import { cs } from './styles';
+import {GestureDetector} from 'react-native-gesture-handler';
+import {VideoItemType} from '../../../redux/CameraRedux/types';
+import {cs} from './styles';
 
 type VideoItemContentProps = {
   item: VideoItemType;
   isActive: boolean;
   videoHeight?: number;
-  onLoad: (data: { duration: number }) => void;
-  onProgress: (data: { currentTime: number }) => void;
+  onLoad: (data: {duration: number}) => void;
+  onProgress: (data: {currentTime: number}) => void;
   gesture: any;
   muted?: boolean;
   /**
@@ -31,7 +31,10 @@ type VideoItemContentProps = {
 };
 
 // Custom equality check for React.memo to avoid re-render when renderOverlay reference is the same
-function areEqual(prevProps: VideoItemContentProps, nextProps: VideoItemContentProps) {
+function areEqual(
+  prevProps: VideoItemContentProps,
+  nextProps: VideoItemContentProps,
+) {
   return (
     prevProps.item === nextProps.item &&
     prevProps.isActive === nextProps.isActive &&
@@ -47,17 +50,17 @@ function areEqual(prevProps: VideoItemContentProps, nextProps: VideoItemContentP
 }
 
 const VideoItemContent = ({
-                            item,
-                            isActive,
-                            videoHeight,
-                            onLoad,
-                            onProgress,
-                            gesture,
-                            muted = false,
-                            renderOverlay,
-                            videoStyle,
-                            paused,
-                          }: VideoItemContentProps) => {
+  item,
+  isActive,
+  videoHeight,
+  onLoad,
+  onProgress,
+  gesture,
+  muted = false,
+  renderOverlay,
+  videoStyle,
+  paused,
+}: VideoItemContentProps) => {
   const videoRef = useRef<Video>(null);
 
   // Seek to the beginning when isActive toggles true
@@ -85,37 +88,42 @@ const VideoItemContent = ({
 
   return (
     <View
-      style={[cs.container, videoHeight ? { height: videoHeight } : null, videoStyle]}
-      collapsable={false}
-    >
+      style={[
+        cs.container,
+        videoHeight ? {height: videoHeight} : null,
+        videoStyle,
+      ]}
+      collapsable={false}>
       <GestureDetector gesture={gesture}>
-        <Video
-          ref={videoRef}
-          source={{ uri: videoUrl }}
-          paused={!isActive || !!paused}
-          resizeMode={ResizeMode.CONTAIN}
-          repeat
-          muted={muted}
-          onLoad={onLoad}
-          onProgress={onProgress}
-          style={[{ height: videoHeight }, cs.width100, videoStyle]}
-          selectedVideoTrack={{ type: SelectedVideoTrackType.AUTO }}
-          onVideoTracks={(data: OnVideoTracksData) => {
-            // console.log('onVideoTracks', data.videoTracks);
-          }}
-          onError={(err: OnVideoErrorData) => {
-            // console.error(JSON.stringify(err));
-          }}
-          onAspectRatio={(data: OnVideoAspectRatioData) => {
-            // console.log('onAspectRadio called ' + JSON.stringify(data));
-          }}
-          onPlaybackStateChanged={(data: OnPlaybackStateChangedData) => {
-            // console.log('onPlaybackStateChanged', data);
-          }}
-          onBandwidthUpdate={(data: OnBandwidthUpdateData) => {
-            // console.log('onVideoBandwidthUpdate', data);
-          }}
-        />
+        <View collapsable={false}>
+          <Video
+            ref={videoRef}
+            source={{uri: videoUrl}}
+            paused={!isActive || !!paused}
+            resizeMode={ResizeMode.CONTAIN}
+            repeat
+            muted={muted}
+            onLoad={onLoad}
+            onProgress={onProgress}
+            style={[{height: videoHeight}, cs.width100, videoStyle]}
+            selectedVideoTrack={{type: SelectedVideoTrackType.AUTO}}
+            onVideoTracks={(data: OnVideoTracksData) => {
+              console.log('onVideoTracks', data.videoTracks);
+            }}
+            onError={(err: OnVideoErrorData) => {
+              console.error(JSON.stringify(err));
+            }}
+            onAspectRatio={(data: OnVideoAspectRatioData) => {
+              console.log('onAspectRadio called ' + JSON.stringify(data));
+            }}
+            onPlaybackStateChanged={(data: OnPlaybackStateChangedData) => {
+              console.log('onPlaybackStateChanged', data);
+            }}
+            onBandwidthUpdate={(data: OnBandwidthUpdateData) => {
+              console.log('onVideoBandwidthUpdate', data);
+            }}
+          />
+        </View>
       </GestureDetector>
       {overlay}
     </View>
