@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { colors, positionHelpers } from '../../../../../../styles';
-import { BodyText, SvgIcon } from '../../../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../../../components/old/UI';
 import { cs } from './styles';
 
 interface HeaderCalendarProps {

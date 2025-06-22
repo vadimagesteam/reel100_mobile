@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios';
 import { LikeResponseType, LikeBodyType, DeleteLikeParams, GetLikesParams } from './types';
 import { getUserInfoAction } from '../AuthRedux/authAction';
 import { getOneUserAction } from '../UsersRedux/usersAction';
+import { api } from '../../lib/api.ts';
 
 
 export const setLikeAction = createAsyncThunk<LikeResponseType, LikeBodyType>(
@@ -10,7 +11,7 @@ export const setLikeAction = createAsyncThunk<LikeResponseType, LikeBodyType>(
     async (likesBodyData, thunkAPI) => {
         const { dataLike, userId } = likesBodyData;
         try {
-            const response = await axios.post('/api/reactions', dataLike);
+            const response = await api.post('/api/reactions', dataLike);
 
             if (response?.status === 201) {
                 thunkAPI.dispatch(getLikesAction({ userId: userId, videoId: dataLike?.video?.id }));
@@ -39,7 +40,7 @@ export const getLikesAction = createAsyncThunk<LikeResponseType[], GetLikesParam
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.get(`/api/reactions?where[typeField]=Like&where[video][id]=${videoId}`, config);
+            const response = await api.get(`/api/reactions?where[typeField]=Like&where[video][id]=${videoId}`, config);
             // console.log('response --Likes-->', response);
             return response?.data;
         } catch (error) {
@@ -57,7 +58,7 @@ export const deleteLikeAction = createAsyncThunk<LikeResponseType, DeleteLikePar
     'likes/setLike',
     async ({ id, userId, videoId }, thunkAPI) => {
         try {
-            const response = await axios.delete(`/api/reactions/${id}`);
+            const response = await api.delete(`/api/reactions/${id}`);
 
             if (response?.status === 200) {
                 thunkAPI.dispatch(getLikesAction({ userId: userId, videoId: videoId }));

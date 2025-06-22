@@ -3,13 +3,13 @@ import { FlatList, Image, SafeAreaView, StyleSheet, TouchableOpacity, View } fro
 import { useNavigation } from '@react-navigation/native';
 import { useReduxDispatch } from '../../../../store/store';
 import { ChatPreview } from './types';
-import { BodyText, Input, SvgIcon } from '../../../../components/UI';
+import { BodyText, Input, SvgIcon } from '../../../../components/old/UI';
 import { colors, positionHelpers } from '../../../../styles';
-import CustomHeader from '../../../../components/navigator/CustomHeader';
+import CustomHeader from '../../../../components/old/navigator/CustomHeader';
 import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
 import { mockChatList } from './mockData';
-import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedModal';
-import MenuModal from '../../../../components/Modals/MenuModal';
+import SearchAnimatedModal from '../../../../components/old/Modals/SearchAnimatedModal';
+import MenuModal from '../../../../components/old/Modals/MenuModal';
 import { DASHBOARD_ROUTES } from '../../../../navigation/routes';
 
 

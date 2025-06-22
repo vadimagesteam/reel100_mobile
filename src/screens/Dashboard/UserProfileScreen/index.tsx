@@ -1,21 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, FlatList, RefreshControl, SafeAreaView, TouchableOpacity, View } from 'react-native';
 import { positionHelpers } from '../../../styles';
-import { LoaderIndicator, SvgIcon } from '../../../components/UI';
-import MenuModal from '../../../components/Modals/MenuModal';
+import { LoaderIndicator, SvgIcon } from '../../../components/old/UI';
+import MenuModal from '../../../components/old/Modals/MenuModal';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import CustomHeader from '../../../components/navigator/CustomHeader';
+import CustomHeader from '../../../components/old/navigator/CustomHeader';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../store/store';
 import { getOneUserAction } from '../../../redux/UsersRedux/usersAction';
 import { getVideosAction } from '../../../redux/CameraRedux/cameraActions';
 import { getFollowAction, setFollowAction, unFollowAction } from '../../../redux/FollowsRedux/followsActions';
-import FullVideoModal from '../../../components/Modals/FullVideoModal';
+import FullVideoModal from '../../../components/old/Modals/FullVideoModal';
 import { setMenuModal } from '../../../redux/ModalsRedux/modalSlice';
-import VideoItem from '../../../components/VideoItem';
+import VideoItem from '../../../components/old/VideoItem';
 import ProfileUserInfo from './components/ProfileUserInfo';
 import { cs } from './styles';
 import { VideoItemType } from '../../../redux/CameraRedux/types';
-import EmptyContent from '../../../components/EmptyContent';
+import EmptyContent from '../../../components/old/EmptyContent';
 import { DASHBOARD_ROUTES } from '../../../navigation/routes';
 import { getInitialsName } from '../../../utils/getInitialsName';
 

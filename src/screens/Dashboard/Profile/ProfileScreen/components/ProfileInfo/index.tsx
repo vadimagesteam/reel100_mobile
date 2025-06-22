@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { BodyText, SvgIcon } from '../../../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../../../components/old/UI';
 import { colors, positionHelpers } from '../../../../../../styles';
 
 interface ProfileInfoProps {

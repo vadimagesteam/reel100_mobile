@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, SafeAreaView, ScrollView, TouchableOpacity, FlatList, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, SafeAreaView, ScrollView, TouchableOpacity, FlatList, RefreshControl, ActivityIndicator, Text } from 'react-native';
 import { colors, positionHelpers } from '../../../../styles';
-import CustomHeader from '../../../../components/navigator/CustomHeader';
-import { BodyText, LoaderIndicator, SvgIcon } from '../../../../components/UI';
+import CustomHeader from '../../../../components/old/navigator/CustomHeader';
+import { BodyText, LoaderIndicator, SvgIcon } from '../../../../components/old/UI';
 import { cs } from './styles';
-import { generateBlocks } from '../../../../components/TabViewVideo/components/StateFeedTab/helpers/generateBlocks';
-import RenderBlock from '../../../../components/TabViewVideo/components/StateFeedTab/components/RenderVideo';
+import { generateBlocks } from '../../../../components/old/TabViewVideo/components/StateFeedTab/helpers/generateBlocks';
+import RenderBlock from '../../../../components/old/TabViewVideo/components/StateFeedTab/components/RenderVideo';
 import { RootState, useReduxDispatch, useReduxSelector } from '../../../../store/store';
-import MenuModal from '../../../../components/Modals/MenuModal';
-import SearchAnimatedModal from '../../../../components/Modals/SearchAnimatedModal';
+import MenuModal from '../../../../components/old/Modals/MenuModal';
+import SearchAnimatedModal from '../../../../components/old/Modals/SearchAnimatedModal';
 import { setIsSearchActive, setMenuModal } from '../../../../redux/ModalsRedux/modalSlice';
-import FullVideoModal from '../../../../components/Modals/FullVideoModal';
+import FullVideoModal from '../../../../components/old/Modals/FullVideoModal';
 import { VideoItemType } from '../../../../redux/CameraRedux/types';
 import { getVideosAction } from '../../../../redux/CameraRedux/cameraActions';
-import EmptyContent from '../../../../components/EmptyContent';
+import EmptyContent from '../../../../components/old/EmptyContent';
+import { useIsFocused } from '@react-navigation/native';
 
 const TAKE = 15;
 
@@ -35,6 +36,9 @@ const FourUScreen = () => {
     useEffect(() => {
         fetchVideos(true);
     }, []);
+
+    const isFocused = useIsFocused();
+    console.log('=========== FOR U VIDEOS RENDER ==========', { isFocused });
 
     const fetchVideos = async (reset = false) => {
         const skip = reset ? 0 : page * TAKE;

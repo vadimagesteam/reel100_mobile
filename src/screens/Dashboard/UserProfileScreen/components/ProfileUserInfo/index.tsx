@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Image, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, positionHelpers } from '../../../../../styles';
-import { BodyText, SvgIcon } from '../../../../../components/UI';
-import ButtonGradient from '../../../../../components/ButtonGradient';
+import { BodyText, SvgIcon } from '../../../../../components/old/UI';
+import ButtonGradient from '../../../../../components/old/ButtonGradient';
 import { cs } from './styles';
 
 interface ProfileUserInfoProps {

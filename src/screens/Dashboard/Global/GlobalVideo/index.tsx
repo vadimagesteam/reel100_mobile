@@ -1,6 +1,6 @@
 import React from 'react';
-import CustomHeader from '../../../../components/navigator/CustomHeader';
-import {TopOneHundredTab} from '../../../../components/TabViewVideo/components';
+import CustomHeader from '../../../../components/old/navigator/CustomHeader';
+import {TopOneHundredTab} from '../../../../components/old/TabViewVideo/components';
 
 const MemoizedTimerHeader = React.memo(CustomHeader);
 const MemoTopOneHundredTab = React.memo(TopOneHundredTab);

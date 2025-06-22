@@ -1,0 +1,96 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useUser } from '../../../../state/user/authStore.ts';
+import { api } from '../../../../lib/api.ts';
+import { CommentType } from './useCommentsInfiniteQuery.ts';
+
+export type CommentMutationArgs = {
+  videoId: string;
+  replyTo?: string;
+  text: string;
+};
+
+type CommentsCache = {
+  pages: CommentType[][];
+};
+
+export const useCommentMutation = () => {
+  const queryClient = useQueryClient();
+  const { id: userId, firstName, lastName } = useUser();
+
+  const getQueryKey = (videoId: string) => ['comments', 'video', videoId];
+
+  return useMutation({
+    mutationFn: async ({ videoId, text, replyTo }: CommentMutationArgs) => {
+      const payload = {
+        replyTo: replyTo ?? '',
+        text,
+        user: { id: userId },
+        video: { id: videoId },
+      };
+      const { data } = await api.post('/api/comments', payload);
+      return data;
+    },
+    onMutate: async ({ text, replyTo, videoId }) => {
+      const key = getQueryKey(videoId);
+      await queryClient.cancelQueries({ queryKey: key });
+      const prev = queryClient.getQueryData<CommentsCache | undefined>(key);
+
+      if (prev) {
+        const optimisticComment: CommentType = {
+          id: `optimistic-${Math.random().toString()}`,
+          user: { id: userId!, firstName, lastName },
+          video: { id: videoId },
+          text,
+          replyTo: replyTo ?? '',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          likesCount: 0,
+          replies: [],
+          repliesCount: 0,
+        };
+
+        queryClient.setQueryData(key, {
+          ...prev,
+          pages: prev.pages.map((p, idx) => {
+            // For simple comments put at the top, for replies we can place at the bottom
+            // const isAppropriatePage = replyTo ? idx === prev.pages.length - 1 : idx === 0;
+            // Place user comment at the top of the cache
+            if (idx === 0) {
+              return [optimisticComment, ...p];
+            }
+            return p;
+          }),
+        });
+      }
+      return { key, prev };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.key && context?.prev) {
+        queryClient.setQueryData(context.key, context.prev);
+      }
+    },
+    onSuccess: (data, { videoId }) => {
+      const key = getQueryKey(videoId);
+      const prev = queryClient.getQueryData<CommentsCache | undefined>(key);
+
+      if (!prev) return;
+
+      const updatedPages = prev.pages.map((page) =>
+        page.map((comment) =>
+          comment.id.startsWith('optimistic-')
+            ? { ...data, user: { id: userId, firstName, lastName } }
+            : comment,
+        ),
+      );
+
+      queryClient.setQueryData(key, {
+        ...prev,
+        pages: updatedPages,
+      });
+    },
+    onSettled: (_data, _error, { videoId }) => {
+      // const key = getQueryKey(videoId);
+      // queryClient.invalidateQueries({ queryKey: key });
+    },
+  });
+};

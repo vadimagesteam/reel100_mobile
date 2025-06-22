@@ -1,0 +1,93 @@
+import { forwardRef, useImperativeHandle } from 'react';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { IconHeart } from '../ui/icons/IconHeart.tsx';
+import { useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useVideoPlayerStore } from '../../state/videoPlayer/videoVideoPlayerStore.ts';
+
+export interface LikeAnimationRef {
+  trigger: () => void;
+  animationDuration: number;
+}
+
+export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
+  const dimensions = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const isFullScreen = useVideoPlayerStore((s) => s.isPlayerFullScreen);
+  const originalIcon = useVideoPlayerStore((s) => s.hearIconPos);
+
+  const scale = useSharedValue(0);
+  const opacity = useSharedValue(0);
+  const rotate = useSharedValue(0);
+
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+
+  const topTabsHeight = 60;
+  const iconSize = 24;
+
+  const startX = dimensions.width / 2 - iconSize / 2;
+  const startY = dimensions.height / 3 - iconSize / 2;
+
+  const finalX = originalIcon.x;
+  const finalY = isFullScreen
+    ? originalIcon.y
+    : originalIcon.y - topTabsHeight - insets.top + iconSize / 2 - 1;
+
+  useImperativeHandle(ref, () => ({
+    animationDuration: 1000,
+    trigger: () => {
+      opacity.value = 1;
+      scale.value = 1;
+      translateX.value = startX;
+      translateY.value = startY;
+
+      rotate.value = withSequence(
+        withTiming(-5, { duration: 50, easing: Easing.linear }),
+        withTiming(5, { duration: 50, easing: Easing.linear }),
+        withTiming(0, { duration: 50, easing: Easing.linear }),
+      );
+
+      scale.value = withSequence(
+        withTiming(5.2, { duration: 150, easing: Easing.out(Easing.ease) }),
+        withTiming(4.9, { duration: 60 }),
+        withTiming(5.0, { duration: 100 }),
+        withTiming(5.6, { duration: 200 }),
+
+        withTiming(1, { duration: 1000 }),
+      );
+
+      translateX.value = withDelay(
+        560,
+        withTiming(finalX, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+      );
+
+      translateY.value = withDelay(
+        560,
+        withTiming(finalY, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+      );
+
+      opacity.value = withDelay(1000, withTiming(0, { duration: 400 }));
+    },
+  }));
+
+  const style = useAnimatedStyle(() => ({
+    top: translateY.value,
+    left: translateX.value,
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }, { rotate: `${rotate.value}deg` }],
+  }));
+
+  return (
+    <Animated.View className="absolute" style={style}>
+      <IconHeart variant="filled" width={24} height={24} />
+    </Animated.View>
+  );
+});

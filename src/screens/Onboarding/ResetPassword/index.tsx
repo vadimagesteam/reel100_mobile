@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View } from 'react-native';
-import FormContainer from '../../../components/Layout/FormContainer';
-import ButtonGradient from '../../../components/ButtonGradient';
+import FormContainer from '../../../components/old/Layout/FormContainer';
+import ButtonGradient from '../../../components/old/ButtonGradient';
 import { colors, positionHelpers } from '../../../styles';
-import { BodyText } from '../../../components/UI';
-import BackButton from '../../../components/navigator/BackButton';
+import { BodyText } from '../../../components/old/UI';
+import BackButton from '../../../components/old/navigator/BackButton';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import ResetPassForm from './components/ResetPassForm';

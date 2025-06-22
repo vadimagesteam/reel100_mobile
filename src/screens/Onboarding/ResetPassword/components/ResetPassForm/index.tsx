@@ -3,7 +3,7 @@ import { Control, Controller, FieldErrors } from 'react-hook-form';
 
 // components, styles
 import { colors, positionHelpers } from '../../../../../styles';
-import { BodyText, Input } from '../../../../../components/UI';
+import { BodyText, Input } from '../../../../../components/old/UI';
 import { cs } from './styles';
 import { FormData } from '../../types';
 

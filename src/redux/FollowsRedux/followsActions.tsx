@@ -2,12 +2,13 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { getOneUserAction } from '../UsersRedux/usersAction';
 import { Alert } from 'react-native';
+import { api } from '../../lib/api.ts';
 
 export const setFollowAction = createAsyncThunk<any, any>(
     'follows/setFollow',
     async (dataFollow, thunkAPI) => {
         try {
-            const response = await axios.post('/api/follows', dataFollow);
+            const response = await api.post('/api/follows', dataFollow);
 
             console.log('response-setFollowAction-->', response);
 
@@ -46,7 +47,7 @@ export const getFollowAction = createAsyncThunk<any, { myId: string | undefined,
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.get(`/api/follows?where[who][id]=${myId}&where[whom][id]=${userId}`, config);
+            const response = await api.get(`/api/follows?where[who][id]=${myId}&where[whom][id]=${userId}`, config);
             return response?.data;
         } catch (error) {
             if (error instanceof AxiosError) {
@@ -63,7 +64,7 @@ export const unFollowAction = createAsyncThunk<any, { id: string, myId: string |
     'follows/unFollow',
     async ({ id, myId, userId }, thunkAPI) => {
         try {
-            const response = await axios.delete(`/api/follows/${id}`);
+            const response = await api.delete(`/api/follows/${id}`);
 
             console.log('response--unFollowAction--->>', response);
 

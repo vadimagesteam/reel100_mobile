@@ -4,6 +4,7 @@ import { setCustomLoading, setPreviewVideoURL } from './cameraSlice';
 import { DASHBOARD_ROUTES } from '../../navigation/routes';
 import { getMimeType } from '../../utils/getMimeType';
 import { GetVideosParams } from './types';
+import { api } from '../../lib/api.ts';
 
 /** Utility to consistently extract error messages from Axios or unknown sources */
 const extractAxiosError = (error: unknown) => {
@@ -21,7 +22,7 @@ export const createVideoAction = createAsyncThunk<any, any>(
     thunkAPI.dispatch(setCustomLoading(true));
     try {
       // Step 1: Create the video record (metadata only)
-      const response = await axios.post('api/videos', createVideo);
+      const response = await api.post('api/videos', createVideo);
 
       if (response?.status === 201 && response.data?.id) {
         const videoId = response.data.id;
@@ -80,7 +81,7 @@ export const uploadVideoAction = createAsyncThunk<any, any>(
         throw new Error('FormData missing video file.');
       }
 
-      const response = await axios.put(
+      const response = await api.put(
         `api/videos/${videoId}/file`,
         formData,
         config,
@@ -128,7 +129,9 @@ export const getVideosAction = createAsyncThunk<any, GetVideosParams>(
         queryParams.append('where[user][id]', userId);
       }
 
-      const response = await axios.get(`api/videos?${queryParams.toString()}`);
+      const response = await api.get(`api/videos?${queryParams.toString()}`);
+      console.log('VIDEOS RESPONSE', response.data);
+
       return response?.data;
     } catch (error) {
       console.error('getVideosAction error:', error);
@@ -151,7 +154,7 @@ export const getVideosTopAction = createAsyncThunk<any, GetVideosParams>(
         queryParams.append(`orderBy[${key}]`, value);
       });
 
-      const response = await axios.get(`api/videos?${queryParams.toString()}`);
+      const response = await api.get(`api/videos?${queryParams.toString()}`);
 
       console.log('Video response: ', response?.data);
 
@@ -176,7 +179,7 @@ export const videoTrackAction = createAsyncThunk<any, any>(
   'camera/videoTrack',
   async (videoId, thunkAPI) => {
     try {
-      const response = await axios.patch(`api/videos/${videoId}/file`);
+      const response = await api.patch(`api/videos/${videoId}/file`);
       return response?.data;
     } catch (error) {
       console.error('videoTrackAction error:', error);

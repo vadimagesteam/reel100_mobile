@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import Video from 'react-native-video';
 import { isIOS } from '../../../../utils/platformChecker';
-import { BodyText, ButtonDefault, SvgIcon } from '../../../../components/UI';
+import { BodyText, ButtonDefault, SvgIcon } from '../../../../components/old/UI';
 import { colors } from '../../../../styles';
 import { useReduxDispatch, useReduxSelector } from '../../../../store/store';
 import { createVideoAction } from '../../../../redux/CameraRedux/cameraActions';

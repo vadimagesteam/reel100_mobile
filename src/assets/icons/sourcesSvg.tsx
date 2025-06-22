@@ -6,10 +6,8 @@ import {
     G,
     Defs,
     ClipPath,
-    LinearGradient,
-    Stop,
 } from 'react-native-svg';
-import { colors } from '../../styles';
+import { colors } from '../../theme/colors.ts';
 
 const backArrow = {
     Draw: ({ color = colors.white }) => (

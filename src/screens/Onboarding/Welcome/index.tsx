@@ -3,9 +3,9 @@ import { SafeAreaView, View } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { colors, positionHelpers } from '../../../styles';
 import { cs } from './styles';
-import { BodyText, ButtonDefault } from '../../../components/UI';
+import { BodyText, ButtonDefault } from '../../../components/old/UI';
 import { ONBOARDING_ROUTES, OnboardingRoutes } from '../../../navigation/routes';
-import ButtonGradient from '../../../components/ButtonGradient';
+import ButtonGradient from '../../../components/old/ButtonGradient';
 import { useReduxDispatch } from '../../../store/store';
 import { clearErrors } from '../../../redux/AuthRedux/authSlice';
 

@@ -15,7 +15,7 @@ import {
     Send,
 } from 'react-native-gifted-chat';
 import { colors, positionHelpers } from '../../../../styles';
-import { BodyText, SvgIcon } from '../../../../components/UI';
+import { BodyText, SvgIcon } from '../../../../components/old/UI';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getInitialsName } from '../../../../utils/getInitialsName';

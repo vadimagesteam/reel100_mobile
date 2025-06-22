@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { api } from '../../lib/api.ts';
 
 export const getUsersAction = createAsyncThunk<any, string>(
     'users/getUsers',
@@ -11,7 +12,7 @@ export const getUsersAction = createAsyncThunk<any, string>(
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.get(`/api/users?where[any]=${query}`, config);
+            const response = await api.get(`/api/users?where[any]=${query}`, config);
 
             return response?.data;
         } catch (error) {
@@ -35,7 +36,7 @@ export const getOneUserAction = createAsyncThunk<any, string | undefined>(
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.get(`/api/users/${id}`, config);
+            const response = await api.get(`/api/users/${id}`, config);
 
             return response?.data;
         } catch (error) {

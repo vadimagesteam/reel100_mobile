@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { api } from '../../lib/api.ts';
 
 // export const getVideoCommentsAction = createAsyncThunk<any, string>(
 //     'video/getVideoComments',
@@ -34,7 +35,7 @@ export const getOneVideoAction = createAsyncThunk<any, string>(
     'video/getOneVideo',
     async (videoId, thunkAPI) => {
         try {
-            const response = await axios.get(`/api/videos/${videoId}`);
+            const response = await api.get(`/api/videos/${videoId}`);
             console.log('getOneVideoAction --->', response);
 
             return response?.data;
@@ -59,8 +60,8 @@ export const getVideoCommentsAction = createAsyncThunk<any, { videoId: string, u
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.get(`/api/videos/${videoId}/comments?where[user][id]=${userId}`, config);
-
+            const response = await api.get(`/api/videos/${videoId}/comments?where[user][id]=${userId}`, config);
+            console.log('->> Comments', response?.data);
             return response?.data;
         } catch (error) {
             console.log('getVideoCommentsAction --->', error);
@@ -86,7 +87,7 @@ export const createVideoCommentAction = createAsyncThunk<any, any>(
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.post('/api/comments', commentData, config);
+            const response = await api.post('/api/comments', commentData, config);
 
             if (response?.status === 201) {
                 const videoId = commentData?.video?.id;

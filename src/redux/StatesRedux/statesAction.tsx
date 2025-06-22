@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { api } from '../../lib/api.ts';
 
 export const getStatesAction = createAsyncThunk<any>(
     'states/getStates',
@@ -11,7 +12,7 @@ export const getStatesAction = createAsyncThunk<any>(
                     'Content-Type': 'application/json',
                 },
             };
-            const response = await axios.get('/api/states', config);
+            const response = await api.get('/api/states', config);
 
             // console.log('response-->States ->', JSON.stringify(response?.data, null, 2));
 
