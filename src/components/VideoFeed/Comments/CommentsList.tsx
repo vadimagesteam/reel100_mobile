@@ -1,5 +1,5 @@
-import React, { forwardRef, useCallback, useMemo, useRef } from 'react';
-import { ActivityIndicator, ListRenderItem } from 'react-native';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { ActivityIndicator, ListRenderItem, Text, View } from 'react-native';
 import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
 import { CommentType, useCommentsInfiniteQuery } from './queries/useCommentsInfiniteQuery.ts';
 import { CommentsListItem } from './CommentsListItem.tsx';
@@ -77,6 +77,11 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
       renderItem={renderComment}
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.3}
+      ListEmptyComponent={() => (
+        <View className="min-h-[280px] flex-1 items-center justify-center">
+          <Text className="text-xl text-neutral-400">No comments yet</Text>
+        </View>
+      )}
       ListFooterComponent={
         isFetchingNextPage ? <ActivityIndicator className="my-4" color="#aaa" /> : null
       }
