@@ -14,16 +14,14 @@ export const api = axios.create({
   },
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().token;
-    console.log('TOKEN', token); // todo: remove
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-);
+api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  console.log('TOKEN', token); // todo: remove
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
@@ -36,11 +34,14 @@ api.interceptors.response.use(
       data: error?.response?.data,
     });
 
+    if (error?.response?.status === 401) {
+      useAuthStore.getState().actions.logout();
+    }
+
     // Sentry.captureException(error);
     return Promise.reject(error);
   },
 );
-
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,8 +49,8 @@ export const queryClient = new QueryClient({
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
     },
   },
-})
+});
 
 export const asyncStoragePersister = createAsyncStoragePersister({
   storage: AsyncStorage,
-})
+});

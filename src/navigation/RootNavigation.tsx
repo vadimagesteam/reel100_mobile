@@ -13,7 +13,6 @@ import {
 import React from 'react';
 import CustomTabNavigator from './CustomTabNavigator';
 import { navigationRef } from './navigationRef';
-import { TestVideoFullScreen } from '../screens/App/TestVideoFullScreen.tsx';
 
 const Stack = createNativeStackNavigator();
 

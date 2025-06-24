@@ -10,6 +10,9 @@ import { SvgIcon } from '../../../components/old/UI';
 import { StateFeedTab, TopOneHundredTab } from '../../../components/old/TabViewVideo/components';
 import { colors } from '../../../theme/colors.ts';
 import { VideoCommentsOverlay } from '../../../components/VideoFeed/Comments/VideoCommentsOverlay.tsx';
+import { GlobalCountdown } from '../../../components/AppHeader/GlobalCountdown/GlobalCountdown.tsx';
+import CustomHeader from '../../../components/old/navigator/CustomHeader';
+import { AppHeader, AppHeaderHeight } from '../../../components/AppHeader/AppHeader.tsx';
 
 const MemoStateFeedTab = React.memo(StateFeedTab);
 
@@ -49,7 +52,9 @@ export function MainTabScreen() {
     left: 0,
     right: 0,
     bottom: 0,
-    top: withTiming(isFullShared.value ? -TopBarHeight - insets.top : 0, { duration: 100 }),
+    top: withTiming(isFullShared.value ? -TopBarHeight - insets.top - AppHeaderHeight : 0, {
+      duration: 100,
+    }),
     paddingTop: insets.top,
   }));
 
@@ -67,7 +72,14 @@ export function MainTabScreen() {
         initialLayout={{ width: screenW }}
         renderTabBar={(props) => {
           return (
-            <TabBar {...props} indicatorStyle={styles.indicatorStyle} style={styles.tabBarStyle} />
+            <>
+              <AppHeader stateSelect />
+              <TabBar
+                {...props}
+                indicatorStyle={styles.indicatorStyle}
+                style={styles.tabBarStyle}
+              />
+            </>
           );
         }}
       />
