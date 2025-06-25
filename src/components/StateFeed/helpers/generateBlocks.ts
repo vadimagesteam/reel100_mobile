@@ -1,7 +1,11 @@
-import { BlockType } from '../components/RenderVideo/types.ts';
+export type BlockType = 'leftSmall_rightBig' | 'leftBig_rightSmall' | 'single';
+export type TileBlock<T> = {
+  type: BlockType;
+  items: T[];
+};
 
-export const generateBlocks = (videos: any[]): BlockType[] => {
-  const blocks: BlockType[] = [];
+export const generateBlocks = <T>(videos: T[]): TileBlock<T>[] => {
+  const blocks: TileBlock<T>[] = [];
   let i = 0;
   let toggle = true;
 

@@ -1,3 +1,4 @@
+/*
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { hideSplash } from 'react-native-splash-view';
@@ -93,3 +94,4 @@ const NavigationContainerScreen = () => {
 };
 
 export default NavigationContainerScreen;
+*/

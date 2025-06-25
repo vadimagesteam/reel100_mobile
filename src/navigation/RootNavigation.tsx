@@ -11,7 +11,7 @@ import {
 } from '../screens/Guest';
 
 import React from 'react';
-import CustomTabNavigator from './CustomTabNavigator';
+import CustomTabNavigator from './Authenticated/TabsNavigator.tsx';
 import { navigationRef } from './navigationRef';
 
 const Stack = createNativeStackNavigator();

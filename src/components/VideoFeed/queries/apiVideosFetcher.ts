@@ -1,11 +1,6 @@
 import { api } from '../../../lib/api.ts';
 import { sleep } from '../../../utils/promise.ts';
 
-export type ApiVideosFetcherParams = {
-  take: number;
-  skip: number;
-};
-
 export type VideoFileQuality = {
   fps: number;
   width: number;
@@ -54,14 +49,24 @@ export type VideoPost = {
   user: VideoUser;
 };
 
+export type ApiVideosFetcherParams = {
+  take: number;
+  skip: number;
+  where?: Record<string, string | number>;
+  orderBy?: Record<string, string>;
+};
+
 export const apiVideosFetcher = async ({
-    take,
-    skip,
+  take,
+  skip,
+  orderBy = {},
+  where = {},
 }: ApiVideosFetcherParams) => {
-  const orderBy = { likesCount: 'desc'  };
-  console.log('🔥 [apiVideosFetcher]', { skip, take });
-  const response = await api.get<VideoPost[]>('api/videos?where[status]=Finished', {
+  console.log('🔥 [apiVideosFetcher]', { where, skip, take, orderBy });
+  const response = await api.get<VideoPost[]>('api/videos', {
     params: {
+      'where[status]': 'Finished',
+      ...where,
       skip,
       take,
       ...Object.fromEntries(
@@ -69,7 +74,10 @@ export const apiVideosFetcher = async ({
       ),
     },
   });
-  console.log('VIDEOS', response.data);
 
-  return response.data;
+  console.log('Video response', response.data);
+  return response.data.map((v) => ({
+    ...v,
+    user: v.user ? v.user : { id: 'dummy_id', firstName: 'MISSING', lastName: 'USER' },
+  }));
 };

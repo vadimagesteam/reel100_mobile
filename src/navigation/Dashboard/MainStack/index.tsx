@@ -1,7 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DASHBOARD_ROUTES } from '../../routes';
-import MainScreen from '../../../screens/Dashboard/Main/MainScreen';
 import FullVideoScreen from '../../../screens/Dashboard/Main/FullVideo';
 import UserProfileScreen from '../../../screens/Dashboard/UserProfileScreen';
 import { MainTabScreen } from '../../../screens/App/Tabs/MainTabScreen.tsx';

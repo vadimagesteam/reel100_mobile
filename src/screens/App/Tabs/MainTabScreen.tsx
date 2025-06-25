@@ -6,24 +6,16 @@ import { SceneMap, TabView, TabBar } from 'react-native-tab-view';
 import { useVideoPlayerStore } from '../../../state/videoPlayer/videoVideoPlayerStore.ts';
 import { Top100Videos } from '../../../components/Top100/Top100Videos.tsx';
 import { SvgIcon } from '../../../components/old/UI';
-
-import { StateFeedTab, TopOneHundredTab } from '../../../components/old/TabViewVideo/components';
 import { colors } from '../../../theme/colors.ts';
 import { VideoCommentsOverlay } from '../../../components/VideoFeed/Comments/VideoCommentsOverlay.tsx';
-import { GlobalCountdown } from '../../../components/AppHeader/GlobalCountdown/GlobalCountdown.tsx';
-import CustomHeader from '../../../components/old/navigator/CustomHeader';
 import { AppHeader, AppHeaderHeight } from '../../../components/AppHeader/AppHeader.tsx';
-
-const MemoStateFeedTab = React.memo(StateFeedTab);
+import { Top100VideosByDate } from '../../../components/Top100/Top100VideosByDate.tsx';
+import { StateFeed } from '../../../components/StateFeed/StateFeed.tsx';
 
 const renderScene = SceneMap({
   top100: Top100Videos,
-  state_feed: () => (
-    <SafeAreaView>
-      <MemoStateFeedTab />
-    </SafeAreaView>
-  ),
-  top_video: () => <TopOneHundredTab withCalendar />,
+  state_feed: StateFeed,
+  top_video: Top100VideosByDate,
 });
 
 const routes = [

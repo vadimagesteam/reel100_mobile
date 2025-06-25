@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { VideoList, SwipeableVideosListProps } from './VideoList.tsx';
 
-export const VideoFeedContext = createContext<{ cacheKey: string } | undefined>(undefined);
+export const VideoFeedContext = createContext<{ cacheKey: string[] } | undefined>(undefined);
 
 export const useVideoFeed = () => {
   const ctx = useContext(VideoFeedContext);
@@ -13,7 +13,7 @@ export const useVideoFeed = () => {
 };
 
 export interface VideoFeedProps extends SwipeableVideosListProps {
-  cacheKey: string;
+  cacheKey: string[];
 }
 
 export const VideoFeed = ({ cacheKey, ...videoListProps }: VideoFeedProps) => {

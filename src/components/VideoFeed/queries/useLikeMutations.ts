@@ -15,9 +15,7 @@ type LikeResponse = { id: string };
 export const useLikeMutations = () => {
   const queryClient = useQueryClient();
   const { id: userId } = useUser();
-  const feedCtx = useVideoFeed();
-
-  const videosKey = [feedCtx.cacheKey];
+  const { cacheKey: videosKey } = useVideoFeed();
 
   const updateVideoLikesCount = (videoId: string, val: 1 | -1) => {
     const videoPages = queryClient.getQueryData<{ pages: VideoPost[][] } | undefined>(videosKey);

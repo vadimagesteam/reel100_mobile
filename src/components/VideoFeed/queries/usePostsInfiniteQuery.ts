@@ -5,15 +5,17 @@ import { queryClient } from '../../../lib/api.ts';
 
 export type usePostsInfiniteQueryParams = {
   limit?: number;
-  cacheKey?: string;
+  cacheKey: string[];
+  where?: Record<string, string | number>;
+  orderBy?: Record<string, string>;
 };
 
 export const usePostsInfiniteQuery = (params: usePostsInfiniteQueryParams) => {
-  const { limit = 10, cacheKey } = params;
+  const { limit = 10, cacheKey, where, orderBy } = params;
   const hookResult = useInfiniteQuery({
-    queryKey: [cacheKey],
+    queryKey: cacheKey,
     queryFn: async ({ pageParam = 0 }) => {
-      return apiVideosFetcher({ take: limit, skip: pageParam });
+      return apiVideosFetcher({ take: limit, skip: pageParam, where, orderBy });
     },
     getNextPageParam: (lastPage, allPages) => {
       const totalLoaded = allPages.flat().length;
