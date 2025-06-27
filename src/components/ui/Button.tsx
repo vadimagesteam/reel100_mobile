@@ -10,7 +10,7 @@ import clsx from 'clsx';
 import { FC, ReactNode } from 'react';
 
 export interface ButtonProps extends TouchableOpacityProps {
-  variant?: 'primary' | 'outline' | 'danger' | 'gradient' | 'ghost'
+  variant?: 'primary' | 'outline' | 'danger' | 'gradient' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   loadingText?: string;
@@ -51,34 +51,26 @@ const textSizes: Record<string, string> = {
 };
 
 export const Button: FC<ButtonProps> = ({
-                                          variant = 'primary',
-                                          size = 'lg',
-                                          loading,
-                                          loadingText,
-                                          textClassName,
-                                          buttonClassName,
-                                          children,
-                                          disabled,
-                                          iconLeft,
-                                          iconRight,
-                                          gradientColors,
-                                          ...rest
-                                        }) => {
+  variant = 'primary',
+  size = 'lg',
+  loading,
+  loadingText,
+  textClassName,
+  buttonClassName,
+  children,
+  disabled,
+  iconLeft,
+  iconRight,
+  gradientColors,
+  ...rest
+}) => {
   const baseButton = 'rounded-xl items-center justify-center flex-row overflow-hidden';
-
 
   const isDisabled = disabled || loading;
 
   const content = loading ? (
     loadingText ? (
-      <Text
-        className={clsx(
-          'font-bold',
-          textVariants[variant],
-          textSizes[size],
-          textClassName,
-        )}
-      >
+      <Text className={clsx('font-bold', textVariants[variant], textSizes[size], textClassName)}>
         {loadingText}
       </Text>
     ) : (
@@ -87,18 +79,15 @@ export const Button: FC<ButtonProps> = ({
   ) : (
     <View className="flex-row items-center gap-x-2">
       {iconLeft}
-      <Text
-        className={clsx(
-          'font-bold',
-          textVariants[variant],
-          textSizes[size],
-          textClassName,
-        )}
-      >
+      <Text className={clsx('font-bold', textVariants[variant], textSizes[size], textClassName)}>
         {children}
       </Text>
       {iconRight}
     </View>
+  );
+  console.log(
+    'BTN TEXT CLASSNAME',
+    clsx('font-bold', textVariants[variant], textSizes[size], textClassName),
   );
 
   const gradient = (
@@ -109,18 +98,16 @@ export const Button: FC<ButtonProps> = ({
         colors={gradientColors ?? ['#39bdc5', '#2140a1']}
         style={{ flex: 1 }}
       >
-          {content}
+        {content}
       </LinearGradient>
     </View>
   );
 
   return (
-    <TouchableOpacity
-      disabled={isDisabled}
-      activeOpacity={0.85}
-      {...rest}
-    >
-      {variant === 'gradient' ? gradient : (
+    <TouchableOpacity disabled={isDisabled} activeOpacity={0.85} {...rest}>
+      {variant === 'gradient' ? (
+        gradient
+      ) : (
         <View className={clsx(baseButton, variants[variant], sizes[size], buttonClassName)}>
           {content}
         </View>

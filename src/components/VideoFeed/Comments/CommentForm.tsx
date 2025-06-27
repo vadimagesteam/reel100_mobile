@@ -2,19 +2,14 @@ import React, { forwardRef, useMemo } from 'react';
 import { BottomSheetTextInput, TouchableOpacity } from '@gorhom/bottom-sheet';
 import { Text, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
-import {
-  useVideoActions,
-  useVideoPlayerStore,
-} from '../../../state/videoPlayer/videoVideoPlayerStore.ts';
 import clsx from 'clsx';
+import { useVideoComments } from '../hooks';
 
 export interface CommentFormProps {
   onSubmit: (text: string) => void;
 }
 export const CommentForm = forwardRef<TextInput, CommentFormProps>(({ onSubmit }, ref) => {
-  const text = useVideoPlayerStore((s) => s.commentText);
-  const { setCommentText } = useVideoActions();
-
+  const { text, setCommentText } = useVideoComments();
   const isEmpty = useMemo(() => !text.trim().length, [text]);
 
   return (

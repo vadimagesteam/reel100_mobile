@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, Text, TouchableOpacity, View, ViewProps } from 'react-native';
-import { CommentType } from './queries/useCommentsInfiniteQuery.ts';
+import { CommentType } from './hooks/useCommentsInfiniteQuery.ts';
 import { formatTimeAgo } from '../../../utils/formatTime.ts';
 
 export interface CommentListItemProps<T = CommentType> extends Pick<ViewProps, 'onLayout'> {

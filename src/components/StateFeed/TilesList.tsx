@@ -28,7 +28,7 @@ export const TilesList = ({
 
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<TileBlock<VideoPost>>) => (
-      <TileListBlock block={item} blockIndex={index} onVideoPress={onVideoClick} />
+      <TileListBlock item={item} index={index} onVideoPress={onVideoClick} />
     ),
     [onVideoClick],
   );

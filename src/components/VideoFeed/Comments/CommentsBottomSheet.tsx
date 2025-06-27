@@ -3,15 +3,11 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { CommentsList, CommentsListProps } from './CommentsList.tsx';
-import { CommentType } from './queries/useCommentsInfiniteQuery.ts';
 import { CommentReplyBar } from './CommentReplyBar.tsx';
 import { CommentForm } from './CommentForm.tsx';
 import { TextInput } from 'react-native-gesture-handler';
-import { useCommentMutation } from './queries/useCommentMutation.ts';
-import {
-  useVideoActions,
-  useVideoPlayerStore,
-} from '../../../state/videoPlayer/videoVideoPlayerStore.ts';
+import { useCommentMutation } from './hooks/useCommentMutation.ts';
+import { useVideoComments } from '../hooks';
 
 export interface CommentsBottomSheetProps {
   open: boolean;
@@ -25,8 +21,8 @@ export const CommentsBottomSheet = ({ open, onClose, videoId }: CommentsBottomSh
 
   const addComment = useCommentMutation();
 
-  const commentReply = useVideoPlayerStore((s) => s.commentReply);
-  const { setCommentReply, resetCommentReply, expandCommentReplies } = useVideoActions();
+  const { commentReply, setCommentReply, resetCommentReply, expandCommentReplies } =
+    useVideoComments();
 
   useEffect(() => {
     if (open) {

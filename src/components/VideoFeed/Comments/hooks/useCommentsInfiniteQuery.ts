@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 import { queryClient } from '../../../../lib/api.ts';
-import { apiFetchComments } from './apiFetchComments.ts';
+import { apiFetchComments } from '../queries/apiFetchComments.ts';
 
 export type CommentType = {
   id: string;

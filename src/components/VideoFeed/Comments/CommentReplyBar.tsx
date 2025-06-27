@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { CommentType } from './queries/useCommentsInfiniteQuery.ts';
+import { CommentType } from './hooks/useCommentsInfiniteQuery.ts';
 
 export interface CommentReplyBarProps {
   replyToUser: CommentType['user'];

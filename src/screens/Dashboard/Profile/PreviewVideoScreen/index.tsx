@@ -1,40 +1,25 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import {
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Alert,
-} from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View, Alert } from 'react-native';
 import Video from 'react-native-video';
 import { isIOS } from '../../../../utils/platformChecker';
 import { BodyText, ButtonDefault, SvgIcon } from '../../../../components/old/UI';
 import { colors } from '../../../../styles';
 import { useReduxDispatch, useReduxSelector } from '../../../../store/store';
 import { createVideoAction } from '../../../../redux/CameraRedux/cameraActions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useStateSelector } from '../../../../state/app/uiStore.ts';
 
 const PreviewVideoScreen: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useReduxDispatch();
-  const { customLoading, prewievVideoUrl } = useReduxSelector(state => state.camera);
+  const { customLoading, prewievVideoUrl } = useReduxSelector((state) => state.camera);
 
   const videoRef = useRef<Video>(null);
   const [duration, setDuration] = useState<number | null>(null);
-  const [stateId, setStateId] = useState<string | null>(null);
+  // const [stateId, setStateId] = useState<string | null>(null);
+  const [selectedState] = useStateSelector();
 
-  // Load stateId from AsyncStorage on mount
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      const id = await AsyncStorage.getItem('STATE');
-      if (isMounted) setStateId(id);
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  console.log('selectedState', selectedState);
 
   // Handle video load and duration check
   const handleLoad = useCallback(
@@ -45,25 +30,31 @@ const PreviewVideoScreen: React.FC = () => {
         navigation.goBack();
       }
     },
-    [navigation]
+    [navigation],
   );
 
   // Publish button handler
   const handlePublish = useCallback(() => {
-    if (!stateId || !prewievVideoUrl) return;
-    const fileName = prewievVideoUrl.split('/').pop()?.replace(/\.[^/.]+$/, '');
+    if (!selectedState?.id) {
+      alert('State is not selected');
+      return;
+    }
+    const fileName = prewievVideoUrl
+      .split('/')
+      .pop()
+      ?.replace(/\.[^/.]+$/, '');
     const payload = {
       createVideo: {
         label: fileName,
         states: {
-          connect: { id: stateId },
+          connect: { id: selectedState?.id },
         },
       },
       file: prewievVideoUrl,
       navigation,
     };
     dispatch(createVideoAction(payload));
-  }, [dispatch, stateId, prewievVideoUrl, navigation]);
+  }, [dispatch, selectedState, prewievVideoUrl, navigation]);
 
   // Back button handler
   const handleBack = useCallback(async () => {
@@ -101,7 +92,7 @@ const PreviewVideoScreen: React.FC = () => {
       <View style={[styles.controls, { left: 20 }]}>
         <ButtonDefault
           loading={customLoading}
-          disabled={customLoading || !stateId}
+          disabled={customLoading}
           buttoStyles={styles.publishButton}
           onPress={handlePublish}
         >

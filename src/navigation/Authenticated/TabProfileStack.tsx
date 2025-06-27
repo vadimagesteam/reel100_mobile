@@ -7,6 +7,7 @@ import PreviewVideoScreen from '../../screens/Dashboard/Profile/PreviewVideoScre
 import UserProfileScreen from '../../screens/Dashboard/UserProfileScreen';
 import ChatListScreen from '../../screens/Dashboard/Chat/ChatListScreen';
 import ChatScreen from '../../screens/Dashboard/Chat/ChatScreen';
+import MyProfileScreen from '../../screens/App/Tabs/MyProfileScreen.tsx';
 
 const Stack = createStackNavigator();
 
@@ -17,7 +18,7 @@ const ProfileStack = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name={DASHBOARD_ROUTES.PROFILE_SCREEN} component={ProfileScreen} />
+      <Stack.Screen name={DASHBOARD_ROUTES.PROFILE_SCREEN} component={MyProfileScreen} />
       <Stack.Screen name={DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN} component={VideoRecordScreen} />
       <Stack.Screen name={DASHBOARD_ROUTES.PREVIEW_VIDEO_SCREEN} component={PreviewVideoScreen} />
       <Stack.Screen name={DASHBOARD_ROUTES.USER_PROFILE_SCREEN} component={UserProfileScreen} />

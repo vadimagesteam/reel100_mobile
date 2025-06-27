@@ -1,5 +1,9 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { apiVideosFetcher } from './apiVideosFetcher.ts';
+import {
+  useInfiniteQuery,
+  type InfiniteData,
+  type UseInfiniteQueryResult,
+} from '@tanstack/react-query';
+import { apiVideosFetcher, VideoPost } from '../queries/apiVideosFetcher.ts';
 import { useEffect, useMemo } from 'react';
 import { queryClient } from '../../../lib/api.ts';
 
@@ -10,7 +14,15 @@ export type usePostsInfiniteQueryParams = {
   orderBy?: Record<string, string>;
 };
 
-export const usePostsInfiniteQuery = (params: usePostsInfiniteQueryParams) => {
+export type VideoPostQueryResult<T extends VideoPost = VideoPost> = UseInfiniteQueryResult<
+  InfiniteData<T[]>
+> & {
+  flatPages: T[];
+};
+
+export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
+  params: usePostsInfiniteQueryParams,
+): VideoPostQueryResult<T> => {
   const { limit = 10, cacheKey, where, orderBy } = params;
   const hookResult = useInfiniteQuery({
     queryKey: cacheKey,
@@ -30,7 +42,7 @@ export const usePostsInfiniteQuery = (params: usePostsInfiniteQueryParams) => {
 
   // Refetch manually only first page
   useEffect(() => {
-    queryClient.setQueryData<{ pages: any[]; pageParams: any[] }>([cacheKey], (data) => {
+    queryClient.setQueryData<{ pages: any[]; pageParams: any[] }>(cacheKey, (data) => {
       if (data) {
         return {
           pages: (data?.pages as any[]).slice(0, 1),
@@ -46,5 +58,5 @@ export const usePostsInfiniteQuery = (params: usePostsInfiniteQueryParams) => {
   return {
     ...hookResult,
     flatPages,
-  };
+  } as VideoPostQueryResult<T>;
 };

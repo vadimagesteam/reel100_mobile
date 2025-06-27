@@ -4,22 +4,24 @@ import Video, {
   ReactVideoProps,
   ResizeMode,
   SelectedVideoTrackType,
+  type OnLoadData,
+  type OnProgressData,
 } from 'react-native-video';
+import Share from 'react-native-share';
+import { useFocusEffect } from '@react-navigation/native';
 import { VideoPost } from './queries/apiVideosFetcher.ts';
-import { ActivityIndicator, View } from 'react-native';
-import { OnLoadData } from 'react-native-video/src/types/events.ts';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { colors } from '../../theme/colors.ts';
 import { VideoPreview } from './VideoPreview.tsx';
-import type { OnProgressData } from 'react-native-video/src/specs/VideoNativeComponent.ts';
 import { formatTime } from '../../utils/formatTime.ts';
-import {
-  useVideoActions,
-  useVideoPlayerStore,
-} from '../../state/videoPlayer/videoVideoPlayerStore.ts';
 import { VideoInfoOverlay } from './VideoInfoOverlay.tsx';
-import { useVideoLikeQuery } from './queries/useLikeQuery.ts';
-import { useLikeMutations } from './queries/useLikeMutations.ts';
-import Share from 'react-native-share';
+import {
+  useLikeMutations,
+  useVideoLikeQuery,
+  useVideoFullscreen,
+  useVideoPause,
+  useVideoFeed,
+} from './hooks';
 
 export interface VideoItemProps extends Pick<ReactVideoProps, 'muted' | 'repeat'> {
   video: VideoPost;
@@ -47,11 +49,10 @@ export const VideoListItem: FC<VideoItemProps> = ({
     },
   } = video;
 
-  const isPlayerFullScreen = useVideoPlayerStore((s) => s.isPlayerFullScreen);
-  const isPaused = useVideoPlayerStore((s) => s.isPaused);
-  const currentTime = useVideoPlayerStore((s) => s.currentTime);
+  const { isFullscreen } = useVideoFullscreen();
+  const { isPaused, setIsPaused } = useVideoPause();
 
-  const { openComments, updateTime } = useVideoActions();
+  const { openComments } = useVideoFeed((s) => s.actions);
 
   const playerRef = useRef<VideoRef>(null);
 
@@ -59,8 +60,18 @@ export const VideoListItem: FC<VideoItemProps> = ({
   const [progress, setProgress] = useState<OnProgressData>();
 
   const { data: likeData } = useVideoLikeQuery('video', videoId);
-
   const { toggleLike } = useLikeMutations();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (active) {
+        setIsPaused(false);
+      }
+      return () => {
+        setIsPaused(true);
+      };
+    }, [active, setIsPaused]),
+  );
 
   // Get preview image (first video "screen")
   const previewUrl = variation ? variation.screenshots[0] : null;
@@ -70,15 +81,15 @@ export const VideoListItem: FC<VideoItemProps> = ({
     if (!active && playerRef.current) {
       playerRef.current.seek(0);
     }
-  }, [active, currentTime]);
+  }, [active]);
 
   const mountRef = useRef(false);
   useEffect(() => {
-    if (!mountRef.current && active && currentTime && playerRef.current) {
-      playerRef.current.seek(currentTime);
+    if (!mountRef.current && active && progress?.currentTime && playerRef.current) {
+      playerRef.current.seek(progress.currentTime);
       mountRef.current = true;
     }
-  }, [active, currentTime]);
+  }, [active, progress?.currentTime]);
 
   const handleLike = () => {
     toggleLike({
@@ -112,19 +123,16 @@ export const VideoListItem: FC<VideoItemProps> = ({
   }, [storagePath]);
 
   return (
-    <View style={dimensions}>
+    <Pressable style={dimensions}>
       <Video
         ref={playerRef}
         repeat
         source={{ uri: hlsUrl, shouldCache: true }}
-        paused={!active || isPaused}
+        paused={!active || isPaused || isPaused}
         resizeMode={ResizeMode.COVER}
         muted={muted || !active}
         onLoad={setLoadStarted}
-        onProgress={(progress: OnProgressData) => {
-          setProgress(progress);
-          updateTime(progress.currentTime);
-        }}
+        onProgress={setProgress}
         style={[dimensions]}
         selectedVideoTrack={{ type: SelectedVideoTrackType.AUTO }}
         {...videoProps}
@@ -133,7 +141,7 @@ export const VideoListItem: FC<VideoItemProps> = ({
       {active && (
         <VideoInfoOverlay
           video={video}
-          isPlayerFullScreen={isPlayerFullScreen}
+          isPlayerFullScreen={isFullscreen}
           isPaused={isPaused}
           timeLeft={
             loadStarted && progress
@@ -159,6 +167,6 @@ export const VideoListItem: FC<VideoItemProps> = ({
           </View>
         </>
       )}
-    </View>
+    </Pressable>
   );
 };

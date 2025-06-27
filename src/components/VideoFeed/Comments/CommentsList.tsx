@@ -1,13 +1,10 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 import { ActivityIndicator, ListRenderItem, Text, View } from 'react-native';
 import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
-import { CommentType, useCommentsInfiniteQuery } from './queries/useCommentsInfiniteQuery.ts';
+import { CommentType, useCommentsInfiniteQuery } from './hooks/useCommentsInfiniteQuery.ts';
 import { CommentsListItem } from './CommentsListItem.tsx';
-import {
-  useVideoActions,
-  useVideoPlayerStore,
-} from '../../../state/videoPlayer/videoVideoPlayerStore.ts';
 import { useScrollToNewComment } from './hooks/useScrollToNewComment.ts';
+import { useVideoComments } from '../hooks';
 
 export interface CommentsListProps {
   videoId: string;
@@ -22,8 +19,7 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
   const { flatPages, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useCommentsInfiniteQuery(videoId);
 
-  const commentsExpanded = useVideoPlayerStore((s) => s.commentsExpanded);
-  const { toggleCommentReplies } = useVideoActions();
+  const { commentsExpanded, toggleCommentReplies } = useVideoComments();
 
   const itemHeighByIndex = useRef<Record<number, number>>({});
 
@@ -77,11 +73,11 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
       renderItem={renderComment}
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.3}
-      ListEmptyComponent={() => (
+      ListEmptyComponent={
         <View className="min-h-[280px] flex-1 items-center justify-center">
           <Text className="text-xl text-neutral-400">No comments yet</Text>
         </View>
-      )}
+      }
       ListFooterComponent={
         isFetchingNextPage ? <ActivityIndicator className="my-4" color="#aaa" /> : null
       }

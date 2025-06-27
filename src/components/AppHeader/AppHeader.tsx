@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../../styles';
 import { SvgIcon } from '../old/UI';
 import { GlobalCountdown } from './GlobalCountdown/GlobalCountdown.tsx';
@@ -10,16 +10,19 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import { useStateSelector } from '../../state/app/appPersistentStore.ts';
 import { MenuButton } from './MenuButton.tsx';
+import clsx from 'clsx';
+import { useStateSelector } from '../../state/app/uiStore.ts';
 
 export const AppHeaderHeight = 60;
 
 export interface AppHeaderProps {
   stateSelect?: boolean;
+  disableLayoutAnimation?: boolean;
+  className?: string;
 }
 
-export const AppHeader = ({ stateSelect = false }: AppHeaderProps) => {
+export const AppHeader = ({ disableLayoutAnimation = true, className }: AppHeaderProps) => {
   const [selectedState] = useStateSelector();
   const [expanded, setExpanded] = useState(false);
 
@@ -30,13 +33,19 @@ export const AppHeader = ({ stateSelect = false }: AppHeaderProps) => {
     [expanded],
   );
 
+  const layoutAnimationProps = disableLayoutAnimation
+    ? {}
+    : ({
+        layout: LinearTransition.duration(1000),
+        entering: FlipInEasyY,
+      } as const);
+
   return (
-    <Animated.View className="z-30 w-full">
+    <View className={clsx('z-30 mx-[10px]', className)}>
       {!expanded ? (
         <Animated.View
-          layout={LinearTransition.duration(1000)}
-          entering={FlipInEasyY}
-          className="h-[60px] flex-row items-center justify-between px-4"
+          {...layoutAnimationProps}
+          className="h-[60px] flex-row items-center justify-between"
         >
           <TouchableOpacity
             className="flex-row gap-2"
@@ -54,7 +63,7 @@ export const AppHeader = ({ stateSelect = false }: AppHeaderProps) => {
       ) : (
         <Animated.View
           style={selectorStyle}
-          className="h-[60px] flex-row items-center gap-4 px-4 opacity-0"
+          className="h-[60px] flex-row items-center gap-4 opacity-0"
         >
           <StateSelector onChange={() => setExpanded(false)} />
           <TouchableOpacity onPress={() => setExpanded(false)}>
@@ -62,6 +71,6 @@ export const AppHeader = ({ stateSelect = false }: AppHeaderProps) => {
           </TouchableOpacity>
         </Animated.View>
       )}
-    </Animated.View>
+    </View>
   );
 };

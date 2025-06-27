@@ -1,13 +1,10 @@
-import {
-  useVideoActions,
-  useVideoPlayerStore,
-} from '../../../state/videoPlayer/videoVideoPlayerStore.ts';
-import { CommentsBottomSheet } from './CommentsBottomSheet.tsx';
 import { Pressable } from 'react-native';
+import { CommentsBottomSheet } from './CommentsBottomSheet.tsx';
+import { useVideoFeed } from '../hooks/useVideoFeed.ts';
 
 export const VideoCommentsOverlay = () => {
-  const commentsOpened = useVideoPlayerStore((s) => s.commentsOpened);
-  const { closeComments } = useVideoActions();
+  const commentsOpened = useVideoFeed((s) => s.commentsOpened);
+  const { closeComments } = useVideoFeed((s) => s.actions);
 
   const isOpened = !!commentsOpened;
 

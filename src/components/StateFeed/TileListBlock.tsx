@@ -11,8 +11,8 @@ const { width: screenWidth } = Dimensions.get('window');
 const half = screenWidth / 2;
 
 export interface RenderBlockProp<T = TileBlock<VideoPost>> {
-  block: T;
-  blockIndex: number;
+  item: T;
+  index: number;
   onVideoPress: (video: VideoPost) => void;
 }
 
@@ -55,7 +55,11 @@ const renderVideo = (
   );
 };
 
-export const TileListBlock = ({ block, blockIndex, onVideoPress }: RenderBlockProp) => {
+export const TileListBlock = ({
+  item: block,
+  index: blockIndex,
+  onVideoPress,
+}: RenderBlockProp) => {
   const { type, items } = block;
 
   if (type === 'leftSmall_rightBig') {

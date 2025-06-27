@@ -1,11 +1,21 @@
-import React, { useCallback, useMemo } from 'react';
-import { usePostsInfiniteQuery } from '../VideoFeed/queries/usePostsInfiniteQuery.ts';
-import { VideoFeed } from '../VideoFeed/VideoFeed.tsx';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useVideosInfiniteQuery } from '../VideoFeed/hooks/useVideosInfiniteQuery.ts';
+import { VideoList } from '../VideoFeed/VideoList.tsx';
+import { useSetVideoFeedCacheKey } from '../VideoFeed/hooks/useSetVideoFeedCacheKey.ts';
+import { useVideoPause } from '../VideoFeed/hooks/useVideoPause.ts';
 
 export const Top100Videos = () => {
   const cacheKey = useMemo(() => ['top100_videos'], []);
+
+  useSetVideoFeedCacheKey(cacheKey);
+
   const { fetchNextPage, hasNextPage, isFetchingNextPage, flatPages, refetch, isRefetching } =
-    usePostsInfiniteQuery({ cacheKey });
+    useVideosInfiniteQuery({
+      cacheKey,
+      orderBy: {
+        likesCount: 'desc',
+      },
+    });
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -14,8 +24,7 @@ export const Top100Videos = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <VideoFeed
-      cacheKey={cacheKey}
+    <VideoList
       initialVideoIndex={0}
       isRefetching={isRefetching}
       refetch={refetch}

@@ -1,6 +1,6 @@
 import { RefObject, useLayoutEffect, useRef } from 'react';
 import { sleep } from '../../../../utils/promise.ts';
-import { CommentType } from '../queries/useCommentsInfiniteQuery.ts';
+import { CommentType } from './useCommentsInfiniteQuery.ts';
 import { BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
 
 /**

@@ -1,5 +1,5 @@
 import { api } from '../../../../lib/api.ts';
-import { CommentType } from './useCommentsInfiniteQuery.ts';
+import { CommentType } from '../hooks/useCommentsInfiniteQuery.ts';
 
 export type FetchCommentsParams = {
   videoId: string;

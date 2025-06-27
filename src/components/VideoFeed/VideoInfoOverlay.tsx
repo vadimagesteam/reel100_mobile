@@ -1,15 +1,14 @@
 import { Image, Text, View } from 'react-native';
-import React, { FC, useCallback } from 'react';
+import React, { FC, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VideoPost } from './queries/apiVideosFetcher.ts';
 import { colors } from '../../styles';
 import { cs } from '../old/VideoAbsoluteInfo/styles.ts';
 import { SvgIcon } from '../old/UI';
 import { GestureTouchableOpacity } from './GestureTouchableOpacity.tsx';
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { IconHeart } from '../ui/icons/IconHeart.tsx';
-import { useVideoActions } from '../../state/videoPlayer/videoVideoPlayerStore.ts';
-import { LayoutChangeEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+import { useVideoFeed } from './hooks';
 
 export interface VideoInfoOverlayProps {
   isPlayerFullScreen: boolean;
@@ -43,7 +42,7 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
   liked,
 }) => {
   const insets = useSafeAreaInsets();
-  const { setHearIconPos } = useVideoActions();
+  const { setHeartIconPos } = useVideoFeed((s) => s.actions);
   const avatar = '';
 
   const {
@@ -52,17 +51,31 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
     commentsCount,
   } = video;
 
-  const onHearIconLayout = useCallback(
-    (e: LayoutChangeEvent) =>
-      e.target.measureInWindow((x, y) => {
-        setHearIconPos({ x, y });
-      }),
-    [setHearIconPos],
-  );
+  const wrapperViewRef = useRef<View>(null);
+  const heartRef = useRef<View>(null);
+
+  const updateIconPosition = () => {
+    heartRef.current?.measureInWindow((x, y) => {
+      console.log('👀 HEART POS', { x, y });
+      // setHeartIconPos({ x, y });
+    });
+    heartRef.current?.measureLayout(
+      wrapperViewRef.current!,
+      (x, y) => {
+        console.log('📌 Relative to custom parent:', { x, y });
+        setHeartIconPos({ x, y });
+      },
+      () => {
+        console.warn('Failed to measure heart icon layout position');
+      },
+    );
+  };
 
   const topInfoStyles = useAnimatedStyle(
     () => ({
-      top: withTiming(isPlayerFullScreen ? insets.top : 30, { duration: 300 }),
+      top: withTiming(isPlayerFullScreen ? insets.top : 30, { duration: 300 }, () => {
+        runOnJS(updateIconPosition)();
+      }),
     }),
     [isPlayerFullScreen],
   );
@@ -75,7 +88,11 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
   );
 
   return (
-    <Animated.View className="absolute bottom-4 top-4 z-20 h-full w-full" style={topInfoStyles}>
+    <Animated.View
+      ref={wrapperViewRef}
+      className="absolute bottom-4 top-4 z-20 h-full w-full"
+      style={topInfoStyles}
+    >
       {isPaused && (
         <View className="absolute h-full w-full items-center justify-center opacity-50">
           <SvgIcon image="playIcon" color="white" style={cs.iconPlayStyle} />
@@ -113,7 +130,10 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
             hitSlop={20}
             className="flex-col items-center gap-2"
           >
-            <View onLayout={onHearIconLayout}>
+            <View
+              ref={heartRef}
+              //onLayout={onHearIconLayout}
+            >
               <IconHeart variant={liked ? 'filled' : 'outline'} width={24} height={24} />
             </View>
             <Text className="text-base font-bold color-white">{likesCount}</Text>

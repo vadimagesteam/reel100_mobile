@@ -1,12 +1,9 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  useVideoActions,
-  useVideoPlayerStore,
-} from '../../state/videoPlayer/videoVideoPlayerStore.ts';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
+  useSharedValue,
   withDelay,
   withSequence,
   withTiming,
@@ -18,7 +15,12 @@ import { useLayoutDimensions } from './hooks/useLayoutDimensions.ts';
 import { VideoListItem } from './VideoListItem.tsx';
 import { useFlatListLayoutChangeScrollFix } from './hooks/useFlatListLayoutChangeScrollFix.ts';
 import { LikeAnimation, LikeAnimationRef } from './LikeAnimation.tsx';
-import { useLikeMutations } from './queries/useLikeMutations.ts';
+import { useLikeMutations } from './hooks/useLikeMutations.ts';
+import { useVideoFullscreen } from './hooks/useVideoFullscreen.ts';
+import { useVideoPause } from './hooks/useVideoPause.ts';
+import { useVideoFeed } from './hooks/useVideoFeed.ts';
+import { useHideableContainer } from '../HidebleContainer';
+import { VideoCommentsOverlay } from './Comments/VideoCommentsOverlay.tsx';
 
 export interface SwipeableVideosListProps
   extends Omit<FlatListProps<VideoPost>, 'data' | 'renderItem' | 'refreshing'> {
@@ -35,10 +37,9 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   isRefetching,
   ...flatListProps
 }) => {
-  // video state
-  const { setIsPlayerFullScreen, togglePause, closeComments } = useVideoActions();
-  const isPaused = useVideoPlayerStore((s) => s.isPaused);
-  const isPlayerFullScreen = useVideoPlayerStore((s) => s.isPlayerFullScreen);
+  const { closeComments } = useVideoFeed((s) => s.actions);
+  const { isFullscreen, setFullscreen } = useVideoFullscreen();
+  const { isPaused, togglePause } = useVideoPause();
 
   const flatListRef = useRef<FlatList<VideoPost>>(null);
 
@@ -47,13 +48,23 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const [viewPaused, setViewPaused] = useState(false);
   const { dimensions, onLayout } = useLayoutDimensions();
 
-  const fullScreenRef = useRef(isPlayerFullScreen);
+  // Fullscreen: hide container
+  const { show: showHeader, hide: hideHeaders } = useHideableContainer();
+  useEffect(() => {
+    if (isFullscreen) {
+      hideHeaders();
+    } else {
+      showHeader();
+    }
+  }, [hideHeaders, isFullscreen, showHeader]);
+
+  const fullScreenRef = useRef(isFullscreen);
   const likeAnimationRef = useRef<LikeAnimationRef>(null);
   useEffect(() => {
-    if (fullScreenRef.current && !isPlayerFullScreen && viewPaused) {
+    if (fullScreenRef.current && !isFullscreen && viewPaused) {
       setViewPaused(false);
     }
-  }, [isPlayerFullScreen, viewPaused]);
+  }, [isFullscreen, viewPaused]);
 
   const { like } = useLikeMutations();
 
@@ -71,18 +82,18 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   };
 
   const handleSingleTap = () => {
-    if (isPlayerFullScreen) {
+    if (isFullscreen) {
       togglePause();
     } else {
-      setIsPlayerFullScreen(true);
+      setFullscreen(true);
       fullScreenRef.current = true;
       closeComments();
     }
   };
 
   const backSwipeGesture = Gesture.Pan().onEnd((e) => {
-    if (isPlayerFullScreen && e.translationX > 50 && e.velocityX > 500) {
-      runOnJS(setIsPlayerFullScreen)(false);
+    if (isFullscreen && e.translationX > 50 && e.velocityX > 500) {
+      runOnJS(setFullscreen)(false);
     }
   });
 
@@ -138,17 +149,22 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   // When video container became bigger we need to reScroll as items height is changed
   useFlatListLayoutChangeScrollFix(flatListRef, activeIndex, dimensions.height);
 
+  const isFullscreenShared = useSharedValue(isFullscreen);
+  useEffect(() => {
+    isFullscreenShared.value = isFullscreen;
+  }, [isFullscreen, isFullscreenShared]);
+
   const viewStyle = useAnimatedStyle(
     () => ({
       zIndex: 20,
-      opacity: isPlayerFullScreen
+      opacity: isFullscreenShared.value
         ? withSequence(
             withTiming(0, { duration: 100 }),
             withDelay(500, withTiming(1, { duration: 200 })),
           )
         : withTiming(1),
     }),
-    [isPlayerFullScreen],
+    [isFullscreenShared],
   );
 
   const gesturesCombined = Gesture.Exclusive(backSwipeGesture, doubleTapGesture, singleTapGesture);
@@ -194,6 +210,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
         />
       </GestureDetector>
       <LikeAnimation ref={likeAnimationRef} />
+      <VideoCommentsOverlay />
     </Animated.View>
   );
 };

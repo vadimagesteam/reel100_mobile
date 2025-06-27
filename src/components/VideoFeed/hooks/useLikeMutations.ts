@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { api } from '../../../lib/api.ts';
 import { useUser } from '../../../state/user/authStore.ts';
-import { VideoPost } from './apiVideosFetcher.ts';
-import { useVideoFeed } from '../VideoFeed.tsx';
+import { VideoPost } from '../queries/apiVideosFetcher.ts';
+import { useVideoFeedCacheKey } from './useVideoFeedCacheKey.ts';
 
 type LikeArgs = {
   type: 'video' | 'comment';
@@ -15,7 +15,7 @@ type LikeResponse = { id: string };
 export const useLikeMutations = () => {
   const queryClient = useQueryClient();
   const { id: userId } = useUser();
-  const { cacheKey: videosKey } = useVideoFeed();
+  const videosKey = useVideoFeedCacheKey();
 
   const updateVideoLikesCount = (videoId: string, val: 1 | -1) => {
     const videoPages = queryClient.getQueryData<{ pages: VideoPost[][] } | undefined>(videosKey);

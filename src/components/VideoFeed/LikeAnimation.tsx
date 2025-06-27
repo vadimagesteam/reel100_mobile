@@ -10,7 +10,8 @@ import Animated, {
 import { IconHeart } from '../ui/icons/IconHeart.tsx';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useVideoPlayerStore } from '../../state/videoPlayer/videoVideoPlayerStore.ts';
+import { useVideoFullscreen } from './hooks/useVideoFullscreen.ts';
+import { useVideoFeed } from './hooks/useVideoFeed.ts';
 
 export interface LikeAnimationRef {
   trigger: () => void;
@@ -20,9 +21,9 @@ export interface LikeAnimationRef {
 export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
   const dimensions = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const isFullScreen = useVideoPlayerStore((s) => s.isPlayerFullScreen);
-  const originalIcon = useVideoPlayerStore((s) => s.hearIconPos);
+  const { isFullscreen } = useVideoFullscreen();
 
+  const originalIcon = useVideoFeed((s) => s.hearIconPos);
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
   const rotate = useSharedValue(0);
@@ -30,16 +31,13 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
-  const topTabsHeight = 60;
   const iconSize = 24;
 
   const startX = dimensions.width / 2 - iconSize / 2;
   const startY = dimensions.height / 3 - iconSize / 2;
 
   const finalX = originalIcon.x;
-  const finalY = isFullScreen
-    ? originalIcon.y
-    : originalIcon.y - topTabsHeight - insets.top + iconSize / 2 - 1;
+  const finalY = originalIcon.y + insets.top - (isFullscreen ? 0 : iconSize);
 
   useImperativeHandle(ref, () => ({
     animationDuration: 1000,

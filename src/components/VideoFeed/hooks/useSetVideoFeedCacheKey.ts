@@ -1,0 +1,13 @@
+import { useVideoFeed } from './useVideoFeed.ts';
+import { useEffect } from 'react';
+
+/**
+ * Set video cache key
+ * The key must be memoized for better perf
+ */
+export const useSetVideoFeedCacheKey = (cacheKey: string[]) => {
+  const setCacheKey = useVideoFeed((s) => s.actions.setCacheKey);
+  useEffect(() => {
+    setCacheKey(cacheKey);
+  }, [cacheKey, setCacheKey]);
+};
