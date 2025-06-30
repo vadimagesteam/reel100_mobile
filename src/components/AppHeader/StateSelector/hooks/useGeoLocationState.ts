@@ -52,10 +52,16 @@ export const useGeoLocationState = () => {
             if (storedState) {
               setSelectedState(storedState);
             } else {
-              Alert.alert('Warning', 'Unable to automatically identify state');
+              Alert.alert(
+                'Hmm…',
+                'We couldn’t determine your state. If you’re outside the US, please select a state manually to continue.',
+              );
             }
           } else {
-            Alert.alert('Warning', 'Unable to automatically identify state');
+            Alert.alert(
+              'Hmm…',
+              'We couldn’t determine your state. If you’re outside the US, please select a state manually to continue.',
+            );
           }
         },
         async (error) => {

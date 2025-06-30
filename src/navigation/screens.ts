@@ -16,5 +16,10 @@ export const Tabs = {
 export const Screens = {
   ...GuestScreens,
   Home: 'Home',
-  UserProfile: 'UserProfile',
+  Profile: 'UserProfile',
+
+  ForYou: 'ForYouScreen',
+  OtherUserProfile: 'UserProfileScreen',
+
+  VideoRecording: 'VideoRecoding',
 } as const;

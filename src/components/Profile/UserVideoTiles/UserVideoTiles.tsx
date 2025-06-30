@@ -6,7 +6,6 @@ import { VideoPost } from '../../VideoFeed/queries/apiVideosFetcher.ts';
 import { VideoTile } from './VideoTile.tsx';
 import { TileConfig } from './tileConfig.ts';
 import { useSetVideoFeedCacheKey } from '../../VideoFeed/hooks/useSetVideoFeedCacheKey.ts';
-import { VideoFeedProvider } from '../../VideoFeed';
 
 export interface ProfileVideoTilesProps {
   userId: string;

@@ -7,6 +7,7 @@ import { HideableView, HidebleContainer } from '../../../components/HidebleConta
 import { VideoFeedProvider } from '../../../components/VideoFeed';
 import { useNavigation } from '@react-navigation/native';
 import { DASHBOARD_ROUTES } from '../../../navigation/routes.ts';
+import { Screens } from '../../../navigation/screens.ts';
 
 const MyProfileScreen = () => {
   const user = useUser();
@@ -17,7 +18,8 @@ const MyProfileScreen = () => {
   }
 
   const handleUploadAndShare = () => {
-    navigation.navigate(DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN);
+    // navigation.navigate(DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN);
+    navigation.navigate(Screens.VideoRecording);
   };
 
   const handleChat = () => {

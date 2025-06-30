@@ -1,7 +1,5 @@
 import { StoreApi } from 'zustand/vanilla';
-import { PlayerStore } from './videoFeedStore.ts';
+import { VideoFeedStore } from './videoFeedStore.ts';
 import { createContext } from 'react';
 
-type VideoFeedStore = StoreApi<PlayerStore>;
-
-export const VideoFeedContext = createContext<VideoFeedStore | undefined>(undefined);
+export const VideoFeedContext = createContext<StoreApi<VideoFeedStore> | undefined>(undefined);

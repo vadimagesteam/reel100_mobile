@@ -67,22 +67,20 @@ export const Top100VideosByDate = () => {
         onCancelPress={cancel}
         onSubmitPress={confirm}
       />
-      {!data && isFetching && (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#ffffff" size="large" />
-        </View>
-      )}
-      {!flatPages.length && !isFetching && (
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-xl text-silver3">No videos found for selected date :(</Text>
-        </View>
-      )}
       <VideoList
         initialVideoIndex={0}
         isRefetching={isRefetching}
         refetch={refetch}
         videos={flatPages}
         onEndReached={onEndReached}
+        ListEmptyComponent={
+          !flatPages.length && !isFetching ? (
+            <View className="flex-1 grow items-center justify-center">
+              <Text className="text-xl text-silver3">Nothing to show yet.</Text>
+              <Text className="text-xl text-silver3">Try selecting a different date.</Text>
+            </View>
+          ) : null
+        }
       />
     </>
   );

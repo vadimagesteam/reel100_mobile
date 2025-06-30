@@ -42,9 +42,7 @@ export const createVideoAction = createAsyncThunk<any, any>(
         } as any); // as any required by RN FormData type
 
         // Step 3: Dispatch file upload action and unwrap for error catching
-        await thunkAPI.dispatch(
-          uploadVideoAction({ videoId, formData, navigation })
-        ).unwrap();
+        await thunkAPI.dispatch(uploadVideoAction({ videoId, formData, navigation })).unwrap();
       }
 
       return response?.data;
@@ -73,19 +71,12 @@ export const uploadVideoAction = createAsyncThunk<any, any>(
       };
 
       // Defensive: Ensure FormData contains a file part
-      if (
-        !(formData as any)._parts?.some?.(
-          (part: any[]) => part[0] === 'file' && part[1]?.uri
-        )
-      ) {
+      if (!(formData as any)._parts?.some?.((part: any[]) => part[0] === 'file' && part[1]?.uri)) {
         throw new Error('FormData missing video file.');
       }
 
-      const response = await api.put(
-        `api/videos/${videoId}/file`,
-        formData,
-        config,
-      );
+      const response = await api.put(`api/videos/${videoId}/file`, formData, config);
+      console.log('OLD VIDEO PUT RESPONSE', response);
 
       if (response?.status === 200) {
         thunkAPI.dispatch(setPreviewVideoURL(''));
@@ -160,10 +151,7 @@ export const getVideosTopAction = createAsyncThunk<any, GetVideosParams>(
 
       // Only return videos with a valid file storagePath (defensive for backend data)
       const cleanedData = (response?.data || []).filter(
-        (video: any) =>
-          video?.file &&
-          typeof video.file === 'object' &&
-          !!video.file.hlsUrl,
+        (video: any) => video?.file && typeof video.file === 'object' && !!video.file.hlsUrl,
       );
 
       return cleanedData;

@@ -2,9 +2,10 @@ import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import SvgIcon from '../../../components/ui/SvgIcon.tsx';
-import { Tabs } from '../../screens.ts';
+import { Screens, Tabs } from '../../screens.ts';
 import { DASHBOARD_ROUTES } from '../../routes.ts';
 import { colors } from '../../../theme/colors.ts';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 type RouteKey = keyof typeof Tabs;
 const TabIcons: Record<RouteKey, string> = {
@@ -26,19 +27,19 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
   const isHiddenScreens = innerRoutes.some(
     (r) =>
       r.name === DASHBOARD_ROUTES.FULL_VIDEO_SCREEN ||
-      r.name === DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN,
-    // ||
-    // r.name === DASHBOARD_ROUTES.CHAT_LIST_SCREEN ||
-    // r.name === DASHBOARD_ROUTES.CHAT_SCREEN ||
-    // r.name === DASHBOARD_ROUTES.CHAT_USER_SCREEN
+      r.name === DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN ||
+      r.name === Screens.VideoRecording,
   );
 
-  if (isHiddenScreens) {
-    return null;
-  }
+  const style = useAnimatedStyle(() => ({
+    position: isHiddenScreens ? 'absolute' : 'static',
+    left: 0,
+    right: 0,
+    bottom: withTiming(isHiddenScreens ? -70 : 0),
+  }));
 
   return (
-    <View className="h-[70px] flex-row bg-black4">
+    <Animated.View style={style} className="h-[70px] flex-row bg-black4">
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
         const iconSize = isFocused ? IconSizeFocused : IconSize;
@@ -71,6 +72,6 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
           </TouchableOpacity>
         );
       })}
-    </View>
+    </Animated.View>
   );
 };

@@ -1,7 +1,7 @@
 import { createStore } from 'zustand';
 import { CommentType } from '../Comments/hooks/useCommentsInfiniteQuery';
 
-export type PlayerStore = {
+export type VideoFeedStore = {
   cacheKey: string[] | null;
   isPlayerFullScreen: boolean;
   isPaused: boolean;
@@ -32,8 +32,8 @@ export type PlayerStore = {
   };
 };
 
-export const createVideoFeedStore = () =>
-  createStore<PlayerStore>((set, get) => ({
+export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 'actions'>> = {}) =>
+  createStore<VideoFeedStore>((set, get) => ({
     // Important for tanstack-query
     cacheKey: null,
 
@@ -50,6 +50,8 @@ export const createVideoFeedStore = () =>
 
     //#overlay ui
     hearIconPos: { x: 0, y: 300 },
+
+    ...initialState,
 
     actions: {
       setCacheKey: (cacheKey) => {

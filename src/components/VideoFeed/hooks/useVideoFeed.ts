@@ -1,9 +1,9 @@
-import { PlayerStore } from '../provider/videoFeedStore.ts';
+import { VideoFeedStore } from '../provider/videoFeedStore.ts';
 import { useContext } from 'react';
 import { VideoFeedContext } from '../provider/context.ts';
 import { useStore } from 'zustand/react';
 
-export const useVideoFeed = <T>(selector: (state: PlayerStore) => T): T => {
+export const useVideoFeed = <T>(selector: (state: VideoFeedStore) => T): T => {
   const store = useContext(VideoFeedContext);
   if (!store) {
     throw new Error('useVideoFeed must be used within VideoFeedProvider');

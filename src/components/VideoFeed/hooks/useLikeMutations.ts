@@ -18,6 +18,12 @@ export const useLikeMutations = () => {
   const videosKey = useVideoFeedCacheKey();
 
   const updateVideoLikesCount = (videoId: string, val: 1 | -1) => {
+    if (!videosKey) {
+      console.error(
+        'Video cache key is missing in the context. Please call the "useSetVideoFeedCacheKey()" hook',
+      );
+      return;
+    }
     const videoPages = queryClient.getQueryData<{ pages: VideoPost[][] } | undefined>(videosKey);
     if (videoPages?.pages) {
       queryClient.setQueryData(videosKey, {

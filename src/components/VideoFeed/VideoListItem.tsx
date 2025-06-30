@@ -8,7 +8,7 @@ import Video, {
   type OnProgressData,
 } from 'react-native-video';
 import Share from 'react-native-share';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { VideoPost } from './queries/apiVideosFetcher.ts';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { colors } from '../../theme/colors.ts';
@@ -22,6 +22,8 @@ import {
   useVideoPause,
   useVideoFeed,
 } from './hooks';
+import { Screens, Tabs } from '../../navigation/screens.ts';
+import { useUser } from '../../state/user/authStore.ts';
 
 export interface VideoItemProps extends Pick<ReactVideoProps, 'muted' | 'repeat'> {
   video: VideoPost;
@@ -47,8 +49,11 @@ export const VideoListItem: FC<VideoItemProps> = ({
       variation: [variation],
       storagePath,
     },
+    user: author,
   } = video;
 
+  const user = useUser();
+  const navigation = useNavigation<any>();
   const { isFullscreen } = useVideoFullscreen();
   const { isPaused, setIsPaused } = useVideoPause();
 
@@ -135,6 +140,8 @@ export const VideoListItem: FC<VideoItemProps> = ({
         onProgress={setProgress}
         style={[dimensions]}
         selectedVideoTrack={{ type: SelectedVideoTrackType.AUTO }}
+        // https://github.com/mrousavy/react-native-vision-camera/issues/3524
+        disableAudioSessionManagement
         {...videoProps}
       />
 
@@ -155,7 +162,15 @@ export const VideoListItem: FC<VideoItemProps> = ({
           liked={!!likeData?.id}
           onLike={handleLike}
           onShare={openShare}
-          onUser={() => {}}
+          onUser={() => {
+            if (user.id === author.id) {
+              navigation.navigate(Tabs.TabProfile);
+            } else {
+              navigation.navigate(Screens.OtherUserProfile, {
+                user: author,
+              });
+            }
+          }}
           onComments={() => openComments(video.id, video.user.id)}
         />
       )}

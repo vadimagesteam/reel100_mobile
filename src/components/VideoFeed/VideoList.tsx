@@ -91,13 +91,16 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     }
   };
 
-  const backSwipeGesture = Gesture.Pan().onEnd((e) => {
-    if (isFullscreen && e.translationX > 50 && e.velocityX > 500) {
-      runOnJS(setFullscreen)(false);
-    }
-  });
+  const backSwipeGesture = Gesture.Pan()
+    .enabled(isFullscreen)
+    .onEnd((e) => {
+      if (isFullscreen && e.translationX > 50 && e.velocityX > 500) {
+        runOnJS(setFullscreen)(false);
+      }
+    });
 
   const singleTapGesture = Gesture.Tap()
+    .enabled(videos.length > 0)
     .shouldCancelWhenOutside(true)
     .maxDuration(250)
     .onEnd(() => {
@@ -105,6 +108,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     });
 
   const doubleTapGesture = Gesture.Tap()
+    .enabled(videos.length > 0)
     .numberOfTaps(2)
     .onEnd(() => {
       runOnJS(handleDoubleTap)();
@@ -174,6 +178,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
       <GestureDetector gesture={gesturesCombined}>
         <FlatList<VideoPost>
           ref={flatListRef}
+          contentContainerClassName="grow"
           disableIntervalMomentum // 1 video per one swipe
           onLayout={onLayout}
           getItemLayout={(data, index) => ({

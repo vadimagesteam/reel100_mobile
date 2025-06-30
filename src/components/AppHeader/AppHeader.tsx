@@ -13,16 +13,24 @@ import Animated, {
 import { MenuButton } from './MenuButton.tsx';
 import clsx from 'clsx';
 import { useStateSelector } from '../../state/app/uiStore.ts';
+import { useNavigation } from '@react-navigation/native';
 
 export const AppHeaderHeight = 60;
 
 export interface AppHeaderProps {
   stateSelect?: boolean;
+  backButton?: boolean;
   disableLayoutAnimation?: boolean;
   className?: string;
 }
 
-export const AppHeader = ({ disableLayoutAnimation = true, className }: AppHeaderProps) => {
+export const AppHeader = ({
+  backButton,
+  stateSelect,
+  disableLayoutAnimation = true,
+  className,
+}: AppHeaderProps) => {
+  const navigation = useNavigation<any>();
   const [selectedState] = useStateSelector();
   const [expanded, setExpanded] = useState(false);
 
@@ -40,6 +48,10 @@ export const AppHeader = ({ disableLayoutAnimation = true, className }: AppHeade
         entering: FlipInEasyY,
       } as const);
 
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
   return (
     <View className={clsx('z-30 mx-[10px]', className)}>
       {!expanded ? (
@@ -47,14 +59,21 @@ export const AppHeader = ({ disableLayoutAnimation = true, className }: AppHeade
           {...layoutAnimationProps}
           className="h-[60px] flex-row items-center justify-between"
         >
-          <TouchableOpacity
-            className="flex-row gap-2"
-            hitSlop={20}
-            onPress={() => setExpanded((prev) => !prev)}
-          >
-            <SvgIcon image="location" color={colors.white} />
-            <Text className="text-xl font-bold text-blue2">{selectedState?.slug}</Text>
-          </TouchableOpacity>
+          {backButton && (
+            <TouchableOpacity hitSlop={20} onPress={handleBackPress}>
+              <SvgIcon image="backArrow" color={colors.white} />
+            </TouchableOpacity>
+          )}
+          {stateSelect && (
+            <TouchableOpacity
+              className="flex-row gap-2"
+              hitSlop={20}
+              onPress={() => setExpanded((prev) => !prev)}
+            >
+              <SvgIcon image="location" color={colors.white} />
+              <Text className="text-xl font-bold text-blue2">{selectedState?.slug}</Text>
+            </TouchableOpacity>
+          )}
 
           <GlobalCountdown />
 

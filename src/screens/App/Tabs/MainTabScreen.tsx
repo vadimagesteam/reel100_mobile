@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useWindowDimensions, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { type SceneRendererProps, type Route, TabView, TabBar } from 'react-native-tab-view';
@@ -10,7 +10,6 @@ import { Top100VideosByDate } from '../../../components/Top100/Top100VideosByDat
 import { StateFeed } from '../../../components/StateFeed/StateFeed.tsx';
 import { HidebleContainer } from '../../../components/HidebleContainer';
 import { TabAwareVideoFeedProvider } from '../../../components/VideoFeed';
-import { useStateSelector } from '../../../state/app/uiStore.ts';
 import { useGeoLocationState } from '../../../components/AppHeader/StateSelector/hooks/useGeoLocationState.ts';
 
 const routes = [
