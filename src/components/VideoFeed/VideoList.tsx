@@ -11,14 +11,16 @@ import Animated, {
 import { FlatList, FlatListProps, RefreshControl } from 'react-native';
 
 import { VideoPost } from './queries/apiVideosFetcher.ts';
-import { useLayoutDimensions } from './hooks/useLayoutDimensions.ts';
 import { VideoListItem } from './VideoListItem.tsx';
-import { useFlatListLayoutChangeScrollFix } from './hooks/useFlatListLayoutChangeScrollFix.ts';
 import { LikeAnimation, LikeAnimationRef } from './LikeAnimation.tsx';
-import { useLikeMutations } from './hooks/useLikeMutations.ts';
-import { useVideoFullscreen } from './hooks/useVideoFullscreen.ts';
-import { useVideoPause } from './hooks/useVideoPause.ts';
-import { useVideoFeed } from './hooks/useVideoFeed.ts';
+import {
+  useLayoutDimensions,
+  useFlatListLayoutChangeScrollFix,
+  useLikeMutations,
+  useVideoFullscreen,
+  useVideoPause,
+  useVideoFeed,
+} from './hooks';
 import { useHideableContainer } from '../HidebleContainer';
 import { VideoCommentsOverlay } from './Comments/VideoCommentsOverlay.tsx';
 
@@ -43,7 +45,6 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
 
   const flatListRef = useRef<FlatList<VideoPost>>(null);
 
-  const scrollIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewPaused, setViewPaused] = useState(false);
   const { dimensions, onLayout } = useLayoutDimensions();
@@ -136,7 +137,6 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
       if (viewableItems.length > 0) {
         const index = viewableItems[0].index;
         if (index !== undefined && index !== null) {
-          scrollIndexRef.current = index;
           setActiveIndex(index);
           // Unpause when swiping to another video
           if (isPaused) {

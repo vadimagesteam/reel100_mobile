@@ -17,9 +17,9 @@ export const Screens = {
   ...GuestScreens,
   Home: 'Home',
   Profile: 'UserProfile',
-
   ForYou: 'ForYouScreen',
   OtherUserProfile: 'UserProfileScreen',
-
   VideoRecording: 'VideoRecoding',
+  ChatList: 'Chat List',
+  Chat: 'Chat',
 } as const;

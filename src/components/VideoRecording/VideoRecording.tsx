@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { ImageLibraryOptions, launchImageLibrary } from 'react-native-image-picker';
 import { VideoPreview } from './VideoPreview.tsx';
-import { useVideoRecordingPreview, useVideoRecordStore } from './videoRecordStore.ts';
+import { useVideoRecordStore } from './videoRecordStore.ts';
 import { PermissionsResult, requestCameraAndMicrophone } from './requestCameraAndMicrophone.ts';
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);

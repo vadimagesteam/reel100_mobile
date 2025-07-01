@@ -1,11 +1,9 @@
-import { cs } from '../../../screens/Dashboard/Profile/ProfileScreen/styles.ts';
-import React, { useMemo } from 'react';
-import { useVideosInfiniteQuery } from '../../VideoFeed/hooks/useVideosInfiniteQuery.ts';
+import { useMemo } from 'react';
 import { VideoTiles } from '../../VideoTiles/VideoTiles.tsx';
 import { VideoPost } from '../../VideoFeed/queries/apiVideosFetcher.ts';
 import { VideoTile } from './VideoTile.tsx';
 import { TileConfig } from './tileConfig.ts';
-import { useSetVideoFeedCacheKey } from '../../VideoFeed/hooks/useSetVideoFeedCacheKey.ts';
+import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../VideoFeed/hooks';
 
 export interface ProfileVideoTilesProps {
   userId: string;
@@ -34,7 +32,7 @@ export const UserVideoTiles = ({ userId, className }: ProfileVideoTilesProps) =>
       queryControl={queryControl}
       keyExtractor={(item) => item.id}
       numColumns={TileConfig.NumColumns}
-      contentContainerStyle={[cs.pb10]}
+      contentContainerClassName="pb-[10px]"
       initialNumToRender={6}
       windowSize={5}
       maxToRenderPerBatch={6}

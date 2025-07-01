@@ -1,3 +1,4 @@
 import { createNavigationContainerRef } from '@react-navigation/native';
 
-export const navigationRef = createNavigationContainerRef();
+// todo: fix types
+export const navigationRef = createNavigationContainerRef<any>();

@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { requestLocationPermission } from '../../../../screens/Dashboard/Main/MainScreen/helpers';
+import { Alert } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { useStatesQuery } from './useStatesQuery.ts';
 import { useStateSelector } from '../../../../state/app/uiStore.ts';
-import { Alert } from 'react-native';
+import { requestLocationPermission } from '../requestLocationPermission.ts';
 
 const getStateFromCoords = async (latitude: number, longitude: number) => {
   try {
@@ -43,7 +43,6 @@ export const useGeoLocationState = () => {
       Geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          console.log('LAT LONG', { latitude, longitude });
 
           const state = await getStateFromCoords(latitude, longitude);
           if (state) {
