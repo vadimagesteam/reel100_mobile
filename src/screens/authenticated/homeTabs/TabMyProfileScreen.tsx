@@ -1,10 +1,10 @@
-import { AppHeader } from '../../../components/AppHeader/AppHeader.tsx';
-import { MyProfileInfo } from '../../../components/Profile';
+import { AppHeader } from '../../../components/appHeader/AppHeader.tsx';
+import { MyProfileInfo } from '../../../components/profile';
 import { useUser } from '../../../state/user/authStore.ts';
 import { Button } from '../../../components/ui/Button.tsx';
-import { UserVideoTiles } from '../../../components/Profile';
-import { HideableView, HidebleContainer } from '../../../components/HidebleContainer';
-import { VideoFeedProvider } from '../../../components/VideoFeed';
+import { UserVideoTiles } from '../../../components/profile';
+import { HideableView, HidebleContainer } from '../../../components/hidebleContainer';
+import { VideoFeedProvider } from '../../../components/videoFeed';
 import { useNavigation } from '@react-navigation/native';
 import { Screens } from '../../../navigation/screens.ts';
 
@@ -28,7 +28,7 @@ export const TabMyProfileScreen = () => {
   return (
     <HidebleContainer className="flex-1 bg-black4">
       <HideableView className="mx-[10px] mb-[15px] flex-col gap-[15px]">
-        <AppHeader className="mx-[0px]" stateSelect />
+        <AppHeader className="mx-0" stateSelect />
         <MyProfileInfo
           likeCount={0}
           followerCount={0}
@@ -36,16 +36,10 @@ export const TabMyProfileScreen = () => {
           fullName={`${user.firstName} ${user.lastName}`}
           onChatPress={handleChat}
         />
-        <Button
-          // buttonClassName="bg-white1"
-          // textClassName="text-blue3"
-          onPress={handleUploadAndShare}
-        >
-          Upload & Share
-        </Button>
+        <Button onPress={handleUploadAndShare}>Upload & Share</Button>
       </HideableView>
       <VideoFeedProvider>
-        <UserVideoTiles className="mx-[10px]" userId={user.id!} />
+        <UserVideoTiles className="mx-[10px]" userId={user.id!} withUnfinished />
       </VideoFeedProvider>
     </HidebleContainer>
   );

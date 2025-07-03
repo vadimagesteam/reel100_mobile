@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { AppHeader, AppHeaderHeight } from '../../../components/AppHeader/AppHeader.tsx';
-import { HidebleContainer } from '../../../components/HidebleContainer';
-import { VideoFeedProvider } from '../../../components/VideoFeed';
-import { useVideosInfiniteQuery } from '../../../components/VideoFeed/hooks';
-import { TileListBlock } from '../../../components/StateFeed/TileListBlock.tsx';
-import { generateBlocks } from '../../../components/StateFeed/helpers/generateBlocks.ts';
-import { VideoTiles } from '../../../components/VideoTiles/VideoTiles.tsx';
+import { AppHeader, AppHeaderHeight } from '../../../components/appHeader/AppHeader.tsx';
+import { HidebleContainer } from '../../../components/hidebleContainer';
+import { VideoFeedProvider } from '../../../components/videoFeed';
+import { useVideosInfiniteQuery } from '../../../components/videoFeed/hooks';
+import { TileListBlock } from '../../../components/stateFeed/TileListBlock.tsx';
+import { generateBlocks } from '../../../components/stateFeed/helpers/generateBlocks.ts';
+import { VideoTiles } from '../../../components/videoTiles/VideoTiles.tsx';
 
 export const TabForYouScreen = () => {
   const cacheKey = useMemo(() => ['for_you_videos'], []);
@@ -13,6 +13,7 @@ export const TabForYouScreen = () => {
   const controllers = useVideosInfiniteQuery({
     cacheKey,
     orderBy: { createdAt: 'desc' },
+    where: { 'where[status]': 'Finished' },
   });
 
   return (

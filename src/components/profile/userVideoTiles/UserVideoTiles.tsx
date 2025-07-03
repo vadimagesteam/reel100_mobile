@@ -1,0 +1,60 @@
+import { useEffect, useMemo, useState } from 'react';
+import { VideoTiles } from '../../videoTiles/VideoTiles.tsx';
+import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher.ts';
+import { VideoTile } from './VideoTile.tsx';
+import { TileConfig } from './tileConfig.ts';
+import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../videoFeed/hooks';
+
+export interface ProfileVideoTilesProps {
+  userId: string;
+  withUnfinished?: boolean;
+  className?: string;
+}
+
+export const UserVideoTiles = ({ userId, withUnfinished, className }: ProfileVideoTilesProps) => {
+  const [shouldPoll, setShouldPoll] = useState<boolean>(false);
+  const cacheKey = useMemo(() => ['user_videos', userId], [userId]);
+  useSetVideoFeedCacheKey(cacheKey);
+
+  const queryControl = useVideosInfiniteQuery({
+    cacheKey,
+    where: useMemo(
+      () => ({
+        'where[userId]': userId,
+        ...(withUnfinished
+          ? {}
+          : {
+              'where[status]': 'Finished',
+            }),
+      }),
+      [userId, withUnfinished],
+    ),
+    orderBy: { createdAt: 'desc' },
+    refetchInterval: shouldPoll ? 3000 : false,
+  });
+
+  // Automatically poll if there is uncompleted video
+  const { flatPages } = queryControl;
+  useEffect(() => {
+    if (withUnfinished) {
+      const hasUnfinished = flatPages.some(
+        (v) => v.status === 'InProcess' || v.status === 'Pending',
+      );
+      setShouldPoll(hasUnfinished);
+    }
+  }, [withUnfinished, flatPages]);
+
+  return (
+    <VideoTiles<VideoPost>
+      className={className}
+      ItemComponent={VideoTile}
+      queryControl={queryControl}
+      keyExtractor={(item) => item.id}
+      numColumns={TileConfig.NumColumns}
+      contentContainerClassName="pb-[10px]"
+      initialNumToRender={6}
+      windowSize={5}
+      maxToRenderPerBatch={6}
+    />
+  );
+};

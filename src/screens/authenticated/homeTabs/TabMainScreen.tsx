@@ -2,15 +2,15 @@ import React, { useCallback } from 'react';
 import { useWindowDimensions, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { type SceneRendererProps, type Route, TabView, TabBar } from 'react-native-tab-view';
-import { Top100Videos } from '../../../components/Top100/Top100Videos.tsx';
+import { Top100Videos } from '../../../components/top100/Top100Videos.tsx';
 import { SvgIcon } from '../../../components/old/UI';
 import { colors } from '../../../theme/colors.ts';
-import { AppHeader } from '../../../components/AppHeader/AppHeader.tsx';
-import { Top100VideosByDate } from '../../../components/Top100/Top100VideosByDate.tsx';
-import { StateFeed } from '../../../components/StateFeed/StateFeed.tsx';
-import { HidebleContainer } from '../../../components/HidebleContainer';
-import { TabAwareVideoFeedProvider } from '../../../components/VideoFeed';
-import { useGeoLocationState } from '../../../components/AppHeader/StateSelector/hooks/useGeoLocationState.ts';
+import { AppHeader } from '../../../components/appHeader/AppHeader.tsx';
+import { Top100VideosByDate } from '../../../components/top100/Top100VideosByDate.tsx';
+import { StateFeed } from '../../../components/stateFeed/StateFeed.tsx';
+import { HidebleContainer } from '../../../components/hidebleContainer';
+import { TabAwareVideoFeedProvider } from '../../../components/videoFeed';
+import { useGeoLocationState } from '../../../components/appHeader/StateSelector/hooks/useGeoLocationState.ts';
 
 const routes = [
   { key: 'top100', title: '', icon: 'top100Tab' },

@@ -53,7 +53,7 @@ export type UserStatsType = {
 };
 
 export type UserType = {
-  id: string | undefined;
+  id: string;
   username: string;
   firstName: string;
   lastName: string;

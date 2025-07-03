@@ -85,10 +85,6 @@ export const Button: FC<ButtonProps> = ({
       {iconRight}
     </View>
   );
-  console.log(
-    'BTN TEXT CLASSNAME',
-    clsx('font-bold', textVariants[variant], textSizes[size], textClassName),
-  );
 
   const gradient = (
     <View className={clsx(baseButton, variants[variant], sizes[size], buttonClassName)}>

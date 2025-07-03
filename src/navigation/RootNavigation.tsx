@@ -1,7 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Screens } from './screens.ts';
-
 import {
   LoginScreen,
   VerifyEmailScreen,
@@ -17,7 +16,10 @@ import UserProfileScreen from '../screens/authenticated/screens/UserProfileScree
 import { VideoRecordingScreen, ChatListScreen, ChatDialogScreen } from '../screens/authenticated';
 // import ChatListScreen from '../screens/Dashboard/Chat/ChatListScreen';
 // import ChatScreen from '../screens/Dashboard/Chat/ChatScreen';
-import { DrawerMenuWrapper } from '../components/Menu/DrawerMenuWrapper.tsx';
+import { DrawerMenuWrapper } from '../components/menu/DrawerMenuWrapper.tsx';
+import { NotificationsSettingsScreen } from '../screens/authenticated/screens/NotificationsSettingsScreen.tsx';
+import { EditProfileScreen } from '../screens/authenticated/screens/EditProfileScreen.tsx';
+import { colors } from '../theme/colors.ts';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,7 +31,11 @@ export function RootNavigation({ isAuthenticated }: RootNavigationProps) {
   return (
     <DrawerMenuWrapper>
       <NavigationContainer ref={navigationRef}>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
           {isAuthenticated ? (
             <>
               <Stack.Screen name="Tabs" component={BottomTabNavigator} />
@@ -41,6 +47,11 @@ export function RootNavigation({ isAuthenticated }: RootNavigationProps) {
               />
               <Stack.Screen name={Screens.ChatList} component={ChatListScreen} />
               <Stack.Screen name={Screens.Chat} component={ChatDialogScreen} />
+              <Stack.Screen
+                name={Screens.NotificationSettings}
+                component={NotificationsSettingsScreen}
+              />
+              <Stack.Screen name={Screens.EditAccount} component={EditProfileScreen} />
             </>
           ) : (
             <>

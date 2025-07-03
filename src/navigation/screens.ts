@@ -22,4 +22,6 @@ export const Screens = {
   VideoRecording: 'VideoRecoding',
   ChatList: 'Chat List',
   Chat: 'Chat',
+  NotificationSettings: 'Notification Settings',
+  EditAccount: 'Edit Account',
 } as const;

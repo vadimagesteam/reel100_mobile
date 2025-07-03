@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { AppHeader } from '../../../components/AppHeader/AppHeader.tsx';
-import { UserVideoTiles } from '../../../components/Profile';
-import { HideableView, HidebleContainer } from '../../../components/HidebleContainer';
-import { VideoFeedProvider } from '../../../components/VideoFeed';
+import { AppHeader } from '../../../components/appHeader/AppHeader.tsx';
+import { UserVideoTiles } from '../../../components/profile';
+import { HideableView, HidebleContainer } from '../../../components/hidebleContainer';
+import { VideoFeedProvider } from '../../../components/videoFeed';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { ProfileUserInfo } from '../../../components/Profile/OtherUserProfileInfo/OtherUserProfileInfo.tsx';
+import { ProfileUserInfo } from '../../../components/profile/otherUserProfileInfo/OtherUserProfileInfo.tsx';
 import { DASHBOARD_ROUTES } from '../../../navigation/routes.ts';
-import { useUserQuery } from '../../../components/Profile/hooks/useUserQuery.ts';
+import { useUserQuery } from '../../../components/profile/hooks/useUserQuery.ts';
 import { Alert } from 'react-native';
-import { useFollowMutation } from '../../../components/Profile/hooks/useFollowMutation.ts';
+import { useFollowMutation } from '../../../components/profile/hooks/useFollowMutation.ts';
 
 const UserProfileScreen = () => {
   const navigation = useNavigation<any>();
@@ -49,7 +49,14 @@ const UserProfileScreen = () => {
   return (
     <HidebleContainer className="flex-1 bg-black4">
       <HideableView className="mx-[10px] mb-[15px] flex-col gap-[15px]">
-        <AppHeader className="mx-[0px]" stateSelect={false} backButton />
+        <AppHeader
+          stateSelect={false}
+          backButton
+          style={{
+            marginLeft: 0,
+            marginRight: 0,
+          }}
+        />
         <ProfileUserInfo
           fullname={fullName}
           followerCount={user?.stats?.followerCount}

@@ -1,4 +1,4 @@
-import ChatDialog from '../../../components/Chat/Dialog';
+import ChatDialog from '../../../components/chat/Dialog';
 
 export const ChatDialogScreen = () => {
   return <ChatDialog />;

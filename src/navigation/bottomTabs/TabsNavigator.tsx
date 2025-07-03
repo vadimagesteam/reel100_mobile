@@ -17,6 +17,9 @@ export const BottomTabNavigator = () => {
       screenOptions={() => ({
         headerShown: false,
         lazy: true,
+        tabBarStyle: {
+          zIndex: 1,
+        },
       })}
       detachInactiveScreens={true}
       tabBar={(props) => <TabBar {...props} />}

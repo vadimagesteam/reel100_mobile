@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { VideoRecording } from '../../../components/VideoRecording/VideoRecording.tsx';
+import { VideoRecording } from '../../../components/videoRecording/VideoRecording.tsx';
 
 export const VideoRecordingScreen = () => {
   return (
