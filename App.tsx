@@ -10,8 +10,32 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { enableScreens } from 'react-native-screens';
 import { asyncStoragePersister, queryClient } from './src/lib/api.ts';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import messaging, {
+  AuthorizationStatus,
+  getMessaging,
+  requestPermission,
+} from '@react-native-firebase/messaging';
+import { getApp } from '@react-native-firebase/app';
 
 enableScreens(true);
+
+async function requestUserPermission() {
+  try {
+    console.log('[requestUserPermission] CHECK PUSH PERMISSIONS');
+    const messaging = getMessaging(getApp());
+    const authStatus = await requestPermission(messaging);
+
+    const enabled =
+      authStatus === AuthorizationStatus.AUTHORIZED ||
+      authStatus === AuthorizationStatus.PROVISIONAL;
+
+    console.log('[requestUserPermission] Authorization status:', authStatus);
+
+    return enabled;
+  } catch (error) {
+    console.log('REQUEST PUSH ERROR', error);
+  }
+}
 
 function App(): React.JSX.Element {
   const isAuthenticated = useAuthStore(({ isAuthenticated }) => isAuthenticated);
@@ -24,6 +48,22 @@ function App(): React.JSX.Element {
       hideSplash();
     });
   }, []);
+
+  // todo: must be moved into a separated module/lib
+  useEffect(() => {
+    if (isAuthenticated) {
+      requestUserPermission();
+
+      (async () => {
+        const fcmToken = await messaging().getToken();
+        console.log('[FCM TOKEN]', fcmToken);
+
+        messaging().onTokenRefresh((newToken) => {
+          console.log('[FCM TOKEN UPDATED]', newToken);
+        });
+      })();
+    }
+  }, [isAuthenticated]);
 
   return (
     <GestureHandlerRootView className="flex-1 bg-black4">

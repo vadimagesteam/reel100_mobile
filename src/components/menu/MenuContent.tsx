@@ -30,12 +30,14 @@ export const MenuContent = () => {
 
   return (
     <View className="flex-1 bg-black1" style={{ paddingTop: insets.top }}>
-      <View className="mt-[30px] flex-row items-center gap-2.5 border-b-[0.5px] border-b-silver6 px-[20px] pb-[20px]">
-        <Avatar name={`${user.firstName} ${user.lastName}`} />
-        <Text className="text-xl font-bold text-white">
-          {user?.firstName} {user?.lastName}
-        </Text>
-      </View>
+      {user && (
+        <View className="mt-[30px] flex-row items-center gap-2.5 border-b-[0.5px] border-b-silver6 px-[20px] pb-[20px]">
+          <Avatar name={`${user.firstName} ${user.lastName}`} />
+          <Text className="text-xl font-bold text-white">
+            {user?.firstName} {user?.lastName}
+          </Text>
+        </View>
+      )}
 
       <View className="mt-[30px] flex-col gap-[30px] px-5">
         <MenuListItem label="Home" icon="homeNavTab" onPress={handleHome} />
