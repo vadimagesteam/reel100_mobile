@@ -1,14 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
-import { useVideosInfiniteQuery } from '../videoFeed/hooks/useVideosInfiniteQuery.ts';
-import { useCalendarModal } from '../old/TabViewVideo/components/TopOneHundredTab/hooks/useCalendarModal.ts';
+import { useCalendarModal } from './useCalendarModal';
 import CalendarModal from '../old/CalendarModal';
-import HeaderCalendar from './CalendarSelectedDate.tsx';
-import { ActivityIndicator, Text, View } from 'react-native';
-import { VideoList } from '../videoFeed/VideoList.tsx';
-import { useSetVideoFeedCacheKey } from '../videoFeed/hooks/useSetVideoFeedCacheKey.ts';
+import HeaderCalendar from './CalendarSelectedDate';
+import { Text, View } from 'react-native';
+import { VideoList } from '../videoFeed';
+import {
+  useVideosInfiniteQuery,
+  useSetVideoFeedCacheKey,
+  useVideoFullscreen,
+} from '../videoFeed/hooks';
 import { endOfDay } from 'date-fns';
-import { useVideoFullscreen } from '../videoFeed/hooks/useVideoFullscreen.ts';
-import { useStateSelector } from '../../state/app/uiStore.ts';
+import { useStateSelector } from '../../state/app/uiStore';
 
 export const Top100VideosByDate = () => {
   const { isVisible, selectedDate, tempDate, open, cancel, confirm, setTempDate, marked } =

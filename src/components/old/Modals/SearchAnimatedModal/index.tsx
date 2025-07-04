@@ -1,3 +1,4 @@
+/*
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     Modal,
@@ -91,7 +92,7 @@ const SearchAnimatedModal = () => {
                 >
                     <Pressable style={cs.inner} onPress={() => { }}>
                         <SafeAreaView>
-                            {/* Input Field */}
+                            {/!* Input Field *!/}
                             <View style={[positionHelpers.alignItemsCenterRow, cs.inputWrapper]}>
                                 <TouchableOpacity
                                     style={cs.iconButton}
@@ -117,7 +118,7 @@ const SearchAnimatedModal = () => {
                                 </View>
                             </View>
 
-                            {/* Results List */}
+                            {/!* Results List *!/}
                             {query ? (
                                 <FlatList
                                     data={filteredUsers}
@@ -172,3 +173,4 @@ const cs = StyleSheet.create({
 });
 
 export default SearchAnimatedModal;
+*/
