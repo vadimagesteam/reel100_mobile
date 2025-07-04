@@ -1,9 +1,8 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../../../styles';
-import { Avatar } from '../../ui/Avatar';
-import SvgIcon from '../../ui/SvgIcon.tsx';
-import CounterSection from './CounterSection.tsx';
+import { SvgIcon, Avatar } from '../../ui';
+import CounterSection from './CounterSection';
 
 interface ProfileInfoProps {
   fullName: string;

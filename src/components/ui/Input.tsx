@@ -1,7 +1,7 @@
-import { TextInput, TextInputProps, View, TouchableOpacity } from 'react-native';
+import { TextInput, TextInputProps, View, TouchableOpacity, Text } from 'react-native';
 import { FC, forwardRef, useState } from 'react';
 import clsx from 'clsx';
-import SvgIcon from './SvgIcon.tsx';
+import { SvgIcon } from './SvgIcon';
 
 export interface InputProps extends TextInputProps {
   className?: string;
@@ -12,7 +12,20 @@ export interface InputProps extends TextInputProps {
 }
 
 export const Input: FC<InputProps> = forwardRef<TextInput, InputProps>(
-  ({ className = '', hasError, clearable, onClear, secureToggle, secureTextEntry, onFocus, onBlur, ...rest }, ref) => {
+  (
+    {
+      className = '',
+      hasError,
+      clearable,
+      onClear,
+      secureToggle,
+      secureTextEntry,
+      onFocus,
+      onBlur,
+      ...rest
+    },
+    ref,
+  ) => {
     const [secure, setSecure] = useState(!!secureTextEntry);
     const [hasValue, setHasValue] = useState('value' in rest && !!rest.value);
     const [focused, setFocused] = useState(false);
@@ -25,7 +38,7 @@ export const Input: FC<InputProps> = forwardRef<TextInput, InputProps>(
           placeholderTextColor="#999"
           secureTextEntry={secureToggle ? secure : secureTextEntry}
           className={clsx(
-            'bg-black5 border-2 text-white text-xl p-[13px]  rounded-xl pr-10',
+            'rounded-xl border-2 bg-black5 p-[13px] pr-10 text-xl text-white',
             !focused && !hasError ? 'border-black5' : '',
             focused && 'border-blue1',
             hasError && 'border-red1',
@@ -47,20 +60,14 @@ export const Input: FC<InputProps> = forwardRef<TextInput, InputProps>(
         />
 
         {secureToggle && (
-          <TouchableOpacity
-            onPress={() => setSecure((s) => !s)}
-            className="absolute right-4 top-5"
-          >
+          <TouchableOpacity onPress={() => setSecure((s) => !s)} className="absolute right-4 top-5">
             <SvgIcon image={!secure ? 'eyeShow' : 'eyeHide'} />
           </TouchableOpacity>
         )}
 
         {clearable && hasValue && (
-          <TouchableOpacity
-            onPress={onClear}
-            className="absolute right-3 top-3"
-          >
-            <SvgIcon image="clear" />
+          <TouchableOpacity onPress={onClear} className="absolute right-3 top-3">
+            <Text>X</Text>
           </TouchableOpacity>
         )}
       </View>

@@ -14,14 +14,12 @@ const HeaderCalendar = ({ style, markerDate, onCalendar }: HeaderCalendarProps) 
   return (
     <AnimatedTouchableOpacity
       activeOpacity={0.9}
-      className="mx-[16px] mb-[10px] mt-[10px] h-[40px] items-center justify-center"
+      className="mx-[10px] mb-[10px] h-10 items-center justify-center"
       onPress={onCalendar}
       style={style}
     >
-      <View className="h-[20px] w-full flex-1 justify-center rounded-[5px] bg-black1 p-[11px]">
-        <Text className="pl-2 pt-[2px] text-[16px] text-silver2">
-          {isoUTCDateToLocate(markerDate)}
-        </Text>
+      <View className="w-full flex-1 justify-center rounded-[5px] bg-zinc-800 px-[11px]">
+        <Text className="pl-2 text-[16px] text-silver2">{isoUTCDateToLocate(markerDate)}</Text>
       </View>
     </AnimatedTouchableOpacity>
   );

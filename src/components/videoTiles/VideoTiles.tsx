@@ -1,16 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  FlatListProps,
-  type ListRenderItemInfo,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, FlatList, FlatListProps, type ListRenderItemInfo } from 'react-native';
 import clsx from 'clsx';
-import { FlexLoading } from '../ui/FlexLoading';
-import { RefreshControl } from '../ui/RefreshControl.tsx';
-import { type VideoPost } from '../videoFeed/queries/apiVideosFetcher.ts';
+import { ListEmptyBlock, FlexLoading, RefreshControl } from '../ui';
+import { type VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoList } from '../videoFeed';
 import { useVideoFullscreen, type VideoPostQueryResult } from '../videoFeed/hooks';
 
@@ -26,6 +18,8 @@ export interface TilesListProps<ItemType>
   prepareData?: (data: VideoPost[]) => any[];
   ItemComponent?: React.ComponentType<BaseTileItemProps<ItemType>>;
   renderItem?: FlatListProps<ItemType>['renderItem'];
+  emptyTitle?: string;
+  emptyMessage?: string;
 }
 
 /**
@@ -37,6 +31,8 @@ export const VideoTiles = <ItemType,>({
   ItemComponent,
   renderItem: propRenderItem,
   className,
+  emptyTitle,
+  emptyMessage,
   ...flatListProps
 }: TilesListProps<ItemType>) => {
   const {
@@ -115,10 +111,10 @@ export const VideoTiles = <ItemType,>({
         onEndReachedThreshold={0.5}
         onEndReached={onEndReached}
         ListEmptyComponent={
-          <View className="mt-10 flex-col items-center gap-2">
-            <Text className="text-2xl font-bold text-white">No videos uploaded yet</Text>
-            <Text className="text-xl text-silver3">Uploaded videos will appear here</Text>
-          </View>
+          <ListEmptyBlock
+            title={emptyTitle ?? 'No videos uploaded yet'}
+            message={emptyMessage ?? 'Uploaded videos will appear here'}
+          />
         }
         ListFooterComponent={
           isFetchingNextPage && hasNextPage ? <ActivityIndicator color="#fff" /> : null

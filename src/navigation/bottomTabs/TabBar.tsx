@@ -1,10 +1,10 @@
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import SvgIcon from '../../components/ui/SvgIcon.tsx';
-import { Screens, Tabs } from '../screens.ts';
-import { colors } from '../../theme/colors.ts';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { SvgIcon } from '../../components/ui';
+import { Screens, Tabs } from '../screens';
+import { colors } from '../../theme/colors';
 
 type RouteKey = keyof typeof Tabs;
 const TabIcons: Record<RouteKey, string> = {

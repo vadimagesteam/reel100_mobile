@@ -3,7 +3,7 @@ import { ViewStyle } from 'react-native';
 
 import Svg from 'react-native-svg';
 import { SvgIconProps, SvgIconsNames } from '../../assets/icons/typesSvg';
-import sourcesSvg from '../../assets/icons/sourcesSvg.tsx';
+import sourcesSvg from '../../assets/icons/sourcesSvg';
 
 interface Props {
   image: SvgIconsNames | string;
@@ -11,8 +11,7 @@ interface Props {
   style?: ViewStyle;
 }
 
-const SvgIcon = ({ image, color, style }: Props) => {
-
+export const SvgIcon = ({ image, color, style }: Props) => {
   // todo: fix type
   const { Draw, width, height, viewBox }: SvgIconProps = (sourcesSvg as any)[image];
 
@@ -31,5 +30,3 @@ const SvgIcon = ({ image, color, style }: Props) => {
     </Svg>
   );
 };
-
-export default SvgIcon;

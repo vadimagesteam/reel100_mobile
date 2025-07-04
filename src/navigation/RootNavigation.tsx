@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import { Screens } from './screens.ts';
 import {
   LoginScreen,
@@ -10,16 +11,14 @@ import {
 } from '../screens/guest';
 
 import React from 'react';
-import { BottomTabNavigator } from './bottomTabs/TabsNavigator.tsx';
+import { BottomTabNavigator } from './bottomTabs/TabsNavigator';
 import { navigationRef } from './navigationRef';
-import UserProfileScreen from '../screens/authenticated/screens/UserProfileScreen.tsx';
+import UserProfileScreen from '../screens/authenticated/screens/UserProfileScreen';
 import { VideoRecordingScreen, ChatListScreen, ChatDialogScreen } from '../screens/authenticated';
-// import ChatListScreen from '../screens/Dashboard/Chat/ChatListScreen';
-// import ChatScreen from '../screens/Dashboard/Chat/ChatScreen';
-import { DrawerMenuWrapper } from '../components/menu/DrawerMenuWrapper.tsx';
-import { NotificationsSettingsScreen } from '../screens/authenticated/screens/NotificationsSettingsScreen.tsx';
-import { EditProfileScreen } from '../screens/authenticated/screens/EditProfileScreen.tsx';
-import { colors } from '../theme/colors.ts';
+import { DrawerMenuWrapper } from '../components/menu/DrawerMenuWrapper';
+import { NotificationsSettingsScreen } from '../screens/authenticated/screens/NotificationsSettingsScreen';
+import { EditProfileScreen } from '../screens/authenticated/screens/EditProfileScreen';
+import { FriendUserSearch } from '../screens/authenticated/screens/FriendUserSearch';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +51,14 @@ export function RootNavigation({ isAuthenticated }: RootNavigationProps) {
                 component={NotificationsSettingsScreen}
               />
               <Stack.Screen name={Screens.EditAccount} component={EditProfileScreen} />
+              <Stack.Screen
+                name={Screens.FriendUserSearch}
+                component={FriendUserSearch}
+                options={{
+                  animation: 'fade_from_bottom',
+                  animationDuration: 200,
+                }}
+              />
             </>
           ) : (
             <>

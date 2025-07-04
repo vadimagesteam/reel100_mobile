@@ -24,4 +24,5 @@ export const Screens = {
   Chat: 'Chat',
   NotificationSettings: 'Notification Settings',
   EditAccount: 'Edit Account',
+  FriendUserSearch: 'Friend Search',
 } as const;

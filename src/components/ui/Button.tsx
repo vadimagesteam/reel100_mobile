@@ -5,9 +5,9 @@ import {
   TouchableOpacityProps,
   View,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import clsx from 'clsx';
 import { FC, ReactNode } from 'react';
+import { LinearGradient } from './LinearGradient';
 
 export interface ButtonProps extends TouchableOpacityProps {
   variant?: 'primary' | 'outline' | 'danger' | 'gradient' | 'ghost';
@@ -87,16 +87,19 @@ export const Button: FC<ButtonProps> = ({
   );
 
   const gradient = (
-    <View className={clsx(baseButton, variants[variant], sizes[size], buttonClassName)}>
-      <LinearGradient
-        start={{ x: 0.1, y: 0.5 }}
-        end={{ x: 0.9, y: 0 }}
-        colors={gradientColors ?? ['#39bdc5', '#2140a1']}
-        style={{ flex: 1 }}
-      >
+    <LinearGradient
+      start={{ x: 0.1, y: 0.5 }}
+      end={{ x: 0.9, y: 0 }}
+      colors={gradientColors ?? ['#39bdc5', '#2140a1']}
+      className="rounded-[6px]"
+    >
+      <View className={clsx(baseButton, variants[variant], sizes[size], buttonClassName)}>
+        {/*<Text className={clsx(textVariants[variant], 'text-[18px] font-bold', buttonClassName)}>
+          {children}
+        </Text>*/}
         {content}
-      </LinearGradient>
-    </View>
+      </View>
+    </LinearGradient>
   );
 
   return (

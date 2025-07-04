@@ -1,8 +1,8 @@
-import SvgIcon from '../ui/SvgIcon.tsx';
-import { colors } from '../../theme/colors.ts';
+import { SvgIcon } from '../ui/';
+import { colors } from '../../theme/colors';
 import { Text, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 import { ReactNode } from 'react';
-import { useUiStoreActions } from '../../state/app/uiStore.ts';
+import { useUiStoreActions } from '../../state/app/uiStore';
 
 export interface MenuListItemProps extends TouchableOpacityProps {
   label: ReactNode;

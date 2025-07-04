@@ -1492,6 +1492,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-vector-icons-ionicons (12.0.1)
   - react-native-video (6.13.0):
     - DoubleConversion
     - glog
@@ -2277,6 +2278,7 @@ DEPENDENCIES:
   - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - "react-native-vector-icons-ionicons (from `../node_modules/@react-native-vector-icons/ionicons`)"
   - react-native-video (from `../node_modules/react-native-video`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -2434,6 +2436,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-vector-icons-ionicons:
+    :path: "../node_modules/@react-native-vector-icons/ionicons"
   react-native-video:
     :path: "../node_modules/react-native-video"
   React-NativeModulesApple:
@@ -2583,6 +2587,7 @@ SPEC CHECKSUMS:
   react-native-keyboard-controller: dd8faebed0bf68c87acf02f8faa2eb76bdd132b2
   react-native-pager-view: 156b78fe1bdb34749535694319d400fe23fbd2a3
   react-native-safe-area-context: 0257d12123e63462a95dda636010156d03806233
+  react-native-vector-icons-ionicons: 82538a5f94fd186b3b7abd49192ea96e28876887
   react-native-video: 1498d8bfcbd75b2119171dfab5415749b14a1d1e
   React-NativeModulesApple: ec44c21ae0bbb5f9a2df72db00294e33a00e07f0
   React-perflogger: 9e8d3c0dc0194eb932162812a168aa5dc662f418
