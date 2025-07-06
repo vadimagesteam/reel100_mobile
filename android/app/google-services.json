@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "342565872541",
+    "project_id": "reel100-ihor",
+    "storage_bucket": "reel100-ihor.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342565872541:android:2021fe7ea33ffd44814574",
+        "android_client_info": {
+          "package_name": "com.reelsapp.beta2025"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkp3JjuiHzG5XrnFKmvkgujDEbMhRSkgU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

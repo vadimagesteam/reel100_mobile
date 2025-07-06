@@ -1,10 +1,11 @@
-import { Image, Text, View } from 'react-native';
+import Ionicons from '@react-native-vector-icons/ionicons';
+import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthActions, useUser } from '../../state/user/authStore.ts';
-import { Avatar } from '../ui/Avatar';
-import { MenuListItem } from './MenuListItem.tsx';
-import { navigationRef } from '../../navigation/navigationRef.ts';
-import { Screens } from '../../navigation/screens.ts';
+import { useAuthActions, useUser } from '../../state/user/authStore';
+import { Avatar } from '../ui';
+import { MenuListItem } from './MenuListItem';
+import { navigationRef } from '../../navigation/navigationRef';
+import { Screens } from '../../navigation/screens';
 
 export const MenuContent = () => {
   const user = useUser();
@@ -41,7 +42,11 @@ export const MenuContent = () => {
 
       <View className="mt-[30px] flex-col gap-[30px] px-5">
         <MenuListItem label="Home" icon="homeNavTab" onPress={handleHome} />
-        <MenuListItem label="Account" icon="homeNavTab" onPress={handleEditProfile} />
+        <MenuListItem
+          label="Account"
+          icon={<Ionicons name="search" size={18} color="#aaa" />}
+          onPress={handleEditProfile}
+        />
         <MenuListItem
           label="Notifications Settings"
           icon="homeNavTab"
