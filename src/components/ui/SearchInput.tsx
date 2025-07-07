@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { ComponentType } from 'react';
 import { TextInput, TextInputProps, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
@@ -6,6 +7,7 @@ export interface SearchInputProps extends TextInputProps {
   className?: string;
   wrapperClassName?: string;
   onClear?: () => void;
+  TextInputComponent?: ComponentType<TextInputProps>;
 }
 
 export const SearchInput = ({
@@ -14,6 +16,7 @@ export const SearchInput = ({
   wrapperClassName,
   onChangeText,
   onClear,
+  TextInputComponent = TextInput,
   ...textInputProps
 }: SearchInputProps) => {
   return (
@@ -24,7 +27,7 @@ export const SearchInput = ({
       )}
     >
       <Ionicons name="search" size={18} color="#aaa" />
-      <TextInput
+      <TextInputComponent
         hitSlop={{ top: 8, bottom: 8 }}
         className={clsx('flex-1 px-2 text-white', className)}
         placeholder="Search..."

@@ -14,6 +14,7 @@ import messaging, {
   requestPermission,
 } from '@react-native-firebase/messaging';
 import { getApp } from '@react-native-firebase/app';
+import './src/nativewindInterops';
 
 enableScreens(true);
 
