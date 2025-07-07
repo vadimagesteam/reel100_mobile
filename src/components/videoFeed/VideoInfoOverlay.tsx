@@ -1,11 +1,10 @@
 import { Text, View } from 'react-native';
 import React, { FC, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Avatar } from '../ui/Avatar';
-import { VideoPost } from './queries/apiVideosFetcher.ts';
+import { Avatar, SvgIcon } from '../ui';
+import { VideoPost } from './queries/apiVideosFetcher';
 import { colors } from '../../styles';
-import { cs } from '../old/VideoAbsoluteInfo/styles.ts';
-import { SvgIcon } from '../old/UI';
+import { cs } from '../old/VideoAbsoluteInfo/styles';
 import { GestureTouchableOpacity } from './GestureTouchableOpacity';
 import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { IconHeart } from '../ui/icons/IconHeart';

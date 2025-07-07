@@ -1,17 +1,11 @@
-import {
-  Alert,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-import { Button } from '../../components/ui/Button.tsx';
+import { Text, TouchableOpacity } from 'react-native';
+import { Button, Input } from '../../components/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
-import { Input } from '../../components/ui/Input.tsx';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAuthStore } from '../../state/user/authStore.ts';
 import { useNavigation } from '@react-navigation/native';
 import { Screens } from '../../navigation/screens.ts';
-import { ONBOARDING_ROUTES } from '../../navigation/routes.ts';
 import { ScreenTitle } from '../../components/layout/guest/ScreenTitle.tsx';
 
 interface FormData {
@@ -30,7 +24,12 @@ export function LoginScreen() {
     }
   }, [pendingVerification, navigation]);
 
-  const { control, handleSubmit, setError, formState: { isLoading, errors } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { isLoading, errors },
+  } = useForm<FormData>({
     defaultValues: {
       username: '',
       password: '',
@@ -78,7 +77,7 @@ export function LoginScreen() {
       />
 
       {errors?.username && errors?.username?.message && (
-        <Text className="text-red1 pl-2">{errors?.username?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.username?.message}</Text>
       )}
 
       <Controller
@@ -104,7 +103,7 @@ export function LoginScreen() {
         )}
       />
       {errors?.password && errors?.password?.message && (
-        <Text className="text-red1 pl-2">{errors?.password?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.password?.message}</Text>
       )}
 
       <TouchableOpacity
@@ -112,7 +111,7 @@ export function LoginScreen() {
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         onPress={() => navigation.navigate(Screens.ForgotPassword)}
       >
-        <Text className="text-silver4 text-xl font-medium">Forgot password?</Text>
+        <Text className="text-xl font-medium text-silver4">Forgot password?</Text>
       </TouchableOpacity>
 
       <Button loading={isLoading} onPress={handleSubmit(onLogin)}>
@@ -123,8 +122,8 @@ export function LoginScreen() {
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         onPress={() => navigation.navigate(Screens.SignUp)}
       >
-        <Text className="text-center text-silver4 text-xl mt-6">
-          Don't have an account? <Text className="text-blue1 font-semibold">Sign Up</Text>
+        <Text className="mt-6 text-center text-xl text-silver4">
+          Don't have an account? <Text className="font-semibold text-blue1">Sign Up</Text>
         </Text>
       </TouchableOpacity>
     </GuestContainer>

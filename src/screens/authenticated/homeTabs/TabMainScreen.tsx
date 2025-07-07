@@ -64,7 +64,7 @@ export const TabMainScreen = () => {
     <HidebleContainer
       hideOffset={Platform.select({
         ios: hideOffset,
-        android: hideOffset + 60,
+        android: hideOffset + 35,
       })}
       className="flex-1 bg-black4"
     >

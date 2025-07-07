@@ -96,10 +96,13 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const backSwipeGesture = Gesture.Pan()
     .enabled(isFullscreen)
     .onEnd((e) => {
-      if (isFullscreen && e.translationX > 50 && e.velocityX > 500) {
+      if (isFullscreen && e.translationX > 50 && e.velocityX > 440) {
         runOnJS(setFullscreen)(false);
       }
-    });
+    })
+    // android
+    .activeOffsetX(20)
+    .failOffsetY([-10, 10]);
 
   const singleTapGesture = Gesture.Tap()
     .enabled(videos.length > 0)

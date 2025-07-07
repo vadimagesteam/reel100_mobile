@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
+import { CalendarModal } from '../calendar';
+import { ListEmptyBlock } from '../ui';
 import { useCalendarModal } from './useCalendarModal';
-import CalendarModal from '../old/CalendarModal';
 import HeaderCalendar from './CalendarSelectedDate';
-import { Text, View } from 'react-native';
 import { VideoList } from '../videoFeed';
 import {
   useVideosInfiniteQuery,
@@ -62,7 +62,7 @@ export const Top100VideosByDate = () => {
     <>
       {!isFullscreen && <HeaderCalendar markerDate={selectedDate} onCalendar={open} />}
       <CalendarModal
-        isCalendarModal={isVisible}
+        visible={isVisible}
         marked={marked}
         currentDate={tempDate}
         setVisibleDate={setTempDate}
@@ -77,10 +77,7 @@ export const Top100VideosByDate = () => {
         onEndReached={onEndReached}
         ListEmptyComponent={
           !flatPages.length && !isFetching ? (
-            <View className="flex-1 grow items-center justify-center">
-              <Text className="text-xl text-silver3">Nothing to show yet.</Text>
-              <Text className="text-xl text-silver3">Try selecting a different date.</Text>
-            </View>
+            <ListEmptyBlock title="Nothing to show yet" message="Try selecting a different date." />
           ) : null
         }
       />

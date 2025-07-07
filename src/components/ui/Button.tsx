@@ -94,9 +94,6 @@ export const Button: FC<ButtonProps> = ({
       className="rounded-[6px]"
     >
       <View className={clsx(baseButton, variants[variant], sizes[size], buttonClassName)}>
-        {/*<Text className={clsx(textVariants[variant], 'text-[18px] font-bold', buttonClassName)}>
-          {children}
-        </Text>*/}
         {content}
       </View>
     </LinearGradient>

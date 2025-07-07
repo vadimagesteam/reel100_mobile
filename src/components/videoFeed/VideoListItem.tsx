@@ -8,11 +8,11 @@ import Video, {
   type OnProgressData,
 } from 'react-native-video';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { VideoPost } from './queries/apiVideosFetcher.ts';
-import { ActivityIndicator, Platform, Pressable, View } from 'react-native';
-import { colors } from '../../theme/colors.ts';
+import { VideoPost } from './queries/apiVideosFetcher';
+import { ActivityIndicator, Platform, View } from 'react-native';
+import { colors } from '../../theme/colors';
 import { VideoPreview } from './VideoPreview';
-import { formatTime } from '../../utils/formatTime.ts';
+import { formatTime } from '../../utils/formatTime';
 import { VideoInfoOverlay } from './VideoInfoOverlay';
 import {
   useLikeMutations,
@@ -22,8 +22,8 @@ import {
   useVideoFeed,
   useVideoShare,
 } from './hooks';
-import { Screens, Tabs } from '../../navigation/screens.ts';
-import { useUser } from '../../state/user/authStore.ts';
+import { Screens, Tabs } from '../../navigation/screens';
+import { useUser } from '../../state/user/authStore';
 
 export interface VideoItemProps extends Pick<ReactVideoProps, 'muted' | 'repeat'> {
   video: VideoPost;
@@ -104,7 +104,7 @@ export const VideoListItem: FC<VideoItemProps> = ({
   };
 
   return (
-    <Pressable style={dimensions}>
+    <View style={dimensions}>
       <Video
         ref={playerRef}
         repeat
@@ -162,6 +162,6 @@ export const VideoListItem: FC<VideoItemProps> = ({
           </View>
         </>
       )}
-    </Pressable>
+    </View>
   );
 };
