@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { useWindowDimensions, StyleSheet } from 'react-native';
+import { useCallback, useState } from 'react';
+import { useWindowDimensions, StyleSheet, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { type SceneRendererProps, type Route, TabView, TabBar } from 'react-native-tab-view';
 import { Top100Videos } from '../../../components/top100/Top100Videos.tsx';
@@ -7,7 +7,7 @@ import { SvgIcon } from '../../../components/old/UI';
 import { colors } from '../../../theme/colors.ts';
 import { AppHeader } from '../../../components/appHeader/AppHeader.tsx';
 import { Top100VideosByDate } from '../../../components/top100/Top100VideosByDate.tsx';
-import { StateFeed } from '../../../components/stateFeed/StateFeed.tsx';
+import { StateFeed } from '../../../components/stateFeed';
 import { HidebleContainer } from '../../../components/hidebleContainer';
 import { TabAwareVideoFeedProvider } from '../../../components/videoFeed';
 import { useGeoLocationState } from '../../../components/appHeader/StateSelector/hooks/useGeoLocationState.ts';
@@ -23,7 +23,7 @@ const TopBarHeight = 50;
 export const TabMainScreen = () => {
   const insets = useSafeAreaInsets();
   const { width: screenW } = useWindowDimensions();
-  const [index, setIndex] = React.useState(0);
+  const [index, setIndex] = useState(0);
 
   const renderScene = useCallback(
     ({ route }: SceneRendererProps & { route: Route }) => {
@@ -58,8 +58,16 @@ export const TabMainScreen = () => {
   // Try to identify state using Geo coords
   useGeoLocationState();
 
+  const hideOffset = TopBarHeight + insets.top + 1;
+
   return (
-    <HidebleContainer hideOffset={TopBarHeight + insets.top + 1} className="flex-1 bg-black4">
+    <HidebleContainer
+      hideOffset={Platform.select({
+        ios: hideOffset,
+        android: hideOffset + 60,
+      })}
+      className="flex-1 bg-black4"
+    >
       <AppHeader stateSelect />
       <TabView
         lazy
