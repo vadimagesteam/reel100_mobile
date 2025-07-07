@@ -42,10 +42,10 @@ export const AnimatedChar = ({ char, className }: AnimatedDigitProps) => {
     <View>
       <Animated.Text
         className={clsx(
-          'text-center text-[24px] font-extrabold text-blue2',
+          'text-center font-extrabold text-blue2',
           Platform.select({
-            ios: 'font-[Courier]',
-            android: 'font-[monospace]',
+            ios: 'font-[Courier] text-[24px]',
+            android: 'font-[monospace] text-[20px]',
           }),
           className,
         )}
@@ -55,10 +55,10 @@ export const AnimatedChar = ({ char, className }: AnimatedDigitProps) => {
       </Animated.Text>
       <Animated.Text
         className={clsx(
-          'text-center text-[24px] font-extrabold text-blue2',
+          'text-center font-extrabold text-blue2',
           Platform.select({
-            ios: 'font-[Courier]',
-            android: 'font-[monospace]',
+            ios: 'font-[Courier] text-[24px]',
+            android: 'font-[monospace] text-[20px]',
           }),
           className,
         )}

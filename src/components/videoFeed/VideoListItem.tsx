@@ -9,7 +9,7 @@ import Video, {
 } from 'react-native-video';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { VideoPost } from './queries/apiVideosFetcher.ts';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, View } from 'react-native';
 import { colors } from '../../theme/colors.ts';
 import { VideoPreview } from './VideoPreview';
 import { formatTime } from '../../utils/formatTime.ts';
@@ -152,7 +152,11 @@ export const VideoListItem: FC<VideoItemProps> = ({
       )}
       {!loadStarted && showImagePreview && previewUrl && (
         <>
-          <VideoPreview blur imageUrl={previewUrl} {...dimensions} />
+          <VideoPreview
+            blur={Platform.select({ ios: true })}
+            imageUrl={previewUrl}
+            {...dimensions}
+          />
           <View className="absolute left-0 top-0 z-10 h-full w-full items-center justify-center">
             <ActivityIndicator size="large" color={colors.blue2} />
           </View>

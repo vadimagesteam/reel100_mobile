@@ -1,9 +1,8 @@
 import clsx from 'clsx';
-import { Platform, Text, View } from 'react-native';
+import { Platform } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { AnimatedChar } from '../../ui/AnimatedChar.tsx';
-import { formatClockTime } from '../../../utils/formatTime.ts';
+import { AnimatedChar } from '../../ui';
 
 export interface TimerProps {
   maxDurationSeconds: number;

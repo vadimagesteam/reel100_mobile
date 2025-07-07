@@ -1,4 +1,3 @@
-import React, { FC } from 'react';
 import FastImage from 'react-native-fast-image';
 import { BlurView } from '@react-native-community/blur';
 import { StyleSheet } from 'react-native';
@@ -13,11 +12,11 @@ export interface VideoPreviewProps {
 /**
  * This component requires relative parent
  */
-export const VideoPreview: FC<VideoPreviewProps> = ({ blur, imageUrl, width, height }) => {
+export const VideoPreview = ({ blur, imageUrl, width, height }: VideoPreviewProps) => {
   return (
     <>
       <FastImage
-        style={[styles.image, { width, height }]}
+        style={[StyleSheet.absoluteFill, { width, height }]}
         source={{
           uri: imageUrl,
           priority: FastImage.priority.normal,
@@ -27,18 +26,13 @@ export const VideoPreview: FC<VideoPreviewProps> = ({ blur, imageUrl, width, hei
       />
       {blur && (
         <BlurView
-          className="absolute left-0 top-0"
-          style={[styles.blur, { width, height }]}
+          className="absolute bottom-0 left-0 right-0 top-0"
           // blurType="light"
           // blurAmount={1}
           reducedTransparencyFallbackColor="white"
+          collapsable={true}
         />
       )}
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  image: { position: 'absolute', top: 0, left: 0, flex: 1, borderRadius: 5 },
-  blur: { position: 'absolute', top: 0, left: 0 },
-});
