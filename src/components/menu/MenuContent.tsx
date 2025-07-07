@@ -41,18 +41,14 @@ export const MenuContent = () => {
       )}
 
       <View className="mt-[30px] flex-col gap-[30px] px-5">
-        <MenuListItem label="Home" icon="homeNavTab" onPress={handleHome} />
-        <MenuListItem
-          label="Account"
-          icon={<Ionicons name="search" size={18} color="#aaa" />}
-          onPress={handleEditProfile}
-        />
+        <MenuListItem label="Home" icon="home" onPress={handleHome} />
+        <MenuListItem label="Account" icon="person" onPress={handleEditProfile} />
         <MenuListItem
           label="Notifications Settings"
-          icon="homeNavTab"
+          icon="notifications"
           onPress={handleNotificationsScreen}
         />
-        <MenuListItem label="Logout" icon="logoutIcon" onPress={handleLogout} />
+        <MenuListItem label="Logout" icon="log-out" onPress={handleLogout} />
       </View>
     </View>
   );
