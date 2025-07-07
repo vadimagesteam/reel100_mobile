@@ -12,13 +12,15 @@ import { AxiosError } from 'axios';
 import { createPersistStore } from '../../lib/createPersistStore.ts';
 import omit from 'lodash.omit';
 
-type ActionResult = {
-  type: 'success';
-} | {
-  type: 'error';
-  errorType: 'unknown' | 'verification_required' | 'invalid_credentials' | 'email_exists'
-  message: string;
-};
+type ActionResult =
+  | {
+      type: 'success';
+    }
+  | {
+      type: 'error';
+      errorType: 'unknown' | 'verification_required' | 'invalid_credentials' | 'email_exists';
+      message: string;
+    };
 
 type AuthState = {
   loading: boolean;
@@ -38,7 +40,7 @@ type AuthState = {
     login: (payload: LoginDataType) => Promise<ActionResult>;
     forgotPassword: (data: ForgotPassType) => Promise<ActionResult>;
     resetPassword: (data: ResetPassType) => Promise<ActionResult>;
-  }
+  };
 };
 
 export const useAuthStore = createPersistStore<AuthState>(
@@ -80,7 +82,11 @@ export const useAuthStore = createPersistStore<AuthState>(
             set({
               pendingVerification: { username: res.data.username },
             });
-            return { type: 'error', errorType: 'verification_required', message: 'Email verification required' };
+            return {
+              type: 'error',
+              errorType: 'verification_required',
+              message: 'Email verification required',
+            };
           }
 
           set({
@@ -115,7 +121,11 @@ export const useAuthStore = createPersistStore<AuthState>(
           return { type: 'success' };
         } catch (error) {
           if (error instanceof AxiosError && error.status === 401) {
-            return { type: 'error', errorType: 'invalid_credentials', message: error.response?.data.message };
+            return {
+              type: 'error',
+              errorType: 'invalid_credentials',
+              message: error.response?.data.message,
+            };
           }
           return { type: 'error', errorType: 'unknown', message: 'Unknown error occurred.' };
         } finally {
@@ -131,7 +141,11 @@ export const useAuthStore = createPersistStore<AuthState>(
           return { type: 'success' };
         } catch (error) {
           if (error instanceof AxiosError && error.status === 401) {
-            return { type: 'error', errorType: 'invalid_credentials', message: error.response?.data.message };
+            return {
+              type: 'error',
+              errorType: 'invalid_credentials',
+              message: error.response?.data.message,
+            };
           }
           return { type: 'error', errorType: 'unknown', message: 'Unknown error occurred.' };
         } finally {
@@ -156,7 +170,8 @@ export const useAuthStore = createPersistStore<AuthState>(
             return {
               type: 'error',
               errorType: 'email_exists',
-              message: 'This account is already registered. Please check your email and enter the verification code to confirm your email address.',
+              message:
+                'This account is already registered. Please check your email and enter the verification code to confirm your email address.',
             };
           }
           return { type: 'error', errorType: 'unknown', message: 'Unknown error occurred.' };
@@ -185,7 +200,8 @@ export const useAuthStore = createPersistStore<AuthState>(
             return {
               type: 'error',
               errorType: 'email_exists',
-              message: 'This account is already registered. Please check your email and enter the verification code to confirm your email address.',
+              message:
+                'This account is already registered. Please check your email and enter the verification code to confirm your email address.',
             };
           }
           return { type: 'error', errorType: 'unknown', message: 'Unknown error occurred.' };
@@ -205,7 +221,11 @@ export const useAuthStore = createPersistStore<AuthState>(
           return { type: 'success' };
         } catch (error) {
           if (error instanceof AxiosError && error.status === 401) {
-            return { type: 'error', errorType: 'invalid_credentials', message: 'Invalid credentials.' };
+            return {
+              type: 'error',
+              errorType: 'invalid_credentials',
+              message: 'Invalid credentials.',
+            };
           }
           return { type: 'error', errorType: 'unknown', message: 'Unknown error occurred.' };
         } finally {
@@ -213,12 +233,14 @@ export const useAuthStore = createPersistStore<AuthState>(
         }
       },
     },
-  }), {
+  }),
+  {
     version: 0,
     ignore: ['loading'],
     name: 'AuthState',
-  });
+  },
+);
 
+export const useIsAuthenticated = () => useAuthStore((s) => s.isAuthenticated);
 export const useUser = () => useAuthStore(({ user }) => user!);
-export const useAuthActions = () =>
-  useAuthStore(({ actions }) => actions);
+export const useAuthActions = () => useAuthStore(({ actions }) => actions);

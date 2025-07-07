@@ -12,6 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useUiStore } from '../../state/app/uiStore.ts';
+import { useIsAuthenticated } from '../../state/user/authStore';
 import { MenuContent } from './MenuContent.tsx';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -45,7 +46,6 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
 
   const gesture = Gesture.Pan()
     .onChange((e) => {
-      console.log('e.translationX', e.translationX);
       if (e.translationX < 0) {
         translateX.value = withSpring(e.translationX, {
           damping: 100,
@@ -96,6 +96,11 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
     };
   });
 
+  const isAuthenticated = useIsAuthenticated();
+  if (!isAuthenticated) {
+    return children;
+  }
+
   return (
     <>
       <GestureDetector gesture={gesture}>
@@ -110,6 +115,8 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
         onPress={() => (active.value = false)}
         className="absolute inset-0 z-[10] bg-black/80"
         style={overlayStyle}
+        // android
+        pointerEvents={menuOpened ? 'auto' : 'none'}
       />
       <Animated.View className="flex-1" style={contentStyle}>
         {children}
