@@ -7,6 +7,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import { isAndroid } from '../../utils';
 import { IconHeart } from './IconHeart';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,7 +38,7 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
   const startY = dimensions.height / 3 - iconSize / 2;
 
   const finalX = originalIcon.x;
-  const finalY = originalIcon.y + insets.top - (isFullscreen ? 0 : iconSize);
+  const finalY = originalIcon.y + insets.top - (isAndroid ? (isFullscreen ? 0 : iconSize) : 0);
 
   useImperativeHandle(ref, () => ({
     animationDuration: 1000,

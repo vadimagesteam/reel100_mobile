@@ -10,7 +10,7 @@ import { enableScreens } from 'react-native-screens';
 import { asyncStoragePersister, queryClient } from './src/lib/api.ts';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import messaging from '@react-native-firebase/messaging';
-import './src/nativewindInterops';
+import './src/lib/nativewindInterops';
 
 enableScreens(true);
 
