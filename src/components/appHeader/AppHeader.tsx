@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Text, TouchableOpacity, View, ViewProps } from 'react-native';
 import { colors } from '../../styles';
 import { SvgIcon } from '../old/UI';
-import { GlobalCountdown } from './GlobalCountdown/GlobalCountdown.tsx';
-import { StateSelector } from './StateSelector/StateSelector.tsx';
+import { GlobalCountdown } from './globalCountdown/GlobalCountdown.tsx';
+import { StateSelector } from './stateSelector/StateSelector.tsx';
 import Animated, {
   FlipInEasyY,
   LinearTransition,

@@ -9,10 +9,6 @@ export const justifyCenterRow: ViewStyle = {
   justifyContent: 'center',
 };
 
-export const justifyCenter: ViewStyle = {
-  justifyContent: 'center',
-};
-
 export const alignCenter: ViewStyle = {
   alignItems: 'center',
 };
@@ -61,22 +57,6 @@ export const ph16: ViewStyle = {
   paddingHorizontal: 16,
 };
 
-export const pt10: ViewStyle = {
-  paddingTop: 10,
-};
-
-export const mt15: ViewStyle = {
-  marginTop: 15,
-};
-
-export const mb10: ViewStyle = {
-  marginBottom: 10,
-};
-
 export const mb20: ViewStyle = {
   marginBottom: 20,
-};
-
-export const br5: ViewStyle = {
-  borderRadius: 5,
 };

@@ -2,15 +2,14 @@ import { useCallback, useState } from 'react';
 import { useWindowDimensions, StyleSheet, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { type SceneRendererProps, type Route, TabView, TabBar } from 'react-native-tab-view';
-import { Top100Videos } from '../../../components/top100/Top100Videos.tsx';
+import { Top100Videos } from '../../../components/top100/Top100Videos';
 import { SvgIcon } from '../../../components/old/UI';
-import { colors } from '../../../theme/colors.ts';
-import { AppHeader } from '../../../components/appHeader/AppHeader.tsx';
-import { Top100VideosByDate } from '../../../components/top100/Top100VideosByDate.tsx';
+import { colors } from '../../../theme/colors';
+import { AppHeader, useGeoLocationState } from '../../../components/appHeader';
+import { Top100VideosByDate } from '../../../components/top100/Top100VideosByDate';
 import { StateFeed } from '../../../components/stateFeed';
 import { HidebleContainer } from '../../../components/hidebleContainer';
 import { TabAwareVideoFeedProvider } from '../../../components/videoFeed';
-import { useGeoLocationState } from '../../../components/appHeader/StateSelector/hooks/useGeoLocationState.ts';
 
 const routes = [
   { key: 'top100', title: '', icon: 'top100Tab' },

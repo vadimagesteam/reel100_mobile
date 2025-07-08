@@ -2,7 +2,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { HeaderBackArrowButton } from '../../../components/navigation/HeaderBackArrowButton';
+import { HeaderBackArrowButton } from '../../../components/appHeader';
 import { SearchInput } from '../../../components/ui';
 import { UsersList } from '../../../components/usersList/UsersList';
 import { UserType } from '../../../state/user/types';
