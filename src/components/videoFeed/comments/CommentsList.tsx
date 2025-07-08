@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 import { ActivityIndicator, ListRenderItem, Text, View } from 'react-native';
 import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
+import { FlexLoading } from '../../ui';
 import { CommentType, useCommentsInfiniteQuery } from './hooks/useCommentsInfiniteQuery.ts';
 import { CommentsListItem } from './CommentsListItem';
 import { useScrollToNewComment } from './hooks/useScrollToNewComment.ts';
@@ -16,7 +17,7 @@ export interface CommentsListProps {
 }
 
 export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
-  const { flatPages, isFetchingNextPage, hasNextPage, fetchNextPage } =
+  const { flatPages, data, isFetchingNextPage, isLoading, hasNextPage, fetchNextPage } =
     useCommentsInfiniteQuery(videoId);
 
   const { commentsExpanded, toggleCommentReplies } = useVideoComments();
@@ -63,6 +64,10 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
   );
 
   useScrollToNewComment(listRef, flatPages, commentsTree);
+
+  if (!data && isLoading) {
+    return <FlexLoading />;
+  }
 
   return (
     <BottomSheetFlatList

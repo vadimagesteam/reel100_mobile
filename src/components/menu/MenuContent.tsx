@@ -1,5 +1,4 @@
-import Ionicons from '@react-native-vector-icons/ionicons';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthActions, useUser } from '../../state/user/authStore';
 import { Avatar } from '../ui';
@@ -40,7 +39,7 @@ export const MenuContent = () => {
         </View>
       )}
 
-      <View className="mt-[30px] flex-col gap-[30px] px-5">
+      <ScrollView contentContainerClassName="mt-[30px] flex-col gap-[30px] px-5">
         <MenuListItem label="Home" icon="home" onPress={handleHome} />
         <MenuListItem label="Account" icon="person" onPress={handleEditProfile} />
         <MenuListItem
@@ -49,7 +48,7 @@ export const MenuContent = () => {
           onPress={handleNotificationsScreen}
         />
         <MenuListItem label="Logout" icon="log-out" onPress={handleLogout} />
-      </View>
+      </ScrollView>
     </View>
   );
 };
