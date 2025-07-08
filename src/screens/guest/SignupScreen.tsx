@@ -1,7 +1,4 @@
-import {
-  Alert,
-  Text,
-} from 'react-native';
+import { Alert, Text } from 'react-native';
 import { Button } from '../../components/ui/Button.tsx';
 import { Controller, useForm } from 'react-hook-form';
 import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
@@ -13,18 +10,22 @@ import { Screens } from '../../navigation/screens.ts';
 import { ScreenTitle } from '../../components/layout/guest/ScreenTitle.tsx';
 
 interface FormData {
-  username: '',
-  password: '',
-  confirmPassword: '',
-  firstName: '',
-  lastName: '',
+  username: '';
+  password: '';
+  confirmPassword: '';
+  firstName: '';
+  lastName: '';
 }
 
 export function SignupScreen() {
   const navigation = useNavigation<any>();
   const signupAction = useAuthStore((store) => store.actions.register);
 
-  const { control, handleSubmit, formState: { isLoading, errors } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm<FormData>({
     defaultValues: {
       username: '',
       password: '',
@@ -42,16 +43,12 @@ export function SignupScreen() {
     }
 
     if (result.type === 'error' && result.errorType === 'email_exists') {
-      Alert.alert(
-        'Registration failed',
-        result.message,
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate(Screens.VerifyEmail, { email: data.username }),
-          },
-        ],
-      );
+      Alert.alert('Registration failed', result.message, [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate(Screens.VerifyEmail, { email: data.username }),
+        },
+      ]);
       return;
     }
 
@@ -85,7 +82,7 @@ export function SignupScreen() {
       />
 
       {errors?.username?.message && (
-        <Text className="text-red1 pl-2">{errors?.username?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.username?.message}</Text>
       )}
 
       <Controller
@@ -95,17 +92,12 @@ export function SignupScreen() {
         }}
         control={control}
         render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder="First Name"
-            value={value}
-            onChangeText={onChange}
-            onBlur={onBlur}
-          />
+          <Input placeholder="First Name" value={value} onChangeText={onChange} onBlur={onBlur} />
         )}
       />
 
       {errors?.firstName?.message && (
-        <Text className="text-red1 pl-2">{errors?.firstName?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.firstName?.message}</Text>
       )}
 
       <Controller
@@ -115,17 +107,12 @@ export function SignupScreen() {
         }}
         control={control}
         render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder="Last Name"
-            value={value}
-            onChangeText={onChange}
-            onBlur={onBlur}
-          />
+          <Input placeholder="Last Name" value={value} onChangeText={onChange} onBlur={onBlur} />
         )}
       />
 
       {errors?.lastName?.message && (
-        <Text className="text-red1 pl-2">{errors?.lastName?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.lastName?.message}</Text>
       )}
 
       <Controller
@@ -151,7 +138,7 @@ export function SignupScreen() {
       />
 
       {errors?.password?.message && (
-        <Text className="text-red1 pl-2">{errors?.password?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.password?.message}</Text>
       )}
 
       <Controller
@@ -175,10 +162,10 @@ export function SignupScreen() {
       />
 
       {errors?.confirmPassword?.message && (
-        <Text className="text-red1 pl-2">{errors?.confirmPassword?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.confirmPassword?.message}</Text>
       )}
 
-      <Button loading={isLoading} onPress={handleSubmit(onSubmit)}>
+      <Button loading={isSubmitting} onPress={handleSubmit(onSubmit)}>
         Sign Up
       </Button>
     </GuestContainer>

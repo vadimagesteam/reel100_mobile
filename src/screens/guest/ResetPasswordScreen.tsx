@@ -1,7 +1,4 @@
-import {
-  Alert,
-  Text,
-} from 'react-native';
+import { Alert, Text } from 'react-native';
 import { Button } from '../../components/ui/Button.tsx';
 import { Controller, useForm } from 'react-hook-form';
 import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
@@ -15,7 +12,7 @@ interface FormData {
   username: string;
   token: string;
   password: string;
-  confirmPassword: string
+  confirmPassword: string;
 }
 
 export function ResetPasswordScreen() {
@@ -23,7 +20,13 @@ export function ResetPasswordScreen() {
   const { params } = useRoute<any>();
   const resetAction = useAuthStore((store) => store.actions.resetPassword);
 
-  const { control, handleSubmit, setValue, setError, formState: { isLoading, errors } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    setError,
+    formState: { isSubmitting, errors },
+  } = useForm<FormData>({
     defaultValues: {
       username: '',
       token: '',
@@ -53,13 +56,10 @@ export function ResetPasswordScreen() {
 
   return (
     <GuestContainer>
-      <Text className="text-white text-center text-3xl font-bold ">
-        Set New Password
-      </Text>
+      <Text className="text-center text-3xl font-bold text-white">Set New Password</Text>
 
-      <Text className="text-gray-400 text-center text-xl font-semibold mb-8">
-        We've sent a 4 digit code to your email:
-        {' '}
+      <Text className="mb-8 text-center text-xl font-semibold text-gray-400">
+        We've sent a 4 digit code to your email:{' '}
         <Text className="font-extrabold">{params.email}</Text>
       </Text>
 
@@ -85,9 +85,7 @@ export function ResetPasswordScreen() {
         )}
       />
 
-      {errors?.token?.message && (
-        <Text className="text-red1 pl-2">{errors?.token?.message}</Text>
-      )}
+      {errors?.token?.message && <Text className="pl-2 text-red1">{errors?.token?.message}</Text>}
 
       <Controller
         name="password"
@@ -112,7 +110,7 @@ export function ResetPasswordScreen() {
       />
 
       {errors?.password?.message && (
-        <Text className="text-red1 pl-2">{errors?.password?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.password?.message}</Text>
       )}
 
       <Controller
@@ -136,10 +134,10 @@ export function ResetPasswordScreen() {
       />
 
       {errors?.confirmPassword?.message && (
-        <Text className="text-red1 pl-2">{errors?.confirmPassword?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.confirmPassword?.message}</Text>
       )}
 
-      <Button loading={isLoading} onPress={handleSubmit(onSubmit)}>
+      <Button loading={isSubmitting} onPress={handleSubmit(onSubmit)}>
         Reset
       </Button>
     </GuestContainer>

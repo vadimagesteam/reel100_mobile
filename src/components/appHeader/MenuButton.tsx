@@ -1,7 +1,6 @@
-import { SvgIcon } from '../old/UI';
+import { SvgIcon } from '../ui';
 import { TouchableOpacity } from 'react-native';
-import React from 'react';
-import { useUiStore } from '../../state/app/uiStore.ts';
+import { useUiStore } from '../../state/app/uiStore';
 
 export const MenuButton = () => {
   const { actions } = useUiStore();

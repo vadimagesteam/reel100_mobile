@@ -11,8 +11,7 @@ import { isAndroid } from '../../utils';
 import { IconHeart } from './IconHeart';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useVideoFullscreen } from './hooks/useVideoFullscreen.ts';
-import { useVideoFeed } from './hooks/useVideoFeed.ts';
+import { useVideoFullscreen, useVideoFeed } from './hooks';
 
 export interface LikeAnimationRef {
   trigger: () => void;

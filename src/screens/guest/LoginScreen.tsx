@@ -2,7 +2,7 @@ import { Text, TouchableOpacity } from 'react-native';
 import { Button, Input } from '../../components/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuthStore } from '../../state/user/authStore.ts';
 import { useNavigation } from '@react-navigation/native';
 import { Screens } from '../../navigation/screens.ts';
@@ -28,7 +28,7 @@ export function LoginScreen() {
     control,
     handleSubmit,
     setError,
-    formState: { isLoading, errors },
+    formState: { isSubmitting, errors },
   } = useForm<FormData>({
     defaultValues: {
       username: '',
@@ -114,7 +114,7 @@ export function LoginScreen() {
         <Text className="text-xl font-medium text-silver4">Forgot password?</Text>
       </TouchableOpacity>
 
-      <Button loading={isLoading} onPress={handleSubmit(onLogin)}>
+      <Button loading={isSubmitting} onPress={handleSubmit(onLogin)}>
         Sign In
       </Button>
 

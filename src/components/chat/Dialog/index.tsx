@@ -4,8 +4,9 @@ import { GiftedChat, IMessage, User, InputToolbar, Send } from 'react-native-gif
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, positionHelpers } from '../../../styles';
-import { BodyText, SvgIcon } from '../../old/UI';
-import { getInitialsName } from '../../../utils/getInitialsName.ts';
+import { HeaderBackArrowButton } from '../../appHeader';
+import { BodyText } from '../../old/UI';
+import { getInitialsName } from '../../../utils/getInitialsName';
 
 const user: User = {
   _id: 1,
@@ -125,12 +126,7 @@ const ChatDialog = () => {
         ]}
       >
         <View style={[positionHelpers.alignItemsCenterRow]}>
-          <TouchableOpacity
-            hitSlop={{ left: 8, top: 9, right: 8, bottom: 9 }}
-            onPress={() => navigation.goBack()}
-          >
-            <SvgIcon image="backArrow" />
-          </TouchableOpacity>
+          <HeaderBackArrowButton />
           <View style={[positionHelpers.alignItemsCenterRow, { marginLeft: 10 }]}>
             <View
               style={[

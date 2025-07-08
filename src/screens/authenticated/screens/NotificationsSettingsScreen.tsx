@@ -1,7 +1,7 @@
 import { NotificationsSettingsForm } from '../../../components/settings/notifications/NotificationsSettingsForm.tsx';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { SvgIcon } from '../../../components/old/UI';
+import { SvgIcon } from '../../../components/ui';
 import { colors } from '../../../styles';
 import React, { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';

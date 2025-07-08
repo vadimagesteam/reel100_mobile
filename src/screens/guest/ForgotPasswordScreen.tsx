@@ -1,7 +1,4 @@
-import {
-  Alert,
-  Text,
-} from 'react-native';
+import { Alert, Text } from 'react-native';
 import { Button } from '../../components/ui/Button.tsx';
 import { Controller, useForm } from 'react-hook-form';
 import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
@@ -20,7 +17,12 @@ export function ForgotPasswordScreen() {
   const navigation = useNavigation<any>();
   const forgotAction = useAuthStore((store) => store.actions.forgotPassword);
 
-  const { control, handleSubmit, setError, formState: { isLoading, errors } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { isSubmitting, errors },
+  } = useForm<FormData>({
     defaultValues: {
       username: '',
     },
@@ -66,10 +68,10 @@ export function ForgotPasswordScreen() {
       />
 
       {errors?.username && errors?.username?.message && (
-        <Text className="text-red1 pl-2">{errors?.username?.message}</Text>
+        <Text className="pl-2 text-red1">{errors?.username?.message}</Text>
       )}
 
-      <Button loading={isLoading} onPress={handleSubmit(onSubmit)}>
+      <Button loading={isSubmitting} onPress={handleSubmit(onSubmit)}>
         Next
       </Button>
     </GuestContainer>

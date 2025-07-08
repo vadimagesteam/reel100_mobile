@@ -1,9 +1,8 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EditProfileForm } from '../../../components/settings/editProfile/EditProfileForm.tsx';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { SvgIcon } from '../../../components/old/UI';
+import { SvgIcon } from '../../../components/ui';
 import { colors } from '../../../styles';
-import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 export const EditProfileScreen = () => {

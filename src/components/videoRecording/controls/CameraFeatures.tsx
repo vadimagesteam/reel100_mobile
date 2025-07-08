@@ -1,8 +1,8 @@
 import { Text, View } from 'react-native';
-import { SvgIcon } from '../../old/UI';
-import { UseCameraFeatures } from './hooks/useCameraFeatures.ts';
+import { SvgIcon } from '../../ui';
+import { UseCameraFeatures } from './hooks/useCameraFeatures';
 import { useAnimatedStyle, withDelay, withTiming } from 'react-native-reanimated';
-import { ControlButton } from './ControlButton.tsx';
+import { ControlButton } from './ControlButton';
 
 export interface CameraFeaturesProps {
   isRecording: boolean;

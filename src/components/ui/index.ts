@@ -10,3 +10,4 @@ export * from './Input';
 export * from './SearchInput';
 export * from './ListEmptyBlock';
 export * from './IonIconTypes';
+export * from './PinInput';

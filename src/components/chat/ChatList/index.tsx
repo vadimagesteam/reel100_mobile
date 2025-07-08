@@ -5,7 +5,7 @@ import { ChatPreview } from './types';
 import { mockChatList } from './mockData';
 import { BodyText } from '../../old/UI';
 import { colors } from '../../../styles';
-import { Screens } from '../../../navigation/screens.ts';
+import { Screens } from '../../../navigation/screens';
 
 const ChatListScreen = () => {
   const navigation = useNavigation<any>();

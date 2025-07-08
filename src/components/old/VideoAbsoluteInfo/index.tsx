@@ -1,8 +1,8 @@
 import React from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Avatar } from '../../ui/Avatar';
-import { BodyText, SvgIcon } from '../UI';
+import { Avatar, SvgIcon } from '../../ui';
+import { BodyText } from '../UI';
 import { colors, positionHelpers } from '../../../styles';
 import { cs } from './styles.ts';
 

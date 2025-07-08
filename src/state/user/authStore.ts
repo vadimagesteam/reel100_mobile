@@ -18,7 +18,12 @@ type ActionResult =
     }
   | {
       type: 'error';
-      errorType: 'unknown' | 'verification_required' | 'invalid_credentials' | 'email_exists';
+      errorType:
+        | 'unknown'
+        | 'verification_required'
+        | 'invalid_credentials'
+        | 'email_exists'
+        | 'verification_code_invalid';
       message: string;
     };
 
@@ -67,6 +72,7 @@ export const useAuthStore = createPersistStore<AuthState>(
       loadUserProfile: async () => {
         const response = await api.get('/api/users/me');
         set({
+          isAuthenticated: true,
           user: response.data,
         });
       },
@@ -189,7 +195,6 @@ export const useAuthStore = createPersistStore<AuthState>(
 
           set({
             pendingVerification: null,
-            isAuthenticated: true,
             token: response.data.accessToken,
           });
           await get().actions.loadUserProfile();
@@ -199,9 +204,8 @@ export const useAuthStore = createPersistStore<AuthState>(
           if (error instanceof AxiosError && error.status === 401) {
             return {
               type: 'error',
-              errorType: 'email_exists',
-              message:
-                'This account is already registered. Please check your email and enter the verification code to confirm your email address.',
+              errorType: 'verification_code_invalid',
+              message: 'Verification code is invalid',
             };
           }
           return { type: 'error', errorType: 'unknown', message: 'Unknown error occurred.' };

@@ -3,7 +3,7 @@ import { useWindowDimensions, StyleSheet, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { type SceneRendererProps, type Route, TabView, TabBar } from 'react-native-tab-view';
 import { Top100Videos } from '../../../components/top100/Top100Videos';
-import { SvgIcon } from '../../../components/old/UI';
+import { SvgIcon } from '../../../components/ui';
 import { colors } from '../../../theme/colors';
 import { AppHeader, useGeoLocationState } from '../../../components/appHeader';
 import { Top100VideosByDate } from '../../../components/top100/Top100VideosByDate';
