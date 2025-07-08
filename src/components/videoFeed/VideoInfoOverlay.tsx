@@ -7,7 +7,7 @@ import { colors } from '../../styles';
 import { cs } from '../old/VideoAbsoluteInfo/styles';
 import { GestureTouchableOpacity } from './GestureTouchableOpacity';
 import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { IconHeart } from '../ui/icons/IconHeart';
+import { IconHeart } from './IconHeart';
 import { useVideoFeed } from './hooks';
 
 export interface VideoInfoOverlayProps {

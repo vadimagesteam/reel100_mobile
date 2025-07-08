@@ -7,7 +7,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { IconHeart } from '../ui/icons/IconHeart';
+import { IconHeart } from './IconHeart';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVideoFullscreen } from './hooks/useVideoFullscreen.ts';

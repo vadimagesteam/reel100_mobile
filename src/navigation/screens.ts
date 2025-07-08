@@ -25,4 +25,5 @@ export const Screens = {
   NotificationSettings: 'Notification Settings',
   EditAccount: 'Edit Account',
   FriendUserSearch: 'Friend Search',
+  SelectState: 'Select State',
 } as const;

@@ -1,6 +1,6 @@
 import Svg, { Path, SvgProps } from 'react-native-svg';
 import { FC } from 'react';
-import { colors } from '../../../styles';
+import { colors } from '../../styles';
 
 export interface IconHeartProps extends SvgProps {
   variant: 'outline' | 'filled';
@@ -9,16 +9,16 @@ export interface IconHeartProps extends SvgProps {
 }
 
 export const IconHeart: FC<IconHeartProps> = ({
-  variant, color = colors.white, fill = colors.red, width, height, ...props
+  variant,
+  color = colors.white,
+  fill = colors.red,
+  width,
+  height,
+  ...props
 }) => {
   if (variant === 'filled') {
     return (
-      <Svg
-        viewBox="0 0 122.88 107.39"
-        width={width ?? 24}
-        height={height ?? 24}
-        {...props}
-      >
+      <Svg viewBox="0 0 122.88 107.39" width={width ?? 24} height={height ?? 24} {...props}>
         <Path
           d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
           fill={fill}
@@ -29,12 +29,7 @@ export const IconHeart: FC<IconHeartProps> = ({
   }
 
   return (
-    <Svg
-      viewBox="0 0 122.88 109.57"
-      width={width ?? 24}
-      height={height ?? 24}
-      {...props}
-    >
+    <Svg viewBox="0 0 122.88 109.57" width={width ?? 24} height={height ?? 24} {...props}>
       <Path
         d="M65.46,19.57c-0.68,0.72-1.36,1.45-2.2,2.32l-2.31,2.41l-2.4-2.33c-0.71-0.69-1.43-1.4-2.13-2.09
           c-7.42-7.3-13.01-12.8-24.52-12.95c-0.45-0.01-0.93,0-1.43,0.02c-6.44,0.23-12.38,2.6-16.72,6.65

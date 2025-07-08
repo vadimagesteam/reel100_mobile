@@ -1,8 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { UserType } from '../../state/user/types';
-import { Avatar, FlexLoading } from '../ui';
-import { ListEmptyBlock } from '../ui/ListEmptyBlock';
+import { Avatar, FlexLoading, ListEmptyBlock } from '../ui';
 import { useShareablePeopleQuery } from '../videoFeed/share/hooks/useShareablePeopleQuery';
 
 export interface SharePeopleListProps {

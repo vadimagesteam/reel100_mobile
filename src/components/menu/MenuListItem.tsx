@@ -2,12 +2,11 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import { Text, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 import { ReactNode } from 'react';
 import { useUiStoreActions } from '../../state/app/uiStore';
-
-type IconsUnion = Parameters<typeof Ionicons.getImageSource>[0];
+import { IonIconType } from '../ui';
 
 export interface MenuListItemProps extends TouchableOpacityProps {
   label: ReactNode;
-  icon: IconsUnion | ReactNode;
+  icon: IonIconType | ReactNode;
 }
 
 export const MenuListItem = ({ label, icon, onPress, ...rest }: MenuListItemProps) => {
@@ -23,7 +22,7 @@ export const MenuListItem = ({ label, icon, onPress, ...rest }: MenuListItemProp
       {...rest}
     >
       {typeof icon === 'string' ? (
-        <Ionicons name={icon as IconsUnion} size={18} color="#aaa" />
+        <Ionicons name={icon as IonIconType} size={18} color="#aaa" />
       ) : (
         icon
       )}

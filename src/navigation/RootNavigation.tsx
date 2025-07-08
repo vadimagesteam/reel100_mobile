@@ -1,5 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SelectStateScreen } from '../screens/authenticated/screens/SelectStateScreen';
+import { colors } from '../theme/colors';
 
 import { Screens } from './screens.ts';
 import {
@@ -55,6 +57,21 @@ export function RootNavigation({ isAuthenticated }: RootNavigationProps) {
                 name={Screens.FriendUserSearch}
                 component={FriendUserSearch}
                 options={{
+                  animation: 'fade_from_bottom',
+                  animationDuration: 200,
+                }}
+              />
+              <Stack.Screen
+                name={Screens.SelectState}
+                component={SelectStateScreen}
+                options={{
+                  title: 'Choose Your State',
+                  headerTitleStyle: { color: colors.white },
+                  headerStyle: {
+                    backgroundColor: colors.black4,
+                  },
+                  headerShown: true,
+                  presentation: 'pageSheet',
                   animation: 'fade_from_bottom',
                   animationDuration: 200,
                 }}
