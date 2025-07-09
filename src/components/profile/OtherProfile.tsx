@@ -1,0 +1,83 @@
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useEffect, useMemo } from 'react';
+import { Alert } from 'react-native';
+import { Screens } from '../../navigation/screens';
+import { ProfileStatsRouteParams } from '../../screens/authenticated/screens/ProfileStatsScreen';
+import { useUser } from '../../state/user/authStore';
+import { UserBase } from '../../state/user/types';
+import { getFullName } from '../../state/user/utils';
+import { useFollowMutation } from './hooks/useFollowMutation';
+import { useUnFollowMutation } from './hooks/useUnFollowMutation';
+import { useUserQuery } from './hooks/useUserQuery';
+import { ProfileUserInfo } from './otherUserProfileInfo/OtherUserProfileInfo';
+
+export interface ProfileProps {}
+
+export const OtherProfile = ({}: ProfileProps) => {
+  const navigation = useNavigation<any>();
+  const { params } = useRoute<{
+    key: string;
+    name: string;
+    params: { user: Pick<UserBase, 'id' | 'firstName' | 'lastName'> };
+  }>();
+
+  if (!params.user) {
+    throw new Error('No user in route params');
+  }
+  const { user: shallowUser } = params;
+
+  const userId = shallowUser.id;
+
+  const me = useUser();
+  const { data: user, error } = useUserQuery(userId);
+  const follow = useFollowMutation();
+  const unfollow = useUnFollowMutation();
+
+  const fullName = user ? getFullName(user) : getFullName(shallowUser);
+
+  useEffect(() => {
+    if (!user && error) {
+      Alert.alert(`An issue occurred when loading ${fullName} profile data`);
+    }
+  }, [user, error, fullName]);
+
+  const myFollow = useMemo(
+    () => user?.whoms.find(({ who }) => who.id === me.id),
+    [me.id, user?.whoms],
+  );
+
+  const followUserCallback = () => {
+    if (myFollow) {
+      unfollow.mutate({ userId, followId: myFollow.id });
+    } else {
+      follow.mutate({ userId });
+    }
+  };
+
+  const handleStatsScreen = (initialTab: ProfileStatsRouteParams['initialTab']) => {
+    navigation.navigate(Screens.ProfileStats, {
+      userId: user?.id,
+      initialTab,
+    } as ProfileStatsRouteParams);
+  };
+
+  return (
+    <ProfileUserInfo
+      fullName={fullName}
+      followerCount={user?.stats?.followerCount}
+      likeCount={user?.stats?.likeCount}
+      followCount={user?.stats?.followCount}
+      followButtonText={myFollow ? 'Unfollow' : 'Follow'}
+      followButtonLoading={follow.status === 'pending'}
+      onFollowPress={() => followUserCallback()}
+      onChatPress={() => {
+        navigation.navigate(Screens.Chat, {
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+        });
+      }}
+      onFollowersPress={() => handleStatsScreen('followers')}
+      onFollowingPress={() => handleStatsScreen('following')}
+    />
+  );
+};

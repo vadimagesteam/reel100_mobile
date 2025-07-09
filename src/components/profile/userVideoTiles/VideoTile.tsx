@@ -1,4 +1,5 @@
 import { Text, TouchableOpacity, View } from 'react-native';
+import { getFullName } from '../../../state/user/utils';
 import { BaseTileItemProps } from '../../videoTiles/VideoTiles.tsx';
 import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher.ts';
 import FastImage from 'react-native-fast-image';
@@ -25,7 +26,7 @@ export const VideoTile = ({ item, onVideoPress, index }: BaseTileItemProps<Video
       {screenshot ? (
         <>
           <FastImage
-            style={{ width: '100%', height: '100%', borderRadius: 5 }}
+            className="size-full"
             source={{
               uri: screenshot,
               priority: FastImage.priority.normal,
@@ -36,7 +37,7 @@ export const VideoTile = ({ item, onVideoPress, index }: BaseTileItemProps<Video
           <VideoAbsoluteInfo
             justInfo="SIMPLE"
             avatar={''}
-            name={`${user?.firstName} ${user?.lastName}`}
+            name={getFullName(user)}
             // videoDuration={`${formatTwoTime(duration)}s`}
             likesCount={item?.likesCount}
           />

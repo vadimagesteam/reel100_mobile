@@ -6,7 +6,7 @@ import ChatList from '../../../components/chat/ChatList';
 export const ChatListScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-black4">
-      <AppHeader backButton />
+      <AppHeader showBackButton />
       <ChatList />
     </SafeAreaView>
   );

@@ -14,19 +14,19 @@ import { useNavigation } from '@react-navigation/native';
 export const AppHeaderHeight = 60;
 
 export interface AppHeaderProps {
-  stateSelect?: boolean;
-  backButton?: boolean;
+  showBackButton?: boolean;
   disableLayoutAnimation?: boolean;
   className?: string;
   style?: ViewProps['style'];
+  noPx?: boolean; // no x-padding
 }
 
 export const AppHeader = ({
-  backButton,
-  stateSelect,
+  showBackButton,
   disableLayoutAnimation = true,
   className,
   style,
+  noPx,
 }: AppHeaderProps) => {
   const navigation = useNavigation<any>();
   const [selectedState, setSelectedState] = useStateSelector();
@@ -39,13 +39,14 @@ export const AppHeader = ({
       };
 
   return (
-    <View className={clsx('z-30 mx-[10px]', className)} style={style}>
+    <View className={clsx('z-30', !noPx && 'px-2.5', className)} style={style}>
       <Animated.View
         {...layoutAnimationProps}
         className="h-[60px] flex-row items-center justify-between"
       >
-        {backButton && <HeaderBackArrowButton />}
-        {stateSelect && (
+        {showBackButton ? (
+          <HeaderBackArrowButton />
+        ) : (
           <TouchableOpacity
             className="flex-row gap-2"
             hitSlop={20}
@@ -60,6 +61,7 @@ export const AppHeader = ({
             <Text className="text-xl font-bold text-blue2">{selectedState?.slug}</Text>
           </TouchableOpacity>
         )}
+
         <GlobalCountdown />
         <MenuButton />
       </Animated.View>

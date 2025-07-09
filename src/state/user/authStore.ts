@@ -6,6 +6,7 @@ import {
   ForgotPassType,
   ResetPassType,
   UserType,
+  UserProfile,
 } from './types';
 import { api } from '../../lib/api.ts';
 import { AxiosError } from 'axios';
@@ -30,7 +31,7 @@ type ActionResult =
 type AuthState = {
   loading: boolean;
   isAuthenticated: boolean;
-  user: UserType | null;
+  user: UserProfile | null;
   token: string | null;
   pendingVerification: null | {
     username: string;

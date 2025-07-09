@@ -31,8 +31,7 @@ export const SelectStateScreen = () => {
 
   return (
     <SafeAreaView edges={['bottom']} className="flex-1 bg-black4 px-4">
-      <View className="my-2 flex-row items-center gap-x-3">
-        <HeaderBackArrowButton />
+      <View className="my-2">
         <SearchInput
           placeholder={placeholderValue}
           icon="location"

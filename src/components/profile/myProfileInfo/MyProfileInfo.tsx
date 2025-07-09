@@ -10,6 +10,8 @@ interface ProfileInfoProps {
   likeCount: number | undefined;
   followCount: number | undefined;
   onChatPress: () => void;
+  onFollowersPress?: () => void;
+  onFollowingPress?: () => void;
 }
 
 export const MyProfileInfo = ({
@@ -18,6 +20,8 @@ export const MyProfileInfo = ({
   likeCount,
   followCount,
   onChatPress,
+  onFollowersPress,
+  onFollowingPress,
 }: ProfileInfoProps) => {
   return (
     <>
@@ -32,9 +36,9 @@ export const MyProfileInfo = ({
       </View>
 
       <View className="h-[70px] flex-row items-center justify-center rounded-[10px] bg-silver5">
-        <CounterSection label="Followers" count={followerCount!} />
+        <CounterSection onPress={onFollowersPress} label="Followers" count={followerCount!} />
         <CounterSection label="Likes" count={likeCount!} />
-        <CounterSection label="Following" count={followCount!} />
+        <CounterSection onPress={onFollowingPress} label="Following" count={followCount!} />
       </View>
     </>
   );

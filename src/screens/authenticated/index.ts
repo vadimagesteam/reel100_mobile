@@ -1,4 +1,4 @@
-export * from './screens/UserProfileScreen';
+export * from './screens/ProfileScreen';
 export * from './screens/VideoRecordingScreen';
 export * from './screens/ChatListScreen';
 export * from './screens/ChatDialogScreen';

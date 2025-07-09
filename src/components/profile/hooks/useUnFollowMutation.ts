@@ -1,29 +1,27 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../../lib/api';
 import { useUser } from '../../../state/user/authStore';
-import { extractUserBase } from '../../../state/user/utils';
+import { RelationId, UserType } from '../../../state/user/types';
 
 type FollowArgs = {
   userId: string;
+  followId: RelationId;
 };
 
-export const useFollowMutation = () => {
+export const useUnFollowMutation = () => {
   const queryClient = useQueryClient();
   const user = useUser();
 
   return useMutation({
-    mutationFn: async ({ userId }: FollowArgs) => {
-      const { data } = await api.post('/api/follows', {
-        who: { id: user.id },
-        whom: { id: userId },
-      });
+    mutationFn: async ({ followId }: FollowArgs) => {
+      const { data } = await api.delete(`/api/follows/${followId}`);
       return data;
     },
     onMutate: async ({ userId }) => {
       const key = ['user_', userId];
       await queryClient.cancelQueries({ queryKey: key });
 
-      const prev = queryClient.getQueryData<any>(key);
+      const prev = queryClient.getQueryData<UserType>(key);
 
       if (!prev) {
         return { key, prev };
@@ -31,13 +29,7 @@ export const useFollowMutation = () => {
 
       const updated = {
         ...prev,
-        whoms: [
-          ...(prev.whoms || []),
-          {
-            id: `optimistic_${Math.random() * 100000}`,
-            who: extractUserBase(user),
-          },
-        ],
+        whoms: (prev.whoms || []).filter((whom) => whom.who.id !== user.id),
       };
 
       queryClient.setQueryData(key, updated);

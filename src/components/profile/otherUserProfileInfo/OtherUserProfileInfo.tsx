@@ -4,23 +4,29 @@ import { SvgIcon, Button, Avatar, Reel100Gradient } from '../../ui';
 import CounterSection from '../myProfileInfo/CounterSection';
 
 interface ProfileUserInfoProps {
-  fullname: string;
+  fullName: string;
   followerCount: number | undefined;
   likeCount: number | undefined;
   followCount: number | undefined;
-  checkFollowButton: string;
+  followButtonText: string;
+  followButtonLoading?: boolean;
   onFollowPress: () => void;
   onChatPress: () => void;
+  onFollowersPress: () => void;
+  onFollowingPress: () => void;
 }
 
 export const ProfileUserInfo = ({
-  fullname,
+  fullName,
   followerCount,
   likeCount,
   followCount,
-  checkFollowButton,
+  followButtonText,
+  followButtonLoading,
   onFollowPress,
   onChatPress,
+  onFollowersPress,
+  onFollowingPress,
 }: ProfileUserInfoProps) => {
   return (
     <>
@@ -30,16 +36,17 @@ export const ProfileUserInfo = ({
         </TouchableOpacity>
         <View className="flex-col items-center">
           <View className="items-center">
-            <Avatar name={fullname} size={70} />
-            <Text className="ml-[5px] text-[20px] font-bold text-white">{fullname}</Text>
+            <Avatar name={fullName} size={70} />
+            <Text className="ml-[5px] text-[20px] font-bold text-white">{fullName}</Text>
           </View>
           <Button
+            loading={followButtonLoading}
             onPress={onFollowPress}
             className="mt-[10px] min-w-[120px]"
             size="md"
             variant="gradient"
           >
-            {checkFollowButton}
+            {followButtonText}
           </Button>
         </View>
         <TouchableOpacity className="justify-end pb-[14px] pr-[20px]" onPress={onChatPress}>
@@ -48,13 +55,13 @@ export const ProfileUserInfo = ({
       </View>
 
       <Reel100Gradient className="h-[70px] flex-row items-center rounded-[10px]">
-        <CounterSection label="Followers" count={followerCount!} />
+        <CounterSection onPress={onFollowersPress} label="Followers" count={followerCount!} />
         <CounterSection
           className="border-l-[0.5px] border-r-[0.5px] border-l-silver3 border-r-silver3"
           label="Likes"
           count={likeCount!}
         />
-        <CounterSection label="Following" count={followCount!} />
+        <CounterSection onPress={onFollowingPress} label="Following" count={followCount!} />
       </Reel100Gradient>
     </>
   );

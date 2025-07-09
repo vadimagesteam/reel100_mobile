@@ -1,9 +1,12 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import clsx from 'clsx';
+import { HeaderBackArrowButton } from '../components/appHeader';
+import { ProfileStatsScreen } from '../screens/authenticated/screens/ProfileStatsScreen';
 import { SelectStateScreen } from '../screens/authenticated/screens/SelectStateScreen';
 import { colors } from '../theme/colors';
-
-import { Screens } from './screens.ts';
+import { isAndroid } from '../utils';
+import { Screens } from './screens';
 import {
   LoginScreen,
   VerifyEmailScreen,
@@ -11,12 +14,14 @@ import {
   ForgotPasswordScreen,
   SignupScreen,
 } from '../screens/guest';
-
-import React from 'react';
 import { BottomTabNavigator } from './bottomTabs/TabsNavigator';
 import { navigationRef } from './navigationRef';
-import UserProfileScreen from '../screens/authenticated/screens/UserProfileScreen';
-import { VideoRecordingScreen, ChatListScreen, ChatDialogScreen } from '../screens/authenticated';
+import {
+  VideoRecordingScreen,
+  ChatListScreen,
+  ChatDialogScreen,
+  ProfileScreen,
+} from '../screens/authenticated';
 import { DrawerMenuWrapper } from '../components/menu/DrawerMenuWrapper';
 import { NotificationsSettingsScreen } from '../screens/authenticated/screens/NotificationsSettingsScreen';
 import { EditProfileScreen } from '../screens/authenticated/screens/EditProfileScreen';
@@ -35,12 +40,17 @@ export function RootNavigation({ isAuthenticated }: RootNavigationProps) {
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
+            headerStyle: { backgroundColor: colors['dark-bg'] },
+            headerTintColor: colors.white,
+            contentStyle: { backgroundColor: colors['dark-bg'] },
+            // eslint-disable-next-line react/no-unstable-nested-components
+            headerLeft: () => <HeaderBackArrowButton className={clsx(isAndroid && 'mr-8')} />,
           }}
         >
           {isAuthenticated ? (
             <>
               <Stack.Screen name="Tabs" component={BottomTabNavigator} />
-              <Stack.Screen name={Screens.OtherUserProfile} component={UserProfileScreen} />
+              <Stack.Screen name={Screens.Profile} component={ProfileScreen} />
               <Stack.Screen
                 name={Screens.VideoRecording}
                 component={VideoRecordingScreen}
@@ -53,6 +63,7 @@ export function RootNavigation({ isAuthenticated }: RootNavigationProps) {
                 component={NotificationsSettingsScreen}
               />
               <Stack.Screen name={Screens.EditAccount} component={EditProfileScreen} />
+              <Stack.Screen name={Screens.ProfileStats} component={ProfileStatsScreen} />
               <Stack.Screen
                 name={Screens.FriendUserSearch}
                 component={FriendUserSearch}

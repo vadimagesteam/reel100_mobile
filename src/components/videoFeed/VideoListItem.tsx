@@ -163,13 +163,9 @@ export const VideoListItem: FC<VideoItemProps> = ({
           onLike={handleLike}
           onShare={() => shareVideo(video.id)}
           onUser={() => {
-            if (user.id === author.id) {
-              navigation.navigate(Tabs.TabProfile);
-            } else {
-              navigation.navigate(Screens.OtherUserProfile, {
-                user: author,
-              });
-            }
+            navigation.navigate(Screens.Profile, {
+              user: author,
+            });
           }}
           onComments={() => openComments(video.id, video.user.id)}
         />

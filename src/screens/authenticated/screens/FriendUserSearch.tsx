@@ -4,7 +4,8 @@ import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBackArrowButton } from '../../../components/appHeader';
 import { SearchInput } from '../../../components/ui';
-import { UsersList } from '../../../components/usersList/UsersList';
+import { UserList } from '../../../components/userList';
+import { useShareablePeopleQuery } from '../../../components/videoFeed/share/hooks/useShareablePeopleQuery';
 import { UserType } from '../../../state/user/types';
 
 export type FriendUserSearchRouteParams = {
@@ -31,6 +32,7 @@ export const FriendUserSearch = () => {
   );
 
   const insets = useSafeAreaInsets();
+  const { data, isLoading } = useShareablePeopleQuery(searchText);
 
   return (
     <View
@@ -52,7 +54,7 @@ export const FriendUserSearch = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        <UsersList searchQuery={searchText} onPress={handleSelected} />
+        <UserList data={data} isLoading={isLoading} onPress={handleSelected} />
       </KeyboardAvoidingView>
     </View>
   );

@@ -52,7 +52,7 @@ export type UserStatsType = {
   likeCount: number;
 };
 
-export type UserType = {
+export type UserBase = {
   id: string;
   username: string;
   firstName: string;
@@ -61,8 +61,24 @@ export type UserType = {
   status: 'Active' | 'Pending' | string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type UserProfile = UserBase & {
   resetPasswordToken: string | null;
   stats: UserStatsType;
-  follows: { id: string }[];
-  whoms: { id: string }[];
+  accessToken: string;
+};
+
+export type RelationId = string;
+
+export type UserType = UserBase & {
+  stats: UserStatsType;
+  follows: {
+    id: RelationId;
+    whom: UserBase;
+  }[];
+  whoms: {
+    id: RelationId;
+    who: UserBase;
+  }[];
 };
