@@ -1,6 +1,8 @@
 import { forwardRef, useImperativeHandle } from 'react';
 import Animated, {
   Easing,
+  interpolateColor,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -13,6 +15,7 @@ import { IconHeart } from './IconHeart';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVideoFullscreen, useVideoFeed } from './hooks';
+import tailwindColors from 'tailwindcss/colors';
 
 export interface LikeAnimationRef {
   trigger: (x?: number, y?: number) => void;
@@ -29,6 +32,8 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
   const opacity = useSharedValue(0);
   const rotate = useSharedValue(0);
 
+  const progress = useSharedValue(0);
+
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
@@ -44,6 +49,7 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
   useImperativeHandle(ref, () => ({
     animationDuration: 1000,
     trigger: (x, y) => {
+      progress.value = 0;
       opacity.value = 1;
       scale.value = 1;
       translateX.value = x ?? startX;
@@ -75,8 +81,15 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
       );
 
       opacity.value = withDelay(1000, withTiming(0, { duration: 400 }));
+      progress.value = withTiming(1, { duration: 1200 });
     },
   }));
+
+  const animatedProps = useAnimatedProps(() => {
+    return {
+      fill: interpolateColor(progress.value, [0, 1], [tailwindColors.pink[600], colors.red]),
+    };
+  }, [progress]);
 
   const style = useAnimatedStyle(() => ({
     top: translateY.value,
@@ -87,7 +100,7 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
 
   return (
     <Animated.View className="absolute" style={style}>
-      <IconHeart fill={colors.red} variant="filled" width={24} height={24} />
+      <IconHeart animatedProps={animatedProps} variant="filled" width={24} height={24} />
     </Animated.View>
   );
 });
