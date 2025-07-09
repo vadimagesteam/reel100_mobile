@@ -7,6 +7,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import { colors } from '../../styles';
 import { isAndroid } from '../../utils';
 import { IconHeart } from './IconHeart';
 import { useWindowDimensions } from 'react-native';
@@ -14,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVideoFullscreen, useVideoFeed } from './hooks';
 
 export interface LikeAnimationRef {
-  trigger: () => void;
+  trigger: (x?: number, y?: number) => void;
   animationDuration: number;
 }
 
@@ -37,39 +38,40 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
   const startY = dimensions.height / 3 - iconSize / 2;
 
   const finalX = originalIcon.x;
-  const finalY = originalIcon.y + insets.top - (isAndroid ? (isFullscreen ? 0 : iconSize) : 0);
+  const iconYInset = isAndroid ? -iconSize / 4 : iconSize * 1.22;
+  const finalY = originalIcon.y + insets.top - (isFullscreen ? 0 : iconYInset);
 
   useImperativeHandle(ref, () => ({
     animationDuration: 1000,
-    trigger: () => {
+    trigger: (x, y) => {
       opacity.value = 1;
       scale.value = 1;
-      translateX.value = startX;
-      translateY.value = startY;
+      translateX.value = x ?? startX;
+      translateY.value = y ?? startY;
+
+      const randomAngle = Math.floor(Math.random() * 80) * (Math.random() > 0.5 ? -1 : 1);
 
       rotate.value = withSequence(
-        withTiming(-5, { duration: 50, easing: Easing.linear }),
-        withTiming(5, { duration: 50, easing: Easing.linear }),
-        withTiming(0, { duration: 50, easing: Easing.linear }),
+        withTiming(randomAngle, { duration: 100, easing: Easing.linear }),
+        withTiming(0, { duration: 500, easing: Easing.linear }),
       );
 
       scale.value = withSequence(
-        withTiming(5.2, { duration: 150, easing: Easing.out(Easing.ease) }),
-        withTiming(4.9, { duration: 60 }),
-        withTiming(5.0, { duration: 100 }),
-        withTiming(5.6, { duration: 200 }),
-
+        withTiming(4.4, { duration: 150, easing: Easing.out(Easing.ease) }),
+        withTiming(3.2, { duration: 60 }),
+        withTiming(3.8, { duration: 100 }),
+        withTiming(2.9, { duration: 200 }),
         withTiming(1, { duration: 1000 }),
       );
 
       translateX.value = withDelay(
-        560,
-        withTiming(finalX, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+        400,
+        withTiming(finalX, { duration: 200, easing: Easing.inOut(Easing.ease) }),
       );
 
       translateY.value = withDelay(
-        560,
-        withTiming(finalY, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+        400,
+        withTiming(finalY, { duration: 200, easing: Easing.inOut(Easing.ease) }),
       );
 
       opacity.value = withDelay(1000, withTiming(0, { duration: 400 }));
@@ -85,7 +87,7 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
 
   return (
     <Animated.View className="absolute" style={style}>
-      <IconHeart variant="filled" width={24} height={24} />
+      <IconHeart fill={colors.red} variant="filled" width={24} height={24} />
     </Animated.View>
   );
 });

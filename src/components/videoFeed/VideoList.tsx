@@ -71,9 +71,9 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
 
   const { like } = useLikeMutations();
 
-  const handleDoubleTap = () => {
+  const handleDoubleTap = (x: number, y: number) => {
     if (videos[activeIndex]) {
-      likeAnimationRef.current?.trigger(); // show "Like" animation
+      likeAnimationRef.current?.trigger(x, y); // show "Like" animation
       setTimeout(() => {
         // wait for animation end (1 sec)
         like.mutate({
@@ -116,8 +116,8 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const doubleTapGesture = Gesture.Tap()
     .enabled(videos.length > 0)
     .numberOfTaps(2)
-    .onEnd(() => {
-      runOnJS(handleDoubleTap)();
+    .onEnd((e) => {
+      runOnJS(handleDoubleTap)(e.x, e.y);
     });
 
   const renderItem = useCallback(
