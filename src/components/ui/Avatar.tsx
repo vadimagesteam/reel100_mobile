@@ -1,6 +1,6 @@
 import FastImage from 'react-native-fast-image';
 import { View, ViewProps, Text, PixelRatio } from 'react-native';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export interface AvatarProps extends ViewProps {
   uri?: string;
@@ -10,6 +10,10 @@ export interface AvatarProps extends ViewProps {
 
 export const Avatar = ({ uri, size = 60, name }: AvatarProps) => {
   const [showFallback, setShowFallback] = useState(!uri);
+
+  useEffect(() => {
+    setShowFallback(!uri);
+  }, [uri]);
 
   const fontSize = PixelRatio.roundToNearestPixel(size / 2.5);
 

@@ -66,7 +66,6 @@ export type UserBase = {
 export type UserProfile = UserBase & {
   resetPasswordToken: string | null;
   stats: UserStatsType;
-  accessToken: string;
 };
 
 export type RelationId = string;
@@ -82,3 +81,5 @@ export type UserType = UserBase & {
     who: UserBase;
   }[];
 };
+
+export type UpdateProfileInput = Pick<UserBase, 'firstName' | 'lastName'>;

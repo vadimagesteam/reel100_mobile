@@ -1,26 +1,24 @@
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
-import { Input } from '../../ui/Input.tsx';
-import React from 'react';
+import { getFullName } from '../../../state/user/utils';
+import { Avatar, Button, Input } from '../../ui';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { useUser } from '../../../state/user/authStore.ts';
-import { Button } from '../../ui/Button.tsx';
-import { sleep } from '../../../utils/promise.ts';
+import { useAuthActions, useUser } from '../../../state/user/authStore.ts';
 
-type FormData = { profilePicture: string; firstName: string; lastName: string };
+type FormData = { profilePicture?: string; firstName: string; lastName: string };
 
 export const EditProfileForm = () => {
   const profile = useUser();
+  const { updateProfile } = useAuthActions();
 
   const {
     control,
     setValue,
     handleSubmit,
     watch,
-    formState: { isLoading, errors, isDirty },
+    formState: { isSubmitting, errors },
   } = useForm<FormData>({
     defaultValues: {
-      profilePicture: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png',
       firstName: profile.firstName,
       lastName: profile.lastName,
     },
@@ -49,7 +47,7 @@ export const EditProfileForm = () => {
   };
 
   const onSubmit = async (values: FormData) => {
-    await sleep(2000);
+    await updateProfile(values);
   };
 
   const photoImageUrl = watch('profilePicture');
@@ -65,10 +63,9 @@ export const EditProfileForm = () => {
           onPress={handlePhotoSelect}
           className="flex-col items-center gap-2 self-center"
         >
-          <Image source={{ uri: photoImageUrl }} className="h-[100px] w-[100px] rounded-full" />
+          <Avatar uri={photoImageUrl} name={getFullName(profile)} size={100} />
           <Text className="text-silver3">Press to Change Photo</Text>
         </TouchableOpacity>
-
         <Controller
           name="firstName"
           rules={{
@@ -79,11 +76,9 @@ export const EditProfileForm = () => {
             <Input placeholder="First Name" value={value} onChangeText={onChange} onBlur={onBlur} />
           )}
         />
-
         {errors?.firstName?.message && (
           <Text className="pl-2 text-red1">{errors?.firstName?.message}</Text>
         )}
-
         <Controller
           name="lastName"
           rules={{
@@ -94,12 +89,10 @@ export const EditProfileForm = () => {
             <Input placeholder="Last Name" value={value} onChangeText={onChange} onBlur={onBlur} />
           )}
         />
-
         {errors?.lastName?.message && (
           <Text className="pl-2 text-red1">{errors?.lastName?.message}</Text>
         )}
-
-        <Button loading={isLoading} onPress={handleSubmit(onSubmit)}>
+        <Button loading={isSubmitting} onPress={handleSubmit(onSubmit)}>
           Save Changes
         </Button>
       </ScrollView>

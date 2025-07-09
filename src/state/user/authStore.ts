@@ -5,15 +5,14 @@ import {
   LoginDataType,
   ForgotPassType,
   ResetPassType,
-  UserType,
   UserProfile,
+  UpdateProfileInput,
 } from './types';
 import { api } from '../../lib/api.ts';
 import { AxiosError } from 'axios';
 import { createPersistStore } from '../../lib/createPersistStore.ts';
-import omit from 'lodash.omit';
 
-type ActionResult =
+type AuthActionResult =
   | {
       type: 'success';
     }
@@ -28,24 +27,26 @@ type ActionResult =
       message: string;
     };
 
+type ActionResult = { type: 'success' | 'error'; message?: string };
+
 type AuthState = {
   loading: boolean;
   isAuthenticated: boolean;
   user: UserProfile | null;
   token: string | null;
-  pendingVerification: null | {
-    username: string;
-  };
+  pendingVerification: null | { username: string };
+
   actions: {
     logout: () => Promise<void>;
     loadUserProfile: () => Promise<void>;
     setToken: (token: string) => Promise<void>;
-    register: (data: RegisterDataType) => Promise<ActionResult>;
-    verifyUser: (data: VerifyUserType) => Promise<ActionResult>;
-    resendVerification: (data: ResendVerifyUserType) => Promise<ActionResult>;
-    login: (payload: LoginDataType) => Promise<ActionResult>;
-    forgotPassword: (data: ForgotPassType) => Promise<ActionResult>;
-    resetPassword: (data: ResetPassType) => Promise<ActionResult>;
+    register: (data: RegisterDataType) => Promise<AuthActionResult>;
+    verifyUser: (data: VerifyUserType) => Promise<AuthActionResult>;
+    resendVerification: (data: ResendVerifyUserType) => Promise<AuthActionResult>;
+    login: (payload: LoginDataType) => Promise<AuthActionResult>;
+    forgotPassword: (data: ForgotPassType) => Promise<AuthActionResult>;
+    resetPassword: (data: ResetPassType) => Promise<AuthActionResult>;
+    updateProfile: (data: UpdateProfileInput) => Promise<ActionResult>;
   };
 };
 
@@ -71,10 +72,20 @@ export const useAuthStore = createPersistStore<AuthState>(
       },
 
       loadUserProfile: async () => {
-        const response = await api.get('/api/users/me');
+        const { data } = await api.get<
+          UserProfile & {
+            accessToken: string;
+          }
+        >('/api/users/me');
+
+        const { accessToken, ...user } = data;
+
+        console.log('Obtained new profile token', accessToken);
+
         set({
           isAuthenticated: true,
-          user: response.data,
+          token: accessToken,
+          user,
         });
       },
 
@@ -235,6 +246,20 @@ export const useAuthStore = createPersistStore<AuthState>(
           return { type: 'error', errorType: 'unknown', message: 'Unknown error occurred.' };
         } finally {
           set({ loading: false });
+        }
+      },
+      updateProfile: async (payload) => {
+        try {
+          await api.patch(`/api/users/${get().user?.id}`, {
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+          });
+          set(({ user }) => ({
+            user: user ? { ...user, ...payload } : user,
+          }));
+          return { type: 'success' };
+        } catch (error) {
+          return { type: 'error', message: (error as Error).message };
         }
       },
     },
