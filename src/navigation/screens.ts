@@ -1,11 +1,3 @@
-export const GuestScreens = {
-  Login: 'Login',
-  SignUp: 'Sign Up',
-  ForgotPassword: 'Forgot Password',
-  ResetPassword: 'Reset Password',
-  VerifyEmail: 'Verify Email',
-} as const;
-
 export const Tabs = {
   TabMain: 'TabMain',
   TabGlobalVideo: 'TabGlobalVideo',
@@ -14,17 +6,23 @@ export const Tabs = {
 } as const;
 
 export const Screens = {
-  ...GuestScreens,
+  // Auth screens
+  Login: 'Login',
+  SignUp: 'Sign Up',
+  ForgotPassword: 'Forgot Password',
+  ResetPassword: 'Reset Password',
+  VerifyEmail: 'Verify Email',
+
+  // In app screens
   Home: 'Home',
-  Profile: 'UserProfile',
-  ForYou: 'ForYouScreen',
-  OtherUserProfile: 'Profile',
-  ProfileStats: 'ProfileStats',
-  VideoRecording: 'VideoRecoding',
-  ChatList: 'Chat List',
-  Chat: 'Chat',
+  Profile: 'Profile',
+  ForYou: 'For U',
+  ProfileStats: 'Profile Stats',
+  VideoRecording: 'Video Recoding',
+  ChatList: 'Messages',
+  Chat: 'Dialog',
   NotificationSettings: 'Notification Settings',
-  EditAccount: 'Edit Account',
+  EditAccount: 'Edit Profile Info',
   FriendUserSearch: 'Friend Search',
   SelectState: 'Select State',
 } as const;

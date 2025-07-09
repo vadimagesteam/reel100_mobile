@@ -14,7 +14,7 @@ import {
   ForgotPasswordScreen,
   SignupScreen,
 } from '../screens/guest';
-import { BottomTabNavigator } from './bottomTabs/TabsNavigator';
+import { BottomTabNavigator } from './TabsNavigator';
 import { navigationRef } from './navigationRef';
 import {
   VideoRecordingScreen,
@@ -61,8 +61,13 @@ export function RootNavigation({ isAuthenticated }: RootNavigationProps) {
               <Stack.Screen
                 name={Screens.NotificationSettings}
                 component={NotificationsSettingsScreen}
+                options={{ headerShown: true }}
               />
-              <Stack.Screen name={Screens.EditAccount} component={EditProfileScreen} />
+              <Stack.Screen
+                name={Screens.EditAccount}
+                component={EditProfileScreen}
+                options={{ headerShown: true }}
+              />
               <Stack.Screen name={Screens.ProfileStats} component={ProfileStatsScreen} />
               <Stack.Screen
                 name={Screens.FriendUserSearch}

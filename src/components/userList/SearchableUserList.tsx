@@ -5,12 +5,14 @@ import { SearchInput } from '../ui';
 import { UserList, UserListProps } from './UserList';
 
 export interface SearchableUserListProps<T extends UserBase> extends UserListProps<T> {
+  autoFocus?: boolean;
   initialSearchText?: string;
   onSearch?: (query: string) => void;
 }
 
 export const SearchableUserList = <T extends UserBase>({
   onSearch,
+  autoFocus,
   initialSearchText,
   ...userListProps
 }: SearchableUserListProps<T>) => {
@@ -26,7 +28,7 @@ export const SearchableUserList = <T extends UserBase>({
       <SearchInput
         autoCorrect={false}
         wrapperClassName="grow-0"
-        autoFocus
+        autoFocus={autoFocus}
         value={searchText}
         onChangeText={handleSearch}
       />

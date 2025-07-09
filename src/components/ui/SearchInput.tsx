@@ -20,7 +20,7 @@ export const SearchInput = ({
   onChangeText,
   onClear,
   icon = 'search',
-  placeholder = 'Search...',
+  placeholder = 'Search',
   TextInputComponent = TextInput,
   ...textInputProps
 }: SearchInputProps) => {

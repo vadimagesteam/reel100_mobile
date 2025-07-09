@@ -33,7 +33,6 @@ export const ProfileStatsScreen = () => {
   >();
 
   const layout = useWindowDimensions();
-  const me = useUser();
   const { data: user, isLoading } = useUserQuery(userId);
 
   useEffect(() => {

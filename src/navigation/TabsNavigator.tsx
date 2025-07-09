@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
 import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { ProfileScreen } from '../../screens/authenticated';
+import { ProfileScreen } from '../screens/authenticated';
 import { TabBar } from './TabBar';
-import { Tabs } from '../screens';
+import { Tabs } from './screens';
 import {
   TabMainScreen,
   TabGlobalVideoScreen,
   TabForYouScreen,
-} from '../../screens/authenticated/homeTabs';
+} from '../screens/authenticated/homeTabs';
 
 const Tab = createBottomTabNavigator();
 
