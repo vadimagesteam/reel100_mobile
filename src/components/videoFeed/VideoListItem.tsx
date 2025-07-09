@@ -1,35 +1,36 @@
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import Video, {
-  VideoRef,
+  type OnLoadData,
+  type OnProgressData,
   ReactVideoProps,
   ResizeMode,
   SelectedVideoTrackType,
-  type OnLoadData,
-  type OnProgressData,
+  VideoRef,
+  ViewType,
 } from 'react-native-video';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { VideoPost } from './queries/apiVideosFetcher';
-import { ActivityIndicator, Platform, View } from 'react-native';
-import { colors } from '../../theme/colors';
-import { VideoPreview } from './VideoPreview';
-import { formatTime } from '../../utils/formatTime';
-import { VideoInfoOverlay } from './VideoInfoOverlay';
-import {
-  useLikeMutations,
-  useVideoLikeQuery,
-  useVideoFullscreen,
-  useVideoPause,
-  useVideoFeed,
-  useVideoShare,
-} from './hooks';
 import { Screens, Tabs } from '../../navigation/screens';
 import { useUser } from '../../state/user/authStore';
+import { colors } from '../../theme/colors';
+import { isAndroid } from '../../utils';
+import { formatTime } from '../../utils/formatTime';
+import {
+  useLikeMutations,
+  useVideoFeed,
+  useVideoFullscreen,
+  useVideoLikeQuery,
+  useVideoPause,
+  useVideoShare,
+} from './hooks';
+import { VideoPost } from './queries/apiVideosFetcher';
+import { VideoInfoOverlay } from './VideoInfoOverlay';
+import { VideoPreview } from './VideoPreview';
 
 export interface VideoItemProps extends Pick<ReactVideoProps, 'muted' | 'repeat'> {
   video: VideoPost;
   active: boolean;
   dimensions: { width: number; height: number };
-  showImagePreview?: boolean;
   rankNumber?: number;
 }
 
@@ -38,7 +39,6 @@ export const VideoListItem: FC<VideoItemProps> = ({
   muted,
   active,
   dimensions,
-  showImagePreview,
   rankNumber,
   ...videoProps
 }) => {
@@ -79,6 +79,12 @@ export const VideoListItem: FC<VideoItemProps> = ({
     const { variation } = file;
     videoUrl = file.hlsUrl ?? file.storagePath;
     previewUrl = variation?.[0]?.screenshots[0] ?? null;
+
+    // Android: HLS file suddenly zooms in after first play, while .mp4 works just fine
+    // https://github.com/TheWidlarzGroup/react-native-video/issues/2909
+    if (isAndroid && variation.length) {
+      videoUrl = variation[variation.length - 1].path;
+    }
   }
 
   // Reset to video start when video became inactive
@@ -88,13 +94,13 @@ export const VideoListItem: FC<VideoItemProps> = ({
     }
   }, [active]);
 
-  const mountRef = useRef(false);
-  useEffect(() => {
-    if (!mountRef.current && active && progress?.currentTime && playerRef.current) {
-      playerRef.current.seek(progress.currentTime);
-      mountRef.current = true;
-    }
-  }, [active, progress?.currentTime]);
+  // const mountRef = useRef(false);
+  // useEffect(() => {
+  //   if (!mountRef.current && active && progress?.currentTime && playerRef.current) {
+  //     playerRef.current.seek(progress.currentTime);
+  //     mountRef.current = true;
+  //   }
+  // }, [active, progress?.currentTime]);
 
   const handleLike = () => {
     toggleLike({
@@ -107,7 +113,12 @@ export const VideoListItem: FC<VideoItemProps> = ({
     <View style={dimensions}>
       <Video
         ref={playerRef}
-        repeat
+        repeat={active}
+        viewType={isAndroid ? ViewType.SURFACE : undefined}
+        disableFocus={isAndroid}
+        onEnd={() => {
+          playerRef.current?.seek(0);
+        }}
         source={{ uri: videoUrl!, shouldCache: true }}
         paused={!active || isPaused || isPaused}
         resizeMode={ResizeMode.COVER}
@@ -115,7 +126,20 @@ export const VideoListItem: FC<VideoItemProps> = ({
         onLoad={setLoadStarted}
         onProgress={setProgress}
         style={[dimensions]}
+        renderLoader={() => (
+          <View className="flex-1">
+            <VideoPreview
+              blur={Platform.select({ ios: true })}
+              imageUrl={previewUrl!}
+              {...dimensions}
+            />
+            <View className="absolute left-0 top-0 z-10 h-full w-full items-center justify-center">
+              <ActivityIndicator size="large" color={colors.blue2} />
+            </View>
+          </View>
+        )}
         selectedVideoTrack={{ type: SelectedVideoTrackType.AUTO }}
+        preventsDisplaySleepDuringVideoPlayback
         // https://github.com/mrousavy/react-native-vision-camera/issues/3524
         disableAudioSessionManagement
         {...videoProps}
@@ -149,18 +173,6 @@ export const VideoListItem: FC<VideoItemProps> = ({
           }}
           onComments={() => openComments(video.id, video.user.id)}
         />
-      )}
-      {!loadStarted && showImagePreview && previewUrl && (
-        <>
-          <VideoPreview
-            blur={Platform.select({ ios: true })}
-            imageUrl={previewUrl}
-            {...dimensions}
-          />
-          <View className="absolute left-0 top-0 z-10 h-full w-full items-center justify-center">
-            <ActivityIndicator size="large" color={colors.blue2} />
-          </View>
-        </>
       )}
     </View>
   );

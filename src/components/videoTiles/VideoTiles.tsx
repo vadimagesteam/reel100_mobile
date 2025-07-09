@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, FlatListProps, type ListRenderItemInfo } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  FlatListProps,
+  type ListRenderItemInfo,
+  Modal,
+  View,
+} from 'react-native';
 import clsx from 'clsx';
+import { isAndroid } from '../../utils';
 import { ListEmptyBlock, FlexLoading, RefreshControl } from '../ui';
 import { type VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoList } from '../videoFeed';
@@ -100,6 +108,14 @@ export const VideoTiles = <ItemType,>({
     <>
       <FlatList
         className={clsx(expandedIndex !== null ? 'hidden' : undefined, className)}
+        style={
+          isAndroid && expandedIndex !== null
+            ? {
+                position: 'absolute',
+                top: -500,
+              }
+            : undefined
+        }
         data={data}
         renderItem={propRenderItem ?? renderItem}
         keyExtractor={(item, i) => i.toString()}

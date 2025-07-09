@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { FlatList, FlatListProps, RefreshControl } from 'react-native';
+import { isAndroid } from '../../utils';
 
 import { VideoPost } from './queries/apiVideosFetcher.ts';
 import { VideoListItem } from './VideoListItem';
@@ -126,7 +127,6 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
           video={video}
           dimensions={dimensions}
           active={activeIndex === index}
-          showImagePreview
           rankNumber={index + 1}
         />
       );
@@ -176,6 +176,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   );
 
   const gesturesCombined = Gesture.Exclusive(backSwipeGesture, doubleTapGesture, singleTapGesture);
+  const VideoBatchSize = 6;
 
   return (
     <Animated.View className="flex-1 bg-black4" style={viewStyle}>
@@ -198,10 +199,10 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
           viewabilityConfig={viewabilityConfig}
           initialScrollIndex={initialVideoIndex}
           onEndReachedThreshold={0.3}
-          initialNumToRender={4}
-          windowSize={4}
-          maxToRenderPerBatch={4}
-          removeClippedSubviews={false}
+          initialNumToRender={VideoBatchSize}
+          windowSize={VideoBatchSize}
+          maxToRenderPerBatch={VideoBatchSize}
+          removeClippedSubviews={isAndroid}
           decelerationRate="fast"
           scrollEventThrottle={1000 / 60}
           pagingEnabled
