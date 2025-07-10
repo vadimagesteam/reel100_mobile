@@ -1,4 +1,4 @@
-import { createPersistStore } from '../../lib/createPersistStore.ts';
+import { createPersistStore } from '../../lib/createPersistStore';
 
 export type StateItem = {
   id: string;

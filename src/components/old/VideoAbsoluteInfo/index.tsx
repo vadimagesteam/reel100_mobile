@@ -5,7 +5,7 @@ import { colors } from '../../../theme';
 import { Avatar, SvgIcon } from '../../ui';
 import { BodyText } from '../UI';
 import { positionHelpers } from '../../../styles';
-import { cs } from './styles.ts';
+import { cs } from './styles';
 
 interface VideoAbsoluteInfoProps {
   justInfo?: 'FULL' | 'SIMPLE';

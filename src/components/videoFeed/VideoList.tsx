@@ -11,7 +11,7 @@ import Animated, {
 import { FlatList, FlatListProps, RefreshControl } from 'react-native';
 import { isAndroid } from '../../utils';
 
-import { VideoPost } from './queries/apiVideosFetcher.ts';
+import { VideoPost } from './queries/apiVideosFetcher';
 import { VideoListItem } from './VideoListItem';
 import { LikeAnimation, LikeAnimationRef } from './LikeAnimation';
 import {
@@ -179,7 +179,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const VideoBatchSize = 6;
 
   return (
-    <Animated.View className="bg-background flex-1" style={viewStyle}>
+    <Animated.View className="flex-1 bg-background" style={viewStyle}>
       <GestureDetector gesture={gesturesCombined}>
         <FlatList<VideoPost>
           ref={flatListRef}

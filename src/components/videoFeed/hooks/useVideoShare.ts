@@ -1,4 +1,4 @@
-import { useVideoFeed } from './useVideoFeed.ts';
+import { useVideoFeed } from './useVideoFeed';
 
 export const useVideoShare = () => {
   const share = useVideoFeed((s) => s.share);

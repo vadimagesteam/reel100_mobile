@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import { VideoFeedContext } from './context';
-import { createVideoFeedStore, VideoFeedStore } from './videoFeedStore.ts';
+import { createVideoFeedStore, VideoFeedStore } from './videoFeedStore';
 
 export interface VideoFeedProviderProps {
   children: ReactNode;

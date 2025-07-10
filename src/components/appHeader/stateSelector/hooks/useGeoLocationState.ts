@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Alert } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import { useStatesQuery } from './useStatesQuery.ts';
-import { useStateSelector } from '../../../../state/app/uiStore.ts';
-import { requestLocationPermission } from '../requestLocationPermission.ts';
+import { useStatesQuery } from './useStatesQuery';
+import { useStateSelector } from '../../../../state/app/uiStore';
+import { requestLocationPermission } from '../requestLocationPermission';
 
 const getStateFromCoords = async (latitude: number, longitude: number) => {
   try {

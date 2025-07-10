@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export interface PinInputProps {

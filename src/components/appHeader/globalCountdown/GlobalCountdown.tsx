@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { ViewProps } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useCentralTimeCountdown } from './useCentralTimeCountdown.ts';
-import { formatClockTime } from '../../../utils/formatTime.ts';
+import { useCentralTimeCountdown } from './useCentralTimeCountdown';
+import { formatClockTime } from '../../../utils/formatTime';
 import { AnimatedChar } from '../../ui';
 
 export const GlobalCountdown = (props: ViewProps) => {

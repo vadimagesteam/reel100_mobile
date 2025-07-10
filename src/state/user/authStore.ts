@@ -11,9 +11,9 @@ import {
   UserType,
   NotificationSettings,
 } from './types';
-import { api } from '../../lib/api.ts';
+import { api } from '../../lib/api';
 import { AxiosError } from 'axios';
-import { createPersistStore } from '../../lib/createPersistStore.ts';
+import { createPersistStore } from '../../lib/createPersistStore';
 
 type AuthActionResult =
   | {

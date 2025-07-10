@@ -1,3 +1,3 @@
-import BodyText from './BodyText.tsx';
+import BodyText from './BodyText';
 
 export { BodyText };

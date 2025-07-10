@@ -1,5 +1,5 @@
 import { Switch, Text, View } from 'react-native';
-import { colors } from '../../../theme/colors.ts';
+import { colors } from '../../../theme';
 
 export const ToggleRow = ({
   label,
@@ -14,7 +14,7 @@ export const ToggleRow = ({
 }) => (
   <View className="px-4 py-4">
     <View className="flex-row items-center justify-between">
-      <Text className="text-primary flex-1 pr-4 text-base">{label}</Text>
+      <Text className="flex-1 pr-4 text-base text-primary">{label}</Text>
       <Switch
         value={value}
         onValueChange={onChange}
@@ -22,6 +22,6 @@ export const ToggleRow = ({
         trackColor={{ true: colors.blue2, false: '#3a3a3c' }}
       />
     </View>
-    {description && <Text className="text-primary/50 mt-2 text-sm">{description}</Text>}
+    {description && <Text className="mt-2 text-sm text-primary/50">{description}</Text>}
   </View>
 );

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../../../lib/api.ts';
-import { StateItem } from '../../../../state/app/uiStore.ts';
+import { api } from '../../../../lib/api';
+import { StateItem } from '../../../../state/app/uiStore';
 
 export const useStatesQuery = () => {
   return useQuery({

@@ -1,6 +1,6 @@
 import { ViewProps } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { useHideableContainer } from './hooks/useHideableContainer.ts';
+import { useHideableContainer } from './hooks/useHideableContainer';
 
 export const HideableView = ({ children, ...props }: ViewProps) => {
   const { isHiddenSharedValue } = useHideableContainer();

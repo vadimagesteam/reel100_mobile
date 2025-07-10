@@ -11,9 +11,9 @@ import { CameraFeatures, Timer, useCameraFeatures, CloseButton, RecordButton } f
 import { useNavigation } from '@react-navigation/native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { ImageLibraryOptions, launchImageLibrary } from 'react-native-image-picker';
-import { VideoPreview } from './VideoPreview.tsx';
-import { useVideoRecordStore } from './videoRecordStore.ts';
-import { PermissionsResult, requestCameraAndMicrophone } from './requestCameraAndMicrophone.ts';
+import { VideoPreview } from './VideoPreview';
+import { useVideoRecordStore } from './videoRecordStore';
+import { PermissionsResult, requestCameraAndMicrophone } from './requestCameraAndMicrophone';
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 const MaxDurationSeconds = 100;
@@ -123,7 +123,7 @@ export const VideoRecording = () => {
   const animatedProps = useAnimatedProps<CameraProps>(() => ({ zoom: zoom.value }), [zoom]);
 
   return (
-    <View className="bg-background flex-1">
+    <View className="flex-1 bg-background">
       {previewUri && <VideoPreview />}
       {!isPreviewReady && (
         <>

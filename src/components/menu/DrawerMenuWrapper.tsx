@@ -11,9 +11,9 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { useUiStore } from '../../state/app/uiStore.ts';
+import { useUiStore } from '../../state/app/uiStore';
 import { useIsAuthenticated } from '../../state/user/authStore';
-import { MenuContent } from './MenuContent.tsx';
+import { MenuContent } from './MenuContent';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 

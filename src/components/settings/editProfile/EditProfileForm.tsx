@@ -5,7 +5,7 @@ import { UserBase } from '../../../state/user/types';
 import { useLoadingCallback } from '../../../utils';
 import { Avatar, Button, Input } from '../../ui';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { useAuthActions, useUser } from '../../../state/user/authStore.ts';
+import { useAuthActions, useUser } from '../../../state/user/authStore';
 
 type FormData = Pick<UserBase, 'avatar' | 'firstName' | 'lastName'>;
 

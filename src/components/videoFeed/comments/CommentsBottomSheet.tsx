@@ -5,7 +5,7 @@ import { CommentForm } from './CommentForm';
 import { TextInput } from 'react-native-gesture-handler';
 import { useCommentMutation } from './hooks/useCommentMutation';
 import { useVideoComments, useVideoFeed } from '../hooks';
-import { BottomSheet } from '../../ui/BottomSheet';
+import { BottomSheet } from '../../ui';
 
 export const CommentsBottomSheet = () => {
   const commentsOpened = useVideoFeed((s) => s.commentsOpened);

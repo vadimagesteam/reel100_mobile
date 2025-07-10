@@ -1,6 +1,6 @@
 import { cssInterop } from 'nativewind';
 import OriginalLinearGradient, { LinearGradientProps } from 'react-native-linear-gradient';
-import { colors as _colors } from '../../theme/colors.ts';
+import { colors as _colors } from '../../theme';
 
 cssInterop(OriginalLinearGradient, {
   className: 'style',

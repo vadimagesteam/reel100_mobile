@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../../lib/api.ts';
-import { UserType } from '../../../state/user/types.ts';
+import { api } from '../../../lib/api';
+import { UserType } from '../../../state/user/types';
 import { useEffect } from 'react';
 
 export const useUserQuery = (userId: string) => {

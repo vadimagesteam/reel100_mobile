@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { HidebleContainerContext } from '../HidableContainer.tsx';
+import { HidebleContainerContext } from '../HidableContainer';
 
 export const useHideableContainer = () => {
   const handles = useContext(HidebleContainerContext);

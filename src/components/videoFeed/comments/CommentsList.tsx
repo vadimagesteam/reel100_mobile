@@ -2,9 +2,9 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { ActivityIndicator, ListRenderItem, Text, View } from 'react-native';
 import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
 import { FlexLoading } from '../../ui';
-import { CommentType, useCommentsInfiniteQuery } from './hooks/useCommentsInfiniteQuery.ts';
+import { CommentType, useCommentsInfiniteQuery } from './hooks/useCommentsInfiniteQuery';
 import { CommentsListItem } from './CommentsListItem';
-import { useScrollToNewComment } from './hooks/useScrollToNewComment.ts';
+import { useScrollToNewComment } from './hooks/useScrollToNewComment';
 import { useVideoComments } from '../hooks';
 
 export interface CommentsListProps {

@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
-import { useVideosInfiniteQuery } from '../videoFeed/hooks/useVideosInfiniteQuery.ts';
-import { VideoTiles } from '../videoTiles/VideoTiles.tsx';
-import { TileListBlock } from './TileListBlock.tsx';
-import { generateBlocks } from './helpers/generateBlocks.ts';
-import { useSetVideoFeedCacheKey } from '../videoFeed/hooks/useSetVideoFeedCacheKey.ts';
-import { useStateSelector } from '../../state/app/uiStore.ts';
+import { useMemo } from 'react';
+import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
+import { VideoTiles } from '../videoTiles/VideoTiles';
+import { TileListBlock } from './TileListBlock';
+import { generateBlocks } from './helpers/generateBlocks';
+import { useStateSelector } from '../../state/app/uiStore';
 
 export const StateFeed = () => {
   const [selectedState] = useStateSelector();

@@ -1,5 +1,4 @@
-import { api } from '../../../lib/api.ts';
-import { sleep } from '../../../utils/promise.ts';
+import { api } from '../../../lib/api';
 
 export type VideoFileQuality = {
   fps: number;

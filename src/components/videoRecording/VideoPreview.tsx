@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Video from 'react-native-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button } from '../ui/Button.tsx';
-import { useVideoRecordStore } from './videoRecordStore.ts';
-import { useStateSelector } from '../../state/app/uiStore.ts';
+import { Button } from '../ui/Button';
+import { useVideoRecordStore } from './videoRecordStore';
+import { useStateSelector } from '../../state/app/uiStore';
 import { useNavigation } from '@react-navigation/native';
 import { useQueryClient } from '@tanstack/react-query';
-import { useUser } from '../../state/user/authStore.ts';
+import { useUser } from '../../state/user/authStore';
 
 export interface VideoPreviewProps {}
 
@@ -63,7 +63,7 @@ export const VideoPreview = ({}: VideoPreviewProps) => {
             </Button>
           </View>
         ) : (
-          <Text className="text-primary text-xl">Uploading...</Text>
+          <Text className="text-xl text-primary">Uploading...</Text>
         )}
       </View>
 

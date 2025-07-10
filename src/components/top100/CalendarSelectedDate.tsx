@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
-import { isoUTCDateToLocate } from '../../utils/formatTime.ts';
+import { isoUTCDateToLocate } from '../../utils/formatTime';
 import Animated from 'react-native-reanimated';
 
 interface HeaderCalendarProps extends Pick<TouchableOpacityProps, 'style'> {
@@ -18,7 +18,7 @@ const HeaderCalendar = ({ style, markerDate, onCalendar }: HeaderCalendarProps) 
       onPress={onCalendar}
       style={style}
     >
-      <View className="bg-input w-full flex-1 justify-center rounded-[5px] px-[11px]">
+      <View className="w-full flex-1 justify-center rounded-[5px] bg-input px-[11px]">
         <Text className="pl-2 text-[16px] text-silver2">{isoUTCDateToLocate(markerDate)}</Text>
       </View>
     </AnimatedTouchableOpacity>

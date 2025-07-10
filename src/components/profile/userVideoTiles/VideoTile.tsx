@@ -1,11 +1,11 @@
 import { Text, TouchableOpacity, View } from 'react-native';
 import { getFullName } from '../../../state/user/utils';
-import { BaseTileItemProps } from '../../videoTiles/VideoTiles.tsx';
-import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher.ts';
+import { BaseTileItemProps } from '../../videoTiles/VideoTiles';
+import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
 import FastImage from 'react-native-fast-image';
 import VideoAbsoluteInfo from '../../old/VideoAbsoluteInfo';
 import React from 'react';
-import { TileConfig } from './tileConfig.ts';
+import { TileConfig } from './tileConfig';
 
 export const VideoTile = ({ item, onVideoPress, index }: BaseTileItemProps<VideoPost>) => {
   const isLastInRow = (index + 1) % TileConfig.NumColumns === 0;
@@ -49,7 +49,7 @@ export const VideoTile = ({ item, onVideoPress, index }: BaseTileItemProps<Video
         </>
       ) : (
         <View className="size-full items-center justify-center rounded-[8px] bg-black">
-          <Text className="text-primary text-[10px]">No preview</Text>
+          <Text className="text-[10px] text-primary">No preview</Text>
         </View>
       )}
     </TouchableOpacity>

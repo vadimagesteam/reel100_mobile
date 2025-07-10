@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../../../lib/api.ts';
+import { api } from '../../../../lib/api';
 import { UserType } from '../../../../state/user/types';
 
 export const useShareablePeopleQuery = (searchQuery?: string) => {

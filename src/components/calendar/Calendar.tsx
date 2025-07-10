@@ -1,7 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Calendar as RNCalendar } from 'react-native-calendars';
-import Animated from 'react-native-reanimated';
 import { colors } from '../../theme';
 import { Button } from '../ui';
 

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import { api } from '../../../lib/api.ts';
-import { useUser } from '../../../state/user/authStore.ts';
-import { VideoPost } from '../queries/apiVideosFetcher.ts';
-import { useVideoFeedCacheKey } from './useVideoFeedCacheKey.ts';
+import { api } from '../../../lib/api';
+import { useUser } from '../../../state/user/authStore';
+import { VideoPost } from '../queries/apiVideosFetcher';
+import { useVideoFeedCacheKey } from './useVideoFeedCacheKey';
 
 type LikeArgs = {
   type: 'video' | 'comment';

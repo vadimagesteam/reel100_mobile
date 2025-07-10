@@ -1,6 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { UserBase, UserType } from '../../state/user/types';
+import { UserBase } from '../../state/user/types';
 import { getFullName } from '../../state/user/utils';
 import { Avatar, FlexLoading, ListEmptyBlock } from '../ui';
 
@@ -40,7 +40,7 @@ export const UserList = <T extends UserBase>({
           <Avatar size={40} name={getFullName(item)} />
 
           <View className="flex-col">
-            <Text numberOfLines={2} className="text-primary text-xl">
+            <Text numberOfLines={2} className="text-xl text-primary">
               {getFullName(item)}
             </Text>
             <Text numberOfLines={2} className="text-sm text-gray-400">

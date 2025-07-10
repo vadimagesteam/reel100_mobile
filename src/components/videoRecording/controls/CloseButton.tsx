@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Platform, Text, TouchableOpacity } from 'react-native';
-import { useVideoRecordStore } from '../videoRecordStore.ts';
+import { useVideoRecordStore } from '../videoRecordStore';
 import { SvgIcon } from '../../ui';
 import React from 'react';
 
@@ -20,7 +20,7 @@ export const CloseButton = ({ onPress }: { onPress: () => void }) => {
       {isPreviewReady ? (
         <SvgIcon image="backArrow" />
       ) : (
-        <Text className={'text-primary text-[16px]'}>&#x2715;</Text>
+        <Text className={'text-[16px] text-primary'}>&#x2715;</Text>
       )}
     </TouchableOpacity>
   );

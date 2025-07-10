@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { UserType } from '../../../state/user/types.ts';
+import { UserType } from '../../../state/user/types';
 import { BottomSheetFlashList, TouchableOpacity } from '@gorhom/bottom-sheet';
 import { useCallback, useState } from 'react';
 import { Avatar, FlexLoading, ListEmptyBlock } from '../../ui';
@@ -38,12 +38,12 @@ export const SharePeopleList = ({ searchQuery, onSelectionChanged }: SharePeople
           <Avatar name={`${item.firstName} ${item.lastName}`} />
           {selected[item.id!] && (
             <View className="absolute bottom-0 right-0 size-[20px] items-center justify-center rounded-full bg-blue2">
-              <Text className="text-primary text-[12px] font-black">&#x2713;</Text>
+              <Text className="text-[12px] font-black text-primary">&#x2713;</Text>
             </View>
           )}
         </View>
 
-        <Text numberOfLines={2} className="text-primary text-[12px]">
+        <Text numberOfLines={2} className="text-[12px] text-primary">
           {item.firstName} {item.lastName}
         </Text>
       </TouchableOpacity>

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api } from '../../lib/api.ts';
+import { api } from '../../lib/api';
 import { getMimeType } from '../../utils';
 
 export type VideoRecordStore = {

@@ -1,8 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useVideosInfiniteQuery } from '../videoFeed/hooks/useVideosInfiniteQuery.ts';
-import { VideoList } from '../videoFeed/VideoList.tsx';
-import { useSetVideoFeedCacheKey } from '../videoFeed/hooks/useSetVideoFeedCacheKey.ts';
-import { useVideoPause } from '../videoFeed/hooks/useVideoPause.ts';
+import { useCallback, useMemo } from 'react';
+import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
+import { VideoList } from '../videoFeed';
 
 export const Top100Videos = () => {
   const cacheKey = useMemo(() => ['top100_videos'], []);

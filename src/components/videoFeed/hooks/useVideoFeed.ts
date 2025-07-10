@@ -1,6 +1,6 @@
-import { VideoFeedStore } from '../provider/videoFeedStore.ts';
+import { VideoFeedStore } from '../provider/videoFeedStore';
 import { useContext } from 'react';
-import { VideoFeedContext } from '../provider/context.ts';
+import { VideoFeedContext } from '../provider/context';
 import { useStore } from 'zustand/react';
 
 export const useVideoFeed = <T>(selector: (state: VideoFeedStore) => T): T => {

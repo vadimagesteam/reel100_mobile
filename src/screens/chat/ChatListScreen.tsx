@@ -1,5 +1,5 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader } from '../../components/appHeader/AppHeader.tsx';
+import { AppHeader } from '../../components/appHeader/AppHeader';
 import ChatList from '../../components/chat/ChatList';
 
 export const ChatListScreen = () => {

@@ -1,4 +1,4 @@
-import { useVideoFeed } from './useVideoFeed.ts';
+import { useVideoFeed } from './useVideoFeed';
 
 export const useVideoFeedCacheKey = () => {
   const cacheKey = useVideoFeed((s) => s.cacheKey);

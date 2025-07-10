@@ -3,9 +3,9 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query';
-import { apiVideosFetcher, VideoPost } from '../queries/apiVideosFetcher.ts';
+import { apiVideosFetcher, VideoPost } from '../queries/apiVideosFetcher';
 import { useEffect, useMemo } from 'react';
-import { queryClient } from '../../../lib/api.ts';
+import { queryClient } from '../../../lib/api';
 
 export type usePostsInfiniteQueryParams = {
   limit?: number;

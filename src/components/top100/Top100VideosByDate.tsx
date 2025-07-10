@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import { endOfDay } from 'date-fns';
 import { CalendarModal } from '../calendar';
 import { ListEmptyBlock } from '../ui';
 import { useCalendarModal } from './useCalendarModal';
@@ -9,7 +10,6 @@ import {
   useSetVideoFeedCacheKey,
   useVideoFullscreen,
 } from '../videoFeed/hooks';
-import { endOfDay } from 'date-fns';
 import { useStateSelector } from '../../state/app/uiStore';
 
 export const Top100VideosByDate = () => {

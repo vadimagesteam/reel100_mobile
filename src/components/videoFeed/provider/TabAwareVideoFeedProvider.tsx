@@ -1,4 +1,4 @@
-import { useVideoPause } from '../hooks/useVideoPause.ts';
+import { useVideoPause } from '../hooks/useVideoPause';
 import { ReactNode, useEffect } from 'react';
 import { VideoFeedProvider } from './VideoFeedProvider';
 

@@ -1,4 +1,4 @@
-import { useVideoFeed } from './useVideoFeed.ts';
+import { useVideoFeed } from './useVideoFeed';
 
 export const useVideoPause = () => {
   const isPaused = useVideoFeed((s) => s.isPaused);

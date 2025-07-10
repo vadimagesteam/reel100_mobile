@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { VideoTiles } from '../../videoTiles/VideoTiles.tsx';
-import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher.ts';
-import { VideoTile } from './VideoTile.tsx';
-import { TileConfig } from './tileConfig.ts';
+import { VideoTiles } from '../../videoTiles/VideoTiles';
+import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
+import { VideoTile } from './VideoTile';
+import { TileConfig } from './tileConfig';
 import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../videoFeed/hooks';
 
 export interface ProfileVideoTilesProps {

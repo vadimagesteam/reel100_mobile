@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, FlatList, FlatListProps, RefreshControl } from 'react-native';
-import { VideoPost } from '../videoFeed/queries/apiVideosFetcher.ts';
-import { generateBlocks, TileBlock } from './helpers/generateBlocks.ts';
-import { TileListBlock } from './TileListBlock.tsx';
+import { VideoPost } from '../videoFeed/queries/apiVideosFetcher';
+import { generateBlocks, TileBlock } from './helpers/generateBlocks';
+import { TileListBlock } from './TileListBlock';
 import { ListRenderItemInfo } from '@react-native/virtualized-lists/Lists/VirtualizedList';
 
 export interface TilesListProps

@@ -1,26 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../../lib/api.ts';
-import { useUser } from '../../../state/user/authStore.ts';
+import { api } from '../../../lib/api';
+import { useUser } from '../../../state/user/authStore';
 
 type LikeResponse = {
   id: string;
 };
 
-export const useVideoLikeQuery = (
-  type: 'video' | 'comment',
-  id: string,
-) => {
+export const useVideoLikeQuery = (type: 'video' | 'comment', id: string) => {
   const { id: userId } = useUser();
   return useQuery({
     queryKey: ['like', type, userId, id],
     queryFn: async () => {
       const { data } = await api.get<LikeResponse[]>(
-        `/api/reactions?where[typeField]=Like&where[${type}][id]=${id}&where[user][id]=${userId}`
+        `/api/reactions?where[typeField]=Like&where[${type}][id]=${id}&where[user][id]=${userId}`,
       );
-      console.log('😝useLikeQuery',
-      `/api/reactions?where[typeField]=Like&where[${type}][id]=${id}&where[user][id]=${userId}`,
+      console.log(
+        '😝useLikeQuery',
+        `/api/reactions?where[typeField]=Like&where[${type}][id]=${id}&where[user][id]=${userId}`,
         data,
-        data.length ? { id: data[0].id } : { id: null }
+        data.length ? { id: data[0].id } : { id: null },
       );
 
       return data.length ? { id: data[0].id } : { id: null };

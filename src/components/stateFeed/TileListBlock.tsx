@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, TouchableOpacity, Dimensions, StyleSheet, Text } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { TileBlock } from './helpers/generateBlocks.ts';
-import { VideoPost } from '../videoFeed/queries/apiVideosFetcher.ts';
+import { TileBlock } from './helpers/generateBlocks';
+import { VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 import VideoAbsoluteInfo from '../old/VideoAbsoluteInfo';
 
 const { width: screenWidth } = Dimensions.get('window');

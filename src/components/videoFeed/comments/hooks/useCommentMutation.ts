@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useUser } from '../../../../state/user/authStore.ts';
-import { api } from '../../../../lib/api.ts';
-import { CommentType } from './useCommentsInfiniteQuery.ts';
+import { useUser } from '../../../../state/user/authStore';
+import { api } from '../../../../lib/api';
+import { CommentType } from './useCommentsInfiniteQuery';
 
 export type CommentMutationArgs = {
   videoId: string;
