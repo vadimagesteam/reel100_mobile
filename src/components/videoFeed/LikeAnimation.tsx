@@ -15,7 +15,6 @@ import { IconHeart } from './IconHeart';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVideoFullscreen, useVideoFeed } from './hooks';
-import tailwindColors from 'tailwindcss/colors';
 
 export interface LikeAnimationRef {
   trigger: (x?: number, y?: number) => void;
@@ -87,7 +86,7 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
 
   const animatedProps = useAnimatedProps(() => {
     return {
-      fill: interpolateColor(progress.value, [0, 1], [tailwindColors.pink[600], colors.red]),
+      fill: interpolateColor(progress.value, [0, 1], [colors.pink600, colors.red]),
     };
   }, [progress]);
 
