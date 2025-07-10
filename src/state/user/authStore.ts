@@ -38,6 +38,10 @@ type AuthState = {
   user: UserProfile | null;
   token: string | null;
   pendingVerification: null | { username: string };
+  pushNotifications: {
+    token?: string;
+    remoteTokenId?: string;
+  };
 
   actions: {
     logout: () => Promise<void>;
@@ -52,6 +56,7 @@ type AuthState = {
     updateProfile: (data: UpdateProfileInput) => Promise<ActionResult>;
     uploadAvatar: (fileUri: string) => Promise<ActionResult>;
     saveNotificationSettings: (settings: Partial<NotificationSettings>) => Promise<ActionResult>;
+    savePushNotificationsToken: (token: string) => Promise<ActionResult>;
   };
 };
 
@@ -62,6 +67,7 @@ export const useAuthStore = createPersistStore<AuthState>(
     user: null,
     token: null,
     pendingVerification: null,
+    pushNotifications: {},
 
     actions: {
       logout: async () => {
@@ -316,6 +322,42 @@ export const useAuthStore = createPersistStore<AuthState>(
           });
         } catch (error) {
           return { type: 'error', message: (error as Error).message };
+        }
+      },
+      savePushNotificationsToken: async (token) => {
+        const user = get().user;
+        if (!user) {
+          return { type: 'error', message: 'User is not initialized yet' };
+        }
+        const existingToken = get().pushNotifications;
+
+        try {
+          const { data } = await api.post<{ id: string }>('api/pushNotificationTokens', {
+            isActive: true,
+            token,
+            user: { id: user.id },
+          });
+
+          set({
+            pushNotifications: {
+              token,
+              remoteTokenId: data?.id,
+            },
+          });
+
+          if (existingToken.remoteTokenId) {
+            console.log('Deleting old push token on the server');
+            await api.delete(`api/pushNotificationTokens/${existingToken.remoteTokenId}`);
+            console.log('[OK] Old push token deleted');
+          }
+
+          return { type: 'success' };
+        } catch (error) {
+          return {
+            type: 'error',
+            message:
+              (error as Error).message ?? 'An error ocurred during saving token on the server',
+          };
         }
       },
     },
