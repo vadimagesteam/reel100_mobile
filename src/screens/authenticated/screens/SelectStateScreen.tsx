@@ -30,7 +30,7 @@ export const SelectStateScreen = () => {
   );
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-black4 px-4">
+    <SafeAreaView edges={['bottom']} className="bg-background flex-1 px-4">
       <View className="my-2">
         <SearchInput
           placeholder={placeholderValue}

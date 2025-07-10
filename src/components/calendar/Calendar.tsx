@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import Animated from 'react-native-reanimated';
-import { colors } from '../../styles';
+import { colors } from '../../theme';
 import { Button } from '../ui';
 
 export interface CalendarProps {
@@ -21,7 +21,7 @@ export const Calendar = ({
   onSubmitPress,
 }: CalendarProps) => {
   return (
-    <View className="w-full flex-col gap-4 rounded-[16px] bg-black1 p-3">
+    <View className="w-full flex-col gap-4 rounded-[16px] bg-surface p-3">
       <RNCalendar
         current={currentDate}
         markedDates={marked}

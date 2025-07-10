@@ -11,10 +11,10 @@ export const CommentReplyBar = ({
   replyToUser: { firstName, lastName },
   onClose,
 }: CommentReplyBarProps) => (
-  <View className="flex-row items-center justify-between bg-black1 p-[10px]">
+  <View className="flex-row items-center justify-between bg-surface p-[10px]">
     <Text className="text-silver4">Replying to {`${firstName} ${lastName}`}</Text>
     <TouchableOpacity hitSlop={20} onPress={onClose}>
-      <Text className="ml-2.5 text-white">✕ Cancel</Text>
+      <Text className="ml-2.5 text-primary">✕ Cancel</Text>
     </TouchableOpacity>
   </View>
 );

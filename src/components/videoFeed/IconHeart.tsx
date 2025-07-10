@@ -1,13 +1,13 @@
 import Animated from 'react-native-reanimated';
 import Svg, { Path, SvgProps } from 'react-native-svg';
 import { FC } from 'react';
-import { colors } from '../../styles';
+import { colors } from '../../theme';
 
 export interface IconHeartProps extends SvgProps {
   variant: 'outline' | 'filled';
   color?: string;
   fill?: string;
-  animatedProps: { fill?: string };
+  animatedProps?: { fill?: string };
 }
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);

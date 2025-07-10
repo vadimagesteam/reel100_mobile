@@ -73,8 +73,8 @@ export function VerifyEmailScreen() {
   return (
     <GuestContainer>
       <View>
-        <Text className="text-center text-3xl font-bold text-white">Check Your Email</Text>
-        <Text className="text-center text-xl font-bold text-white">
+        <Text className="text-primary text-center text-3xl font-bold">Check Your Email</Text>
+        <Text className="text-primary text-center text-xl font-bold">
           We sent a verification code to {email}
         </Text>
       </View>

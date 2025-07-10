@@ -40,7 +40,7 @@ export const UserList = <T extends UserBase>({
           <Avatar size={40} name={getFullName(item)} />
 
           <View className="flex-col">
-            <Text numberOfLines={2} className="text-xl text-white">
+            <Text numberOfLines={2} className="text-primary text-xl">
               {getFullName(item)}
             </Text>
             <Text numberOfLines={2} className="text-sm text-gray-400">

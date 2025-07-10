@@ -13,7 +13,7 @@ export const GuestContainer = ({ withBackButton = true, children }: GuestContain
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView className="flex-1 bg-black4">
+    <SafeAreaView className="bg-background flex-1">
       <KeyboardAvoidingView behavior="padding" className="flex-1">
         <ScrollView
           contentContainerClassName="grow"

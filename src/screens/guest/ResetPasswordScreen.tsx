@@ -56,7 +56,7 @@ export function ResetPasswordScreen() {
 
   return (
     <GuestContainer>
-      <Text className="text-center text-3xl font-bold text-white">Set New Password</Text>
+      <Text className="text-primary text-center text-3xl font-bold">Set New Password</Text>
 
       <Text className="mb-8 text-center text-xl font-semibold text-gray-400">
         We've sent a 4 digit code to your email:{' '}

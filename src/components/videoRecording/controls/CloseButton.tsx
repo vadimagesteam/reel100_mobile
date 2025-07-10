@@ -20,7 +20,7 @@ export const CloseButton = ({ onPress }: { onPress: () => void }) => {
       {isPreviewReady ? (
         <SvgIcon image="backArrow" />
       ) : (
-        <Text className={'text-[16px] text-white'}>&#x2715;</Text>
+        <Text className={'text-primary text-[16px]'}>&#x2715;</Text>
       )}
     </TouchableOpacity>
   );

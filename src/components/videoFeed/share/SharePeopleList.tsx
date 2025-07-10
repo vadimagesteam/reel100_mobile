@@ -38,12 +38,12 @@ export const SharePeopleList = ({ searchQuery, onSelectionChanged }: SharePeople
           <Avatar name={`${item.firstName} ${item.lastName}`} />
           {selected[item.id!] && (
             <View className="absolute bottom-0 right-0 size-[20px] items-center justify-center rounded-full bg-blue2">
-              <Text className="text-[12px] font-black text-white">&#x2713;</Text>
+              <Text className="text-primary text-[12px] font-black">&#x2713;</Text>
             </View>
           )}
         </View>
 
-        <Text numberOfLines={2} className="text-[12px] text-white">
+        <Text numberOfLines={2} className="text-primary text-[12px]">
           {item.firstName} {item.lastName}
         </Text>
       </TouchableOpacity>

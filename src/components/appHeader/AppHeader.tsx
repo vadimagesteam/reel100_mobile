@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity, View, ViewProps } from 'react-native';
 import { Screens } from '../../navigation/screens';
 import { SelectStateRouteParams } from '../../screens/authenticated/screens/SelectStateScreen';
-import { colors } from '../../styles';
+import { colors } from '../../theme';
 import { SvgIcon } from '../ui';
 import { GlobalCountdown } from './globalCountdown/GlobalCountdown.tsx';
 import Animated, { FlipInEasyY, LinearTransition } from 'react-native-reanimated';
@@ -58,7 +58,7 @@ export const AppHeader = ({
             }}
           >
             <SvgIcon image="location" color={colors.white} />
-            <Text className="text-xl font-bold text-blue2">{selectedState?.slug}</Text>
+            <Text className="text-xl font-bold text-accent">{selectedState?.slug}</Text>
           </TouchableOpacity>
         )}
 

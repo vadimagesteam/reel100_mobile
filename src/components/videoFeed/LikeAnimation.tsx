@@ -9,7 +9,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { colors } from '../../styles';
+import { colors } from '../../theme';
 import { isAndroid } from '../../utils';
 import { IconHeart } from './IconHeart';
 import { useWindowDimensions } from 'react-native';

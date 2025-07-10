@@ -3,7 +3,7 @@ import React, { FC, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar, SvgIcon } from '../ui';
 import { VideoPost } from './queries/apiVideosFetcher';
-import { colors } from '../../styles';
+import { colors } from '../../theme';
 import { cs } from '../old/VideoAbsoluteInfo/styles';
 import { GestureTouchableOpacity } from './GestureTouchableOpacity';
 import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -104,7 +104,7 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
         hitSlop={20}
       >
         <Avatar size={32} name={`${firstName} ${lastName}`} />
-        <Text className="font-bold text-white">{`${firstName} ${lastName}`}</Text>
+        <Text className="font-bold text-primary">{`${firstName} ${lastName}`}</Text>
       </GestureTouchableOpacity>
 
       <View className="absolute right-4 flex-row">

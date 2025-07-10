@@ -4,8 +4,6 @@ import FastImage from 'react-native-fast-image';
 import { TileBlock } from './helpers/generateBlocks.ts';
 import { VideoPost } from '../videoFeed/queries/apiVideosFetcher.ts';
 import VideoAbsoluteInfo from '../old/VideoAbsoluteInfo';
-import { positionHelpers } from '../../styles';
-import { colors } from '../../theme/colors.ts';
 
 const { width: screenWidth } = Dimensions.get('window');
 const half = screenWidth / 2;
@@ -47,8 +45,8 @@ const renderVideo = (
           />
         </>
       ) : (
-        <View style={[style, positionHelpers.center, { backgroundColor: colors.black1 }]}>
-          <Text className="text-[10px] text-white">No preview</Text>
+        <View className="items-center justify-center bg-surface" style={style}>
+          <Text className="text-[10px] text-primary">No preview</Text>
         </View>
       )}
     </TouchableOpacity>
@@ -69,11 +67,11 @@ export const TileListBlock = ({
           {items
             .slice(0, 2)
             .map((item, index) =>
-              renderVideo(onVideoPress, item, cs.smallBox, `${blockIndex}-${index}-${item.id}`),
+              renderVideo(onVideoPress, item, styles.smallBox, `${blockIndex}-${index}-${item.id}`),
             )}
         </View>
         {items[2] &&
-          renderVideo(onVideoPress, items[2], cs.bigBox, `${blockIndex}-2-${items[2].id}`)}
+          renderVideo(onVideoPress, items[2], styles.bigBox, `${blockIndex}-2-${items[2].id}`)}
       </View>
     );
   }
@@ -81,12 +79,17 @@ export const TileListBlock = ({
   if (type === 'leftBig_rightSmall') {
     return (
       <View className="mb-[2px] flex-row">
-        {renderVideo(onVideoPress, items[0], cs.bigBox, `${blockIndex}-0-${items[0].id}`)}
+        {renderVideo(onVideoPress, items[0], styles.bigBox, `${blockIndex}-0-${items[0].id}`)}
         <View>
           {items
             .slice(1, 3)
             .map((item, index) =>
-              renderVideo(onVideoPress, item, cs.smallBox, `${blockIndex}-${index + 1}-${item.id}`),
+              renderVideo(
+                onVideoPress,
+                item,
+                styles.smallBox,
+                `${blockIndex}-${index + 1}-${item.id}`,
+              ),
             )}
         </View>
       </View>
@@ -98,7 +101,6 @@ export const TileListBlock = ({
       {renderVideo(
         onVideoPress,
         items[0],
-        // { width: screenWidth - 20, height: (screenWidth - 20) * 0.6 },
         { width: screenWidth, height: half },
         `${blockIndex}-fallback-${items[0].id}`,
       )}
@@ -106,7 +108,7 @@ export const TileListBlock = ({
   );
 };
 
-export const cs = StyleSheet.create({
+export const styles = StyleSheet.create({
   smallBox: {
     width: half,
     height: half,

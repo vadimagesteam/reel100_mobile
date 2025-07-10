@@ -40,9 +40,10 @@ export function RootNavigation({ isAuthenticated }: RootNavigationProps) {
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
-            headerStyle: { backgroundColor: colors['dark-bg'] },
-            headerTintColor: colors.white,
-            contentStyle: { backgroundColor: colors['dark-bg'] },
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.primary,
+            contentStyle: { backgroundColor: colors.background },
+
             // eslint-disable-next-line react/no-unstable-nested-components
             headerLeft: () => <HeaderBackArrowButton className={clsx(isAndroid && 'mr-8')} />,
           }}

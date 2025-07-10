@@ -39,7 +39,7 @@ export const FriendUserSearch = () => {
       style={{
         paddingTop: insets.top,
       }}
-      className="flex-1 bg-black4 px-4"
+      className="bg-background flex-1 px-4"
     >
       <View className="mb-2 flex-row items-center gap-x-3">
         <HeaderBackArrowButton />

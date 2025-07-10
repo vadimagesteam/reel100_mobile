@@ -14,7 +14,7 @@ export const ToggleRow = ({
 }) => (
   <View className="px-4 py-4">
     <View className="flex-row items-center justify-between">
-      <Text className="flex-1 pr-4 text-base text-white">{label}</Text>
+      <Text className="text-primary flex-1 pr-4 text-base">{label}</Text>
       <Switch
         value={value}
         onValueChange={onChange}
@@ -22,6 +22,6 @@ export const ToggleRow = ({
         trackColor={{ true: colors.blue2, false: '#3a3a3c' }}
       />
     </View>
-    {description && <Text className="mt-2 text-sm text-white/50">{description}</Text>}
+    {description && <Text className="text-primary/50 mt-2 text-sm">{description}</Text>}
   </View>
 );

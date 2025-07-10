@@ -20,7 +20,7 @@ export const NotificationsSettingsForm = () => {
 
   return (
     <ScrollView className="flex-1">
-      <Text className="mb-2 mt-6 px-7 text-base font-semibold text-white">Interactions</Text>
+      <Text className="text-primary mb-2 mt-6 px-7 text-base font-semibold">Interactions</Text>
 
       <View className="mx-4 mb-6 rounded-xl bg-[#1c1c1e]">
         <ToggleRow label="Likes" value={likes} onChange={(val) => updateSetting('likes', val)} />

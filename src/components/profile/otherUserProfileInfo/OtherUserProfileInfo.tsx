@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import { colors } from '../../../styles';
+import { colors } from '../../../theme';
 import { SvgIcon, Button, Avatar, Reel100Gradient } from '../../ui';
 import CounterSection from '../myProfileInfo/CounterSection';
 
@@ -37,7 +37,7 @@ export const ProfileUserInfo = ({
         <View className="flex-col items-center">
           <View className="items-center">
             <Avatar name={fullName} size={70} />
-            <Text className="ml-[5px] text-[20px] font-bold text-white">{fullName}</Text>
+            <Text className="ml-[5px] text-[20px] font-bold text-primary">{fullName}</Text>
           </View>
           <Button
             loading={followButtonLoading}

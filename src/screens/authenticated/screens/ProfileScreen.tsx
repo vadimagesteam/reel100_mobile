@@ -24,7 +24,7 @@ export const ProfileScreen = () => {
 
   console.log('parent', navigation.getParent()?.getId());
   return (
-    <HidebleContainer className="flex-1 bg-black4">
+    <HidebleContainer className="bg-background flex-1">
       <HideableView className="mx-2.5 mb-[15px] flex-col gap-[15px]">
         <AppHeader showBackButton={canGoBack} noPx />
         {isMe ? <Profile /> : <OtherProfile />}

@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { ComponentType } from 'react';
 import { TextInput, TextInputProps, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
+import { colors } from '../../theme';
 import { isAndroid } from '../../utils';
 import { IonIconType } from './IonIconTypes';
 
@@ -26,17 +27,14 @@ export const SearchInput = ({
 }: SearchInputProps) => {
   return (
     <View
-      className={clsx(
-        'h-10 grow flex-row items-center rounded-lg bg-zinc-800 px-3',
-        wrapperClassName,
-      )}
+      className={clsx('bg-input h-10 grow flex-row items-center rounded-lg px-3', wrapperClassName)}
     >
       <Ionicons name={icon} size={18} color="#aaa" />
       <TextInputComponent
         hitSlop={{ top: 8, bottom: 8 }}
-        className={clsx('flex-1 px-2 text-white', isAndroid && 'h-12', className)}
+        className={clsx('flex-1 px-2 text-primary', isAndroid && 'h-12', className)}
         placeholder={placeholder}
-        placeholderTextColor="#888"
+        placeholderTextColor={colors.muted}
         value={value}
         onChangeText={onChangeText}
         keyboardAppearance="dark"
@@ -52,7 +50,7 @@ export const SearchInput = ({
             onClear?.();
           }}
         >
-          <Ionicons name="close-circle" size={18} color="#aaa" />
+          <Ionicons name="close-circle" size={18} color={colors.primary} />
         </TouchableOpacity>
       )}
     </View>

@@ -38,8 +38,8 @@ export const TabForYouScreen = () => {
     : null;
 
   return (
-    <HidebleContainer hideOffset={AppHeaderHeight} className="flex-1 bg-black4">
-      <AppHeader stateSelect />
+    <HidebleContainer hideOffset={AppHeaderHeight} className="bg-background flex-1">
+      <AppHeader />
       <HideableView>
         <SearchInput
           wrapperClassName="mx-[10px] mb-3 grow-0"

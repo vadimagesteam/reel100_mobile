@@ -18,7 +18,7 @@ const HeaderCalendar = ({ style, markerDate, onCalendar }: HeaderCalendarProps) 
       onPress={onCalendar}
       style={style}
     >
-      <View className="w-full flex-1 justify-center rounded-[5px] bg-zinc-800 px-[11px]">
+      <View className="bg-input w-full flex-1 justify-center rounded-[5px] px-[11px]">
         <Text className="pl-2 text-[16px] text-silver2">{isoUTCDateToLocate(markerDate)}</Text>
       </View>
     </AnimatedTouchableOpacity>

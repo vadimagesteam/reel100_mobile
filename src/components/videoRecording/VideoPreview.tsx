@@ -63,7 +63,7 @@ export const VideoPreview = ({}: VideoPreviewProps) => {
             </Button>
           </View>
         ) : (
-          <Text className="text-xl text-white">Uploading...</Text>
+          <Text className="text-primary text-xl">Uploading...</Text>
         )}
       </View>
 

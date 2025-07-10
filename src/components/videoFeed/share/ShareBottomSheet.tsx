@@ -43,7 +43,7 @@ export const ShareBottomSheet = () => {
           />
           <SharePeopleList searchQuery={search} onSelectionChanged={handleSelectionChange} />
           {showFooter && (
-            <View className="bg-black4 px-6">
+            <View className="bg-background px-6">
               <Button onPress={handleShare} size="md">
                 Send
               </Button>

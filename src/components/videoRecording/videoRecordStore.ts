@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../../lib/api.ts';
-import { getMimeType } from '../../utils/getMimeType.ts';
+import { getMimeType } from '../../utils';
 
 export type VideoRecordStore = {
   previewUri: string | null;

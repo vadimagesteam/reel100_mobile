@@ -49,7 +49,7 @@ export const VideoTile = ({ item, onVideoPress, index }: BaseTileItemProps<Video
         </>
       ) : (
         <View className="size-full items-center justify-center rounded-[8px] bg-black">
-          <Text className="text-[10px] text-white">No preview</Text>
+          <Text className="text-primary text-[10px]">No preview</Text>
         </View>
       )}
     </TouchableOpacity>

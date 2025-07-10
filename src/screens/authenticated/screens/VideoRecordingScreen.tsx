@@ -3,7 +3,7 @@ import { VideoRecording } from '../../../components/videoRecording/VideoRecordin
 
 export const VideoRecordingScreen = () => {
   return (
-    <View className="flex-1 bg-black4">
+    <View className="bg-background flex-1">
       <VideoRecording />
     </View>
   );

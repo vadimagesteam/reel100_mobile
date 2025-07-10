@@ -38,7 +38,7 @@ export const Input: FC<InputProps> = forwardRef<TextInput, InputProps>(
           placeholderTextColor="#999"
           secureTextEntry={secureToggle ? secure : secureTextEntry}
           className={clsx(
-            'rounded-xl border-2 bg-black5 p-[13px] pr-10 text-xl text-white',
+            'text-primary rounded-xl border-2 bg-black5 p-[13px] pr-10 text-xl',
             !focused && !hasError ? 'border-black5' : '',
             focused && 'border-blue1',
             hasError && 'border-red1',

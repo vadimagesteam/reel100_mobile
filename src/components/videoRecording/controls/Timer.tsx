@@ -65,7 +65,7 @@ export const Timer = ({ active, onTimeOut, maxDurationSeconds }: TimerProps) => 
       )}
     >
       {digits.map((d, i) => (
-        <AnimatedChar key={i} char={d} className="py-2 text-[12px] font-light text-white" />
+        <AnimatedChar key={i} char={d} className="text-primary py-2 text-[12px] font-light" />
       ))}
     </Animated.View>
   );

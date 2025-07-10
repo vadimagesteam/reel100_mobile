@@ -48,8 +48,8 @@ export const CameraFeatures = ({
           setFrameRate((prev) => (prev === 30 ? 60 : 30));
         }}
       >
-        <Text className="text-[10px] text-white">{frameRate}</Text>
-        <Text className="text-[10px] text-white">FPS</Text>
+        <Text className="text-primary text-[10px]">{frameRate}</Text>
+        <Text className="text-primary text-[10px]">FPS</Text>
       </ControlButton>
       <ControlButton animated style={animStyle} onPress={onPickFromGallery}>
         <SvgIcon image="gellaryCameraIcon" />

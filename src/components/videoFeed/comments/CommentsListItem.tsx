@@ -23,7 +23,7 @@ export const CommentsListItem = ({
       }}
       onLayout={onLayout}
     >
-      <View className="flex-row justify-between rounded-[10] bg-black1 p-[10px]">
+      <View className="flex-row justify-between rounded-[10] bg-surface p-[10px]">
         <View>
           <View className="flex-row items-center">
             <Image
@@ -38,7 +38,7 @@ export const CommentsListItem = ({
             <Text className="text-silver1">{item?.text}</Text>
           </View>
         </View>
-        <Text className="text-[9px] text-white">
+        <Text className="text-[9px] text-primary">
           {item.id.startsWith('optimistic') ? 'sending...' : formatTimeAgo(item?.createdAt)}
         </Text>
       </View>
@@ -46,7 +46,7 @@ export const CommentsListItem = ({
       {!item.replyTo && (
         <View className="flex-row items-center justify-between">
           <TouchableOpacity hitSlop={20} onPress={() => onReplyPress?.(item)}>
-            <Text className="text-white">Reply</Text>
+            <Text className="text-primary">Reply</Text>
           </TouchableOpacity>
           {item.repliesCount > 0 && (
             <TouchableOpacity

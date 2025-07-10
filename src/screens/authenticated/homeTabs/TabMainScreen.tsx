@@ -65,9 +65,9 @@ export const TabMainScreen = () => {
         ios: hideOffset,
         android: hideOffset + 35,
       })}
-      className="flex-1 bg-black4"
+      className="bg-background flex-1"
     >
-      <AppHeader stateSelect />
+      <AppHeader />
       <TabView
         lazy
         className="mt-10"
@@ -89,6 +89,6 @@ export const TabMainScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  indicatorStyle: { backgroundColor: colors.white },
-  tabBarStyle: { backgroundColor: colors.black4, height: TopBarHeight },
+  indicatorStyle: { backgroundColor: colors.primary },
+  tabBarStyle: { backgroundColor: colors.background, height: TopBarHeight },
 });

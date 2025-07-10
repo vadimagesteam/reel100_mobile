@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors } from '../../../styles';
+import { colors } from '../../../theme';
 import { SvgIcon, Avatar } from '../../ui';
 import CounterSection from './CounterSection';
 

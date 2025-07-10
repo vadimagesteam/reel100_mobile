@@ -23,19 +23,19 @@ export interface ButtonProps extends TouchableOpacityProps {
 }
 
 const variants: Record<string, string> = {
-  primary: 'bg-blue1',
-  outline: 'border border-blue1 bg-transparent',
-  danger: 'bg-red',
+  primary: 'bg-button-primary',
+  outline: 'border border-button-primary bg-transparent',
+  danger: 'bg-button-danger',
   gradient: '', // no bg for gradient, handled separately
   ghost: '',
 };
 
 const textVariants: Record<string, string> = {
-  primary: 'text-white',
+  primary: 'text-primary',
   outline: 'text-green',
-  danger: 'text-white',
-  gradient: 'text-white',
-  ghost: 'text-white',
+  danger: 'text-primary',
+  gradient: 'text-primary',
+  ghost: 'text-primary',
 };
 
 const sizes: Record<string, string> = {

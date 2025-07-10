@@ -5,7 +5,7 @@ import RNBottomSheet, {
   BottomSheetBackdropProps,
   BottomSheetProps as OriginalBottomSheetProps,
 } from '@gorhom/bottom-sheet';
-import { colors } from '../../styles';
+import { colors } from '../../theme';
 
 export interface BottomSheetProps extends OriginalBottomSheetProps {
   withBackdrop?: boolean;

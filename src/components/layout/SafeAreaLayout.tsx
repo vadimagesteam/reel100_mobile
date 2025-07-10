@@ -6,7 +6,7 @@ export interface SafeAreaLayoutProps extends SafeAreaViewProps {}
 
 export const SafeAreaLayout: FC<SafeAreaLayoutProps> = ({ children, className, ...rest }) => {
   return (
-    <SafeAreaView className={clsx('flex-1 bg-black4', className)} {...rest}>
+    <SafeAreaView className={clsx('bg-background flex-1', className)} {...rest}>
       {children}
     </SafeAreaView>
   );

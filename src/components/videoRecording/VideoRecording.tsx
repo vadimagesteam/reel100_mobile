@@ -123,7 +123,7 @@ export const VideoRecording = () => {
   const animatedProps = useAnimatedProps<CameraProps>(() => ({ zoom: zoom.value }), [zoom]);
 
   return (
-    <View className="flex-1 bg-black4">
+    <View className="bg-background flex-1">
       {previewUri && <VideoPreview />}
       {!isPreviewReady && (
         <>

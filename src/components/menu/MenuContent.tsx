@@ -29,11 +29,11 @@ export const MenuContent = () => {
   };
 
   return (
-    <View className="flex-1 bg-black1" style={{ paddingTop: insets.top }}>
+    <View className="bg-surface flex-1" style={{ paddingTop: insets.top }}>
       {user && (
         <View className="mt-[30px] flex-row items-center gap-2.5 border-b-[0.5px] border-b-silver6 px-[20px] pb-[20px]">
           <Avatar name={`${user.firstName} ${user.lastName}`} />
-          <Text className="text-xl font-bold text-white">
+          <Text className="text-primary text-xl font-bold">
             {user?.firstName} {user?.lastName}
           </Text>
         </View>

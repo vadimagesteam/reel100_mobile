@@ -179,7 +179,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const VideoBatchSize = 6;
 
   return (
-    <Animated.View className="flex-1 bg-black4" style={viewStyle}>
+    <Animated.View className="bg-background flex-1" style={viewStyle}>
       <GestureDetector gesture={gesturesCombined}>
         <FlatList<VideoPost>
           ref={flatListRef}

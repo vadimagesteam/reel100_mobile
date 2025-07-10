@@ -1,4 +1,4 @@
-import { getMimeType } from '../../utils/getMimeType';
+import { getMimeType } from '../../utils';
 import {
   RegisterDataType,
   VerifyUserType,

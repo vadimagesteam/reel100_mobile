@@ -39,7 +39,7 @@ export const Avatar = ({ uri, size = 60, name }: AvatarProps) => {
   if (showFallback) {
     return (
       <View className="items-center justify-center rounded-full" style={[sizeStyle, emptyBgStyle]}>
-        <Text className="text-white" style={textStyle}>
+        <Text className="text-primary" style={textStyle}>
           {initials}
         </Text>
       </View>

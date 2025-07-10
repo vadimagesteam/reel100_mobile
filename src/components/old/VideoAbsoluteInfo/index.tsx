@@ -1,9 +1,10 @@
 import React from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors } from '../../../theme';
 import { Avatar, SvgIcon } from '../../ui';
 import { BodyText } from '../UI';
-import { colors, positionHelpers } from '../../../styles';
+import { positionHelpers } from '../../../styles';
 import { cs } from './styles.ts';
 
 interface VideoAbsoluteInfoProps {

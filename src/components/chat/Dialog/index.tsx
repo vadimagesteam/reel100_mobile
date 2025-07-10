@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GiftedChat, IMessage, User, InputToolbar, Send } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { colors, positionHelpers } from '../../../styles';
+import { getFullName } from '../../../state/user/utils';
+import { colors } from '../../../theme';
 import { HeaderBackArrowButton } from '../../appHeader';
-import { BodyText } from '../../old/UI';
-import { getInitialsName } from '../../../utils/getInitialsName';
+import { Avatar } from '../../ui';
 
 const user: User = {
   _id: 1,
@@ -20,7 +20,6 @@ const ChatDialog = () => {
   const params = route?.params;
   const insets = useSafeAreaInsets();
 
-  const paddingInsets = insets.top ? insets.top + 8 : 17;
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   console.log('fullName-->', params);
@@ -72,7 +71,7 @@ const ChatDialog = () => {
         style={[styles.messageContainer, { justifyContent: isUser ? 'flex-end' : 'flex-start' }]}
       >
         {!isUser && props.currentMessage.user.avatar ? (
-          <Image source={{ uri: props.currentMessage.user.avatar }} style={styles.avatar} />
+          <Avatar name="B B" uri={props.currentMessage.user.avatar} style={styles.avatar} />
         ) : null}
 
         <View
@@ -84,7 +83,11 @@ const ChatDialog = () => {
             },
           ]}
         >
-          {!isUser && <Text style={styles.sender}>{props.currentMessage.user.name}</Text>}
+          {!isUser && (
+            <Text className="mb-[5px] font-bold text-primary">
+              {props.currentMessage.user.name}
+            </Text>
+          )}
           <Text style={styles.text}>{props.currentMessage.text}</Text>
           <Text style={styles.timestamp}>
             {new Date(props.currentMessage.createdAt).toLocaleTimeString([], {
@@ -113,49 +116,21 @@ const ChatDialog = () => {
   return (
     <>
       <View
-        style={[
-          positionHelpers.rowFillCenter,
-          positionHelpers.ph16,
-          {
-            paddingTop: paddingInsets,
-            paddingBottom: 8,
-            backgroundColor: colors.black,
-            borderBottomWidth: 0.5,
-            borderBottomColor: colors.silver,
-          },
-        ]}
+        className="flex-row items-center justify-between border-b-[0.5px] border-b-silver px-4 pb-2"
+        style={{ paddingTop: insets.top }}
       >
-        <View style={[positionHelpers.alignItemsCenterRow]}>
+        <View className="flex-row items-center gap-2.5">
           <HeaderBackArrowButton />
-          <View style={[positionHelpers.alignItemsCenterRow, { marginLeft: 10 }]}>
-            <View
-              style={[
-                positionHelpers.center,
-                { height: 40, width: 40, borderRadius: '80%', backgroundColor: colors.blue },
-              ]}
-            >
-              <BodyText fontWeight={'bold'} fontSize={16} color={colors.white}>
-                {getInitialsName(params?.firstName, params?.lastName)}
-              </BodyText>
-            </View>
-            <View style={{ marginLeft: 10 }}>
-              <BodyText
-                fontSize={14}
-                color={colors.white}
-              >{`${params?.firstName} ${params?.lastName}`}</BodyText>
-              <BodyText fontSize={14} color={colors.silver} marginTop={2}>
-                a few seconds ago
-              </BodyText>
+          <View className="flex-row gap-2.5">
+            <Avatar name={getFullName(params)} size={40} />
+            <View className="flex-col gap-0.5">
+              <Text className="text-sm text-primary">{`${params?.firstName} ${params?.lastName}`}</Text>
+              <Text className="text-muted text-primary">a few seconds ago</Text>
             </View>
           </View>
         </View>
-        <TouchableOpacity
-          style={{ backgroundColor: colors.red, padding: 4, borderRadius: 5 }}
-          onPress={() => true}
-        >
-          <BodyText fontWeight={'500'} fontSize={14} color={colors.white}>
-            {'Block user'}
-          </BodyText>
+        <TouchableOpacity className="rounded-[6px] bg-danger p-1" onPress={() => true}>
+          <Text className="text-base font-medium text-primary">Block user</Text>
         </TouchableOpacity>
       </View>
       <GiftedChat
@@ -197,15 +172,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
   },
-  sender: {
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#fff',
-  },
   timestamp: {
     fontSize: 10,
-    color: '#fff',
-    // color: '#555',
+    color: colors.primary,
     marginVertical: 5,
     textAlign: 'right',
   },
@@ -217,7 +186,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   inputToolbar: {
-    backgroundColor: '#111',
+    backgroundColor: colors.black4,
     borderTopWidth: 0,
     paddingVertical: 10,
     paddingBottom: 20,
@@ -233,13 +202,10 @@ const styles = StyleSheet.create({
     color: '#007aff',
   },
   messagesContainer: {
-    backgroundColor: '#000',
+    backgroundColor: colors.black,
   },
   textInput: {
-    color: '#fff',
-    // backgroundColor: '#222',
-    // borderRadius: 20,
-    // paddingHorizontal: 15,
+    color: colors.primary,
     fontSize: 16,
   },
 });
