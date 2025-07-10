@@ -72,12 +72,6 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
             name,
           } as any); // as any required by RN FormData type
 
-          console.log(22222, {
-            uri: fileUri,
-            type,
-            name,
-          });
-
           const fileUploadResponse = await api.put(`api/videos/${videoId}/file`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',

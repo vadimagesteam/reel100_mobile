@@ -3,7 +3,7 @@ import { View, ViewProps, Text, PixelRatio } from 'react-native';
 import { useEffect, useMemo, useState } from 'react';
 
 export interface AvatarProps extends ViewProps {
-  uri?: string;
+  uri?: string | null;
   name: string;
   size?: number;
 }
@@ -48,7 +48,7 @@ export const Avatar = ({ uri, size = 60, name }: AvatarProps) => {
 
   return (
     <FastImage
-      source={{ uri: uri }}
+      source={{ uri: uri! }}
       className="rounded-full"
       style={sizeStyle}
       onError={() => setShowFallback(true)}

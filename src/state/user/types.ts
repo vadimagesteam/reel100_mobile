@@ -61,11 +61,24 @@ export type UserBase = {
   status: 'Active' | 'Pending' | string;
   createdAt: string;
   updatedAt: string;
+  avatar?: string | null;
+};
+
+export type NotificationSettings = {
+  likes: boolean;
+  comments: boolean;
+  followers: boolean;
+  messages: boolean;
+};
+
+export type ProfileSettings = {
+  notifications: NotificationSettings;
 };
 
 export type UserProfile = UserBase & {
   resetPasswordToken: string | null;
   stats: UserStatsType;
+  settings: ProfileSettings;
 };
 
 export type RelationId = string;
@@ -82,4 +95,4 @@ export type UserType = UserBase & {
   }[];
 };
 
-export type UpdateProfileInput = Pick<UserBase, 'firstName' | 'lastName'>;
+export type UpdateProfileInput = Partial<Pick<UserProfile, 'firstName' | 'lastName' | 'settings'>>;

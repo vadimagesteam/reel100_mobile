@@ -1,29 +1,21 @@
-import { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
+import { useNotificationSettings } from '../../../state/user/authStore';
+import { NotificationSettings } from '../../../state/user/types';
 import { ToggleRow } from './ToggleRow';
 import { Divider } from './Divider';
 
-type NotificationSettings = {
-  likes: boolean;
-  comments: boolean;
-  followers: boolean;
-  messages: boolean;
-};
-
 export const NotificationsSettingsForm = () => {
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
-    likes: true,
-    comments: true,
-    followers: true,
-    messages: true,
-  });
+  const [notificationSettings, saveNotificationSettings] = useNotificationSettings();
+  const { comments, messages, followers, likes } = notificationSettings;
 
   const updateSetting = async (key: keyof NotificationSettings, value: boolean) => {
-    setNotificationSettings((prev) => ({
-      ...prev,
+    const { type, message } = await saveNotificationSettings({
+      ...notificationSettings,
       [key]: value,
-    }));
-    // todo: implement UI for update setting
+    });
+    if (type === 'error') {
+      Alert.alert('Save Failed', message ?? 'Server internal error');
+    }
   };
 
   return (
@@ -31,27 +23,23 @@ export const NotificationsSettingsForm = () => {
       <Text className="mb-2 mt-6 px-7 text-base font-semibold text-white">Interactions</Text>
 
       <View className="mx-4 mb-6 rounded-xl bg-[#1c1c1e]">
-        <ToggleRow
-          label="Likes"
-          value={notificationSettings.likes}
-          onChange={(val) => updateSetting('likes', val)}
-        />
+        <ToggleRow label="Likes" value={likes} onChange={(val) => updateSetting('likes', val)} />
         <Divider />
         <ToggleRow
           label="Comments"
-          value={notificationSettings.comments}
+          value={comments}
           onChange={(val) => updateSetting('comments', val)}
         />
         <Divider />
         <ToggleRow
           label="New Followers"
-          value={notificationSettings.followers}
+          value={followers}
           onChange={(val) => updateSetting('followers', val)}
         />
         <Divider />
         <ToggleRow
           label="Messages"
-          value={notificationSettings.messages}
+          value={messages}
           onChange={(val) => updateSetting('messages', val)}
         />
       </View>

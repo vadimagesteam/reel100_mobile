@@ -1,3 +1,7 @@
+import { useCallback } from 'react';
+import { Alert } from 'react-native';
+import { getMimeType } from '../../utils/getMimeType';
+import { sleep } from '../../utils/promise';
 import {
   RegisterDataType,
   VerifyUserType,
@@ -7,6 +11,8 @@ import {
   ResetPassType,
   UserProfile,
   UpdateProfileInput,
+  UserType,
+  NotificationSettings,
 } from './types';
 import { api } from '../../lib/api.ts';
 import { AxiosError } from 'axios';
@@ -47,6 +53,8 @@ type AuthState = {
     forgotPassword: (data: ForgotPassType) => Promise<AuthActionResult>;
     resetPassword: (data: ResetPassType) => Promise<AuthActionResult>;
     updateProfile: (data: UpdateProfileInput) => Promise<ActionResult>;
+    uploadAvatar: (fileUri: string) => Promise<ActionResult>;
+    saveNotificationSettings: (settings: Partial<NotificationSettings>) => Promise<ActionResult>;
   };
 };
 
@@ -250,14 +258,65 @@ export const useAuthStore = createPersistStore<AuthState>(
       },
       updateProfile: async (payload) => {
         try {
-          await api.patch(`/api/users/${get().user?.id}`, {
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-          });
+          await api.patch(`/api/users/${get().user?.id}`, payload);
           set(({ user }) => ({
             user: user ? { ...user, ...payload } : user,
           }));
           return { type: 'success' };
+        } catch (error) {
+          return { type: 'error', message: (error as Error).message };
+        }
+      },
+      uploadAvatar: async (fileUri) => {
+        const { type, name } = getMimeType(fileUri);
+        const uri = fileUri.startsWith('file://') ? fileUri : `file://${fileUri}`;
+
+        const formData = new FormData();
+        formData.append('file', { uri, type, name });
+
+        const { data } = await api.put<UserType>(`api/users/${get().user?.id}/avatar`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        if (data.avatar) {
+          set(({ user }) => ({
+            user: user ? { ...user, avatar: data.avatar } : user,
+          }));
+        }
+
+        return { type: 'success' };
+      },
+      saveNotificationSettings: async (settings) => {
+        const u = get().user;
+        if (!u) {
+          return { type: 'error', message: 'User is not initialized yet' };
+        }
+
+        const notificationSettings: NotificationSettings = {
+          followers: settings.followers ?? u?.settings?.notifications?.followers ?? true,
+          messages: settings.messages ?? u?.settings?.notifications?.messages ?? true,
+          likes: settings.likes ?? u?.settings?.notifications?.likes ?? true,
+          comments: settings.comments ?? u?.settings?.notifications?.comments ?? true,
+        };
+
+        // Optimistic
+        set(({ user }) => ({
+          user: {
+            ...user!,
+            settings: {
+              ...(user?.settings ?? {}),
+              notifications: notificationSettings,
+            },
+          },
+        }));
+        try {
+          return get().actions.updateProfile({
+            settings: {
+              notifications: notificationSettings,
+            },
+          });
         } catch (error) {
           return { type: 'error', message: (error as Error).message };
         }
@@ -274,3 +333,27 @@ export const useAuthStore = createPersistStore<AuthState>(
 export const useIsAuthenticated = () => useAuthStore((s) => s.isAuthenticated);
 export const useUser = () => useAuthStore(({ user }) => user!);
 export const useAuthActions = () => useAuthStore(({ actions }) => actions);
+
+export const useNotificationSettings = (): [
+  NotificationSettings,
+  (update: Partial<NotificationSettings>) => Promise<ActionResult>,
+] => {
+  const { settings } = useUser();
+  const { saveNotificationSettings } = useAuthActions();
+  const {
+    messages = true,
+    comments = true,
+    followers = true,
+    likes = true,
+  } = settings?.notifications ?? {};
+
+  return [
+    {
+      messages,
+      comments,
+      followers,
+      likes,
+    },
+    saveNotificationSettings,
+  ];
+};

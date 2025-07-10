@@ -1,28 +1,33 @@
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from '@react-native-vector-icons/ionicons';
 import { Controller, useForm } from 'react-hook-form';
-import { getFullName } from '../../../state/user/utils';
+import { UserBase } from '../../../state/user/types';
+import { useLoadingCallback } from '../../../utils';
 import { Avatar, Button, Input } from '../../ui';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useAuthActions, useUser } from '../../../state/user/authStore.ts';
 
-type FormData = { profilePicture?: string; firstName: string; lastName: string };
+type FormData = Pick<UserBase, 'avatar' | 'firstName' | 'lastName'>;
 
 export const EditProfileForm = () => {
   const profile = useUser();
-  const { updateProfile } = useAuthActions();
+  const { updateProfile, uploadAvatar } = useAuthActions();
 
   const {
     control,
     setValue,
     handleSubmit,
     watch,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting, errors, isDirty },
   } = useForm<FormData>({
     defaultValues: {
+      avatar: profile.avatar,
       firstName: profile.firstName,
       lastName: profile.lastName,
     },
   });
+
+  const [startAvatarUpload, isAvatarUploading] = useLoadingCallback(uploadAvatar);
 
   const handlePhotoSelect = async () => {
     const { didCancel, errorCode, assets } = await launchImageLibrary({
@@ -42,15 +47,12 @@ export const EditProfileForm = () => {
 
     if (assets?.length) {
       const imageUri = assets[0].uri!;
-      setValue('profilePicture', imageUri);
+      setValue('avatar', imageUri);
+      await startAvatarUpload(imageUri);
     }
   };
 
-  const onSubmit = async (values: FormData) => {
-    await updateProfile(values);
-  };
-
-  const photoImageUrl = watch('profilePicture');
+  const avatar = watch('avatar');
 
   return (
     <View className="flex-1">
@@ -58,14 +60,23 @@ export const EditProfileForm = () => {
         keyboardShouldPersistTaps="handled"
         contentContainerClassName="flex-1 mt-10 gap-4 px-5"
       >
-        <TouchableOpacity
-          hitSlop={15}
-          onPress={handlePhotoSelect}
-          className="flex-col items-center gap-2 self-center"
-        >
-          <Avatar uri={photoImageUrl} name={getFullName(profile)} size={100} />
-          <Text className="text-silver3">Press to Change Photo</Text>
-        </TouchableOpacity>
+        <View className="flex-col items-center gap-2">
+          <TouchableOpacity
+            hitSlop={15}
+            onPress={handlePhotoSelect}
+            className="relative flex-col items-center justify-center gap-2 self-center"
+          >
+            <Avatar uri={avatar} name="" size={100} />
+            <View className="absolute size-[36px] items-center justify-center">
+              {isAvatarUploading ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Ionicons name="camera-outline" color="#fff" size={36} />
+              )}
+            </View>
+          </TouchableOpacity>
+          <Text className="text-silver3">Change Avatar</Text>
+        </View>
         <Controller
           name="firstName"
           rules={{
@@ -92,9 +103,11 @@ export const EditProfileForm = () => {
         {errors?.lastName?.message && (
           <Text className="pl-2 text-red1">{errors?.lastName?.message}</Text>
         )}
-        <Button loading={isSubmitting} onPress={handleSubmit(onSubmit)}>
-          Save Changes
-        </Button>
+        {isDirty && (
+          <Button loading={isSubmitting} onPress={handleSubmit(updateProfile)}>
+            Save Changes
+          </Button>
+        )}
       </ScrollView>
     </View>
   );
