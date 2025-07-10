@@ -20,7 +20,7 @@ export const MenuContent = () => {
   };
 
   const handleEditProfile = () => {
-    navigationRef.navigate(Screens.EditAccount);
+    navigationRef.navigate(Screens.EditProfile);
   };
 
   const handleLogout = () => {
@@ -29,11 +29,11 @@ export const MenuContent = () => {
   };
 
   return (
-    <View className="bg-surface flex-1" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-surface" style={{ paddingTop: insets.top }}>
       {user && (
         <View className="mt-[30px] flex-row items-center gap-2.5 border-b-[0.5px] border-b-silver6 px-[20px] pb-[20px]">
           <Avatar name={`${user.firstName} ${user.lastName}`} />
-          <Text className="text-primary text-xl font-bold">
+          <Text className="text-xl font-bold text-primary">
             {user?.firstName} {user?.lastName}
           </Text>
         </View>

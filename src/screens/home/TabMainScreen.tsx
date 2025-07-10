@@ -2,14 +2,14 @@ import { useCallback, useState } from 'react';
 import { useWindowDimensions, StyleSheet, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { type SceneRendererProps, type Route, TabView, TabBar } from 'react-native-tab-view';
-import { Top100Videos } from '../../../components/top100/Top100Videos';
-import { SvgIcon } from '../../../components/ui';
-import { colors } from '../../../theme/colors';
-import { AppHeader, useGeoLocationState } from '../../../components/appHeader';
-import { Top100VideosByDate } from '../../../components/top100/Top100VideosByDate';
-import { StateFeed } from '../../../components/stateFeed';
-import { HidebleContainer } from '../../../components/hidebleContainer';
-import { TabAwareVideoFeedProvider } from '../../../components/videoFeed';
+import { Top100Videos } from '../../components/top100/Top100Videos';
+import { SvgIcon } from '../../components/ui';
+import { colors } from '../../theme';
+import { AppHeader, useGeoLocationState } from '../../components/appHeader';
+import { Top100VideosByDate } from '../../components/top100/Top100VideosByDate';
+import { StateFeed } from '../../components/stateFeed';
+import { HidebleContainer } from '../../components/hidebleContainer';
+import { TabAwareVideoFeedProvider } from '../../components/videoFeed';
 
 const routes = [
   { key: 'top100', title: '', icon: 'top100Tab' },
@@ -65,7 +65,7 @@ export const TabMainScreen = () => {
         ios: hideOffset,
         android: hideOffset + 35,
       })}
-      className="bg-background flex-1"
+      className="flex-1 bg-background"
     >
       <AppHeader />
       <TabView

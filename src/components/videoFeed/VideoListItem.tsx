@@ -1,4 +1,4 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, View } from 'react-native';
 import Video, {
@@ -10,9 +10,9 @@ import Video, {
   VideoRef,
   ViewType,
 } from 'react-native-video';
-import { Screens, Tabs } from '../../navigation/screens';
-import { useUser } from '../../state/user/authStore';
-import { colors } from '../../theme/colors';
+import { useNavigation } from '../../navigation';
+import { Screens } from '../../navigation/screens';
+import { colors } from '../../theme';
 import { isAndroid } from '../../utils';
 import { formatTime } from '../../utils/formatTime';
 import {
@@ -44,8 +44,7 @@ export const VideoListItem: FC<VideoItemProps> = ({
 }) => {
   const { id: videoId, file, user: author } = video;
 
-  const user = useUser();
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
   const { isFullscreen } = useVideoFullscreen();
   const { isPaused, setIsPaused } = useVideoPause();
   const { shareVideo } = useVideoShare();
@@ -163,9 +162,7 @@ export const VideoListItem: FC<VideoItemProps> = ({
           onLike={handleLike}
           onShare={() => shareVideo(video.id)}
           onUser={() => {
-            navigation.navigate(Screens.Profile, {
-              user: author,
-            });
+            navigation.navigate(Screens.Profile, { user: author });
           }}
           onComments={() => openComments(video.id, video.user.id)}
         />

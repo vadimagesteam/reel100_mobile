@@ -1,12 +1,12 @@
 import { Alert, Text } from 'react-native';
-import { Button } from '../../components/ui/Button.tsx';
+import { Button } from '../../components/ui/Button';
 import { Controller, useForm } from 'react-hook-form';
-import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
-import { Input } from '../../components/ui/Input.tsx';
+import { GuestContainer } from '../../components/layout/guest/GuestContainer';
+import { Input } from '../../components/ui/Input';
 import React, { useEffect } from 'react';
-import { useAuthStore } from '../../state/user/authStore.ts';
+import { useAuthStore } from '../../state/user/authStore';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Screens } from '../../navigation/screens.ts';
+import { Screens } from '../../navigation/screens';
 
 interface FormData {
   username: string;
@@ -56,7 +56,7 @@ export function ResetPasswordScreen() {
 
   return (
     <GuestContainer>
-      <Text className="text-primary text-center text-3xl font-bold">Set New Password</Text>
+      <Text className="text-center text-3xl font-bold text-primary">Set New Password</Text>
 
       <Text className="mb-8 text-center text-xl font-semibold text-gray-400">
         We've sent a 4 digit code to your email:{' '}

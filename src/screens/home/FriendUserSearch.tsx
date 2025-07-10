@@ -1,30 +1,25 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { HeaderBackArrowButton } from '../../../components/appHeader';
-import { SearchInput } from '../../../components/ui';
-import { UserList } from '../../../components/userList';
-import { useShareablePeopleQuery } from '../../../components/videoFeed/share/hooks/useShareablePeopleQuery';
-import { UserType } from '../../../state/user/types';
-
-export type FriendUserSearchRouteParams = {
-  onSelected: (user: UserType) => void;
-};
+import { HeaderBackArrowButton } from '../../components/appHeader';
+import { SearchInput } from '../../components/ui';
+import { UserList } from '../../components/userList';
+import { useShareablePeopleQuery } from '../../components/videoFeed/share/hooks/useShareablePeopleQuery';
+import { useNavigation, useRoute } from '../../navigation';
+import { UserBase } from '../../state/user/types';
 
 export const FriendUserSearch = () => {
   const [searchText, setSearchText] = useState('');
   const navigation = useNavigation();
-  const {
-    params: { onSelected },
-  } = useRoute<
-    RouteProp<{
-      params: FriendUserSearchRouteParams;
-    }>
-  >();
+  const { params } = useRoute<'FriendUserSearch'>();
 
-  const handleSelected = useCallback<FriendUserSearchRouteParams['onSelected']>(
-    (user) => {
+  if (!params?.onSelected) {
+    throw new Error('[FriendUserSearch] onSelected param is missing');
+  }
+
+  const { onSelected } = params;
+  const handleSelected = useCallback(
+    (user: UserBase) => {
       onSelected?.(user);
       navigation.goBack();
     },
@@ -39,7 +34,7 @@ export const FriendUserSearch = () => {
       style={{
         paddingTop: insets.top,
       }}
-      className="bg-background flex-1 px-4"
+      className="flex-1 bg-background px-4"
     >
       <View className="mb-2 flex-row items-center gap-x-3">
         <HeaderBackArrowButton />

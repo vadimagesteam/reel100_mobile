@@ -1,13 +1,11 @@
 import { Alert, Text } from 'react-native';
-import { Button } from '../../components/ui/Button.tsx';
-import { Controller, useForm } from 'react-hook-form';
-import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
-import { Input } from '../../components/ui/Input.tsx';
-import React from 'react';
-import { useAuthStore } from '../../state/user/authStore.ts';
 import { useNavigation } from '@react-navigation/native';
-import { Screens } from '../../navigation/screens.ts';
-import { ScreenTitle } from '../../components/layout/guest/ScreenTitle.tsx';
+import { Controller, useForm } from 'react-hook-form';
+import { Button, Input } from '../../components/ui';
+import { GuestContainer } from '../../components/layout/guest/GuestContainer';
+import { useAuthStore } from '../../state/user/authStore';
+import { Screens } from '../../navigation/screens';
+import { ScreenTitle } from '../../components/layout/guest/ScreenTitle';
 
 interface FormData {
   username: string;

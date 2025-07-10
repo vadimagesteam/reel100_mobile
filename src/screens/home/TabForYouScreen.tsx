@@ -1,15 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useMemo, useState } from 'react';
-import { AppHeader, AppHeaderHeight } from '../../../components/appHeader/AppHeader';
-import { HideableView, HidebleContainer } from '../../../components/hidebleContainer';
-import { SearchInput } from '../../../components/ui';
-import { VideoFeedProvider } from '../../../components/videoFeed';
-import { useVideosInfiniteQuery } from '../../../components/videoFeed/hooks';
-import { TileListBlock, generateBlocks } from '../../../components/stateFeed';
-import { VideoTiles } from '../../../components/videoTiles/VideoTiles';
-import { Screens } from '../../../navigation/screens';
-import { UserType } from '../../../state/user/types';
-import { FriendUserSearchRouteParams } from '../screens/FriendUserSearch';
+import { AppHeader, AppHeaderHeight } from '../../components/appHeader';
+import { HideableView, HidebleContainer } from '../../components/hidebleContainer';
+import { SearchInput } from '../../components/ui';
+import { VideoFeedProvider } from '../../components/videoFeed';
+import { useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
+import { TileListBlock, generateBlocks } from '../../components/stateFeed';
+import { VideoTiles } from '../../components/videoTiles/VideoTiles';
+import { Screens } from '../../navigation/screens';
+import { UserType } from '../../state/user/types';
 
 export const TabForYouScreen = () => {
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
@@ -38,7 +37,7 @@ export const TabForYouScreen = () => {
     : null;
 
   return (
-    <HidebleContainer hideOffset={AppHeaderHeight} className="bg-background flex-1">
+    <HidebleContainer hideOffset={AppHeaderHeight} className="flex-1 bg-background">
       <AppHeader />
       <HideableView>
         <SearchInput
@@ -48,7 +47,7 @@ export const TabForYouScreen = () => {
           onFocus={(e) => {
             navigation.navigate(Screens.FriendUserSearch, {
               onSelected: setSelectedUser,
-            } as FriendUserSearchRouteParams);
+            });
             e.currentTarget.blur();
           }}
         />

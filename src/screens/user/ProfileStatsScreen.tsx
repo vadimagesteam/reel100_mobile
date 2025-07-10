@@ -1,14 +1,13 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { type Route, type SceneRendererProps, TabBar, TabView } from 'react-native-tab-view';
-import { useUserQuery } from '../../../components/profile/hooks/useUserQuery';
-import { SearchableUserList } from '../../../components/userList';
-import { Screens } from '../../../navigation/screens';
-import { useUser } from '../../../state/user/authStore';
-import { UserBase } from '../../../state/user/types';
-import { getFullName } from '../../../state/user/utils';
-import { colors } from '../../../theme/colors';
+import { useUserQuery } from '../../components/profile/hooks/useUserQuery';
+import { SearchableUserList } from '../../components/userList';
+import { Screens } from '../../navigation/screens';
+import { UserBase } from '../../state/user/types';
+import { getFullName } from '../../state/user/utils';
+import { colors } from '../../theme';
+import { useNavigation, useRoute } from '../../navigation';
 
 type TabRoutes = 'followers' | 'following';
 
@@ -23,14 +22,10 @@ const routes: { key: TabRoutes; title: string }[] = [
 ];
 
 export const ProfileStatsScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
   const {
     params: { userId, initialTab = 'followers' },
-  } = useRoute<
-    RouteProp<{
-      params: ProfileStatsRouteParams;
-    }>
-  >();
+  } = useRoute<'ProfileStats'>();
 
   const layout = useWindowDimensions();
   const { data: user, isLoading } = useUserQuery(userId);

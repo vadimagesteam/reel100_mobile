@@ -1,10 +1,10 @@
-import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
+import { GuestContainer } from '../../components/layout/guest/GuestContainer';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Button, PinInput } from '../../components/ui';
-import { useAuthStore } from '../../state/user/authStore.ts';
-import { Screens } from '../../navigation/screens.ts';
+import { useAuthStore } from '../../state/user/authStore';
+import { Screens } from '../../navigation/screens';
 import { useLoadingCallback } from '../../utils';
 
 export function VerifyEmailScreen() {
@@ -73,8 +73,8 @@ export function VerifyEmailScreen() {
   return (
     <GuestContainer>
       <View>
-        <Text className="text-primary text-center text-3xl font-bold">Check Your Email</Text>
-        <Text className="text-primary text-center text-xl font-bold">
+        <Text className="text-center text-3xl font-bold text-primary">Check Your Email</Text>
+        <Text className="text-center text-xl font-bold text-primary">
           We sent a verification code to {email}
         </Text>
       </View>

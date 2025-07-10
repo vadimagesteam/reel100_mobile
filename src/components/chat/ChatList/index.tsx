@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '../../../navigation';
 import { getFullName } from '../../../state/user/utils';
 import { Avatar } from '../../ui';
 import { ChatPreview } from './types';
@@ -13,7 +13,7 @@ const formatTime = (timestamp: string) => {
 };
 
 const ChatListScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
 
   const renderItem = ({ item }: { item: ChatPreview }) => (
     <TouchableOpacity
@@ -28,7 +28,7 @@ const ChatListScreen = () => {
       <Avatar size={50} name={getFullName(item)} />
       <View className="ml-3 flex-1 justify-center">
         <View className="flex-row items-center justify-between">
-          <Text className="text-primary text-[16px] font-bold">
+          <Text className="text-[16px] font-bold text-primary">
             {`${item.firstName} ${item?.lastName}`}
           </Text>
           <Text className="text-xs text-zinc-400">{formatTime(item.timestamp)}</Text>
@@ -39,7 +39,7 @@ const ChatListScreen = () => {
           </Text>
           {item.unreadCount ? (
             <View className="ml-2 rounded-full bg-[#2e89ff] px-2 py-0.5">
-              <Text className="text-primary text-xs">{item.unreadCount}</Text>
+              <Text className="text-xs text-primary">{item.unreadCount}</Text>
             </View>
           ) : null}
         </View>

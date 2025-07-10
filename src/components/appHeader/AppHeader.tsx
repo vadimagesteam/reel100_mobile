@@ -1,15 +1,14 @@
 import { Text, TouchableOpacity, View, ViewProps } from 'react-native';
+import Animated, { FlipInEasyY, LinearTransition } from 'react-native-reanimated';
+import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
-import { SelectStateRouteParams } from '../../screens/authenticated/screens/SelectStateScreen';
 import { colors } from '../../theme';
 import { SvgIcon } from '../ui';
-import { GlobalCountdown } from './globalCountdown/GlobalCountdown.tsx';
-import Animated, { FlipInEasyY, LinearTransition } from 'react-native-reanimated';
+import { GlobalCountdown } from './globalCountdown/GlobalCountdown';
 import { HeaderBackArrowButton } from './HeaderBackArrowButton';
-import { MenuButton } from './MenuButton.tsx';
+import { MenuButton } from './MenuButton';
 import clsx from 'clsx';
-import { useStateSelector } from '../../state/app/uiStore.ts';
-import { useNavigation } from '@react-navigation/native';
+import { useStateSelector } from '../../state/app/uiStore';
 
 export const AppHeaderHeight = 60;
 
@@ -28,7 +27,7 @@ export const AppHeader = ({
   style,
   noPx,
 }: AppHeaderProps) => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
   const [selectedState, setSelectedState] = useStateSelector();
 
   const layoutAnimationProps = disableLayoutAnimation
@@ -54,7 +53,7 @@ export const AppHeader = ({
               navigation.navigate(Screens.SelectState, {
                 placeholderValue: selectedState?.label,
                 onSelected: setSelectedState,
-              } as SelectStateRouteParams);
+              });
             }}
           >
             <SvgIcon image="location" color={colors.white} />

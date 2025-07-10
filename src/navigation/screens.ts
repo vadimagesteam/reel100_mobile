@@ -1,3 +1,6 @@
+import { StateItem } from '../state/app/uiStore';
+import { UserBase, UserType } from '../state/user/types';
+
 export const Tabs = {
   TabMain: 'TabMain',
   TabGlobalVideo: 'TabGlobalVideo',
@@ -8,21 +11,59 @@ export const Tabs = {
 export const Screens = {
   // Auth screens
   Login: 'Login',
-  SignUp: 'Sign Up',
-  ForgotPassword: 'Forgot Password',
-  ResetPassword: 'Reset Password',
-  VerifyEmail: 'Verify Email',
+  SignUp: 'SignUp',
+  ForgotPassword: 'ForgotPassword',
+  ResetPassword: 'ResetPassword',
+  VerifyEmail: 'VerifyEmail',
 
   // In app screens
   Home: 'Home',
   Profile: 'Profile',
-  ForYou: 'For U',
-  ProfileStats: 'Profile Stats',
-  VideoRecording: 'Video Recoding',
-  ChatList: 'Messages',
-  Chat: 'Dialog',
-  NotificationSettings: 'Notification Settings',
-  EditAccount: 'Edit Profile Info',
-  FriendUserSearch: 'Friend Search',
-  SelectState: 'Select State',
+  ForYou: 'ForYou',
+  ProfileStats: 'ProfileStats',
+  VideoRecording: 'VideoRecording',
+  ChatList: 'ChatList',
+  Chat: 'Chat',
+  NotificationSettings: 'NotificationSettings',
+  EditProfile: 'EditProfile',
+  FriendUserSearch: 'FriendUserSearch',
+  SelectState: 'SelectState',
 } as const;
+
+export type AuthStackParamList = {
+  Login: undefined;
+  SignUp: undefined;
+  ForgotPassword: undefined;
+  ResetPassword: undefined;
+  VerifyEmail: undefined;
+};
+
+export type AppStackParamList = {
+  Tabs: undefined;
+  Profile:
+    | { fromTabs?: boolean; user: Pick<UserBase, 'id' | 'firstName' | 'lastName'> }
+    | undefined;
+  VideoRecording: undefined;
+  ChatList: undefined;
+  Chat: { firstName: string; lastName: string };
+  NotificationSettings: undefined;
+  EditProfile: undefined;
+  ProfileStats: {
+    userId: string;
+    initialTab: 'followers' | 'following';
+  };
+  FriendUserSearch: {
+    onSelected: (user: UserBase) => void;
+  };
+  SelectState: {
+    placeholderValue?: string;
+    onSelected: (state: StateItem) => void;
+  };
+};
+
+export type BottomTabParamList = {
+  TabMain: undefined;
+  TabGlobalVideo: undefined;
+  TabForYou: undefined;
+  TabProfile: { fromTabs: boolean };
+};

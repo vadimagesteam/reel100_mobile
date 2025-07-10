@@ -1,6 +1,6 @@
 import { TouchableOpacity, TouchableOpacityProps } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../theme/colors';
+import { colors } from '../../theme';
 import { SvgIcon } from '../ui';
 
 export const HeaderBackArrowButton = (props: Omit<TouchableOpacityProps, 'onPress'>) => {

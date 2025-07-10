@@ -1,6 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import { Screens } from '../../navigation/screens';
-import { ProfileStatsRouteParams } from '../../screens/authenticated/screens/ProfileStatsScreen';
+import { useNavigation } from '../../navigation';
+import { AppStackParamList, Screens } from '../../navigation/screens';
 import { useUser } from '../../state/user/authStore';
 import { getFullName } from '../../state/user/utils';
 import { Button } from '../ui';
@@ -8,14 +7,13 @@ import { MyProfileInfo } from './myProfileInfo/MyProfileInfo';
 
 export const Profile = () => {
   const user = useUser();
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
 
   if (!user) {
     return null;
   }
 
   const handleUploadAndShare = () => {
-    // navigation.navigate(DASHBOARD_ROUTES.VIDEO_RECORD_SCREEN);
     navigation.navigate(Screens.VideoRecording);
   };
 
@@ -23,11 +21,11 @@ export const Profile = () => {
     navigation.navigate(Screens.ChatList);
   };
 
-  const handleStatsScreen = (initialTab: ProfileStatsRouteParams['initialTab']) => {
+  const handleStatsScreen = (initialTab: AppStackParamList['ProfileStats']['initialTab']) => {
     navigation.navigate(Screens.ProfileStats, {
       userId: user?.id,
       initialTab,
-    } as ProfileStatsRouteParams);
+    });
   };
 
   const {

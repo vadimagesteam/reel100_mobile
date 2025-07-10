@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GiftedChat, IMessage, User, InputToolbar, Send } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useRoute } from '../../../navigation';
 import { getFullName } from '../../../state/user/utils';
 import { colors } from '../../../theme';
 import { HeaderBackArrowButton } from '../../appHeader';
@@ -15,8 +15,8 @@ const user: User = {
 };
 
 const ChatDialog = () => {
-  const navigation = useNavigation<any>();
-  const route = useRoute<any>();
+  // const navigation = useNavigation();
+  const route = useRoute<'Chat'>();
   const params = route?.params;
   const insets = useSafeAreaInsets();
 

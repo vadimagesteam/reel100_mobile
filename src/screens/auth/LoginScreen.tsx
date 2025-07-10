@@ -1,12 +1,12 @@
 import { Text, TouchableOpacity } from 'react-native';
 import { Button, Input } from '../../components/ui';
 import { Controller, useForm } from 'react-hook-form';
-import { GuestContainer } from '../../components/layout/guest/GuestContainer.tsx';
-import React, { useEffect } from 'react';
-import { useAuthStore } from '../../state/user/authStore.ts';
+import { GuestContainer } from '../../components/layout/guest/GuestContainer';
+import { useEffect } from 'react';
+import { useAuthStore } from '../../state/user/authStore';
 import { useNavigation } from '@react-navigation/native';
-import { Screens } from '../../navigation/screens.ts';
-import { ScreenTitle } from '../../components/layout/guest/ScreenTitle.tsx';
+import { Screens } from '../../navigation/screens';
+import { ScreenTitle } from '../../components/layout/guest/ScreenTitle';
 
 interface FormData {
   username: string;
@@ -37,9 +37,7 @@ export function LoginScreen() {
   });
 
   const onLogin = async (data: FormData) => {
-    console.log('pp111', data);
     const result = await authLoginAction(data);
-    console.log('result', data);
     if (result.type === 'success') {
       // navigate...
       return;

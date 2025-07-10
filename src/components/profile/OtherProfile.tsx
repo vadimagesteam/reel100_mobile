@@ -1,10 +1,9 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { useEffect, useMemo } from 'react';
 import { Alert } from 'react-native';
+import { useNavigation, useRoute } from '../../navigation';
 import { Screens } from '../../navigation/screens';
-import { ProfileStatsRouteParams } from '../../screens/authenticated/screens/ProfileStatsScreen';
+import { ProfileStatsRouteParams } from '../../screens';
 import { useUser } from '../../state/user/authStore';
-import { UserBase } from '../../state/user/types';
 import { getFullName } from '../../state/user/utils';
 import { useFollowMutation } from './hooks/useFollowMutation';
 import { useUnFollowMutation } from './hooks/useUnFollowMutation';
@@ -14,14 +13,10 @@ import { ProfileUserInfo } from './otherUserProfileInfo/OtherUserProfileInfo';
 export interface ProfileProps {}
 
 export const OtherProfile = ({}: ProfileProps) => {
-  const navigation = useNavigation<any>();
-  const { params } = useRoute<{
-    key: string;
-    name: string;
-    params: { user: Pick<UserBase, 'id' | 'firstName' | 'lastName'> };
-  }>();
+  const navigation = useNavigation();
+  const { params } = useRoute<'Profile'>();
 
-  if (!params.user) {
+  if (!params?.user) {
     throw new Error('No user in route params');
   }
   const { user: shallowUser } = params;
@@ -56,9 +51,9 @@ export const OtherProfile = ({}: ProfileProps) => {
 
   const handleStatsScreen = (initialTab: ProfileStatsRouteParams['initialTab']) => {
     navigation.navigate(Screens.ProfileStats, {
-      userId: user?.id,
+      userId: user?.id!,
       initialTab,
-    } as ProfileStatsRouteParams);
+    });
   };
 
   return (
@@ -72,8 +67,8 @@ export const OtherProfile = ({}: ProfileProps) => {
       onFollowPress={() => followUserCallback()}
       onChatPress={() => {
         navigation.navigate(Screens.Chat, {
-          firstName: user?.firstName,
-          lastName: user?.lastName,
+          firstName: user?.firstName!,
+          lastName: user?.lastName!,
         });
       }}
       onFollowersPress={() => handleStatsScreen('followers')}

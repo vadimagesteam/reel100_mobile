@@ -1,9 +1,9 @@
 import { View } from 'react-native';
-import { VideoRecording } from '../../../components/videoRecording/VideoRecording.tsx';
+import { VideoRecording } from '../../components/videoRecording/VideoRecording';
 
 export const VideoRecordingScreen = () => {
   return (
-    <View className="bg-background flex-1">
+    <View className="flex-1 bg-background">
       <VideoRecording />
     </View>
   );

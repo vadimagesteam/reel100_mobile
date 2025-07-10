@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { format } from 'date-fns';
-import { colors } from '../../theme/colors';
+import { colors } from '../../theme';
 
 export const useCalendarModal = () => {
   const [isVisible, setIsVisible] = useState(false);
