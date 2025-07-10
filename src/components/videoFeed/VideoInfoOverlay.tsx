@@ -54,14 +54,10 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
   const heartRef = useRef<View>(null);
 
   const updateIconPosition = () => {
-    heartRef.current?.measureInWindow((x, y) => {
-      console.log('👀 HEART POS', { x, y });
-      // setHeartIconPos({ x, y });
-    });
     heartRef.current?.measureLayout(
       wrapperViewRef.current!,
       (x, y) => {
-        console.log('📌 Relative to custom parent:', { x, y });
+        // console.log('📌 Relative to custom parent:', { x, y });
         setHeartIconPos({ x, y });
       },
       () => {
