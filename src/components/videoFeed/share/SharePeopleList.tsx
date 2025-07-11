@@ -1,9 +1,11 @@
 import { Text, View } from 'react-native';
+import { useUser } from '../../../state/user/authStore';
 import { UserType } from '../../../state/user/types';
 import { BottomSheetFlashList, TouchableOpacity } from '@gorhom/bottom-sheet';
 import { useCallback, useState } from 'react';
 import { Avatar, FlexLoading, ListEmptyBlock } from '../../ui';
-import { useShareablePeopleQuery } from './hooks/useShareablePeopleQuery';
+import { useUserQuery } from '../../user/hooks';
+import { useUserSearchableFollowRelations } from '../../user/userFollowRelations/useUserSearchableFollowRelations';
 
 type ShallowUser = Pick<UserType, 'id' | 'firstName' | 'lastName'>;
 
@@ -15,7 +17,10 @@ export interface SharePeopleListProps {
 export const SharePeopleList = ({ searchQuery, onSelectionChanged }: SharePeopleListProps) => {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
 
-  const { data, isLoading } = useShareablePeopleQuery(searchQuery);
+  // fixme...
+  const me = useUser();
+  const { data: user, isLoading } = useUserQuery(me.id);
+  const { data } = useUserSearchableFollowRelations(user, 'following', searchQuery);
 
   const handleItemPress = useCallback(
     ({ id }: ShallowUser) => {

@@ -8,7 +8,7 @@ export * from './auth/VerifyEmailScreen';
 // home
 export * from './home/TabMainScreen';
 export * from './home/TabForYouScreen';
-export * from './home/FriendUserSearch';
+export * from './user/UserFollowingSearchScreen';
 export * from './home/TabGlobalVideoScreen';
 export * from './home/SelectStateScreen';
 
@@ -17,6 +17,7 @@ export * from './user/ProfileScreen';
 export * from './user/EditProfileScreen';
 export * from './user/NotificationsSettingsScreen';
 export * from './user/ProfileStatsScreen';
+export * from './user/UserSearchScreen';
 
 // videos
 export * from './video/VideoRecordingScreen';

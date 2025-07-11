@@ -3,18 +3,19 @@ import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBackArrowButton } from '../../components/appHeader';
 import { SearchInput } from '../../components/ui';
+import { useUserQuery } from '../../components/user/hooks';
+import { useUserSearchableFollowRelations } from '../../components/user/userFollowRelations/useUserSearchableFollowRelations';
 import { UserList } from '../../components/userList';
-import { useShareablePeopleQuery } from '../../components/videoFeed/share/hooks/useShareablePeopleQuery';
 import { useNavigation, useRoute } from '../../navigation';
+import { useUser } from '../../state/user/authStore';
 import { UserBase } from '../../state/user/types';
 
-export const FriendUserSearch = () => {
-  const [searchText, setSearchText] = useState('');
+export const UserFollowingSearchScreen = () => {
   const navigation = useNavigation();
-  const { params } = useRoute<'FriendUserSearch'>();
+  const { params } = useRoute<'UserFollowingSearch'>();
 
   if (!params?.onSelected) {
-    throw new Error('[FriendUserSearch] onSelected param is missing');
+    throw new Error('[UserFollowingSearchScreen] onSelected param is missing');
   }
 
   const { onSelected } = params;
@@ -27,7 +28,9 @@ export const FriendUserSearch = () => {
   );
 
   const insets = useSafeAreaInsets();
-  const { data, isLoading } = useShareablePeopleQuery(searchText);
+  const me = useUser();
+  const { data: user, isLoading } = useUserQuery(me.id);
+  const { data, searchQuery, setSearchQuery } = useUserSearchableFollowRelations(user, 'following');
 
   return (
     <View
@@ -41,8 +44,8 @@ export const FriendUserSearch = () => {
         <SearchInput
           autoCorrect={false}
           autoFocus
-          value={searchText}
-          onChangeText={setSearchText}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
       </View>
       <KeyboardAvoidingView

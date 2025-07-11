@@ -45,7 +45,7 @@ export const TabForYouScreen = () => {
           value={searchByFullName ?? ''}
           onClear={() => setSelectedUser(null)}
           onFocus={(e) => {
-            navigation.navigate(Screens.FriendUserSearch, {
+            navigation.navigate(Screens.UserFollowingSearch, {
               onSelected: setSelectedUser,
             });
             e.currentTarget.blur();

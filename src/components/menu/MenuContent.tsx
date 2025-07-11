@@ -25,7 +25,7 @@ export const MenuContent = () => {
   };
 
   const handleLogout = () => {
-    console.log('logout!');
+    // todo: clear all caches!
     logout();
   };
 

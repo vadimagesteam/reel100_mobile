@@ -9,11 +9,12 @@ import {
   ChatDialogScreen,
   ChatListScreen,
   EditProfileScreen,
-  FriendUserSearch,
+  UserFollowingSearchScreen,
   NotificationsSettingsScreen,
   ProfileScreen,
   ProfileStatsScreen,
   SelectStateScreen,
+  UserSearchScreen,
   VideoRecordingScreen,
 } from '../screens';
 import { BottomTabNavigator } from './TabsNavigator';
@@ -60,8 +61,16 @@ export const AppNavigator = () => (
     />
     <Stack.Screen name={Screens.ProfileStats} component={ProfileStatsScreen} />
     <Stack.Screen
-      name={Screens.FriendUserSearch}
-      component={FriendUserSearch}
+      name={Screens.UserSearch}
+      component={UserSearchScreen}
+      options={{
+        animation: 'fade_from_bottom',
+        animationDuration: 200,
+      }}
+    />
+    <Stack.Screen
+      name={Screens.UserFollowingSearch}
+      component={UserFollowingSearchScreen}
       options={{
         animation: 'fade_from_bottom',
         animationDuration: 200,

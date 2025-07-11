@@ -1,3 +1,4 @@
+import { UserFollowingSearchScreen } from '../screens';
 import { StateItem } from '../state/app/uiStore';
 import { UserBase, UserType } from '../state/user/types';
 
@@ -26,7 +27,8 @@ export const Screens = {
   Chat: 'Chat',
   NotificationSettings: 'NotificationSettings',
   EditProfile: 'EditProfile',
-  FriendUserSearch: 'FriendUserSearch',
+  UserFollowingSearch: 'UserFollowingSearch',
+  UserSearch: 'UserSearch',
   SelectState: 'SelectState',
 } as const;
 
@@ -52,9 +54,10 @@ export type AppStackParamList = {
     userId: string;
     initialTab: 'followers' | 'following';
   };
-  FriendUserSearch: {
+  UserFollowingSearch: {
     onSelected: (user: UserBase) => void;
   };
+  UserSearch: undefined;
   SelectState: {
     placeholderValue?: string;
     onSelected: (state: StateItem) => void;

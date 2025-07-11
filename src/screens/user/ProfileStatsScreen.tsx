@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { type Route, type SceneRendererProps, TabBar, TabView } from 'react-native-tab-view';
-import { useUserQuery } from '../../components/profile/hooks/useUserQuery';
+import { useUserQuery } from '../../components/user/hooks/useUserQuery';
+import { useUserSearchableFollowRelations } from '../../components/user/userFollowRelations/useUserSearchableFollowRelations';
 import { SearchableUserList } from '../../components/userList';
 import { Screens } from '../../navigation/screens';
 import { UserBase } from '../../state/user/types';
@@ -44,21 +45,15 @@ export const ProfileStatsScreen = () => {
     ),
   );
 
-  // Todo: ideally these must be handled in separated scene components
-  const [followersSearch, setFollowersSearch] = useState('');
-  const [followingSearch, setFollowingSearch] = useState('');
+  const { data: followers, setSearchQuery: setFollowersSearch } = useUserSearchableFollowRelations(
+    user,
+    'followers',
+  );
 
-  const followers = useMemo(() => {
-    const list = user?.whoms.map((v) => v.who);
-    const q = followersSearch.toLowerCase().trim();
-    return q ? list?.filter((r) => getFullName(r).toLowerCase().includes(q)) : list;
-  }, [user, followersSearch]);
-
-  const following = useMemo(() => {
-    const list = user?.follows.map((v) => v.whom);
-    const q = followingSearch.toLowerCase().trim();
-    return q ? list?.filter((r) => getFullName(r).toLowerCase().includes(q)) : list;
-  }, [user, followingSearch]);
+  const { data: following, setSearchQuery: setFollowingSearch } = useUserSearchableFollowRelations(
+    user,
+    'following',
+  );
 
   const handleUserPress = useCallback(
     (_user: UserBase) => {
@@ -91,7 +86,7 @@ export const ProfileStatsScreen = () => {
         );
       }
     },
-    [followers, following, isLoading, handleUserPress],
+    [setFollowersSearch, followers, isLoading, handleUserPress, setFollowingSearch, following],
   );
 
   return (

@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppHeader } from '../../components/appHeader';
 import { HideableView, HidebleContainer } from '../../components/hidebleContainer';
-import { OtherProfile, Profile, UserVideoTiles } from '../../components/profile';
+import { OtherProfile, Profile, UserVideoTiles } from '../../components/user';
 import { VideoFeedProvider } from '../../components/videoFeed';
 import { useUser } from '../../state/user/authStore';
 import { UserBase } from '../../state/user/types';
