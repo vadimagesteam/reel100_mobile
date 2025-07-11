@@ -91,8 +91,6 @@ export const useAuthStore = createPersistStore<AuthState>(
 
         const { accessToken, ...user } = data;
 
-        console.log('Obtained new profile token', accessToken);
-
         set({
           isAuthenticated: true,
           token: accessToken,
@@ -396,3 +394,12 @@ export const useNotificationSettings = (): [
     saveNotificationSettings,
   ];
 };
+
+// Refetch profile once app reloaded
+useAuthStore.persist.onFinishHydration(() => {
+  const { isAuthenticated, actions, token } = useAuthStore.getState();
+  console.log('auth store hydrated. isAuh:', isAuthenticated, 'API AUTH JWT: ', token);
+  if (isAuthenticated) {
+    actions.loadUserProfile();
+  }
+});

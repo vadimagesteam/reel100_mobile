@@ -1,4 +1,4 @@
-export const formatTime = (seconds: number): string => {
+export const formatSeconds = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60); // лише для UI
   return `${mins}:${secs < 10 ? `0${secs}` : secs}`;
@@ -88,3 +88,8 @@ export function isoDateTimeToLocale(isoDateTime: string | Date): string {
     timeZoneName: 'short',
   })}`;
 }
+
+export const formatTime = (isoDateTime: string | Date) => {
+  const date = typeof isoDateTime === 'string' ? new Date(isoDateTime) : isoDateTime;
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};

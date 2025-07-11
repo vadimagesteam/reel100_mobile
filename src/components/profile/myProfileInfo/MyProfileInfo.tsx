@@ -5,6 +5,7 @@ import { SvgIcon, Avatar } from '../../ui';
 import CounterSection from './CounterSection';
 
 interface ProfileInfoProps {
+  avatar: string | null;
   fullName: string;
   followerCount: number | undefined;
   likeCount: number | undefined;
@@ -16,6 +17,7 @@ interface ProfileInfoProps {
 
 export const MyProfileInfo = ({
   fullName,
+  avatar,
   followerCount,
   likeCount,
   followCount,
@@ -27,7 +29,7 @@ export const MyProfileInfo = ({
     <>
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center justify-center">
-          <Avatar name={fullName} />
+          <Avatar uri={avatar} name={fullName} />
           <Text className="ml-[5px] text-[16px] font-bold text-silver4">{fullName}</Text>
         </View>
         <TouchableOpacity onPress={onChatPress}>

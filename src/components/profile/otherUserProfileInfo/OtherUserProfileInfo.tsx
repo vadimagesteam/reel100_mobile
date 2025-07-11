@@ -5,6 +5,7 @@ import CounterSection from '../myProfileInfo/CounterSection';
 
 interface ProfileUserInfoProps {
   fullName: string;
+  avatar?: string | null;
   followerCount: number | undefined;
   likeCount: number | undefined;
   followCount: number | undefined;
@@ -18,6 +19,7 @@ interface ProfileUserInfoProps {
 
 export const ProfileUserInfo = ({
   fullName,
+  avatar,
   followerCount,
   likeCount,
   followCount,
@@ -36,7 +38,7 @@ export const ProfileUserInfo = ({
         </TouchableOpacity>
         <View className="flex-col items-center">
           <View className="items-center">
-            <Avatar name={fullName} size={70} />
+            <Avatar uri={avatar} name={fullName} size={70} />
             <Text className="ml-[5px] text-[20px] font-bold text-primary">{fullName}</Text>
           </View>
           <Button

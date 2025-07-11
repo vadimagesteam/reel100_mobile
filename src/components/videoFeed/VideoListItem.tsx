@@ -14,7 +14,7 @@ import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
 import { colors } from '../../theme';
 import { isAndroid } from '../../utils';
-import { formatTime } from '../../utils/formatTime';
+import { formatSeconds } from '../../utils/formatTime';
 import {
   useLikeMutations,
   useVideoFeed,
@@ -151,7 +151,7 @@ export const VideoListItem: FC<VideoItemProps> = ({
           isPaused={isPaused}
           timeLeft={
             loadStarted && progress
-              ? formatTime(Math.round(loadStarted?.duration - progress?.currentTime))
+              ? formatSeconds(Math.round(loadStarted?.duration - progress?.currentTime))
               : undefined
           }
           rankNumber={rankNumber}

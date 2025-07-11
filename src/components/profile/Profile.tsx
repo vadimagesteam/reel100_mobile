@@ -35,6 +35,7 @@ export const Profile = () => {
   return (
     <>
       <MyProfileInfo
+        avatar={user.avatar}
         likeCount={likeCount}
         followerCount={followerCount}
         followCount={followCount}

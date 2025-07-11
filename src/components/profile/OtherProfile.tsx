@@ -58,6 +58,7 @@ export const OtherProfile = ({}: ProfileProps) => {
 
   return (
     <ProfileUserInfo
+      avatar={user?.avatar}
       fullName={fullName}
       followerCount={user?.stats?.followerCount}
       likeCount={user?.stats?.likeCount}
@@ -67,8 +68,7 @@ export const OtherProfile = ({}: ProfileProps) => {
       onFollowPress={() => followUserCallback()}
       onChatPress={() => {
         navigation.navigate(Screens.Chat, {
-          firstName: user?.firstName!,
-          lastName: user?.lastName!,
+          userId: user!.id,
         });
       }}
       onFollowersPress={() => handleStatsScreen('followers')}

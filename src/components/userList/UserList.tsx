@@ -37,7 +37,7 @@ export const UserList = <T extends UserBase>({
           className="mt-3 flex-1 flex-row items-center gap-2 border-b-[0.5px] border-b-gray-800 pb-2"
           onPress={() => onPress?.(item)}
         >
-          <Avatar size={40} name={getFullName(item)} />
+          <Avatar uri={item.avatar} size={40} name={getFullName(item)} />
 
           <View className="flex-col">
             <Text numberOfLines={2} className="text-xl text-primary">

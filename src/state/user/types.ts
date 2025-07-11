@@ -61,7 +61,7 @@ export type UserBase = {
   status: 'Active' | 'Pending' | string;
   createdAt: string;
   updatedAt: string;
-  avatar?: string | null;
+  avatar: string | null;
 };
 
 export type NotificationSettings = {

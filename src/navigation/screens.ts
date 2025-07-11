@@ -45,7 +45,7 @@ export type AppStackParamList = {
     | undefined;
   VideoRecording: undefined;
   ChatList: undefined;
-  Chat: { firstName: string; lastName: string };
+  Chat: { chatId?: string; userId: string };
   NotificationSettings: undefined;
   EditProfile: undefined;
   ProfileStats: {

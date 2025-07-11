@@ -62,7 +62,7 @@ export const apiVideosFetcher = async ({
   orderBy = {},
   where = {},
 }: ApiVideosFetcherParams): Promise<VideoPost[]> => {
-  console.log('🔥 [apiVideosFetcher]', { where, skip, take, orderBy });
+  // console.log('🔥 [apiVideosFetcher]', { where, skip, take, orderBy });
   const response = await api.get<VideoPost[]>('api/videos', {
     params: {
       ...where,

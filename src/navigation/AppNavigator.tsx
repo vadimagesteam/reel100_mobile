@@ -39,7 +39,14 @@ export const AppNavigator = () => (
       component={VideoRecordingScreen}
       options={{ gestureEnabled: false }}
     />
-    <Stack.Screen name={Screens.ChatList} component={ChatListScreen} />
+    <Stack.Screen
+      options={{
+        title: 'Messages',
+        headerShown: true,
+      }}
+      name={Screens.ChatList}
+      component={ChatListScreen}
+    />
     <Stack.Screen name={Screens.Chat} component={ChatDialogScreen} />
     <Stack.Screen
       name={Screens.NotificationSettings}
