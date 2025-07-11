@@ -1,17 +1,23 @@
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import { useNavigation } from '../../navigation';
 import { AppStackParamList, Screens } from '../../navigation/screens';
-import { useUser } from '../../state/user/authStore';
+import { useAuthActions, useUser } from '../../state/user/authStore';
 import { getFullName } from '../../state/user/utils';
 import { Button } from '../ui';
 import { MyProfileInfo } from './myProfileInfo/MyProfileInfo';
 
 export const Profile = () => {
   const user = useUser();
+  const { loadUserProfile } = useAuthActions();
   const navigation = useNavigation();
 
-  if (!user) {
-    return null;
-  }
+  // silently refetch profile once tab is active
+  useFocusEffect(
+    useCallback(() => {
+      loadUserProfile();
+    }, [loadUserProfile]),
+  );
 
   const handleUploadAndShare = () => {
     navigation.navigate(Screens.VideoRecording);
@@ -27,6 +33,10 @@ export const Profile = () => {
       initialTab,
     });
   };
+
+  if (!user) {
+    return null;
+  }
 
   const {
     stats: { likeCount, followCount, followerCount },

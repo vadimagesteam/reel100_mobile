@@ -20,9 +20,6 @@ export const ProfileScreen = () => {
   const userId = params?.user?.id ?? me.id;
   const isMe = userId === me.id;
 
-  const navigation = useNavigation();
-
-  console.log('parent', navigation.getParent()?.getId());
   return (
     <HidebleContainer className="flex-1 bg-background">
       <HideableView className="mx-2.5 mb-[15px] flex-col gap-[15px]">
