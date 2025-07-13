@@ -67,7 +67,7 @@ export const AppHeader = ({
         <View className="flex-row items-center gap-3">
           <TouchableOpacity
             className="flex-row gap-2"
-            hitSlop={20}
+            hitSlop={10}
             onPress={() => {
               navigation.navigate(Screens.UserSearch);
             }}

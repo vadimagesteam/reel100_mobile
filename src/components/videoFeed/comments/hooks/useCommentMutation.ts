@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../state/user/authStore';
 import { api } from '../../../../lib/api';
+import { useVideoFeedCacheKey } from '../../hooks';
+import { VideoPost } from '../../queries/apiVideosFetcher';
 import { CommentType } from './useCommentsInfiniteQuery';
 
 export type CommentMutationArgs = {
@@ -16,6 +18,8 @@ type CommentsCache = {
 export const useCommentMutation = () => {
   const queryClient = useQueryClient();
   const { id: userId, firstName, lastName } = useUser();
+
+  const videoKey = useVideoFeedCacheKey();
 
   const getQueryKey = (videoId: string) => ['comments', 'video', videoId];
 
@@ -62,7 +66,33 @@ export const useCommentMutation = () => {
           }),
         });
       }
-      return { key, prev };
+
+      // Optimistic update for comment counter
+      let videoPrev;
+      if (videoKey) {
+        videoPrev = queryClient.getQueryData<{ pages: VideoPost[][] }>(videoKey);
+        if (videoPrev) {
+          queryClient.setQueryData<{ pages: VideoPost[][] }>(videoKey, (prevData) => {
+            if (prevData) {
+              return {
+                ...prevData,
+                pages: prevData.pages.map((p) => {
+                  return p.map((_videoPost) =>
+                    _videoPost.id === videoId
+                      ? {
+                          ..._videoPost,
+                          commentsCount: _videoPost.commentsCount + 1,
+                        }
+                      : _videoPost,
+                  );
+                }),
+              };
+            }
+          });
+        }
+      }
+
+      return { key, prev, videoPrev };
     },
     onError: (_err, _vars, context) => {
       if (context?.key && context?.prev) {
