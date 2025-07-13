@@ -51,7 +51,7 @@ export const useFollowMutation = () => {
     onSettled: async (_data, _error, { userId }) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['user', userId] }),
-        queryClient.refetchQueries({ type: 'all', exact: true, queryKey: ['user', userId] }),
+        queryClient.invalidateQueries({ queryKey: ['user', user.id] }),
       ]);
     },
     retry: 3,
