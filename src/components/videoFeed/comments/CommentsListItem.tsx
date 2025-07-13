@@ -1,6 +1,11 @@
-import { Image, Text, TouchableOpacity, View, ViewProps } from 'react-native';
+import clsx from 'clsx';
+import { Text, TouchableOpacity, View, ViewProps } from 'react-native';
+import { useNavigation } from '../../../navigation';
+import { Screens } from '../../../navigation/screens';
+import { getFullName } from '../../../state/user/utils';
+import { Avatar } from '../../ui';
 import { CommentType } from './hooks/useCommentsInfiniteQuery';
-import { formatTimeAgo } from '../../../utils/formatTime';
+import { formatTimeAgo } from '../../../utils';
 
 export interface CommentListItemProps<T = CommentType> extends Pick<ViewProps, 'onLayout'> {
   comment: T;
@@ -14,31 +19,32 @@ export const CommentsListItem = ({
   onToggleReplies,
   onLayout,
 }: CommentListItemProps) => {
+  const { user } = item;
+  const navigation = useNavigation();
+  const fullName = getFullName(user);
+
   return (
-    <View
-      className="mt-[10px]"
-      style={{
-        marginLeft: item.replyTo ? 20 : 0,
-      }}
-      onLayout={onLayout}
-    >
+    <View className={clsx('mt-[10px]', item.replyTo && 'ml-[20px]')} onLayout={onLayout}>
       <View className="flex-row justify-between rounded-[10] bg-surface p-[10px]">
         <View>
-          <View className="flex-row items-center">
-            <Image
-              source={{ uri: 'https://cdn-icons-png.flaticon.com/512/9203/9203764.png' }}
-              className="h-[30px] w-[30px]"
-            />
-            <Text className="ml-[5px] text-[16px] font-bold text-silver4">
-              {`${item?.user?.firstName} ${item?.user?.lastName}`}
-            </Text>
-          </View>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              navigation.navigate(Screens.Profile, {
+                user,
+              });
+            }}
+            className="flex-row"
+          >
+            <Avatar size={30} name={fullName} uri={user.avatar} />
+            <Text className="ml-[5px] text-[16px] font-bold text-silver4">{fullName}</Text>
+          </TouchableOpacity>
           <View className="ml-[36px]">
-            <Text className="text-silver1">{item?.text}</Text>
+            <Text className="text-silver1">{item.text}</Text>
           </View>
         </View>
         <Text className="text-[9px] text-primary">
-          {item.id.startsWith('optimistic') ? 'sending...' : formatTimeAgo(item?.createdAt)}
+          {item.id.startsWith('optimistic') ? 'sending...' : formatTimeAgo(item.createdAt)}
         </Text>
       </View>
 

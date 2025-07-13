@@ -1,13 +1,14 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 import { queryClient } from '../../../../lib/api';
+import { UserBase } from '../../../../state/user/types';
 import { apiFetchComments } from '../queries/apiFetchComments';
 
 export type CommentType = {
   id: string;
   replyTo: string;
   text: string;
-  user: { id: string; firstName: string; lastName: string };
+  user: UserBase;
   video: { id: string };
   createdAt: string;
   updatedAt: string;
