@@ -1,17 +1,18 @@
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import Video from 'react-native-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button } from '../ui/Button';
+import { useLoadingCallback } from '../../hooks/useLoadingCallback';
+import { Button } from '../ui';
+import { requestCameraRollSavePermissions } from './requestCameraRollSave';
 import { useVideoRecordStore } from './videoRecordStore';
 import { useStateSelector } from '../../state/app/uiStore';
 import { useNavigation } from '@react-navigation/native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../state/user/authStore';
 
-export interface VideoPreviewProps {}
-
-export const VideoPreview = ({}: VideoPreviewProps) => {
+export const VideoPreview = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
@@ -37,6 +38,36 @@ export const VideoPreview = ({}: VideoPreviewProps) => {
       navigation.goBack();
     }
   };
+
+  const [handleDraft, isSavingDraft] = useLoadingCallback(async () => {
+    let saved = false;
+    try {
+      if (!(await requestCameraRollSavePermissions())) {
+        Alert.alert(
+          'Unable to save video',
+          'We need permissions to save video to your camera roll',
+        );
+      }
+      await CameraRoll.saveAsset(`file://${previewUri}`, {
+        type: 'video',
+      });
+    } catch (e) {
+      // Weird behaviour - the video is saved,
+      // but this error is thrown when "add only" option selected
+      // https://github.com/react-native-cameraroll/react-native-cameraroll/issues/617
+      if ((e as Error).message.includes('Unknown error from a native module')) {
+        saved = true;
+      } else {
+        Alert.alert('Unable to save video', (e as Error).message);
+      }
+    } finally {
+      if (saved) {
+        Alert.alert('Saved', 'Video saved into your camera roll');
+        actions.clear();
+        navigation.goBack();
+      }
+    }
+  });
 
   return (
     <>
@@ -69,12 +100,19 @@ export const VideoPreview = ({}: VideoPreviewProps) => {
 
       <View
         className="absolute left-0 w-full flex-row justify-between px-16"
+        // eslint-disable-next-line react-native/no-inline-styles
         style={{ bottom: insets.bottom, display: uploading ? 'none' : 'flex' }}
       >
         <Button variant="primary" onPress={handlePublish}>
           Publish Now
         </Button>
-        <Button variant="primary" buttonClassName="bg-silver" onPress={() => {}}>
+        <Button
+          loading={isSavingDraft}
+          loadingText="Saving..."
+          variant="primary"
+          buttonClassName="bg-silver"
+          onPress={handleDraft}
+        >
           Save Draft
         </Button>
       </View>

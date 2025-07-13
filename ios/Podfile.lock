@@ -1333,6 +1333,27 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-cameraroll (7.10.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-config (1.5.5):
     - react-native-config/App (= 1.5.5)
   - react-native-config/App (1.5.5):
@@ -1493,7 +1514,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - Yoga
   - react-native-vector-icons-ionicons (12.0.1)
-  - react-native-video (6.13.0):
+  - react-native-video (6.16.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1506,7 +1527,7 @@ PODS:
     - React-featureflags
     - React-graphics
     - React-ImageManager
-    - react-native-video/Video (= 6.13.0)
+    - react-native-video/Video (= 6.16.1)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-rendererdebug
@@ -1515,7 +1536,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-video/Fabric (6.13.0):
+  - react-native-video/Fabric (6.16.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1536,7 +1557,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-video/Video (6.13.0):
+  - react-native-video/Video (6.16.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2271,6 +2292,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
+  - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-config (from `../node_modules/react-native-config`)
   - react-native-create-thumbnail (from `../node_modules/react-native-create-thumbnail`)
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
@@ -2422,6 +2444,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
+  react-native-cameraroll:
+    :path: "../node_modules/@react-native-camera-roll/camera-roll"
   react-native-config:
     :path: "../node_modules/react-native-config"
   react-native-create-thumbnail:
@@ -2580,6 +2604,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 9fbb496e7d6f7c34d5e617365ee778bf96d14eae
   React-microtasksnativemodule: 36adde22631838680d1be62776e8ccb83186c06a
   react-native-blur: 745703f35133ed6a1210d4bbff358a631911f002
+  react-native-cameraroll: 358f5fa47e0da40c9e26017b85917e7441f131ed
   react-native-config: 644074ab88db883fcfaa584f03520ec29589d7df
   react-native-create-thumbnail: 733160dca9a548262e1030e7fcdae90a93d203ca
   react-native-geolocation-service: 32b2c2a3b91e70ce2a8d0c684801aaeb0a07e0ec
@@ -2588,7 +2613,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: 156b78fe1bdb34749535694319d400fe23fbd2a3
   react-native-safe-area-context: 0257d12123e63462a95dda636010156d03806233
   react-native-vector-icons-ionicons: 82538a5f94fd186b3b7abd49192ea96e28876887
-  react-native-video: 1498d8bfcbd75b2119171dfab5415749b14a1d1e
+  react-native-video: 85cc10d4eb38921b0cae5df50af465e94bfbe4cc
   React-NativeModulesApple: ec44c21ae0bbb5f9a2df72db00294e33a00e07f0
   React-perflogger: 9e8d3c0dc0194eb932162812a168aa5dc662f418
   React-performancetimeline: 350424518f433dd43f063dc5f2cf3195c1a5b60f

@@ -22,7 +22,7 @@ export const Timer = ({ active, onTimeOut, maxDurationSeconds }: TimerProps) => 
       timerRef.current = setInterval(() => {
         setSecondsLeft((prev) => prev - 1);
         tickValue--;
-        if (tickValue === 0) {
+        if (tickValue <= 0) {
           clearInterval(timerRef.current!);
           onTimeOut();
         }
@@ -65,7 +65,7 @@ export const Timer = ({ active, onTimeOut, maxDurationSeconds }: TimerProps) => 
       )}
     >
       {digits.map((d, i) => (
-        <AnimatedChar key={i} char={d} className="text-primary py-2 text-[12px] font-light" />
+        <AnimatedChar key={i} char={d} className="py-2 text-[12px] font-light text-primary" />
       ))}
     </Animated.View>
   );

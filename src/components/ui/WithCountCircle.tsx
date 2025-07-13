@@ -8,7 +8,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { AnimatedChar } from './AnimatedChar';
 
 export type WithCountCircleProps<P = {}> = {
   children: ReactNode;
@@ -63,10 +62,9 @@ export const WithCountCircle = <P,>({
             containerClassName,
           )}
         >
-          <AnimatedChar
-            char={count > 99 ? '99+' : count}
-            className={clsx('text-[14px] font-medium text-primary', textClassName)}
-          />
+          <Text className={clsx('text-[14px] font-medium text-primary', textClassName)}>
+            {count > 99 ? '99+' : count}
+          </Text>
         </Animated.View>
       )}
     </Wrapper>

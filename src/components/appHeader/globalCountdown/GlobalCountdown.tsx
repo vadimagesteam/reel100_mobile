@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useEffect } from 'react';
 import { ViewProps } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useCentralTimeCountdown } from './useCentralTimeCountdown';
-import { formatClockTime } from '../../../utils/formatTime';
+import { formatClockTime } from '../../../utils';
 import { AnimatedChar } from '../../ui';
 
 export const GlobalCountdown = (props: ViewProps) => {
@@ -11,6 +12,14 @@ export const GlobalCountdown = (props: ViewProps) => {
     start();
     return () => cleanup();
   }, [cleanup, start]);
+
+  // stop timer when screen isn't focused
+  useFocusEffect(
+    useCallback(() => {
+      start();
+      return () => cleanup();
+    }, [cleanup, start]),
+  );
 
   // No need to memoize, it updates every second
   const digits = formatClockTime(secondsLeft).split('');
