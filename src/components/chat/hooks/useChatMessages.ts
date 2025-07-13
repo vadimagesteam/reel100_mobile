@@ -27,14 +27,23 @@ const qqlQuery = `query(
     ) {
         id
         chat { id }
-        fromField { id firstName lastName avatar }
-        to { id firstName lastName avatar }
+        fromField { ...ShallowUser }
+        to { ...ShallowUser }
+        video {
+            id
+            likesCount
+            commentsCount
+            file
+            user { ...ShallowUser }
+        }
         text
         isRead
         createdAt
         updatedAt
     }
-}`;
+}
+fragment ShallowUser on User { id firstName lastName avatar }
+`;
 
 export const useChatMessages = (chatId?: string) => {
   const cacheKey = ['chat_messages', chatId];

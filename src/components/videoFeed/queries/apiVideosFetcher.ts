@@ -33,6 +33,7 @@ export type VideoUser = {
   id: string;
   firstName: string;
   lastName: string;
+  avatar: string | null;
 };
 
 export type VideoPost = {
@@ -74,8 +75,5 @@ export const apiVideosFetcher = async ({
     },
   });
 
-  return response.data.map((v) => ({
-    ...v,
-    user: v.user ? v.user : { id: 'dummy_id', firstName: 'MISSING', lastName: 'USER' },
-  }));
+  return response.data;
 };

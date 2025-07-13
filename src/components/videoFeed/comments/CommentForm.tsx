@@ -7,31 +7,37 @@ import { useVideoComments } from '../hooks';
 
 export interface CommentFormProps {
   onSubmit: (text: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
-export const CommentForm = forwardRef<TextInput, CommentFormProps>(({ onSubmit }, ref) => {
-  const { text, setCommentText } = useVideoComments();
-  const isEmpty = useMemo(() => !text.trim().length, [text]);
+export const CommentForm = forwardRef<TextInput, CommentFormProps>(
+  ({ onSubmit, onFocus, onBlur }, ref) => {
+    const { text, setCommentText } = useVideoComments();
+    const isEmpty = useMemo(() => !text.trim().length, [text]);
 
-  return (
-    <View className="flex-row items-center border-t border-t-[#333] bg-surface p-[15px]">
-      <BottomSheetTextInput
-        ref={ref}
-        className="h-10 flex-1 rounded-full bg-[#222] px-3 text-primary"
-        placeholder="Add a comment..."
-        placeholderTextColor="#aaa"
-        value={text}
-        onChangeText={setCommentText}
-      />
-      <TouchableOpacity
-        onPress={() => {
-          onSubmit(text);
-          setCommentText('');
-        }}
-        className={clsx('ml-2 rounded-[20px] bg-blue px-3.5 py-2', isEmpty && 'opacity-60')}
-        disabled={isEmpty}
-      >
-        <Text className="font-bold text-primary">Send</Text>
-      </TouchableOpacity>
-    </View>
-  );
-});
+    return (
+      <View className="flex-row items-center border-t border-t-[#333] bg-surface p-[15px]">
+        <BottomSheetTextInput
+          ref={ref}
+          className="h-10 flex-1 rounded-full bg-[#222] px-3 text-primary"
+          placeholder="Add a comment..."
+          placeholderTextColor="#aaa"
+          value={text}
+          onChangeText={setCommentText}
+          onFocus={onFocus}
+          onBlur={onBlur}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            onSubmit(text);
+            setCommentText('');
+          }}
+          className={clsx('ml-2 rounded-[20px] bg-blue px-3.5 py-2', isEmpty && 'opacity-60')}
+          disabled={isEmpty}
+        >
+          <Text className="font-bold text-primary">Send</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  },
+);

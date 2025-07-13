@@ -12,8 +12,8 @@ export const HideableView = ({ children, ...props }: ViewProps) => {
     left: 0,
     right: 0,
     bottom: 0,
-    top: withTiming(isHiddenSharedValue.value ? -viewHeight.value : 0, { duration: 160 }),
-    opacity: withTiming(isHiddenSharedValue.value ? 0 : 1, { duration: 160 }),
+    top: withTiming(isHiddenSharedValue.value ? -viewHeight.value : 0, { duration: 100 }),
+    opacity: withTiming(isHiddenSharedValue.value ? 0 : 1, { duration: 60 }),
   }));
 
   return (

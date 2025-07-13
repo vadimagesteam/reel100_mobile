@@ -1,6 +1,6 @@
-import { UserFollowingSearchScreen } from '../screens';
+import { VideoPost } from '../components/videoFeed/queries/apiVideosFetcher';
 import { StateItem } from '../state/app/uiStore';
-import { UserBase, UserType } from '../state/user/types';
+import { UserBase } from '../state/user/types';
 
 export const Tabs = {
   TabMain: 'TabMain',
@@ -30,6 +30,7 @@ export const Screens = {
   UserFollowingSearch: 'UserFollowingSearch',
   UserSearch: 'UserSearch',
   SelectState: 'SelectState',
+  VideoModal: 'VideoModal',
 } as const;
 
 export type AuthStackParamList = {
@@ -61,6 +62,9 @@ export type AppStackParamList = {
   SelectState: {
     placeholderValue?: string;
     onSelected: (state: StateItem) => void;
+  };
+  VideoModal: {
+    video: VideoPost;
   };
 };
 

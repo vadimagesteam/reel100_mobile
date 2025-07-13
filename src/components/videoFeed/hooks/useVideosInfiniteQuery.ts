@@ -24,7 +24,7 @@ export type VideoPostQueryResult<T extends VideoPost = VideoPost> = UseInfiniteQ
 export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
   params: usePostsInfiniteQueryParams,
 ): VideoPostQueryResult<T> => {
-  const { limit = 10, cacheKey, where, orderBy, refetchInterval } = params;
+  const { limit = 20, cacheKey, where, orderBy, refetchInterval } = params;
   const hookResult = useInfiniteQuery({
     queryKey: cacheKey,
     queryFn: async ({ pageParam = 0 }) => {

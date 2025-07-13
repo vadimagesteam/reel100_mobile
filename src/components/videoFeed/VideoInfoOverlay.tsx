@@ -1,12 +1,13 @@
-import { Text, View } from 'react-native';
-import React, { FC, useRef } from 'react';
+import Ionicons from '@react-native-vector-icons/ionicons';
+import { StyleSheet, Text, View } from 'react-native';
+import { useRef } from 'react';
+import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getFullName } from '../../state/user/utils';
 import { Avatar, SvgIcon } from '../ui';
 import { VideoPost } from './queries/apiVideosFetcher';
 import { colors } from '../../theme';
-import { cs } from '../old/VideoAbsoluteInfo/styles';
 import { GestureTouchableOpacity } from './GestureTouchableOpacity';
-import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { IconHeart } from './IconHeart';
 import { useVideoFeed } from './hooks';
 
@@ -24,9 +25,11 @@ export interface VideoInfoOverlayProps {
   onShare?: () => void;
   onComments?: () => void;
   onUser?: () => void;
+  onBackPress?: () => void;
 }
 
-export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
+export const VideoInfoOverlay = ({
+  onBackPress,
   isPlayerFullScreen,
   isPaused,
   timeLeft,
@@ -40,15 +43,11 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
   onComments,
   onLike,
   liked,
-}) => {
+}: VideoInfoOverlayProps) => {
   const insets = useSafeAreaInsets();
   const { setHeartIconPos } = useVideoFeed((s) => s.actions);
 
-  const {
-    user: { firstName, lastName },
-    likesCount,
-    commentsCount,
-  } = video;
+  const { user, likesCount, commentsCount } = video;
 
   const wrapperViewRef = useRef<View>(null);
   const heartRef = useRef<View>(null);
@@ -82,6 +81,8 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
     [isPlayerFullScreen],
   );
 
+  const displayName = getFullName(user);
+
   return (
     <Animated.View
       ref={wrapperViewRef}
@@ -90,18 +91,32 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
     >
       {isPaused && (
         <View className="absolute h-full w-full items-center justify-center opacity-50">
-          <SvgIcon image="playIcon" color="white" style={cs.iconPlayStyle} />
+          <SvgIcon image="playIcon" color="white" style={styles.playIcon} />
         </View>
       )}
 
-      <GestureTouchableOpacity
-        className="absolute left-4 flex-row items-center gap-2"
-        onPress={onUser}
-        hitSlop={20}
-      >
-        <Avatar size={32} name={`${firstName} ${lastName}`} />
-        <Text className="font-bold text-primary">{`${firstName} ${lastName}`}</Text>
-      </GestureTouchableOpacity>
+      <View className="absolute left-2 flex-row items-center gap-2">
+        {isPlayerFullScreen && (
+          <GestureTouchableOpacity
+            className="flex-row items-center gap-2"
+            onPress={onBackPress}
+            hitSlop={10}
+          >
+            <Ionicons size={24} name="chevron-back" color="#fff" />
+          </GestureTouchableOpacity>
+        )}
+
+        <GestureTouchableOpacity
+          className="flex-row items-center gap-2"
+          onPress={onUser}
+          hitSlop={{ top: 10, right: 10, bottom: 10 }}
+        >
+          <Avatar size={32} name={displayName} />
+          <Text numberOfLines={1} className="max-w-[200px] font-bold text-primary">
+            {displayName}
+          </Text>
+        </GestureTouchableOpacity>
+      </View>
 
       <View className="absolute right-4 flex-row">
         <View className="ml-1 rounded bg-orange p-1 opacity-80">
@@ -136,16 +151,27 @@ export const VideoInfoOverlay: FC<VideoInfoOverlayProps> = ({
             hitSlop={20}
             className="flex-col items-center gap-2"
           >
-            <SvgIcon image="commentIcon" color={colors.white} style={cs.iconStyle24} />
+            <SvgIcon image="commentIcon" color={colors.white} style={styles.icon} />
             <Text className="text-base font-bold color-white">{commentsCount}</Text>
           </GestureTouchableOpacity>
         )}
         {showShare && (
           <GestureTouchableOpacity hitSlop={20} onPress={onShare}>
-            <SvgIcon image="shareIcon" color={colors.white} style={cs.iconStyle24} />
+            <SvgIcon image="shareIcon" color={colors.white} style={styles.icon} />
           </GestureTouchableOpacity>
         )}
       </Animated.View>
     </Animated.View>
   );
 };
+
+const styles = StyleSheet.create({
+  icon: {
+    width: 24,
+    height: 24,
+  },
+  playIcon: {
+    width: 50,
+    height: 50,
+  },
+});

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { CommentsList, CommentsListProps } from './CommentsList';
 import { CommentReplyBar } from './CommentReplyBar';
 import { CommentForm } from './CommentForm';
@@ -12,8 +12,8 @@ export const CommentsBottomSheet = () => {
   const { closeComments: onClose } = useVideoFeed((s) => s.actions);
   const open = !!commentsOpened;
   const videoId = commentsOpened?.videoId;
-
-  const snapPoints = useMemo(() => ['68%'], []);
+  const [focused, setFocused] = useState(false);
+  const snapPoints = useMemo(() => (focused ? ['100%'] : ['68%']), [focused]);
   const addComment = useCommentMutation();
   const { commentReply, setCommentReply, resetCommentReply, expandCommentReplies } =
     useVideoComments();
@@ -38,15 +38,25 @@ export const CommentsBottomSheet = () => {
     textInputRef.current?.focus();
   };
 
+  const handleClose = () => {
+    onClose();
+    setFocused(false);
+  };
+
   return (
-    <BottomSheet open={open} onClose={onClose} snapPoints={snapPoints}>
+    <BottomSheet open={open} onClose={handleClose} snapPoints={snapPoints}>
       {videoId && (
         <>
           <CommentsList videoId={videoId} onReply={handleReply} />
           {commentReply && (
             <CommentReplyBar replyToUser={commentReply.user} onClose={resetCommentReply} />
           )}
-          <CommentForm ref={textInputRef} onSubmit={postComment} />
+          <CommentForm
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            ref={textInputRef}
+            onSubmit={postComment}
+          />
         </>
       )}
     </BottomSheet>

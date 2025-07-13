@@ -1,30 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  FlatListProps,
-  type ListRenderItemInfo,
-  Modal,
-  View,
-} from 'react-native';
+import { ComponentType, useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, FlatList, FlatListProps, type ListRenderItemInfo } from 'react-native';
 import clsx from 'clsx';
 import { isAndroid } from '../../utils';
 import { ListEmptyBlock, FlexLoading, RefreshControl } from '../ui';
 import { type VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoList } from '../videoFeed';
 import { useVideoFullscreen, type VideoPostQueryResult } from '../videoFeed/hooks';
-
-export interface BaseTileItemProps<ItemType> {
-  item: ItemType;
-  index: number;
-  onVideoPress: (video: VideoPost) => void;
-}
+import { VideoTileProps } from './VideoTile';
 
 export interface TilesListProps<ItemType>
   extends Omit<FlatListProps<ItemType>, 'data' | 'renderItem'> {
   queryControl: VideoPostQueryResult;
   prepareData?: (data: VideoPost[]) => any[];
-  ItemComponent?: React.ComponentType<BaseTileItemProps<ItemType>>;
+  ItemComponent?: ComponentType<VideoTileProps<ItemType>>;
   renderItem?: FlatListProps<ItemType>['renderItem'];
   emptyTitle?: string;
   emptyMessage?: string;
@@ -95,7 +83,7 @@ export const VideoTiles = <ItemType,>({
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ItemType>) =>
       ItemComponent ? (
-        <ItemComponent item={item} index={index} onVideoPress={handleVideoOpen} />
+        <ItemComponent item={item} rowSize={3} index={index} onVideoPress={handleVideoOpen} />
       ) : null,
     [handleVideoOpen, ItemComponent],
   );

@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../../../theme';
-import { SvgIcon, Avatar } from '../../ui';
+import { useUnreadChatsCount } from '../../chat/hooks/useUnreadChatsCount';
+import { SvgIcon, Avatar, WithCountCircle } from '../../ui';
 import CounterSection from './CounterSection';
 
 interface ProfileInfoProps {
@@ -25,6 +26,7 @@ export const MyProfileInfo = ({
   onFollowersPress,
   onFollowingPress,
 }: ProfileInfoProps) => {
+  const unreadChatsCount = useUnreadChatsCount();
   return (
     <>
       <View className="flex-row items-center justify-between">
@@ -32,9 +34,13 @@ export const MyProfileInfo = ({
           <Avatar uri={avatar} name={fullName} />
           <Text className="ml-[5px] text-[16px] font-bold text-silver4">{fullName}</Text>
         </View>
-        <TouchableOpacity onPress={onChatPress}>
+        <WithCountCircle
+          Component={TouchableOpacity}
+          onPress={onChatPress}
+          count={unreadChatsCount}
+        >
           <SvgIcon image="commentIcon" color={colors.white} style={styles.chatIcon} />
-        </TouchableOpacity>
+        </WithCountCircle>
       </View>
 
       <View className="h-[70px] flex-row items-center justify-center rounded-[10px] bg-silver5">

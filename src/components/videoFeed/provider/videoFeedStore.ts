@@ -16,7 +16,10 @@ export type VideoFeedStore = {
 
   hearIconPos: { x: number; y: number };
 
+  backPressHandler?: () => void;
+
   actions: {
+    setBackPressHandler: (handler: () => void) => void;
     setCacheKey: (key: string[]) => void;
     setHeartIconPos: (coords: { x: number; y: number }) => void;
     updateTime: (time: number) => void;
@@ -41,6 +44,7 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
   createStore<VideoFeedStore>((set, get) => ({
     // Important for tanstack-query
     cacheKey: null,
+    backPressHandler: undefined,
 
     //#playerState
     isPlayerFullScreen: false,
@@ -53,10 +57,11 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
     commentReply: null,
     commentsExpanded: [],
 
+    //#share
+    share: null,
+
     //#overlay ui
     hearIconPos: { x: 0, y: 300 },
-
-    share: null,
 
     ...initialState,
 
@@ -70,6 +75,9 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
           });
         }
         set({ cacheKey });
+      },
+      setBackPressHandler: (backPressHandler) => {
+        set({ backPressHandler });
       },
       setHeartIconPos: (coords) => {
         // don't override once set

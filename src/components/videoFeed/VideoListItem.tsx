@@ -13,8 +13,7 @@ import Video, {
 import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
 import { colors } from '../../theme';
-import { isAndroid } from '../../utils';
-import { formatSeconds } from '../../utils/formatTime';
+import { isAndroid, formatSeconds } from '../../utils';
 import {
   useLikeMutations,
   useVideoFeed,
@@ -45,10 +44,11 @@ export const VideoListItem: FC<VideoItemProps> = ({
   const { id: videoId, file, user: author } = video;
 
   const navigation = useNavigation();
-  const { isFullscreen } = useVideoFullscreen();
+  const { isFullscreen, setFullscreen } = useVideoFullscreen();
   const { isPaused, setIsPaused } = useVideoPause();
   const { shareVideo } = useVideoShare();
 
+  const backPressHandler = useVideoFeed((s) => s.backPressHandler);
   const { openComments } = useVideoFeed((s) => s.actions);
 
   const playerRef = useRef<VideoRef>(null);
@@ -93,14 +93,6 @@ export const VideoListItem: FC<VideoItemProps> = ({
     }
   }, [active]);
 
-  // const mountRef = useRef(false);
-  // useEffect(() => {
-  //   if (!mountRef.current && active && progress?.currentTime && playerRef.current) {
-  //     playerRef.current.seek(progress.currentTime);
-  //     mountRef.current = true;
-  //   }
-  // }, [active, progress?.currentTime]);
-
   const handleLike = () => {
     toggleLike({
       type: 'video',
@@ -132,9 +124,6 @@ export const VideoListItem: FC<VideoItemProps> = ({
               imageUrl={previewUrl!}
               {...dimensions}
             />
-            <View className="absolute left-0 top-0 z-10 h-full w-full items-center justify-center">
-              <ActivityIndicator size="large" color={colors.blue2} />
-            </View>
           </View>
         )}
         selectedVideoTrack={{ type: SelectedVideoTrackType.AUTO }}
@@ -147,6 +136,13 @@ export const VideoListItem: FC<VideoItemProps> = ({
       {active && (
         <VideoInfoOverlay
           video={video}
+          onBackPress={() => {
+            if (backPressHandler) {
+              backPressHandler();
+            } else {
+              setFullscreen(false);
+            }
+          }}
           isPlayerFullScreen={isFullscreen}
           isPaused={isPaused}
           timeLeft={

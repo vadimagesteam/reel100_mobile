@@ -18,7 +18,7 @@ export const useUnFollowMutation = () => {
       return data;
     },
     onMutate: async ({ userId }) => {
-      const key = ['user_', userId];
+      const key = ['user', userId];
       await queryClient.cancelQueries({ queryKey: key });
 
       const prev = queryClient.getQueryData<UserType>(key);
@@ -40,8 +40,11 @@ export const useUnFollowMutation = () => {
         queryClient.setQueryData(context.key, context.prev);
       }
     },
-    onSettled: (_data, _error, { userId }) => {
-      queryClient.invalidateQueries({ queryKey: ['user_', userId] });
+    onSettled: async (_data, _error, { userId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['user', userId] }),
+        queryClient.refetchQueries({ type: 'all', exact: true, queryKey: ['user', userId] }),
+      ]);
     },
     retry: 3,
   });

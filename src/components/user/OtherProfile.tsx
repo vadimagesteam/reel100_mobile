@@ -5,9 +5,8 @@ import { Screens } from '../../navigation/screens';
 import { ProfileStatsRouteParams } from '../../screens';
 import { useUser } from '../../state/user/authStore';
 import { getFullName } from '../../state/user/utils';
-import { useFollowMutation } from './hooks/useFollowMutation';
-import { useUnFollowMutation } from './hooks/useUnFollowMutation';
-import { useUserQuery } from './hooks/useUserQuery';
+import { useChatNavigation } from '../chat/hooks/useChatNavigation';
+import { useFollowMutation, useUnFollowMutation, useUserQuery } from './hooks';
 import { ProfileUserInfo } from './otherUserProfileInfo/OtherUserProfileInfo';
 
 export interface ProfileProps {}
@@ -27,6 +26,7 @@ export const OtherProfile = ({}: ProfileProps) => {
   const { data: user, error } = useUserQuery(userId);
   const follow = useFollowMutation();
   const unfollow = useUnFollowMutation();
+  const openChat = useChatNavigation();
 
   const fullName = user ? getFullName(user) : getFullName(shallowUser);
 
@@ -67,9 +67,7 @@ export const OtherProfile = ({}: ProfileProps) => {
       followButtonLoading={follow.status === 'pending'}
       onFollowPress={() => followUserCallback()}
       onChatPress={() => {
-        navigation.navigate(Screens.Chat, {
-          userId: user!.id,
-        });
+        openChat(user!.id);
       }}
       onFollowersPress={() => handleStatsScreen('followers')}
       onFollowingPress={() => handleStatsScreen('following')}

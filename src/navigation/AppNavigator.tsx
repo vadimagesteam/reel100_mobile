@@ -16,6 +16,7 @@ import {
   SelectStateScreen,
   UserSearchScreen,
   VideoRecordingScreen,
+  VideoModalScreen,
 } from '../screens';
 import { BottomTabNavigator } from './TabsNavigator';
 
@@ -71,6 +72,14 @@ export const AppNavigator = () => (
     <Stack.Screen
       name={Screens.UserFollowingSearch}
       component={UserFollowingSearchScreen}
+      options={{
+        animation: 'fade_from_bottom',
+        animationDuration: 200,
+      }}
+    />
+    <Stack.Screen
+      name={Screens.VideoModal}
+      component={VideoModalScreen}
       options={{
         animation: 'fade_from_bottom',
         animationDuration: 200,

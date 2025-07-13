@@ -13,11 +13,14 @@ import { useUser } from '../../../state/user/authStore';
 import { getFullName } from '../../../state/user/utils';
 import { colors } from '../../../theme';
 import { useUserQuery } from '../../user/hooks/useUserQuery';
+import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
 import { useChatMessages, useMarkMessagesAsRead, useSendMessage } from '../hooks';
 import { DialogHeader } from './DialogHeader';
 import { MessageBubble } from './MessageBubble';
+import { VideoBubble } from './VideoBubble';
 
 type IMessage = GiftedChatMessageType & {
+  video: VideoPost | null;
   read: boolean;
 };
 
@@ -64,6 +67,7 @@ export const ChatDialog = () => {
             },
             sent: !msg.id.startsWith('tmp'),
             read: msg.isRead,
+            video: msg.video,
           }) as IMessage,
       ),
     [rawMessages],
@@ -87,7 +91,21 @@ export const ChatDialog = () => {
 
   const renderBubble = ({ currentMessage }: BubbleProps<IMessage>) => {
     const isUser = currentMessage.user._id === user.id;
-    const { text, createdAt, sent, read } = currentMessage;
+    const { text, createdAt, sent, read, video } = currentMessage;
+
+    if (video) {
+      return (
+        <VideoBubble
+          createdAt={createdAt}
+          text={text}
+          isMy={isUser}
+          sent={!!sent}
+          read={read}
+          video={video}
+        />
+      );
+    }
+
     return (
       <MessageBubble createdAt={createdAt} text={text} isMy={isUser} sent={!!sent} read={read} />
     );

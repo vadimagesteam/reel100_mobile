@@ -1,8 +1,8 @@
-import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { SvgIcon } from '../ui';
+import { useUnreadChatsCount } from '../chat/hooks/useUnreadChatsCount';
+import { SvgIcon, WithCountCircle } from '../ui';
 import { Screens, Tabs } from '../../navigation/screens';
 import { colors } from '../../theme';
 
@@ -14,8 +14,7 @@ const TabIcons: Record<RouteKey, string> = {
   [Tabs.TabProfile]: 'profileNavTab',
 };
 
-const IconSize = 24;
-const IconSizeFocused = 28;
+const IconSize = 28;
 export const BottomTabHeight = 70;
 
 export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
@@ -32,11 +31,12 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
     bottom: withTiming(isHiddenScreens ? -70 : 0),
   }));
 
+  const unreadChats = useUnreadChatsCount();
+
   return (
     <Animated.View style={style} className="h-[70px] flex-row bg-black4">
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
-        const iconSize = isFocused ? IconSizeFocused : IconSize;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -45,24 +45,30 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
             canPreventDefault: true,
           });
 
-          if (!isFocused && !event.defaultPrevented) {
+          if (!event.defaultPrevented) {
             navigation.navigate(route.name);
           }
         };
 
+        const icon = (
+          <SvgIcon
+            image={TabIcons[route.name as RouteKey]}
+            color={isFocused ? colors.blue2 : colors.white}
+            style={{ width: IconSize, height: IconSize }}
+          />
+        );
+
         return (
           <TouchableOpacity
             key={route.key}
-            className="flex-1 items-center justify-center"
+            className="mb-[10px] flex-1 items-center justify-center p-[5px]"
             onPress={onPress}
           >
-            <View className="mb-[10px] items-center justify-center rounded-[40px] p-[5px]">
-              <SvgIcon
-                image={TabIcons[route.name as RouteKey]}
-                color={isFocused ? colors.blue2 : colors.white}
-                style={{ width: iconSize, height: iconSize }}
-              />
-            </View>
+            {route.name === Tabs.TabProfile ? (
+              <WithCountCircle count={unreadChats}>{icon}</WithCountCircle>
+            ) : (
+              icon
+            )}
           </TouchableOpacity>
         );
       })}

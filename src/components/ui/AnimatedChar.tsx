@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 export interface AnimatedDigitProps {
-  char: string;
+  char: string | number;
   className?: string;
 }
 
@@ -42,7 +42,7 @@ export const AnimatedChar = ({ char, className }: AnimatedDigitProps) => {
     <View>
       <Animated.Text
         className={clsx(
-          'text-accent text-center font-extrabold',
+          'text-center font-extrabold text-accent',
           Platform.select({
             ios: 'font-[Courier] text-[24px]',
             android: 'font-[monospace] text-[20px]',
@@ -55,7 +55,7 @@ export const AnimatedChar = ({ char, className }: AnimatedDigitProps) => {
       </Animated.Text>
       <Animated.Text
         className={clsx(
-          'text-accent text-center font-extrabold',
+          'text-center font-extrabold text-accent',
           Platform.select({
             ios: 'font-[Courier] text-[24px]',
             android: 'font-[monospace] text-[20px]',

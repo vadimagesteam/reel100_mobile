@@ -46,6 +46,7 @@ export const useChats = () => {
   return useQuery({
     queryKey: cacheKey,
     queryFn: async () => {
+      console.log('Query chats');
       const { data } = await api.post<{
         data: { chats: ChatApiResponseType[] };
       }>('/graphql', {

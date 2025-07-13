@@ -1,9 +1,7 @@
-import React from 'react';
-import { View, TouchableOpacity, Dimensions, StyleSheet, Text } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { View, Dimensions, StyleSheet } from 'react-native';
+import { VideoTile } from '../videoTiles';
 import { TileBlock } from './helpers/generateBlocks';
 import { VideoPost } from '../videoFeed/queries/apiVideosFetcher';
-import VideoAbsoluteInfo from '../old/VideoAbsoluteInfo';
 
 const { width: screenWidth } = Dimensions.get('window');
 const half = screenWidth / 2;
@@ -20,39 +18,18 @@ const renderVideo = (
   style: any,
   uniqueKey: string,
 ) => {
-  const screenshot = item?.file?.variation?.[0]?.screenshots?.[0];
-  const fullName = `${item?.user?.firstName} ${item?.user?.lastName}`;
-
   return (
-    <TouchableOpacity onPress={() => onVideoPress(item)} key={uniqueKey}>
-      {screenshot !== undefined ? (
-        <>
-          <FastImage
-            style={style}
-            source={{
-              uri: screenshot,
-              priority: FastImage.priority.normal,
-              cache: FastImage.cacheControl.immutable,
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-          <VideoAbsoluteInfo
-            justInfo="SIMPLE"
-            avatar={''}
-            name={fullName}
-            // videoDuration={`${formatTwoTime(duration)}s`}
-            likesCount={item?.likesCount}
-          />
-        </>
-      ) : (
-        <View className="items-center justify-center bg-surface" style={style}>
-          <Text className="text-[10px] text-primary">No preview</Text>
-        </View>
-      )}
-    </TouchableOpacity>
+    <VideoTile
+      key={uniqueKey}
+      style={style}
+      index={0}
+      className="mb-0 mr-0 rounded-none"
+      item={item}
+      onVideoPress={onVideoPress}
+    />
   );
 };
-
+let fx = 0;
 export const TileListBlock = ({
   item: block,
   index: blockIndex,
@@ -62,7 +39,7 @@ export const TileListBlock = ({
 
   if (type === 'leftSmall_rightBig') {
     return (
-      <View className="mb-[2px] flex-row">
+      <View className="flex-row">
         <View>
           {items
             .slice(0, 2)
@@ -78,7 +55,7 @@ export const TileListBlock = ({
 
   if (type === 'leftBig_rightSmall') {
     return (
-      <View className="mb-[2px] flex-row">
+      <View className="flex-row">
         {renderVideo(onVideoPress, items[0], styles.bigBox, `${blockIndex}-0-${items[0].id}`)}
         <View>
           {items
@@ -96,15 +73,11 @@ export const TileListBlock = ({
     );
   }
 
-  return (
-    <View className="m-[10px]">
-      {renderVideo(
-        onVideoPress,
-        items[0],
-        { width: screenWidth, height: half },
-        `${blockIndex}-fallback-${items[0].id}`,
-      )}
-    </View>
+  return renderVideo(
+    onVideoPress,
+    items[0],
+    { width: screenWidth, height: half },
+    `${blockIndex}-fallback-${items[0].id}`,
   );
 };
 
@@ -112,14 +85,13 @@ export const styles = StyleSheet.create({
   smallBox: {
     width: half,
     height: half,
-    margin: 1,
+    marginRight: 1,
+    marginBottom: 1,
   },
   bigBox: {
     width: half,
     height: half * 2,
-    margin: 3,
-  },
-  margin10: {
-    margin: 10,
+    marginRight: 1,
+    marginBottom: 1,
   },
 });

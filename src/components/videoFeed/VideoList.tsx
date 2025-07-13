@@ -1,14 +1,16 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  interpolate,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withSequence,
+  Extrapolation,
   withTiming,
+  withSpring,
 } from 'react-native-reanimated';
 import { FlatList, FlatListProps, RefreshControl } from 'react-native';
+import { useNavigation } from '../../navigation';
 import { isAndroid } from '../../utils';
 
 import { VideoPost } from './queries/apiVideosFetcher';
@@ -29,8 +31,8 @@ import { ShareBottomSheet } from './share/ShareBottomSheet';
 export interface SwipeableVideosListProps
   extends Omit<FlatListProps<VideoPost>, 'data' | 'renderItem' | 'refreshing'> {
   videos: VideoPost[];
-  isRefetching: boolean;
-  refetch: () => void;
+  isRefetching?: boolean;
+  refetch?: () => void;
   initialVideoIndex: number;
 }
 
@@ -38,9 +40,10 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   videos,
   refetch,
   initialVideoIndex,
-  isRefetching,
+  isRefetching = false,
   ...flatListProps
 }) => {
+  const backPressHandler = useVideoFeed((s) => s.backPressHandler);
   const { closeComments } = useVideoFeed((s) => s.actions);
   const { isFullscreen, setFullscreen } = useVideoFullscreen();
   const { isPaused, togglePause } = useVideoPause();
@@ -60,6 +63,20 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
       showHeader();
     }
   }, [hideHeaders, isFullscreen, showHeader]);
+
+  // Exit from full-screen if tab changed or the same tab tapped
+  const navigation = useNavigation();
+  useEffect(() => {
+    let listener = () => {
+      if (isFullscreen) {
+        setFullscreen(false);
+      }
+    };
+    if (isFullscreen) {
+      navigation.addListener('tabPress', listener);
+    }
+    return () => navigation.removeListener('tabPress', listener);
+  }, [navigation, isFullscreen, setFullscreen]);
 
   const fullScreenRef = useRef(isFullscreen);
   const likeAnimationRef = useRef<LikeAnimationRef>(null);
@@ -94,16 +111,36 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     }
   };
 
+  const handleBackSwipe = () => {
+    if (backPressHandler) {
+      backPressHandler();
+    } else {
+      setFullscreen(false);
+    }
+  };
+
+  const swipeTranslateX = useSharedValue(0);
+  const swipeTranslateY = useSharedValue(0);
   const backSwipeGesture = Gesture.Pan()
     .enabled(isFullscreen)
-    .onEnd((e) => {
-      if (isFullscreen && e.translationX > 50 && e.velocityX > 440) {
-        runOnJS(setFullscreen)(false);
-      }
+    .onStart(() => {
+      swipeTranslateX.value = 0;
+      swipeTranslateY.value = 0;
     })
-    // android
-    .activeOffsetX(20)
-    .failOffsetY([-10, 10]);
+    .onUpdate((e) => {
+      swipeTranslateX.value = e.translationX;
+      swipeTranslateY.value = e.translationY;
+    })
+    .onEnd((e) => {
+      swipeTranslateX.value = 0;
+      swipeTranslateY.value = 0;
+      if (isFullscreen && e.translationX > 50 && e.velocityX > 300) {
+        runOnJS(handleBackSwipe)();
+      }
+    });
+  if (isAndroid) {
+    backSwipeGesture.activeOffsetX(20).failOffsetY([-10, 10]);
+  }
 
   const singleTapGesture = Gesture.Tap()
     .enabled(videos.length > 0)
@@ -164,22 +201,34 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
 
   const viewStyle = useAnimatedStyle(
     () => ({
-      zIndex: 20,
-      opacity: isFullscreenShared.value
-        ? withSequence(
-            withTiming(0, { duration: 100 }),
-            withDelay(500, withTiming(1, { duration: 200 })),
-          )
-        : withTiming(1),
+      borderRadius: swipeTranslateX.value ? 40 : 0,
+      transform: [
+        {
+          scale: interpolate(swipeTranslateX.value, [0, 500], [1, 0.9], Extrapolation.CLAMP),
+        },
+        {
+          rotate: `${interpolate(swipeTranslateX.value, [0, 500], [0, 0.5], Extrapolation.CLAMP)}deg`,
+        },
+        {
+          translateX: withSpring(
+            interpolate(swipeTranslateX.value, [0, 200], [0, 26], Extrapolation.CLAMP),
+          ),
+        },
+        {
+          translateY: withSpring(
+            interpolate(swipeTranslateY.value, [0, 200], [0, 26], Extrapolation.CLAMP),
+          ),
+        },
+      ],
     }),
-    [isFullscreenShared],
+    [],
   );
 
   const gesturesCombined = Gesture.Exclusive(backSwipeGesture, doubleTapGesture, singleTapGesture);
   const VideoBatchSize = 6;
 
   return (
-    <Animated.View className="flex-1 bg-background" style={viewStyle}>
+    <Animated.View className="flex-1 overflow-hidden bg-background" style={viewStyle}>
       <GestureDetector gesture={gesturesCombined}>
         <FlatList<VideoPost>
           ref={flatListRef}
@@ -204,17 +253,19 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
           maxToRenderPerBatch={VideoBatchSize}
           removeClippedSubviews={isAndroid}
           decelerationRate="fast"
-          scrollEventThrottle={1000 / 60}
+          scrollEventThrottle={1}
           pagingEnabled
           snapToAlignment="start"
           snapToInterval={dimensions.height}
           refreshControl={
-            <RefreshControl
-              refreshing={isRefetching}
-              onRefresh={refetch}
-              colors={['#fff']}
-              tintColor="#fff"
-            />
+            refetch && (
+              <RefreshControl
+                refreshing={isRefetching}
+                onRefresh={refetch}
+                colors={['#fff']}
+                tintColor="#fff"
+              />
+            )
           }
           {...flatListProps}
         />

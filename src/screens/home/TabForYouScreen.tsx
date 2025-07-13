@@ -6,7 +6,7 @@ import { SearchInput } from '../../components/ui';
 import { VideoFeedProvider } from '../../components/videoFeed';
 import { useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
 import { TileListBlock, generateBlocks } from '../../components/stateFeed';
-import { VideoTiles } from '../../components/videoTiles/VideoTiles';
+import { VideoTiles } from '../../components/videoTiles';
 import { Screens } from '../../navigation/screens';
 import { UserType } from '../../state/user/types';
 

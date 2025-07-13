@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { VideoTiles } from '../../videoTiles/VideoTiles';
+import { VideoTiles, VideoTile } from '../../videoTiles';
 import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
-import { VideoTile } from './VideoTile';
-import { TileConfig } from './tileConfig';
 import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../videoFeed/hooks';
 
 export interface ProfileVideoTilesProps {
@@ -50,7 +48,7 @@ export const UserVideoTiles = ({ userId, withUnfinished, className }: ProfileVid
       ItemComponent={VideoTile}
       queryControl={queryControl}
       keyExtractor={(item) => item.id}
-      numColumns={TileConfig.NumColumns}
+      numColumns={3}
       contentContainerClassName="pb-[10px]"
       initialNumToRender={6}
       windowSize={5}
