@@ -375,7 +375,7 @@ export const useAuthStore = createPersistStore<AuthState>(
     },
   }),
   {
-    version: 1,
+    version: 0,
     ignore: ['loading'],
     name: 'AuthState',
   },
