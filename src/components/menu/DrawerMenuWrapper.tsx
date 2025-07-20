@@ -24,7 +24,7 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
   const { menuOpened, actions } = useUiStore();
 
   const active = useSharedValue(menuOpened);
-  const translateX = useSharedValue(-drawerWidth);
+  const translateX = useSharedValue(drawerWidth);
 
   useEffect(() => {
     if (menuOpened !== active.value) {
@@ -38,7 +38,7 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
       if (curr) {
         translateX.value = withTiming(0);
       } else {
-        translateX.value = withTiming(-drawerWidth);
+        translateX.value = withTiming(drawerWidth);
       }
       runOnJS(actions.setMenuOpened)(curr);
     },
@@ -46,7 +46,7 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
 
   const gesture = Gesture.Pan()
     .onChange((e) => {
-      if (e.translationX < 0) {
+      if (e.translationX > 0) {
         translateX.value = withSpring(e.translationX, {
           damping: 100,
           stiffness: 400,
@@ -59,13 +59,13 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
       }
     })
     .onEnd((e) => {
-      if (e.velocityX < -1000) {
+      if (e.velocityX > 1000) {
         translateX.value = withTiming(-drawerWidth, { duration: 160 }, () => {
           active.value = false;
         });
       }
-      if (e.translationX < -drawerWidth / 2) {
-        translateX.value = withTiming(-drawerWidth, { duration: 200 }, () => {
+      if (e.translationX > drawerWidth / 2) {
+        translateX.value = withTiming(drawerWidth, { duration: 200 }, () => {
           active.value = false;
         });
       } else {
@@ -78,7 +78,7 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
   }));
 
   const overlayStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(translateX.value, [-drawerWidth, 0], [0, 0.9], Extrapolation.CLAMP);
+    const opacity = interpolate(translateX.value, [drawerWidth, 0], [0, 0.9], Extrapolation.CLAMP);
     return {
       opacity,
     };
@@ -87,8 +87,8 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
   const contentStyle = useAnimatedStyle(() => {
     const containerTranslateX = interpolate(
       translateX.value,
-      [-drawerWidth, 0],
-      [0, 100],
+      [drawerWidth, 0],
+      [0, -100],
       Extrapolation.CLAMP,
     );
     return {
@@ -105,7 +105,7 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
     <>
       <GestureDetector gesture={gesture}>
         <Animated.View
-          className="absolute bottom-0 left-0 top-0 z-[11] flex-1"
+          className="absolute bottom-0 right-0 top-0 z-[11] flex-1"
           style={[{ width: drawerWidth }, drawerStyle]}
         >
           <MenuContent />
