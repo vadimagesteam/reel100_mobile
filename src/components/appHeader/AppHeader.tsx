@@ -58,7 +58,7 @@ export const AppHeader = ({
             }}
           >
             <SvgIcon image="location" color={colors.white} />
-            <Text className="text-xl font-bold text-accent">{selectedState?.slug}</Text>
+            <Text className="text-xl font-bold text-primary">{selectedState?.slug}</Text>
           </TouchableOpacity>
         )}
 

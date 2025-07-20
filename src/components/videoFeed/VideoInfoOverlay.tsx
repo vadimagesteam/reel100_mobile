@@ -111,7 +111,7 @@ export const VideoInfoOverlay = ({
           onPress={onUser}
           hitSlop={{ top: 10, right: 10, bottom: 10 }}
         >
-          <Avatar size={32} name={displayName} />
+          <Avatar size={32} uri={user.avatar} name={displayName} />
           <Text numberOfLines={1} className="max-w-[200px] font-bold text-primary">
             {displayName}
           </Text>

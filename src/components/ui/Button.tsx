@@ -31,7 +31,7 @@ const variants: Record<string, string> = {
 };
 
 const textVariants: Record<string, string> = {
-  primary: 'text-primary',
+  primary: 'button-primary-text',
   outline: 'text-green',
   danger: 'text-primary',
   gradient: 'text-primary',
@@ -74,7 +74,7 @@ export const Button: FC<ButtonProps> = ({
         {loadingText}
       </Text>
     ) : (
-      <ActivityIndicator color="white" size="small" />
+      <ActivityIndicator size="small" />
     )
   ) : (
     <View className="flex-row items-center gap-x-2">

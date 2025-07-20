@@ -90,7 +90,7 @@ export function VerifyEmailScreen() {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           onPress={handleResendVerify}
         >
-          <Text className="text-center text-xl text-blue1 underline">Click here to resend.</Text>
+          <Text className="text-center text-xl text-primary underline">Click here to resend.</Text>
         </TouchableOpacity>
       </View>
     </GuestContainer>

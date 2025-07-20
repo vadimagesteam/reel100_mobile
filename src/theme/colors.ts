@@ -54,7 +54,8 @@ export const colors = {
   input: twColors.zinc[800],
 
   // buttons
-  'button-primary': baseColors.blue1,
+  'button-primary': baseColors.white,
+  'button-primary-text': baseColors.black,
   'button-danger': baseColors.red,
 
   // text

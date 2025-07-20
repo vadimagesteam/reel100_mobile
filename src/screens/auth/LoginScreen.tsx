@@ -121,7 +121,7 @@ export function LoginScreen() {
         onPress={() => navigation.navigate(Screens.SignUp)}
       >
         <Text className="mt-6 text-center text-xl text-silver4">
-          Don't have an account? <Text className="font-semibold text-blue1">Sign Up</Text>
+          Don't have an account? <Text className="font-semibold text-primary">Sign Up</Text>
         </Text>
       </TouchableOpacity>
     </GuestContainer>
