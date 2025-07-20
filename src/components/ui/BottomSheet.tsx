@@ -46,7 +46,7 @@ export const BottomSheet = forwardRef<RNBottomSheet, BottomSheetProps>(
     return (
       <RNBottomSheet
         ref={sheetRef}
-        index={-1}
+        index={open ? 0 : -1}
         backgroundStyle={styles.backgroundStyle}
         style={styles.bottomSheetStyle}
         handleIndicatorStyle={styles.handleIndicatorStyle}

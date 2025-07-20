@@ -12,7 +12,7 @@ import { useRoute } from '../../../navigation';
 import { useUser } from '../../../state/user/authStore';
 import { getFullName } from '../../../state/user/utils';
 import { colors } from '../../../theme';
-import { useUserQuery } from '../../user/hooks/useUserQuery';
+import { useUserQuery } from '../../user/hooks';
 import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
 import { useChatMessages, useMarkMessagesAsRead, useSendMessage } from '../hooks';
 import { DialogHeader } from './DialogHeader';

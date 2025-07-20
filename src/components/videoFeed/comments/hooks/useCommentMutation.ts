@@ -17,7 +17,8 @@ type CommentsCache = {
 
 export const useCommentMutation = () => {
   const queryClient = useQueryClient();
-  const { id: userId, firstName, lastName } = useUser();
+  const user = useUser();
+  const { id: userId } = user;
 
   const videoKey = useVideoFeedCacheKey();
 
@@ -35,6 +36,7 @@ export const useCommentMutation = () => {
       return data;
     },
     onMutate: async ({ text, replyTo, videoId }) => {
+      console.log('new comment to', videoId);
       const key = getQueryKey(videoId);
       await queryClient.cancelQueries({ queryKey: key });
       const prev = queryClient.getQueryData<CommentsCache | undefined>(key);
@@ -42,7 +44,7 @@ export const useCommentMutation = () => {
       if (prev) {
         const optimisticComment: CommentType = {
           id: `optimistic-${Math.random().toString()}`,
-          user: { id: userId!, firstName, lastName },
+          user,
           video: { id: videoId },
           text,
           replyTo: replyTo ?? '',
@@ -103,14 +105,12 @@ export const useCommentMutation = () => {
       const key = getQueryKey(videoId);
       const prev = queryClient.getQueryData<CommentsCache | undefined>(key);
 
-      if (!prev) return;
+      if (!prev) {
+        return;
+      }
 
       const updatedPages = prev.pages.map((page) =>
-        page.map((comment) =>
-          comment.id.startsWith('optimistic-')
-            ? { ...data, user: { id: userId, firstName, lastName } }
-            : comment,
-        ),
+        page.map((comment) => (comment.id.startsWith('optimistic-') ? { ...data, user } : comment)),
       );
 
       queryClient.setQueryData(key, {

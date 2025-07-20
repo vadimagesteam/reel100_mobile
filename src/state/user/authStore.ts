@@ -57,6 +57,7 @@ type AuthState = {
     uploadAvatar: (fileUri: string) => Promise<ActionResult>;
     saveNotificationSettings: (settings: Partial<NotificationSettings>) => Promise<ActionResult>;
     savePushNotificationsToken: (token: string) => Promise<ActionResult>;
+    removePushToken: (remoteTokenId: string) => Promise<ActionResult>;
   };
 };
 
@@ -75,6 +76,15 @@ export const useAuthStore = createPersistStore<AuthState>(
 
     actions: {
       logout: async () => {
+        const {
+          pushNotifications,
+          actions: { removePushToken },
+        } = get();
+
+        const { remoteTokenId } = pushNotifications;
+        if (remoteTokenId) {
+          await removePushToken(remoteTokenId);
+        }
         set(initialState);
       },
 
@@ -344,9 +354,7 @@ export const useAuthStore = createPersistStore<AuthState>(
           });
 
           if (existingToken.remoteTokenId) {
-            console.log('Deleting old push token on the server');
-            await api.delete(`api/pushNotificationTokens/${existingToken.remoteTokenId}`);
-            console.log('[OK] Old push token deleted');
+            await get().actions.removePushToken(existingToken.remoteTokenId);
           }
 
           return { type: 'success' };
@@ -357,6 +365,12 @@ export const useAuthStore = createPersistStore<AuthState>(
               (error as Error).message ?? 'An error ocurred during saving token on the server',
           };
         }
+      },
+      removePushToken: async (remoteTokenId) => {
+        console.log('Deleting old push token on the server');
+        await api.delete(`api/pushNotificationTokens/${remoteTokenId}`);
+        console.log('[OK] Old push token deleted');
+        return { type: 'success' };
       },
     },
   }),

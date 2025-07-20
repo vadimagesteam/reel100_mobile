@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useAuthActions, useAuthStore } from '../../state/user/authStore';
 import { messaging } from './firebase';
+import { handlePushNotification } from './handlePushNotification';
 import { requestPushNotificationsAccess } from './requestPushNotificationsAccess';
 
 export const usePushNotifications = (enabled: boolean) => {
@@ -32,9 +33,34 @@ export const usePushNotifications = (enabled: boolean) => {
   }, [enabled, subscribe]);
 
   useEffect(() => {
-    return messaging.onMessage(async (remoteMessage) => {
-      console.log('REMOTE MESSAGE', remoteMessage);
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    if (!enabled) {
+      return () => {};
+    }
+
+    const checkInitialNotification = async () => {
+      const message = await messaging.getInitialNotification();
+      if (message) {
+        console.log('[Push] initial notification', message);
+        await handlePushNotification(message);
+      }
+    };
+
+    checkInitialNotification();
+
+    const unsubscribeOnMessage = messaging.onMessage(async (message) => {
+      console.log('[Push] onMessage', message);
+      // handle something like in app message view with onPress?
+      // await handlePushNotification(message);
     });
-  }, []);
+
+    const unsubscribeOpenApp = messaging.onNotificationOpenedApp(async (message) => {
+      console.log('[Push] onNotificationOpenedApp', message);
+      await handlePushNotification(message);
+    });
+
+    return () => {
+      unsubscribeOnMessage();
+      unsubscribeOpenApp();
+    };
+  }, [enabled]);
 };

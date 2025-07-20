@@ -1,4 +1,4 @@
 import { createNavigationContainerRef } from '@react-navigation/native';
+import { AppStackParamList } from './screens';
 
-// todo: fix types
-export const navigationRef = createNavigationContainerRef<any>();
+export const navigationRef = createNavigationContainerRef<AppStackParamList>();

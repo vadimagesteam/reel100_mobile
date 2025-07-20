@@ -7,7 +7,7 @@ export type VideoFeedStore = {
   isPaused: boolean;
   currentTime: number;
 
-  commentsOpened: { videoId: string; userId: string } | null;
+  commentsOpened: { videoId: string } | null;
   commentText: string;
   commentReply: CommentType | null;
   commentsExpanded: string[];
@@ -27,7 +27,7 @@ export type VideoFeedStore = {
     setIsPaused: (isPaused: boolean) => void;
     togglePause: () => void;
 
-    openComments: (videoId: string, userId: string) => void;
+    openComments: (videoId: string) => void;
     closeComments: () => void;
     setCommentText: (text: string) => void;
     setCommentReply: (comment: CommentType) => void;
@@ -93,8 +93,7 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
 
       // comments
       setCommentText: (text: string) => set({ commentText: text }),
-      openComments: (videoId: string, userId: string) =>
-        set({ commentsOpened: { videoId, userId } }),
+      openComments: (videoId: string) => set({ commentsOpened: { videoId } }),
       closeComments: () => set({ commentsOpened: null, commentReply: null, commentsExpanded: [] }),
       setCommentReply: (comment) => set({ commentReply: comment }),
       resetCommentReply: () => set({ commentReply: null }),

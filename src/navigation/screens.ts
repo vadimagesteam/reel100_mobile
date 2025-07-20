@@ -45,6 +45,7 @@ export type AppStackParamList = {
   Tabs: undefined;
   Profile:
     | { fromTabs?: boolean; user: Pick<UserBase, 'id' | 'firstName' | 'lastName'> }
+    | { fromTabs?: boolean; userId: string }
     | undefined;
   VideoRecording: undefined;
   ChatList: undefined;
@@ -63,9 +64,11 @@ export type AppStackParamList = {
     placeholderValue?: string;
     onSelected: (state: StateItem) => void;
   };
-  VideoModal: {
-    video: VideoPost;
-  };
+  VideoModal:
+    | {
+        video: VideoPost;
+      }
+    | { videoId: string; commentId?: string };
 };
 
 export type BottomTabParamList = {

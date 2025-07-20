@@ -160,7 +160,7 @@ export const VideoListItem: FC<VideoItemProps> = ({
           onUser={() => {
             navigation.navigate(Screens.Profile, { user: author });
           }}
-          onComments={() => openComments(video.id, video.user.id)}
+          onComments={() => openComments(video.id)}
         />
       )}
     </View>

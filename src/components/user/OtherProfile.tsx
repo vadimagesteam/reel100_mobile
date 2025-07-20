@@ -15,12 +15,12 @@ export const OtherProfile = ({}: ProfileProps) => {
   const navigation = useNavigation();
   const { params } = useRoute<'Profile'>();
 
-  if (!params?.user) {
-    throw new Error('No user in route params');
+  if (!params) {
+    throw new Error('No route params!');
   }
-  const { user: shallowUser } = params;
 
-  const userId = shallowUser.id;
+  const shallowUser = 'user' in params ? params.user : null;
+  const userId = 'user' in params ? params.user.id : params.userId;
 
   const me = useUser();
   const { data: user, error } = useUserQuery(userId);
@@ -28,7 +28,7 @@ export const OtherProfile = ({}: ProfileProps) => {
   const unfollow = useUnFollowMutation();
   const openChat = useChatNavigation();
 
-  const fullName = user ? getFullName(user) : getFullName(shallowUser);
+  const fullName = user ? getFullName(user) : shallowUser ? getFullName(shallowUser) : '...';
 
   useEffect(() => {
     if (!user && error) {
