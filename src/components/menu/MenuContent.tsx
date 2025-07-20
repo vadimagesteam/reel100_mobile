@@ -1,5 +1,6 @@
 import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { clearStoreCaches } from '../../lib/createPersistStore';
 import { useAuthActions, useUser } from '../../state/user/authStore';
 import { getFullName } from '../../state/user/utils';
 import { Avatar } from '../ui';
@@ -24,9 +25,9 @@ export const MenuContent = () => {
     navigationRef.navigate(Screens.EditProfile);
   };
 
-  const handleLogout = () => {
-    // todo: clear all caches!
-    logout();
+  const handleLogout = async () => {
+    await logout();
+    await clearStoreCaches();
   };
 
   return (

@@ -60,22 +60,22 @@ type AuthState = {
   };
 };
 
+const initialState = {
+  loading: false,
+  isAuthenticated: false,
+  user: null,
+  token: null,
+  pendingVerification: null,
+  pushNotifications: {},
+};
+
 export const useAuthStore = createPersistStore<AuthState>(
   (set, get) => ({
-    loading: false,
-    isAuthenticated: false,
-    user: null,
-    token: null,
-    pendingVerification: null,
-    pushNotifications: {},
+    ...initialState,
 
     actions: {
       logout: async () => {
-        set({
-          isAuthenticated: false,
-          user: null,
-          loading: false,
-        });
+        set(initialState);
       },
 
       setToken: async (token) => {
@@ -361,7 +361,7 @@ export const useAuthStore = createPersistStore<AuthState>(
     },
   }),
   {
-    version: 0,
+    version: 1,
     ignore: ['loading'],
     name: 'AuthState',
   },
