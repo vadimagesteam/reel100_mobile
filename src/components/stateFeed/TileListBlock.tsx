@@ -29,7 +29,7 @@ const renderVideo = (
     />
   );
 };
-let fx = 0;
+
 export const TileListBlock = ({
   item: block,
   index: blockIndex,
@@ -85,13 +85,13 @@ export const styles = StyleSheet.create({
   smallBox: {
     width: half,
     height: half,
-    marginRight: 1,
-    marginBottom: 1,
+    marginRight: 0.5,
+    marginBottom: 0.5,
   },
   bigBox: {
     width: half,
     height: half * 2,
-    marginRight: 1,
-    marginBottom: 1,
+    marginRight: 0.5,
+    marginBottom: 0,
   },
 });
