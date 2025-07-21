@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Video, {
   type OnLoadData,
   type OnProgressData,
@@ -12,7 +12,6 @@ import Video, {
 } from 'react-native-video';
 import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
-import { colors } from '../../theme';
 import { isAndroid, formatSeconds } from '../../utils';
 import {
   useLikeMutations,
@@ -148,7 +147,7 @@ export const VideoListItem: FC<VideoItemProps> = ({
           timeLeft={
             loadStarted && progress
               ? formatSeconds(Math.round(loadStarted?.duration - progress?.currentTime))
-              : undefined
+              : '0:00'
           }
           rankNumber={rankNumber}
           showComments

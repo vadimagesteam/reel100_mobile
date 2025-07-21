@@ -32,7 +32,7 @@ const variants: Record<string, string> = {
 
 const textVariants: Record<string, string> = {
   primary: 'button-primary-text',
-  outline: 'text-green',
+  outline: 'text-primary',
   danger: 'text-primary',
   gradient: 'text-primary',
   ghost: 'text-primary',

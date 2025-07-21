@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { api } from '../../../lib/api';
 import { useUser } from '../../../state/user/authStore';
-import { VideoPost } from '../queries/apiVideosFetcher';
 import { useVideoFeedCacheKey } from './useVideoFeedCacheKey';
+import { updateVideoCache } from './useVideosInfiniteQuery';
 
 type LikeArgs = {
   type: 'video' | 'comment';
@@ -18,23 +18,10 @@ export const useLikeMutations = () => {
   const videosKey = useVideoFeedCacheKey();
 
   const updateVideoLikesCount = (videoId: string, val: 1 | -1) => {
-    if (!videosKey) {
-      console.error(
-        'Video cache key is missing in the context. Please call the "useSetVideoFeedCacheKey()" hook',
-      );
-      return;
-    }
-    const videoPages = queryClient.getQueryData<{ pages: VideoPost[][] } | undefined>(videosKey);
-    if (videoPages?.pages) {
-      queryClient.setQueryData(videosKey, {
-        ...videoPages,
-        pages: videoPages.pages.map((page) =>
-          page.map((video) =>
-            video.id === videoId ? { ...video, likesCount: video.likesCount + val } : video,
-          ),
-        ),
-      });
-    }
+    return updateVideoCache(videosKey!, videoId, (video) => ({
+      ...video,
+      likesCount: video.likesCount + val,
+    }));
   };
 
   const like = useMutation({
@@ -59,15 +46,21 @@ export const useLikeMutations = () => {
       queryClient.setQueryData(key, { id: 'optimistic' });
 
       // Update video counter
-      if (type === 'video') {
-        updateVideoLikesCount(id, 1);
+      let videosPrev;
+      if (videosKey && type === 'video') {
+        videosPrev = updateVideoLikesCount(id, 1);
       }
 
-      return { key, prev };
+      return { key, prev, videosPrev };
     },
     onError: (_err, _vars, context) => {
       if (context?.key && context?.prev) {
         queryClient.setQueryData(context.key, context.prev);
+
+        // revert video cache back
+        if (videosKey && context.videosPrev) {
+          queryClient.setQueryData(videosKey, context.videosPrev);
+        }
       }
     },
     onSuccess: (data, { type, id }) => {
@@ -94,9 +87,19 @@ export const useLikeMutations = () => {
     onMutate: ({ type, id }) => {
       const prev = queryClient.getQueryData<{ id: string } | undefined>(['like', type, userId, id]);
 
-      // Update video counter
-      if (type === 'video' && prev?.id) {
-        updateVideoLikesCount(id, -1);
+      let videosPrev;
+      if (videosKey && type === 'video' && prev?.id) {
+        videosPrev = updateVideoLikesCount(id, -1);
+      }
+
+      return {
+        videosPrev,
+      };
+    },
+    onError: (_err, _vars, context) => {
+      // revert video cache back
+      if (videosKey && context?.videosPrev) {
+        queryClient.setQueryData(videosKey, context.videosPrev);
       }
     },
     onSettled: (_data, _err, { type, id }) => {

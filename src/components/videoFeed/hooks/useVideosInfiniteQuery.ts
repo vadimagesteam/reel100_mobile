@@ -62,3 +62,28 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
     flatPages,
   } as VideoPostQueryResult<T>;
 };
+
+export const updateVideoCache = (
+  cacheKey: string[],
+  videoId: string,
+  updateFn: (video: VideoPost) => VideoPost,
+) => {
+  const prev = queryClient.getQueryData<{ pages: VideoPost[][] } | VideoPost[] | undefined>(
+    cacheKey,
+  );
+  if (prev) {
+    const mapper = (video: VideoPost) => (video.id === videoId ? updateFn(video) : video);
+
+    if ('pages' in prev) {
+      queryClient.setQueryData(cacheKey, {
+        ...prev,
+        pages: prev.pages.map((page) => page.map(mapper)),
+      });
+    }
+
+    if (Array.isArray(prev)) {
+      queryClient.setQueryData(cacheKey, prev.map(mapper));
+    }
+  }
+  return prev;
+};

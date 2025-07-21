@@ -1,42 +1,37 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { View } from 'react-native';
 import { HidebleContainer } from '../../components/hidebleContainer';
 import { FlexLoading } from '../../components/ui';
 import { VideoFeedProvider, VideoList } from '../../components/videoFeed';
 import { apiVideosFetcher, VideoPost } from '../../components/videoFeed/queries/apiVideosFetcher';
-import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useNavigation, useRoute } from '../../navigation';
 
 export const VideoModalScreen = () => {
   const { params } = useRoute<'VideoModal'>();
   const navigation = useNavigation();
-  const [videos, setVideos] = useState<VideoPost[]>(() =>
-    'video' in params ? [params.video] : [],
-  );
 
-  const [loadVideo, isLoading] = useLoadingCallback(
-    useCallback(async (videoId: string) => {
-      const videoResponse = await apiVideosFetcher({
-        where: {
-          'where[id]': videoId,
-        },
+  const cacheKey = ['video_modal'];
+
+  const { data: videos, isLoading } = useQuery({
+    queryKey: cacheKey,
+    queryFn: async (): Promise<VideoPost[]> => {
+      if ('video' in params) {
+        return [params.video];
+      }
+      return apiVideosFetcher({
+        where: { 'where[id]': params.videoId },
         take: 1,
         skip: 0,
       });
-      setVideos(videoResponse);
-    }, []),
-  );
-
-  useEffect(() => {
-    if (!('video' in params)) {
-      loadVideo(params.videoId);
-    }
-  }, [loadVideo, params]);
+    },
+    refetchOnMount: 'always',
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 60 * 24,
+  });
 
   const commentId = 'commentId' in params ? params.commentId : null;
-  const videoId = videos[0]?.id;
 
-  if (isLoading || !videoId) {
+  if (isLoading || !videos) {
     return (
       <View className="flex-1 bg-background">
         <FlexLoading />
@@ -49,12 +44,8 @@ export const VideoModalScreen = () => {
       <VideoFeedProvider
         initialState={{
           isPlayerFullScreen: true,
-          commentsOpened: commentId
-            ? {
-                videoId,
-              }
-            : null,
-          cacheKey: ['video_modal'],
+          commentsOpened: commentId ? { videoId: videos[0]?.id } : null,
+          cacheKey,
           backPressHandler: () => navigation.goBack(),
         }}
       >

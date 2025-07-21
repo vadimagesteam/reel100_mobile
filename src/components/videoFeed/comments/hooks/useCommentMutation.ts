@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../state/user/authStore';
 import { api } from '../../../../lib/api';
-import { useVideoFeedCacheKey } from '../../hooks';
-import { VideoPost } from '../../queries/apiVideosFetcher';
+import { updateVideoCache, useVideoFeedCacheKey } from '../../hooks';
 import { CommentType } from './useCommentsInfiniteQuery';
 
 export type CommentMutationArgs = {
@@ -36,7 +35,6 @@ export const useCommentMutation = () => {
       return data;
     },
     onMutate: async ({ text, replyTo, videoId }) => {
-      console.log('new comment to', videoId);
       const key = getQueryKey(videoId);
       await queryClient.cancelQueries({ queryKey: key });
       const prev = queryClient.getQueryData<CommentsCache | undefined>(key);
@@ -72,31 +70,16 @@ export const useCommentMutation = () => {
       // Optimistic update for comment counter
       let videoPrev;
       if (videoKey) {
-        videoPrev = queryClient.getQueryData<{ pages: VideoPost[][] }>(videoKey);
-        if (videoPrev) {
-          queryClient.setQueryData<{ pages: VideoPost[][] }>(videoKey, (prevData) => {
-            if (prevData) {
-              return {
-                ...prevData,
-                pages: prevData.pages.map((p) => {
-                  return p.map((_videoPost) =>
-                    _videoPost.id === videoId
-                      ? {
-                          ..._videoPost,
-                          commentsCount: _videoPost.commentsCount + 1,
-                        }
-                      : _videoPost,
-                  );
-                }),
-              };
-            }
-          });
-        }
+        videoPrev = updateVideoCache(videoKey, videoId, (v) => ({
+          ...v,
+          commentsCount: v.commentsCount + 1,
+        }));
       }
 
       return { key, prev, videoPrev };
     },
     onError: (_err, _vars, context) => {
+      console.log('_err', _err);
       if (context?.key && context?.prev) {
         queryClient.setQueryData(context.key, context.prev);
       }
