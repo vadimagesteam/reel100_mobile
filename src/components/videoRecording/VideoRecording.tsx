@@ -91,8 +91,14 @@ export const VideoRecording = () => {
   };
 
   const handleFinishRecording = async () => {
-    setIsRecording(false);
     await cameraRef.current?.stopRecording();
+    // Emulators debug
+    // if (!cameraRef.current) {
+    //   setPreviewUri(
+    //     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    //   );
+    // }
+    setIsRecording(false);
   };
 
   const handleCloseCamera = () => {

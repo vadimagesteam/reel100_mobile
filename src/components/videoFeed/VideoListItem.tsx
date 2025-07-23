@@ -1,5 +1,6 @@
+import { PortalHost } from '@gorhom/portal';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
 import Video, {
   type OnLoadData,
@@ -32,7 +33,7 @@ export interface VideoItemProps extends Pick<ReactVideoProps, 'muted' | 'repeat'
   rankNumber?: number;
 }
 
-export const VideoListItem: FC<VideoItemProps> = ({
+export const VideoListItemRaw: FC<VideoItemProps> = ({
   video,
   muted,
   active,
@@ -117,13 +118,11 @@ export const VideoListItem: FC<VideoItemProps> = ({
         onProgress={setProgress}
         style={[dimensions]}
         renderLoader={() => (
-          <View className="flex-1">
-            <VideoPreview
-              blur={Platform.select({ ios: true })}
-              imageUrl={previewUrl!}
-              {...dimensions}
-            />
-          </View>
+          <VideoPreview
+            blur={Platform.select({ ios: true })}
+            imageUrl={previewUrl!}
+            {...dimensions}
+          />
         )}
         selectedVideoTrack={{ type: SelectedVideoTrackType.AUTO }}
         preventsDisplaySleepDuringVideoPlayback
@@ -131,7 +130,6 @@ export const VideoListItem: FC<VideoItemProps> = ({
         disableAudioSessionManagement
         {...videoProps}
       />
-
       {active && (
         <VideoInfoOverlay
           video={video}
@@ -165,3 +163,12 @@ export const VideoListItem: FC<VideoItemProps> = ({
     </View>
   );
 };
+
+export const VideoListItem = memo(
+  VideoListItemRaw,
+  (prev, next) =>
+    prev.video === next.video &&
+    prev.active === next.active &&
+    prev.dimensions === next.dimensions &&
+    prev.rankNumber === next.rankNumber,
+);

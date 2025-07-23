@@ -25,6 +25,8 @@ const baseColors = {
   silverLight: '#F8F9FB',
   silver1Procent50: 'rgba(128, 128, 128, 0.5)',
 
+  graphite: '#2f2f2f',
+
   green: '#1ECB99',
   green1: 'rgba(34, 156, 122, 1)',
 

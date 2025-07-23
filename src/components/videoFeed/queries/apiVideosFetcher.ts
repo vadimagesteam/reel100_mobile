@@ -47,6 +47,7 @@ export type VideoPost = {
   commentsCount: number;
   likesCount: number;
   viewsCount: number;
+  description: string;
   user: VideoUser;
 };
 

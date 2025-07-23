@@ -1,3 +1,4 @@
+import { PortalProvider } from '@gorhom/portal';
 import React, { useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -38,7 +39,9 @@ function App(): React.JSX.Element {
           persistOptions={{ persister: asyncStoragePersister }}
         >
           <SafeAreaProvider>
-            <RootNavigation isAuthenticated={isAuthenticated} />
+            <PortalProvider>
+              <RootNavigation isAuthenticated={isAuthenticated} />
+            </PortalProvider>
           </SafeAreaProvider>
         </PersistQueryClientProvider>
       )}

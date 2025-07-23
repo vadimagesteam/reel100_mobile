@@ -1,15 +1,22 @@
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { StyleSheet, Text, View } from 'react-native';
-import { useRef } from 'react';
-import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import React, { useRef } from 'react';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getFullName } from '../../state/user/utils';
-import { Avatar, SvgIcon } from '../ui';
+import { isAndroid } from '../../utils';
+import { Avatar, Backdrop, SvgIcon } from '../ui';
 import { VideoPost } from './queries/apiVideosFetcher';
 import { colors } from '../../theme';
 import { GestureTouchableOpacity } from './GestureTouchableOpacity';
 import { IconHeart } from './IconHeart';
 import { useVideoFeed } from './hooks';
+import { VideoDescription } from './VideoDescription';
 
 export interface VideoInfoOverlayProps {
   isPlayerFullScreen: boolean;
@@ -67,69 +74,75 @@ export const VideoInfoOverlay = ({
 
   const topInfoStyles = useAnimatedStyle(
     () => ({
-      top: withTiming(isPlayerFullScreen ? insets.top : 30, { duration: 300 }, () => {
+      top: withTiming(isPlayerFullScreen ? insets.top : 12, { duration: 300 }, () => {
         runOnJS(updateIconPosition)();
       }),
     }),
     [isPlayerFullScreen],
   );
 
-  const bottomInfoStyles = useAnimatedStyle(
-    () => ({
-      bottom: withTiming(isPlayerFullScreen ? 110 : 80, { duration: 300 }),
-    }),
-    [isPlayerFullScreen],
-  );
-
+  const backdropActive = useSharedValue(false);
   const displayName = getFullName(user);
 
   return (
-    <Animated.View
-      ref={wrapperViewRef}
-      className="absolute bottom-4 top-4 z-20 h-full w-full"
-      style={topInfoStyles}
-    >
+    <View ref={wrapperViewRef} className="absolute inset-0 z-20 h-full w-full">
+      <Backdrop
+        activeOpacity={0.6}
+        onPress={() => {
+          if (backdropActive.value) {
+            backdropActive.value = false;
+          }
+        }}
+        active={backdropActive}
+      />
+      <Animated.View
+        style={topInfoStyles}
+        className="absolute left-2 right-2 top-4 flex-row items-center justify-between"
+      >
+        {/* Top Left */}
+        <View className="flex-row items-center gap-2">
+          {isPlayerFullScreen && (
+            <GestureTouchableOpacity
+              className="flex-row items-center gap-2"
+              onPress={onBackPress}
+              hitSlop={10}
+            >
+              <Ionicons size={24} name="chevron-back" color="#fff" />
+            </GestureTouchableOpacity>
+          )}
+
+          <GestureTouchableOpacity
+            className="flex-row items-center gap-2"
+            onPress={onUser}
+            hitSlop={{ top: 10, right: 10, bottom: 10 }}
+          >
+            <Avatar size={32} uri={user.avatar} name={displayName} />
+            <Text numberOfLines={1} className="max-w-[200px] font-bold text-primary">
+              {displayName}
+            </Text>
+          </GestureTouchableOpacity>
+        </View>
+
+        {/* Top Right */}
+        <View className="flex-row">
+          <View className="ml-1 rounded bg-orange p-1 opacity-80">
+            <Text className="color-white">#{rankNumber}</Text>
+          </View>
+          {timeLeft && (
+            <View className="ml-1 rounded bg-black5 p-1 opacity-80">
+              <Text className="color-white">{timeLeft}</Text>
+            </View>
+          )}
+        </View>
+      </Animated.View>
+
       {isPaused && (
         <View className="absolute h-full w-full items-center justify-center opacity-50">
           <SvgIcon image="playIcon" color="white" style={styles.playIcon} />
         </View>
       )}
 
-      <View className="absolute left-2 flex-row items-center gap-2">
-        {isPlayerFullScreen && (
-          <GestureTouchableOpacity
-            className="flex-row items-center gap-2"
-            onPress={onBackPress}
-            hitSlop={10}
-          >
-            <Ionicons size={24} name="chevron-back" color="#fff" />
-          </GestureTouchableOpacity>
-        )}
-
-        <GestureTouchableOpacity
-          className="flex-row items-center gap-2"
-          onPress={onUser}
-          hitSlop={{ top: 10, right: 10, bottom: 10 }}
-        >
-          <Avatar size={32} uri={user.avatar} name={displayName} />
-          <Text numberOfLines={1} className="max-w-[200px] font-bold text-primary">
-            {displayName}
-          </Text>
-        </GestureTouchableOpacity>
-      </View>
-
-      <View className="absolute right-4 flex-row">
-        <View className="ml-1 rounded bg-orange p-1 opacity-80">
-          <Text className="color-white">#{rankNumber}</Text>
-        </View>
-        {timeLeft && (
-          <View className="ml-1 rounded bg-black5 p-1 opacity-80">
-            <Text className="color-white">{timeLeft}</Text>
-          </View>
-        )}
-      </View>
-
-      <Animated.View className="absolute right-4 flex flex-col gap-6" style={bottomInfoStyles}>
+      <Animated.View className="absolute bottom-[80px] right-4 z-[11] flex flex-col gap-6">
         {showLikes && (
           <GestureTouchableOpacity
             onPress={onLike}
@@ -161,7 +174,15 @@ export const VideoInfoOverlay = ({
           </GestureTouchableOpacity>
         )}
       </Animated.View>
-    </Animated.View>
+
+      {video.description && (
+        <VideoDescription
+          backdropActive={backdropActive}
+          text={video.description}
+          bottomInset={isAndroid ? 18 : 12}
+        />
+      )}
+    </View>
   );
 };
 

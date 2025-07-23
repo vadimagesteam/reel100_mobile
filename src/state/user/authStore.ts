@@ -45,6 +45,7 @@ type AuthState = {
 
   actions: {
     logout: () => Promise<void>;
+    silentLogout: () => Promise<void>;
     loadUserProfile: () => Promise<void>;
     setToken: (token: string) => Promise<void>;
     register: (data: RegisterDataType) => Promise<AuthActionResult>;
@@ -87,11 +88,12 @@ export const useAuthStore = createPersistStore<AuthState>(
         }
         set(initialState);
       },
-
+      silentLogout: async () => {
+        set(initialState);
+      },
       setToken: async (token) => {
         set({ token });
       },
-
       loadUserProfile: async () => {
         const { data } = await api.get<
           UserProfile & {

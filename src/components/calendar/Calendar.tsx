@@ -40,12 +40,7 @@ export const Calendar = ({
         <Button buttonClassName="min-w-[100px]" variant="outline" size="sm" onPress={onCancelPress}>
           Cancel
         </Button>
-        <Button
-          buttonClassName="min-w-[100px]"
-          variant="gradient"
-          size="sm"
-          onPress={onSubmitPress}
-        >
+        <Button buttonClassName="min-w-[100px]" size="sm" onPress={onSubmitPress}>
           Confirm
         </Button>
       </View>

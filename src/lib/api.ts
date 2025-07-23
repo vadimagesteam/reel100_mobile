@@ -4,6 +4,7 @@ import { useAuthStore } from '../state/user/authStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QueryClient } from '@tanstack/react-query';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import { clearStoreCaches } from './createPersistStore';
 
 export const api = axios.create({
   baseURL: Config.APP_API_URL,
@@ -34,7 +35,8 @@ api.interceptors.response.use(
     });
 
     if (error?.response?.status === 401) {
-      useAuthStore.getState().actions.logout();
+      clearStoreCaches();
+      useAuthStore.getState().actions.silentLogout();
     }
 
     // Sentry.captureException(error);

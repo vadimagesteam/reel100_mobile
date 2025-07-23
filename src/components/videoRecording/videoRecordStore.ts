@@ -12,7 +12,7 @@ export type VideoRecordStore = {
     clear: () => void;
     setPreviewUri: (uri: string) => void;
     setIsPreviewReady: (ready: boolean) => void;
-    publish: (stateId: string) => Promise<boolean>;
+    publish: (stateId: string, description: string) => Promise<boolean>;
   };
 };
 
@@ -34,7 +34,7 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
     setPreviewUri: (uri) => set({ previewUri: uri }),
     setIsPreviewReady: (ready) => set({ isPreviewReady: ready }),
 
-    publish: async (stateId: string) => {
+    publish: async (stateId, description) => {
       const { previewUri } = get();
 
       if (!previewUri) {
@@ -48,6 +48,7 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
 
       const metaDataPayload = {
         label: fileName,
+        description,
         states: {
           connect: { id: stateId },
         },

@@ -43,9 +43,13 @@ export const MyProfileInfo = ({
         </WithCountCircle>
       </View>
 
-      <View className="h-[70px] flex-row items-center justify-center rounded-[10px] bg-[#2f2f2f]">
+      <View className="bg-graphite h-[70px] flex-row items-center justify-center rounded-[10px]">
         <CounterSection onPress={onFollowersPress} label="Followers" count={followerCount!} />
-        <CounterSection label="Likes" count={likeCount!} />
+        <CounterSection
+          className="border-l-[0.5px] border-r-[0.5px] border-l-silver3 border-r-silver3"
+          label="Likes"
+          count={likeCount!}
+        />
         <CounterSection onPress={onFollowingPress} label="Following" count={followCount!} />
       </View>
     </>

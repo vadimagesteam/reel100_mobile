@@ -6,7 +6,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   Extrapolation,
-  withTiming,
   withSpring,
 } from 'react-native-reanimated';
 import { FlatList, FlatListProps, RefreshControl } from 'react-native';
@@ -123,6 +122,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const swipeTranslateY = useSharedValue(0);
   const backSwipeGesture = Gesture.Pan()
     .enabled(isFullscreen)
+    .minDistance(10)
     .onStart(() => {
       swipeTranslateX.value = 0;
       swipeTranslateY.value = 0;
@@ -134,13 +134,10 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     .onEnd((e) => {
       swipeTranslateX.value = 0;
       swipeTranslateY.value = 0;
-      if (isFullscreen && e.translationX > 50 && e.velocityX > 300) {
+      if (isFullscreen && e.translationX > 50 && (isAndroid || e.velocityX > 300)) {
         runOnJS(handleBackSwipe)();
       }
     });
-  if (isAndroid) {
-    backSwipeGesture.activeOffsetX(20).failOffsetY([-10, 10]);
-  }
 
   const singleTapGesture = Gesture.Tap()
     .enabled(videos.length > 0)

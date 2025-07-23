@@ -42,8 +42,8 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
   const startY = dimensions.height / 3 - iconSize / 2;
 
   const finalX = originalIcon.x;
-  const iconYInset = isAndroid ? -iconSize / 4 : iconSize * 1.22;
-  const finalY = originalIcon.y + insets.top - (isFullscreen ? 0 : iconYInset);
+  // const iconYInset = isAndroid ? -iconSize / 4 : iconSize * 1.22;
+  const finalY = originalIcon.y; //- (isFullscreen ? 0 : iconYInset);
 
   useImperativeHandle(ref, () => ({
     animationDuration: 1000,

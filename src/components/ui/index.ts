@@ -12,3 +12,4 @@ export * from './ListEmptyBlock';
 export * from './IonIconTypes';
 export * from './PinInput';
 export * from './WithCountCircle';
+export * from './Backdrop';

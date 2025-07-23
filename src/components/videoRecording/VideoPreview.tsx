@@ -1,4 +1,5 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import Video from 'react-native-video';
@@ -6,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { Button } from '../ui';
 import { requestCameraRollSavePermissions } from './requestCameraRollSave';
+import { VideoDescriptionInput } from './VideoDescriptionInput';
 import { useVideoRecordStore } from './videoRecordStore';
 import { useStateSelector } from '../../state/app/uiStore';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +20,7 @@ export const VideoPreview = () => {
   const queryClient = useQueryClient();
   const user = useUser();
   const [volume, setVolume] = useState(1);
+  const [description, setDescription] = useState('');
   const { previewUri, error, uploading, actions } = useVideoRecordStore();
   const [selectedState] = useStateSelector();
 
@@ -31,7 +34,7 @@ export const VideoPreview = () => {
       return;
     }
 
-    const uploadOk = await actions.publish(selectedState.id);
+    const uploadOk = await actions.publish(selectedState.id, description);
     if (uploadOk) {
       actions.clear();
       await queryClient.invalidateQueries({ queryKey: ['user_videos', user.id] });
@@ -80,10 +83,12 @@ export const VideoPreview = () => {
         repeat
         onLoad={() => actions.setIsPreviewReady(true)}
       />
-
+      {!uploading && <VideoDescriptionInput value={description} setValue={setDescription} />}
       <View
-        className="absolute left-0 top-0 h-full w-full items-center justify-center"
-        style={{ display: uploading ? 'flex' : 'none' }}
+        className={clsx(
+          'absolute left-0 top-0 h-full w-full items-center justify-center',
+          !uploading && 'hidden',
+        )}
       >
         <View className="absolute h-full w-full bg-black/60" />
         {error ? (
@@ -109,8 +114,7 @@ export const VideoPreview = () => {
         <Button
           loading={isSavingDraft}
           loadingText="Saving..."
-          variant="primary"
-          buttonClassName="bg-silver"
+          variant="outline"
           onPress={handleDraft}
         >
           Save Draft
