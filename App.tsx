@@ -17,19 +17,28 @@ enableScreens(true);
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
 
-function App(): React.JSX.Element {
+function App() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [storeHydrated, setStoreHydrated] = useState<boolean>(false);
 
+  usePushNotifications(isAuthenticated);
+
   useEffect(() => {
+    if (useAuthStore.persist.hasHydrated()) {
+      setStoreHydrated(true);
+      return;
+    }
+
     showSplash();
-    return useAuthStore.persist.onFinishHydration(() => {
+    useAuthStore.persist.onFinishHydration(() => {
       setStoreHydrated(true);
       hideSplash();
     });
   }, []);
 
-  usePushNotifications(isAuthenticated);
+  if (!storeHydrated) {
+    return null;
+  }
 
   return (
     <GestureHandlerRootView className="flex-1 bg-black4">

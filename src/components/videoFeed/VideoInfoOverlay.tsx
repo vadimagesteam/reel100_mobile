@@ -8,6 +8,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRoute } from '../../navigation';
+import { Screens } from '../../navigation/screens';
 import { getFullName } from '../../state/user/utils';
 import { isAndroid } from '../../utils';
 import { Avatar, Backdrop, SvgIcon } from '../ui';
@@ -52,6 +54,7 @@ export const VideoInfoOverlay = ({
   liked,
 }: VideoInfoOverlayProps) => {
   const insets = useSafeAreaInsets();
+  const route = useRoute();
   const { setHeartIconPos } = useVideoFeed((s) => s.actions);
 
   const { user, likesCount, commentsCount } = video;
@@ -179,7 +182,7 @@ export const VideoInfoOverlay = ({
         <VideoDescription
           backdropActive={backdropActive}
           text={video.description}
-          bottomInset={isAndroid ? 18 : 12}
+          bottomInset={route.name === Screens.VideoModal ? insets.bottom : isAndroid ? 18 : 12}
         />
       )}
     </View>

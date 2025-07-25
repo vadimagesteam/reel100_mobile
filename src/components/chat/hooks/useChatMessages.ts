@@ -33,6 +33,7 @@ const qqlQuery = `query(
             id
             likesCount
             commentsCount
+            description
             file
             user { ...ShallowUser }
         }
