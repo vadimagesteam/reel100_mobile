@@ -25,7 +25,8 @@ export const Screens = {
   VideoRecording: 'VideoRecording',
   ChatList: 'ChatList',
   Chat: 'Chat',
-  NotificationSettings: 'NotificationSettings',
+  Settings: 'Settings',
+  DeleteAccount: 'DeleteAccount',
   EditProfile: 'EditProfile',
   UserFollowingSearch: 'UserFollowingSearch',
   UserSearch: 'UserSearch',
@@ -50,7 +51,8 @@ export type AppStackParamList = {
   VideoRecording: undefined;
   ChatList: undefined;
   Chat: { chatId?: string; userId: string };
-  NotificationSettings: undefined;
+  Settings: undefined;
+  DeleteAccount: undefined;
   EditProfile: undefined;
   ProfileStats: {
     userId: string;

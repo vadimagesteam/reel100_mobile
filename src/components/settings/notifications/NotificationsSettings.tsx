@@ -4,7 +4,7 @@ import { NotificationSettings } from '../../../state/user/types';
 import { ToggleRow } from './ToggleRow';
 import { Divider } from './Divider';
 
-export const NotificationsSettingsForm = () => {
+export const NotificationsSettings = () => {
   const [notificationSettings, saveNotificationSettings] = useNotificationSettings();
   const { comments, messages, followers, likes } = notificationSettings;
 
@@ -19,8 +19,8 @@ export const NotificationsSettingsForm = () => {
   };
 
   return (
-    <ScrollView className="flex-1">
-      <Text className="text-primary mb-2 mt-6 px-7 text-base font-semibold">Interactions</Text>
+    <View className="flex-col gap-y-2">
+      <Text className="mt-6 px-7 text-base font-semibold text-primary">Notification Settings</Text>
 
       <View className="mx-4 mb-6 rounded-xl bg-[#1c1c1e]">
         <ToggleRow label="Likes" value={likes} onChange={(val) => updateSetting('likes', val)} />
@@ -43,6 +43,6 @@ export const NotificationsSettingsForm = () => {
           onChange={(val) => updateSetting('messages', val)}
         />
       </View>
-    </ScrollView>
+    </View>
   );
 };

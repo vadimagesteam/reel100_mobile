@@ -60,6 +60,7 @@ type AuthState = {
     saveNotificationSettings: (settings: Partial<NotificationSettings>) => Promise<ActionResult>;
     savePushNotificationsToken: (token: string) => Promise<ActionResult>;
     removePushToken: (remoteTokenId: string) => Promise<ActionResult>;
+    deleteMyAccount: () => Promise<ActionResult>;
   };
 };
 
@@ -383,6 +384,26 @@ export const useAuthStore = createPersistStore<AuthState>(
         console.log('Deleting old push token on the server');
         await api.delete(`api/pushNotificationTokens/${remoteTokenId}`);
         console.log('[OK] Old push token deleted');
+        return { type: 'success' };
+      },
+      deleteMyAccount: async () => {
+        const { user } = get();
+        if (!user) {
+          throw new Error('This action must be called for authenticated user only!');
+        }
+
+        const {
+          pushNotifications,
+          actions: { removePushToken },
+        } = get();
+
+        const { remoteTokenId } = pushNotifications;
+        if (remoteTokenId) {
+          await removePushToken(remoteTokenId);
+        }
+
+        await api.delete(`api/users/${user.id}`);
+        set(initialState);
         return { type: 'success' };
       },
     },

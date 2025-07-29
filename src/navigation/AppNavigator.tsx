@@ -10,13 +10,14 @@ import {
   ChatListScreen,
   EditProfileScreen,
   UserFollowingSearchScreen,
-  NotificationsSettingsScreen,
+  SettingsScreen,
   ProfileScreen,
   ProfileStatsScreen,
   SelectStateScreen,
   UserSearchScreen,
   VideoRecordingScreen,
   VideoModalScreen,
+  DeleteAccountScreen,
 } from '../screens';
 import { BottomTabNavigator } from './TabsNavigator';
 
@@ -51,8 +52,8 @@ export const AppNavigator = () => (
     />
     <Stack.Screen name={Screens.Chat} component={ChatDialogScreen} />
     <Stack.Screen
-      name={Screens.NotificationSettings}
-      component={NotificationsSettingsScreen}
+      name={Screens.Settings}
+      component={SettingsScreen}
       options={{ headerShown: true }}
     />
     <Stack.Screen
@@ -60,6 +61,7 @@ export const AppNavigator = () => (
       component={EditProfileScreen}
       options={{ title: 'Edit Profile', headerShown: true }}
     />
+    <Stack.Screen name={Screens.DeleteAccount} component={DeleteAccountScreen} />
     <Stack.Screen name={Screens.ProfileStats} component={ProfileStatsScreen} />
     <Stack.Screen
       name={Screens.UserSearch}

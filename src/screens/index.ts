@@ -15,9 +15,10 @@ export * from './home/SelectStateScreen';
 // user
 export * from './user/ProfileScreen';
 export * from './user/EditProfileScreen';
-export * from './user/NotificationsSettingsScreen';
+export * from './user/SettingsScreen';
 export * from './user/ProfileStatsScreen';
 export * from './user/UserSearchScreen';
+export * from './user/DeleteAccountScreen';
 
 // videos
 export * from './video/VideoRecordingScreen';

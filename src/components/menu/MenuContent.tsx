@@ -17,8 +17,8 @@ export const MenuContent = () => {
     navigationRef.navigate('Tabs');
   };
 
-  const handleNotificationsScreen = () => {
-    navigationRef.navigate(Screens.NotificationSettings);
+  const handleSettingsScreen = () => {
+    navigationRef.navigate(Screens.Settings);
   };
 
   const handleEditProfile = () => {
@@ -42,11 +42,7 @@ export const MenuContent = () => {
       <ScrollView contentContainerClassName="mt-[30px] flex-col gap-[30px] px-5">
         <MenuListItem label="Home" icon="home" onPress={handleHome} />
         <MenuListItem label="Account" icon="person" onPress={handleEditProfile} />
-        <MenuListItem
-          label="Notifications Settings"
-          icon="notifications"
-          onPress={handleNotificationsScreen}
-        />
+        <MenuListItem label="Settings" icon="settings" onPress={handleSettingsScreen} />
         <MenuListItem label="Logout" icon="log-out" onPress={handleLogout} />
       </ScrollView>
     </View>
