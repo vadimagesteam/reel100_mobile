@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import {
   GiftedChat,
   IMessage as GiftedChatMessageType,
@@ -8,10 +8,12 @@ import {
   Send,
 } from 'react-native-gifted-chat';
 import { BubbleProps } from 'react-native-gifted-chat/src/Bubble';
-import { useRoute } from '../../../navigation';
+import { useNavigation, useRoute } from '../../../navigation';
+import { Screens } from '../../../navigation/screens';
 import { useUser } from '../../../state/user/authStore';
 import { getFullName } from '../../../state/user/utils';
 import { colors } from '../../../theme';
+import { Avatar } from '../../ui';
 import { useUserQuery } from '../../user/hooks';
 import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
 import { useChatMessages, useMarkMessagesAsRead, useSendMessage } from '../hooks';
@@ -26,6 +28,7 @@ type IMessage = GiftedChatMessageType & {
 
 export const ChatDialog = () => {
   const route = useRoute<'Chat'>();
+  const navigation = useNavigation();
   const { chatId: _chatId, userId: toUserId } = route?.params;
   const user = useUser();
 
@@ -139,11 +142,26 @@ export const ChatDialog = () => {
       <DialogHeader
         avatar={interlocutor?.avatar}
         displayName={interlocutor ? getFullName(interlocutor) : '...'}
+        onPress={() => {
+          if (interlocutor) {
+            navigation.navigate(Screens.Profile, { user: interlocutor });
+          }
+        }}
       />
       <GiftedChat
         messages={messages}
         onSend={onSend}
         user={chatUser}
+        renderAvatar={({ currentMessage: { user } }) => (
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => {
+              navigation.navigate(Screens.Profile, { userId: user._id as string });
+            }}
+          >
+            <Avatar name={user.name!} size={34} uri={user.avatar as string} />
+          </TouchableOpacity>
+        )}
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
         renderSend={renderSend}

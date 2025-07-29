@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBackArrowButton } from '../../appHeader';
 import { Avatar } from '../../ui';
@@ -8,9 +8,10 @@ export interface DialogHeaderProps {
   avatar?: string | null;
   displayName: string;
   // lastActive?: string;
+  onPress: () => void;
 }
 
-export const DialogHeader = ({ displayName, avatar }: DialogHeaderProps) => {
+export const DialogHeader = ({ onPress, displayName, avatar }: DialogHeaderProps) => {
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -19,13 +20,13 @@ export const DialogHeader = ({ displayName, avatar }: DialogHeaderProps) => {
     >
       <View className="flex-row items-center gap-4">
         <HeaderBackArrowButton />
-        <View className="flex-row gap-2.5">
+        <TouchableOpacity onPress={onPress} className="flex-row gap-2.5">
           <Avatar uri={avatar} name={displayName} size={40} />
           <View className="flex-col gap-0.5">
             <Text className="text-base font-bold text-primary">{displayName}</Text>
             <Text className="text-sm text-muted">a few seconds ago</Text>
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
       {/*<TouchableOpacity className="rounded-[6px] bg-danger p-1" onPress={() => true}>
         <Text className="text-base font-medium text-primary">Block user</Text>

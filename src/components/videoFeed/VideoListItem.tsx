@@ -113,7 +113,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
         source={{ uri: videoUrl!, shouldCache: true }}
         paused={!active || isPaused || isPaused}
         resizeMode={ResizeMode.COVER}
-        muted={muted || !active}
+        muted={!isFullscreen || muted || !active}
         onLoad={setLoadStarted}
         onProgress={setProgress}
         style={[dimensions]}
@@ -144,8 +144,8 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
           isPaused={isPaused}
           timeLeft={
             loadStarted && progress
-              ? formatSeconds(Math.round(loadStarted?.duration - progress?.currentTime))
-              : '0:00'
+              ? Math.round(loadStarted?.duration - progress?.currentTime)
+              : '0'
           }
           rankNumber={rankNumber}
           showComments

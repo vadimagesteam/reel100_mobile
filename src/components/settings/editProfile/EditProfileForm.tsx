@@ -67,13 +67,15 @@ export const EditProfileForm = () => {
             className="relative flex-col items-center justify-center gap-2 self-center"
           >
             <Avatar uri={avatar} name="" size={100} />
-            <View className="absolute size-[36px] items-center justify-center">
-              {isAvatarUploading ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Ionicons name="camera-outline" color="#fff" size={36} />
-              )}
-            </View>
+            {!avatar && (
+              <View className="absolute size-[36px] items-center justify-center">
+                {isAvatarUploading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Ionicons name="camera-outline" color="#fff" size={36} />
+                )}
+              </View>
+            )}
           </TouchableOpacity>
           <Text className="text-silver3">Change Avatar</Text>
         </View>

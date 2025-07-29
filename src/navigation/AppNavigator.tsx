@@ -58,7 +58,7 @@ export const AppNavigator = () => (
     <Stack.Screen
       name={Screens.EditProfile}
       component={EditProfileScreen}
-      options={{ headerShown: true }}
+      options={{ title: 'Edit Profile', headerShown: true }}
     />
     <Stack.Screen name={Screens.ProfileStats} component={ProfileStatsScreen} />
     <Stack.Screen

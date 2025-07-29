@@ -22,7 +22,7 @@ import { VideoDescription } from './VideoDescription';
 
 export interface VideoInfoOverlayProps {
   isPlayerFullScreen: boolean;
-  timeLeft?: string;
+  timeLeft?: string | number;
   rankNumber?: number;
   video: VideoPost;
   showComments?: boolean;
@@ -131,9 +131,9 @@ export const VideoInfoOverlay = ({
           <View className="ml-1 rounded bg-orange p-1 opacity-80">
             <Text className="color-white">#{rankNumber}</Text>
           </View>
-          {timeLeft && (
-            <View className="ml-1 rounded bg-black5 p-1 opacity-80">
-              <Text className="color-white">{timeLeft}</Text>
+          {timeLeft !== undefined && (
+            <View className="ml-1 w-[35px] p-1">
+              <Text className="text-right text-[15px] font-bold color-white">{timeLeft}s</Text>
             </View>
           )}
         </View>

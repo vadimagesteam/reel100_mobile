@@ -42,16 +42,7 @@ export const Timer = ({ active, onTimeOut, maxDurationSeconds }: TimerProps) => 
   }));
 
   // No need to memoize, it updates on every render
-  const digits = [
-    Math.floor(secondsLeft / 60)
-      .toString()
-      .padStart(2, '0'),
-    Math.floor(secondsLeft % 60)
-      .toString()
-      .padStart(2, '0'),
-  ]
-    .join(':')
-    .split('');
+  const digits = `${secondsLeft.toString()}s`.split('');
 
   return (
     <Animated.View
