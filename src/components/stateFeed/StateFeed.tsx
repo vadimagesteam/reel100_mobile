@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
 import { VideoTiles } from '../videoTiles/VideoTiles';
-import { TileListBlock } from './TileListBlock';
 import { generateBlocks } from './helpers/generateBlocks';
 import { useStateSelector } from '../../state/app/uiStore';
 
@@ -26,11 +25,5 @@ export const StateFeed = () => {
     orderBy: { createdAt: 'desc' },
   });
 
-  return (
-    <VideoTiles
-      queryControl={controllers}
-      ItemComponent={TileListBlock}
-      prepareData={generateBlocks}
-    />
-  );
+  return <VideoTiles queryControl={controllers} />;
 };

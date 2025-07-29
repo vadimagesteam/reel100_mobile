@@ -18,6 +18,7 @@ export type RegisterDataType = {
   confirmPassword: string;
   firstName: string;
   lastName: string;
+  nickname: string;
 };
 
 export type VerifyUserType = {

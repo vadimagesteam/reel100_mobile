@@ -1,12 +1,19 @@
 import { ComponentType, useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, FlatListProps, type ListRenderItemInfo } from 'react-native';
+import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  FlatListProps,
+  type ListRenderItemInfo,
+  StyleSheet,
+} from 'react-native';
 import clsx from 'clsx';
 import { isAndroid } from '../../utils';
 import { ListEmptyBlock, FlexLoading, RefreshControl } from '../ui';
 import { type VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoList } from '../videoFeed';
 import { useVideoFullscreen, type VideoPostQueryResult } from '../videoFeed/hooks';
-import { VideoTileProps } from './VideoTile';
+import { VideoTile, VideoTileProps } from './VideoTile';
 
 export interface TilesListProps<ItemType>
   extends Omit<FlatListProps<ItemType>, 'data' | 'renderItem'> {
@@ -21,7 +28,7 @@ export interface TilesListProps<ItemType>
 /**
  * Generic FlatList-based grid of tiles that can expand to fullscreen.
  */
-export const VideoTiles = <ItemType,>({
+export const VideoTiles = <ItemType extends VideoPost>({
   queryControl,
   prepareData,
   ItemComponent,
@@ -84,7 +91,15 @@ export const VideoTiles = <ItemType,>({
     ({ item, index }: ListRenderItemInfo<ItemType>) =>
       ItemComponent ? (
         <ItemComponent item={item} rowSize={3} index={index} onVideoPress={handleVideoOpen} />
-      ) : null,
+      ) : (
+        <VideoTile
+          index={index}
+          className="rounded-none"
+          style={styles.tile}
+          item={item}
+          onVideoPress={handleVideoOpen}
+        />
+      ),
     [handleVideoOpen, ItemComponent],
   );
 
@@ -108,6 +123,7 @@ export const VideoTiles = <ItemType,>({
         renderItem={propRenderItem ?? renderItem}
         keyExtractor={(item, i) => i.toString()}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+        numColumns={3}
         initialNumToRender={6}
         windowSize={6}
         maxToRenderPerBatch={6}
@@ -137,3 +153,21 @@ export const VideoTiles = <ItemType,>({
     </>
   );
 };
+
+const videoWidth = Dimensions.get('window').width / 3 - 2; // 3 videos - two right borderlines
+
+const styles = StyleSheet.create({
+  tile: {
+    width: videoWidth,
+    height: (videoWidth / 9) * 16,
+    marginTop: 0,
+    marginRight: 1,
+    marginLeft: 0,
+    marginBottom: 1,
+
+    paddingTop: 0,
+    paddingRight: 0,
+    paddingBottom: 0,
+    paddingLeft: 0,
+  },
+});

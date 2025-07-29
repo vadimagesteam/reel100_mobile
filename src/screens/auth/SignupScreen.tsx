@@ -1,20 +1,21 @@
+import omit from 'lodash.omit';
 import { Alert, Text } from 'react-native';
-import { Button } from '../../components/ui/Button';
+import { Button, Checkbox, Input } from '../../components/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { GuestContainer } from '../../components/layout/guest/GuestContainer';
-import { Input } from '../../components/ui/Input';
-import React from 'react';
 import { useAuthStore } from '../../state/user/authStore';
 import { useNavigation } from '@react-navigation/native';
 import { Screens } from '../../navigation/screens';
 import { ScreenTitle } from '../../components/layout/guest/ScreenTitle';
 
 interface FormData {
-  username: '';
-  password: '';
-  confirmPassword: '';
-  firstName: '';
-  lastName: '';
+  username: string;
+  password: string;
+  confirmPassword: string;
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  ageOver13: boolean;
 }
 
 export function SignupScreen() {
@@ -27,6 +28,7 @@ export function SignupScreen() {
     formState: { isSubmitting, errors },
   } = useForm<FormData>({
     defaultValues: {
+      nickname: '',
       username: '',
       password: '',
       confirmPassword: '',
@@ -36,7 +38,7 @@ export function SignupScreen() {
   });
 
   const onSubmit = async (data: FormData) => {
-    const result = await signupAction(data);
+    const result = await signupAction(omit(data, ['ageOver13']));
     if (result.type === 'success') {
       navigation.navigate(Screens.VerifyEmail);
       return;
@@ -83,6 +85,33 @@ export function SignupScreen() {
 
       {errors?.username?.message && (
         <Text className="pl-2 text-red1">{errors?.username?.message}</Text>
+      )}
+
+      <Controller
+        name="nickname"
+        rules={{
+          required: 'Nickname is required',
+          maxLength: {
+            value: 22,
+            message: 'Nickname must be less or equal 22 characters',
+          },
+        }}
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input
+            maxLength={22}
+            placeholder="Nickname"
+            value={value}
+            onChangeText={(v) => {
+              onChange(v.replace(/\s|[^\p{Emoji}\p{L}\p{N}_]/gu, ''));
+            }}
+            onBlur={onBlur}
+          />
+        )}
+      />
+
+      {errors?.nickname?.message && (
+        <Text className="pl-2 text-red1">{errors?.nickname?.message}</Text>
       )}
 
       <Controller
@@ -161,8 +190,26 @@ export function SignupScreen() {
         )}
       />
 
-      {errors?.confirmPassword?.message && (
-        <Text className="pl-2 text-red1">{errors?.confirmPassword?.message}</Text>
+      <Controller
+        rules={{ required: 'You have to confirm your age' }}
+        name="ageOver13"
+        control={control}
+        render={({ field: { value, onChange } }) => (
+          <Checkbox
+            value={value}
+            onChange={onChange}
+            label={
+              <Text className="text-base text-primary">
+                {' '}
+                I confirm that I am at least 13 years old
+              </Text>
+            }
+          />
+        )}
+      />
+
+      {errors?.ageOver13?.message && (
+        <Text className="pl-2 text-red1">{errors?.ageOver13?.message}</Text>
       )}
 
       <Button loading={isSubmitting} onPress={handleSubmit(onSubmit)}>

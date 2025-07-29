@@ -55,8 +55,6 @@ export const TabForYouScreen = () => {
       <VideoFeedProvider initialState={{ cacheKey: cacheKey }}>
         <VideoTiles
           queryControl={controllers}
-          ItemComponent={TileListBlock}
-          prepareData={generateBlocks}
           emptyMessage={
             searchByFullName ? `${searchByFullName} is not uploaded any videos` : undefined
           }

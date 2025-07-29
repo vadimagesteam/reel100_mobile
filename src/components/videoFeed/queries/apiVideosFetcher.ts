@@ -49,6 +49,8 @@ export type VideoPost = {
   viewsCount: number;
   description: string;
   user: VideoUser;
+  top_100Position: number | null;
+  top_100Date: string | null;
 };
 
 export type ApiVideosFetcherParams = {

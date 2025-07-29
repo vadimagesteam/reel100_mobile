@@ -30,7 +30,6 @@ export interface VideoItemProps extends Pick<ReactVideoProps, 'muted' | 'repeat'
   video: VideoPost;
   active: boolean;
   dimensions: { width: number; height: number };
-  rankNumber?: number;
 }
 
 export const VideoListItemRaw: FC<VideoItemProps> = ({
@@ -38,7 +37,6 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
   muted,
   active,
   dimensions,
-  rankNumber,
   ...videoProps
 }) => {
   const { id: videoId, file, user: author } = video;
@@ -147,7 +145,6 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
               ? Math.round(loadStarted?.duration - progress?.currentTime)
               : '0'
           }
-          rankNumber={rankNumber}
           showComments
           showShare
           showLikes
@@ -167,8 +164,5 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
 export const VideoListItem = memo(
   VideoListItemRaw,
   (prev, next) =>
-    prev.video === next.video &&
-    prev.active === next.active &&
-    prev.dimensions === next.dimensions &&
-    prev.rankNumber === next.rankNumber,
+    prev.video === next.video && prev.active === next.active && prev.dimensions === next.dimensions,
 );
