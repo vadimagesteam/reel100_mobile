@@ -4,6 +4,7 @@ import { Camera, CameraProps, useCameraDevice } from 'react-native-vision-camera
 import Reanimated, {
   Extrapolation,
   interpolate,
+  runOnJS,
   useAnimatedProps,
   useSharedValue,
 } from 'react-native-reanimated';
@@ -126,6 +127,18 @@ export const VideoRecording = () => {
       );
     });
 
+  const toggleCameraPosition = () => {
+    cameraFeatures.setCameraPosition((prev) => (prev === 'back' ? 'front' : 'back'));
+  };
+
+  const doubleTapGesture = Gesture.Tap()
+    .numberOfTaps(2)
+    .onEnd(() => {
+      runOnJS(toggleCameraPosition)();
+    });
+
+  const cameraGesture = Gesture.Exclusive(pinchGesture, doubleTapGesture);
+
   const animatedProps = useAnimatedProps<CameraProps>(() => ({ zoom: zoom.value }), [zoom]);
 
   return (
@@ -134,7 +147,7 @@ export const VideoRecording = () => {
       {!isPreviewReady && (
         <>
           {activeDevice && (
-            <GestureDetector gesture={pinchGesture}>
+            <GestureDetector gesture={cameraGesture}>
               <ReanimatedCamera
                 ref={cameraRef}
                 style={StyleSheet.absoluteFill}
