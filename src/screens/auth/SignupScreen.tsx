@@ -25,6 +25,7 @@ export function SignupScreen() {
   const {
     control,
     handleSubmit,
+    setError,
     formState: { isSubmitting, errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -54,7 +55,15 @@ export function SignupScreen() {
       return;
     }
 
-    Alert.alert('Error', 'Unknown error occurred.');
+    if (result.type === 'error' && result.message?.includes('(nickname) already exists')) {
+      setError('nickname', {
+        type: 'error',
+        message: 'This username is already taken by someone else',
+      });
+      return;
+    }
+
+    Alert.alert('Error', result.message);
   };
 
   return (
@@ -90,17 +99,17 @@ export function SignupScreen() {
       <Controller
         name="nickname"
         rules={{
-          required: 'Nickname is required',
+          required: 'Username is required',
           maxLength: {
             value: 22,
-            message: 'Nickname must be less or equal 22 characters',
+            message: 'Username must be less or equal 22 characters',
           },
         }}
         control={control}
         render={({ field: { onChange, onBlur, value } }) => (
           <Input
             maxLength={22}
-            placeholder="Nickname"
+            placeholder="Username"
             value={value}
             onChangeText={(v) => {
               onChange(v.replace(/\s|[^\p{Emoji}\p{L}\p{N}_]/gu, ''));

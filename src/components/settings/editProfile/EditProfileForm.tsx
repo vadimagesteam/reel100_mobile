@@ -1,13 +1,17 @@
+import { isAxiosError } from 'axios';
 import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { Controller, useForm } from 'react-hook-form';
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { UserBase } from '../../../state/user/types';
 import { useLoadingCallback } from '../../../utils';
 import { Avatar, Button, Input } from '../../ui';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useAuthActions, useUser } from '../../../state/user/authStore';
 
-type FormData = Pick<UserBase, 'avatar' | 'firstName' | 'lastName'>;
+type FormData = Pick<UserBase, 'avatar' | 'firstName' | 'lastName'> & {
+  nickname: string;
+};
 
 export const EditProfileForm = () => {
   const profile = useUser();
@@ -17,10 +21,12 @@ export const EditProfileForm = () => {
     control,
     setValue,
     handleSubmit,
+    setError,
     watch,
     formState: { isSubmitting, errors, isDirty },
   } = useForm<FormData>({
     defaultValues: {
+      nickname: profile.nickname ?? '',
       avatar: profile.avatar,
       firstName: profile.firstName,
       lastName: profile.lastName,
@@ -49,6 +55,27 @@ export const EditProfileForm = () => {
       const imageUri = assets[0].uri!;
       setValue('avatar', imageUri);
       await startAvatarUpload(imageUri);
+    }
+  };
+
+  const handleSave = async (data: FormData) => {
+    const { type, message } = await updateProfile(data);
+
+    if (type === 'success') {
+      Alert.alert('Success', 'Changes has been saved!');
+      return;
+    }
+
+    if (type === 'error' && message?.includes('(nickname) already exists')) {
+      setError('nickname', {
+        type: 'error',
+        message: 'This username is already taken by someone else',
+      });
+      return;
+    }
+
+    if (type === 'error') {
+      Alert.alert('Error', message);
     }
   };
 
@@ -105,10 +132,40 @@ export const EditProfileForm = () => {
         {errors?.lastName?.message && (
           <Text className="pl-2 text-red1">{errors?.lastName?.message}</Text>
         )}
+
+        <Controller
+          name="nickname"
+          rules={{
+            required: 'Username is required',
+            maxLength: {
+              value: 22,
+              message: 'Username must be less or equal 22 characters',
+            },
+          }}
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              maxLength={22}
+              placeholder="Username"
+              value={value}
+              onChangeText={(v) => {
+                onChange(v.replace(/\s|[^\p{Emoji}\p{L}\p{N}_]/gu, ''));
+              }}
+              onBlur={onBlur}
+            />
+          )}
+        />
+
+        {errors?.nickname?.message && (
+          <Text className="pl-2 text-red1">{errors?.nickname?.message}</Text>
+        )}
+
         {isDirty && (
-          <Button loading={isSubmitting} onPress={handleSubmit(updateProfile)}>
-            Save Changes
-          </Button>
+          <Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+            <Button loading={isSubmitting} onPress={handleSubmit(handleSave)}>
+              Save Changes
+            </Button>
+          </Animated.View>
         )}
       </ScrollView>
     </View>

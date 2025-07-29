@@ -63,6 +63,7 @@ export type UserBase = {
   createdAt: string;
   updatedAt: string;
   avatar: string | null;
+  nickname: string | null;
 };
 
 export type NotificationSettings = {

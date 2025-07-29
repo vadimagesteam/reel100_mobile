@@ -12,7 +12,7 @@ import {
   NotificationSettings,
 } from './types';
 import { api } from '../../lib/api';
-import { AxiosError } from 'axios';
+import { AxiosError, isAxiosError } from 'axios';
 import { createPersistStore } from '../../lib/createPersistStore';
 
 type AuthActionResult =
@@ -26,6 +26,7 @@ type AuthActionResult =
         | 'verification_required'
         | 'invalid_credentials'
         | 'email_exists'
+        | 'nickname_exists'
         | 'verification_code_invalid';
       message: string;
     };
@@ -202,7 +203,7 @@ export const useAuthStore = createPersistStore<AuthState>(
           return { type: 'success' };
         } catch (error) {
           console.log('[register]', error);
-          if (error instanceof AxiosError && error.status === 401) {
+          if (isAxiosError(error) && error.status === 401) {
             set({
               pendingVerification: { username: payload.username },
             });
@@ -211,6 +212,13 @@ export const useAuthStore = createPersistStore<AuthState>(
               errorType: 'email_exists',
               message:
                 'This account is already registered. Please check your email and enter the verification code to confirm your email address.',
+            };
+          }
+          if (isAxiosError(error) && error.status && error.status < 500) {
+            return {
+              type: 'error',
+              errorType: 'nickname_exists',
+              message: error.response?.data.message,
             };
           }
           return { type: 'error', errorType: 'unknown', message: 'Unknown error occurred.' };
@@ -277,6 +285,9 @@ export const useAuthStore = createPersistStore<AuthState>(
           }));
           return { type: 'success' };
         } catch (error) {
+          if (isAxiosError(error) && error.status && error.status < 500) {
+            return { type: 'error', message: error.response?.data.message };
+          }
           return { type: 'error', message: (error as Error).message };
         }
       },
