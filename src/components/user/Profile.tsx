@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useNavigation } from '../../navigation';
 import { AppStackParamList, Screens } from '../../navigation/screens';
 import { useAuthActions, useUser } from '../../state/user/authStore';
-import { getFullName } from '../../state/user/utils';
+import { getDisplayName } from '../../state/user/utils';
 import { Button } from '../ui';
 import { MyProfileInfo } from './myProfileInfo/MyProfileInfo';
 
@@ -49,7 +49,7 @@ export const Profile = () => {
         likeCount={likeCount}
         followerCount={followerCount}
         followCount={followCount}
-        fullName={getFullName(user)}
+        fullName={getDisplayName(user)}
         onChatPress={handleChat}
         onFollowersPress={() => handleStatsScreen('followers')}
         onFollowingPress={() => handleStatsScreen('following')}

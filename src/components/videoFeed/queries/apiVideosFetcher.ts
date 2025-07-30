@@ -1,4 +1,6 @@
 import { api } from '../../../lib/api';
+import { RelationId, UserBase } from '../../../state/user/types';
+import { ChatMessageType } from '../../chat/hooks';
 
 export type VideoFileQuality = {
   fps: number;
@@ -34,6 +36,11 @@ export type VideoUser = {
   firstName: string;
   lastName: string;
   avatar: string | null;
+  nickname: string | null;
+  whoms: {
+    id: RelationId;
+    who: { id: RelationId };
+  }[];
 };
 
 export type VideoPost = {
@@ -53,30 +60,105 @@ export type VideoPost = {
   top_100Date: string | null;
 };
 
+// quick types here, generate them or move somewhere else to be able to import them as generics
+type StringFilter = Partial<{
+  equals: string;
+  contains: string;
+  startsWith: string;
+  endsWith: string;
+  gt: string;
+  gte: string;
+  lte: string;
+  lt: string;
+  not: string;
+  notIn: string;
+}>;
+
+type RelationFilter<Keys extends object> = Partial<{
+  every: { [K in keyof Keys]?: StringFilter };
+  none: { [K in keyof Keys]?: StringFilter };
+  some: { [K in keyof Keys]?: StringFilter };
+}>;
+
+type WhereUniqueInput = { id: string };
+
 export type ApiVideosFetcherParams = {
   take: number;
   skip: number;
-  where?: Record<string, string | number>;
-  orderBy?: Record<string, string>;
+  where?: Partial<
+    Record<keyof Omit<VideoPost, 'status'>, StringFilter> & {
+      // enums
+      user: WhereUniqueInput;
+      status: VideoPost['status'];
+      states: RelationFilter<{ id: string }>;
+    }
+  >;
+  orderBy?: Array<Partial<Record<keyof VideoPost, 'Asc' | 'Desc'>>>;
 };
+
+const qqlQuery = `query(
+  $orderBy: [VideoOrderByInput!]
+  $skip: Float
+  $take: Float
+  $where: VideoWhereInput
+) {
+    videos(
+        where: $where
+        skip: $skip
+        orderBy: $orderBy
+        take: $take
+    ) {
+        id
+        label
+        slug
+        createdAt
+        updatedAt
+        file
+        status
+        likesCount
+        commentsCount
+        viewsCount
+        description
+        user {
+          ...ShallowUser
+          # We need this to understand if authenticated user is following the author
+          whoms {
+            id
+            who {
+                id
+            }
+          }
+        }
+        top_100Position
+        top_100Date
+    }
+}
+fragment ShallowUser on User { id firstName lastName avatar nickname }
+`;
 
 export const apiVideosFetcher = async ({
   take,
   skip,
-  orderBy = {},
+  orderBy = [],
   where = {},
 }: ApiVideosFetcherParams): Promise<VideoPost[]> => {
-  // console.log('🔥 [apiVideosFetcher]', { where, skip, take, orderBy });
-  const response = await api.get<VideoPost[]>('api/videos', {
-    params: {
-      ...where,
-      skip,
+  console.log('🔥 [apiVideosFetcher]', { where, skip, take, orderBy });
+
+  const { status, data } = await api.post<{
+    data: {
+      videos: VideoPost[];
+    };
+  }>('/graphql', {
+    query: qqlQuery,
+    variables: {
       take,
-      ...Object.fromEntries(
-        Object.entries(orderBy).map(([key, value]) => [`orderBy[${key}]`, value]),
-      ),
+      skip,
+      orderBy,
+      where,
     },
   });
 
-  return response.data;
+  console.log('resp', { status }, data);
+
+  return data.data.videos;
 };

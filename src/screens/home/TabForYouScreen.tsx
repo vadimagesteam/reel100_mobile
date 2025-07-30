@@ -1,11 +1,10 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useMemo, useState } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useMemo, useState } from 'react';
 import { AppHeader, AppHeaderHeight } from '../../components/appHeader';
 import { HideableView, HidebleContainer } from '../../components/hidebleContainer';
 import { SearchInput } from '../../components/ui';
 import { VideoFeedProvider } from '../../components/videoFeed';
 import { useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
-import { TileListBlock, generateBlocks } from '../../components/stateFeed';
 import { VideoTiles } from '../../components/videoTiles';
 import { Screens } from '../../navigation/screens';
 import { UserType } from '../../state/user/types';
@@ -21,16 +20,24 @@ export const TabForYouScreen = () => {
 
   const controllers = useVideosInfiniteQuery({
     cacheKey,
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ createdAt: 'Desc' }],
     where: {
-      'where[status]': 'Finished',
+      status: 'Finished',
       ...(selectedUser
         ? {
-            'where[user][id]': selectedUser.id,
+            user: { id: selectedUser.id },
           }
         : {}),
     },
   });
+
+  const { refetch } = controllers;
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   const searchByFullName = selectedUser
     ? `${selectedUser?.firstName} ${selectedUser?.lastName}`

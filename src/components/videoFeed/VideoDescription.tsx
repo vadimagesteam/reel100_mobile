@@ -14,13 +14,6 @@ export const VideoDescription = memo(
     const dimensions = useWindowDimensions();
     const [hasMore, setHasMore] = useState(false);
 
-    const animationStyle = useAnimatedStyle(() => {
-      return {
-        bottom: bottomInset,
-        zIndex: 11,
-      };
-    });
-
     const shortTextStyle = useAnimatedStyle(() => {
       return {
         display: active.value ? 'none' : 'flex',
@@ -35,13 +28,20 @@ export const VideoDescription = memo(
       };
     });
 
+    const test = useAnimatedStyle(() => {
+      return {
+        position: active.value ? 'absolute' : 'relative',
+        left: withTiming(active.value ? 10 : 0),
+      };
+    });
+
     const textToMeasure = 'Hello World Example Text';
 
     return (
       <GestureTouchableOpacity
         hitSlop={{ top: 10 }}
-        className="absolute left-[10px] z-30 w-[80%] flex-col items-start justify-end"
-        style={animationStyle}
+        className="z-30 w-[80%] flex-col items-start justify-center"
+        style={[{ bottom: bottomInset }, test]}
         onPress={() => {
           if (hasMore) {
             active.value = !active.value;
@@ -51,7 +51,7 @@ export const VideoDescription = memo(
       >
         {/* Measure text size */}
         <Text
-          className="text-[14px] font-medium text-primary opacity-0"
+          className="text-[12px] font-bold text-primary opacity-0"
           onLayout={(e) => {
             const approxOneChar = e.nativeEvent.layout.width / textToMeasure.length;
             // Max size of the text container is 80%
@@ -67,12 +67,12 @@ export const VideoDescription = memo(
 
         <Animated.Text
           style={shortTextStyle}
-          className="text-[14px] font-medium text-primary"
+          className="text-[12px] font-bold text-primary"
           numberOfLines={1}
         >
           {text}
         </Animated.Text>
-        <Animated.Text style={longTextStyle} className="text-[14px] font-medium text-primary">
+        <Animated.Text style={longTextStyle} className="text-[12px] font-medium text-primary">
           {text}
         </Animated.Text>
       </GestureTouchableOpacity>

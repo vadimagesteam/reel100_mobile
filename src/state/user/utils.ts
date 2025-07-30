@@ -1,9 +1,12 @@
 import pick from 'lodash.pick';
 import { UserBase, UserProfile, UserType } from './types';
 
-export const getFullName = <T extends Pick<UserBase, 'firstName' | 'lastName'>>(
+export const getDisplayName = <T extends Pick<UserBase, 'firstName' | 'lastName' | 'nickname'>>(
   user: T,
 ): string => {
+  if (user.nickname) {
+    return user.nickname;
+  }
   return `${user.firstName} ${user.lastName}`;
 };
 

@@ -1,3 +1,5 @@
+import { usePostsInfiniteQueryParams } from '../components/videoFeed/hooks';
+import { VideoFeedStore } from '../components/videoFeed/provider/videoFeedStore';
 import { VideoPost } from '../components/videoFeed/queries/apiVideosFetcher';
 import { StateItem } from '../state/app/uiStore';
 import { UserBase } from '../state/user/types';
@@ -32,6 +34,7 @@ export const Screens = {
   UserSearch: 'UserSearch',
   SelectState: 'SelectState',
   VideoModal: 'VideoModal',
+  VideoFeedModal: 'VideoFeedModal',
 } as const;
 
 export type AuthStackParamList = {
@@ -45,7 +48,7 @@ export type AuthStackParamList = {
 export type AppStackParamList = {
   Tabs: undefined;
   Profile:
-    | { fromTabs?: boolean; user: Pick<UserBase, 'id' | 'firstName' | 'lastName'> }
+    | { fromTabs?: boolean; user: Pick<UserBase, 'id' | 'firstName' | 'lastName' | 'nickname'> }
     | { fromTabs?: boolean; userId: string }
     | undefined;
   VideoRecording: undefined;
@@ -71,6 +74,11 @@ export type AppStackParamList = {
         video: VideoPost;
       }
     | { videoId: string; commentId?: string };
+  VideoFeedModal: {
+    queryParams: usePostsInfiniteQueryParams;
+    feedState: Partial<Omit<VideoFeedStore, 'actions'>>;
+    videoIndex?: number;
+  };
 };
 
 export type BottomTabParamList = {

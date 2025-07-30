@@ -115,6 +115,9 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
             id: videoId,
           });
           setFullscreen(false);
+          if (backPressHandler) {
+            backPressHandler();
+          }
         },
       },
     ]);

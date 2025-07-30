@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { endOfDay } from 'date-fns';
 import { CalendarModal } from '../calendar';
 import { ListEmptyBlock } from '../ui';
+import { ApiVideosFetcherParams } from '../videoFeed/queries/apiVideosFetcher';
 import { useCalendarModal } from './useCalendarModal';
 import HeaderCalendar from './CalendarSelectedDate';
 import { VideoList } from '../videoFeed';
@@ -27,12 +28,19 @@ export const Top100VideosByDate = () => {
   useSetVideoFeedCacheKey(cacheKey);
 
   const filters = useMemo(
-    () => ({
-      'where[status]': 'Finished',
-      'where[top_100Date][gte]': new Date(selectedDate).toISOString(),
-      'where[top_100Date][lte]': endOfDay(new Date(selectedDate)).toISOString(),
-      'where[states][some][id]': selectedState?.id!,
-    }),
+    () =>
+      ({
+        status: 'Finished',
+        top_100Date: {
+          gte: new Date(selectedDate).toISOString(),
+          lte: endOfDay(new Date(selectedDate)).toISOString(),
+        },
+        states: {
+          some: {
+            id: { equals: selectedState?.id! },
+          },
+        },
+      }) as ApiVideosFetcherParams['where'],
     [selectedDate, selectedState],
   );
 
@@ -47,9 +55,11 @@ export const Top100VideosByDate = () => {
   } = useVideosInfiniteQuery({
     cacheKey,
     where: filters,
-    orderBy: {
-      top_100Position: 'desc',
-    },
+    orderBy: [
+      {
+        top_100Position: 'Desc',
+      },
+    ],
   });
 
   const onEndReached = useCallback(() => {

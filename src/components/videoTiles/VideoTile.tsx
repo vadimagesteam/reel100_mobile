@@ -8,7 +8,7 @@ import { VideoInfoOverlay } from './VideoInfoOverlay';
 export interface VideoTileProps<ItemType = VideoPost>
   extends Omit<TouchableOpacityProps, 'onPress'> {
   item: ItemType;
-  onVideoPress: (video: VideoPost) => void;
+  onVideoPress: (video: VideoPost, index: number) => void;
   rowSize?: number;
   index: number;
   className?: string;
@@ -36,7 +36,7 @@ export const VideoTile = ({
         className,
       )}
       style={[{ width }, style]}
-      onPress={() => onVideoPress(item)}
+      onPress={() => onVideoPress(item, index)}
     >
       {screenshot ? (
         <>

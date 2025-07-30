@@ -15,7 +15,7 @@ const AnimatedPath = Animated.createAnimatedComponent(Path);
 export const IconHeart: FC<IconHeartProps> = ({
   variant,
   color = colors.white,
-  fill = colors.red,
+  fill = colors.red3,
   width,
   height,
   animatedProps,

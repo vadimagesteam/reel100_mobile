@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { getFullName } from '../../state/user/utils';
+import { getDisplayName } from '../../state/user/utils';
 import { Avatar, SvgIcon } from '../ui';
 import { VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 
@@ -17,7 +17,7 @@ export const VideoInfoOverlay = ({
   showDuration = true,
   video,
 }: VideoInfoOverlayProps) => {
-  const userDisplayName = getFullName(video.user);
+  const userDisplayName = getDisplayName(video.user);
   return (
     <View className="absolute bottom-0 left-0 top-0 size-full">
       <View className="w-full flex-row items-center justify-between">

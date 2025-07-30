@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
-import { VideoTiles } from '../videoTiles/VideoTiles';
-import { generateBlocks } from './helpers/generateBlocks';
+import { VideoTiles } from '../videoTiles';
 import { useStateSelector } from '../../state/app/uiStore';
 
-export const StateFeed = () => {
+export const StateFeed = ({ isActiveTab }: { isActiveTab: boolean }) => {
   const [selectedState] = useStateSelector();
 
   const cacheKey = useMemo(
@@ -17,13 +17,31 @@ export const StateFeed = () => {
     cacheKey,
     where: useMemo(
       () => ({
-        'where[status]': 'Finished',
-        'where[states][some][id]': selectedState?.id!,
+        status: 'Finished',
+        states: {
+          some: {
+            id: { equals: selectedState?.id! },
+          },
+        },
       }),
       [selectedState?.id],
     ),
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ createdAt: 'Desc' }],
   });
+
+  const { refetch } = controllers;
+
+  useEffect(() => {
+    if (isActiveTab) {
+      refetch();
+    }
+  }, [isActiveTab, refetch]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   return <VideoTiles queryControl={controllers} />;
 };

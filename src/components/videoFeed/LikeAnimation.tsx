@@ -86,7 +86,7 @@ export const LikeAnimation = forwardRef<LikeAnimationRef>((_, ref) => {
 
   const animatedProps = useAnimatedProps(() => {
     return {
-      fill: interpolateColor(progress.value, [0, 1], [colors.pink600, colors.red]),
+      fill: interpolateColor(progress.value, [0, 1], [colors.pink600, colors.red3]),
     };
   }, [progress]);
 

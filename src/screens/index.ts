@@ -23,6 +23,7 @@ export * from './user/DeleteAccountScreen';
 // videos
 export * from './video/VideoRecordingScreen';
 export * from './video/VideoModalScreen';
+export * from './video/VideoFeedModalScreen';
 
 // chat
 export * from './chat/ChatListScreen';

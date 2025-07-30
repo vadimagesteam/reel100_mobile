@@ -37,6 +37,7 @@ const baseColors = {
 
   red: '#E95050',
   red1: '#f76f6f',
+  red3: '#F51212',
   redLight: '#FFCCCB',
   yellow: '#FFFF00',
 

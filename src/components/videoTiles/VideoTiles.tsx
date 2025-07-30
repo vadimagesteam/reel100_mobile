@@ -7,12 +7,11 @@ import {
   type ListRenderItemInfo,
   StyleSheet,
 } from 'react-native';
-import clsx from 'clsx';
-import { isAndroid } from '../../utils';
+import { useNavigation } from '../../navigation';
+import { Screens } from '../../navigation/screens';
 import { ListEmptyBlock, FlexLoading, RefreshControl } from '../ui';
 import { type VideoPost } from '../videoFeed/queries/apiVideosFetcher';
-import { VideoList } from '../videoFeed';
-import { useVideoFullscreen, type VideoPostQueryResult } from '../videoFeed/hooks';
+import { useVideoFeed, useVideoFeedCacheKey, type VideoPostQueryResult } from '../videoFeed/hooks';
 import { VideoTile, VideoTileProps } from './VideoTile';
 
 export interface TilesListProps<ItemType>
@@ -26,7 +25,7 @@ export interface TilesListProps<ItemType>
 }
 
 /**
- * Generic FlatList-based grid of tiles that can expand to fullscreen.
+ * Generic FlatList-based grid of tiles that opens video feed
  */
 export const VideoTiles = <ItemType extends VideoPost>({
   queryControl,
@@ -46,14 +45,15 @@ export const VideoTiles = <ItemType extends VideoPost>({
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
+    queryParams,
   } = queryControl;
 
   if (propRenderItem && ItemComponent) {
     throw new Error('Both props are not supported: renderItem & ItemComponent');
   }
 
-  const { isFullscreen, setFullscreen } = useVideoFullscreen();
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const navigation = useNavigation();
+  const allowDelete = useVideoFeed((s) => s.allowDelete);
 
   const data = useMemo(
     () => (prepareData ? prepareData(flatPages) : flatPages),
@@ -66,25 +66,19 @@ export const VideoTiles = <ItemType extends VideoPost>({
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  useEffect(() => {
-    if (!isFullscreen && expandedIndex !== null) {
-      setExpandedIndex(null);
-    }
-  }, [expandedIndex, isFullscreen]);
-
-  const fullScreenVideos = useMemo(
-    () => (expandedIndex !== null ? flatPages.slice(expandedIndex) : flatPages),
-    [expandedIndex, flatPages],
-  );
-
   const handleVideoOpen = useCallback(
-    (video: VideoPost) => {
+    (video: VideoPost, index: number) => {
       if (video) {
-        setExpandedIndex(flatPages.findIndex((v) => v.id === video.id));
-        setFullscreen(true);
+        navigation.push(Screens.VideoFeedModal, {
+          queryParams,
+          videoIndex: index,
+          feedState: {
+            allowDelete,
+          },
+        });
       }
     },
-    [flatPages, setFullscreen],
+    [allowDelete, navigation, queryParams],
   );
 
   const renderItem = useCallback(
@@ -110,15 +104,7 @@ export const VideoTiles = <ItemType extends VideoPost>({
   return (
     <>
       <FlatList
-        className={clsx(expandedIndex !== null ? 'hidden' : undefined, className)}
-        style={
-          isAndroid && expandedIndex !== null
-            ? {
-                position: 'absolute',
-                top: -500,
-              }
-            : undefined
-        }
+        className={className}
         data={data}
         renderItem={propRenderItem ?? renderItem}
         keyExtractor={(item, i) => i.toString()}
@@ -141,15 +127,6 @@ export const VideoTiles = <ItemType extends VideoPost>({
         }
         {...flatListProps}
       />
-      {expandedIndex !== null && (
-        <VideoList
-          initialVideoIndex={0}
-          isRefetching={isRefetching}
-          refetch={refetch}
-          videos={fullScreenVideos}
-          onEndReached={onEndReached}
-        />
-      )}
     </>
   );
 };

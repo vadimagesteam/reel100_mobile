@@ -156,14 +156,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
 
   const renderItem = useCallback(
     ({ item: video, index }: { item: VideoPost; index: number }) => {
-      return (
-        <VideoListItem
-          video={video}
-          dimensions={dimensions}
-          active={activeIndex === index}
-          rankNumber={index + 1}
-        />
-      );
+      return <VideoListItem video={video} dimensions={dimensions} active={activeIndex === index} />;
     },
     [dimensions, activeIndex],
   );

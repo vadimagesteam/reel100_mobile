@@ -15,10 +15,9 @@ export type VideoFeedStore = {
   share: { videoId: string } | null;
 
   hearIconPos: { x: number; y: number };
-
   backPressHandler?: () => void;
-
   allowDelete: boolean;
+  screenType: 'inner' | 'modal';
 
   actions: {
     setBackPressHandler: (handler: () => void) => void;
@@ -65,6 +64,7 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
     //#overlay ui
     hearIconPos: { x: 0, y: 300 },
     allowDelete: false,
+    screenType: 'inner',
 
     ...initialState,
 

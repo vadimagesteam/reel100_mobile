@@ -3,22 +3,21 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query';
-import { apiVideosFetcher, VideoPost } from '../queries/apiVideosFetcher';
+import { apiVideosFetcher, ApiVideosFetcherParams, VideoPost } from '../queries/apiVideosFetcher';
 import { useEffect, useMemo } from 'react';
 import { queryClient } from '../../../lib/api';
 
 export type usePostsInfiniteQueryParams = {
   limit?: number;
   cacheKey: string[];
-  where?: Record<string, string | number>;
-  orderBy?: Record<string, string>;
   refetchInterval?: number | false;
-};
+} & Omit<ApiVideosFetcherParams, 'skip' | 'take'>;
 
 export type VideoPostQueryResult<T extends VideoPost = VideoPost> = UseInfiniteQueryResult<
   InfiniteData<T[]>
 > & {
   flatPages: T[];
+  queryParams: usePostsInfiniteQueryParams;
 };
 
 export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
@@ -60,6 +59,7 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
   return {
     ...hookResult,
     flatPages,
+    queryParams: params,
   } as VideoPostQueryResult<T>;
 };
 

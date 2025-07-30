@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { Text, TouchableOpacity, View, ViewProps } from 'react-native';
 import { useNavigation } from '../../../navigation';
 import { Screens } from '../../../navigation/screens';
-import { getFullName } from '../../../state/user/utils';
+import { getDisplayName } from '../../../state/user/utils';
 import { Avatar } from '../../ui';
 import { CommentType } from './hooks/useCommentsInfiniteQuery';
 import { formatTimeAgo } from '../../../utils';
@@ -21,7 +21,7 @@ export const CommentsListItem = ({
 }: CommentListItemProps) => {
   const { user } = item;
   const navigation = useNavigation();
-  const fullName = getFullName(user);
+  const fullName = getDisplayName(user);
 
   return (
     <View className={clsx('mt-[10px]', item.replyTo && 'ml-[20px]')} onLayout={onLayout}>

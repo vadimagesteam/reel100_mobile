@@ -19,7 +19,7 @@ export const VideoModalScreen = () => {
         return [params.video];
       }
       return apiVideosFetcher({
-        where: { 'where[id]': params.videoId },
+        where: { id: { equals: params.videoId } },
         take: 1,
         skip: 0,
       });
@@ -43,6 +43,7 @@ export const VideoModalScreen = () => {
     <HidebleContainer>
       <VideoFeedProvider
         initialState={{
+          screenType: 'modal',
           isPlayerFullScreen: true,
           commentsOpened: commentId ? { videoId: videos[0]?.id } : null,
           cacheKey,

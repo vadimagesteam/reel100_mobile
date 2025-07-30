@@ -11,7 +11,7 @@ import { BubbleProps } from 'react-native-gifted-chat/src/Bubble';
 import { useNavigation, useRoute } from '../../../navigation';
 import { Screens } from '../../../navigation/screens';
 import { useUser } from '../../../state/user/authStore';
-import { getFullName } from '../../../state/user/utils';
+import { getDisplayName } from '../../../state/user/utils';
 import { colors } from '../../../theme';
 import { Avatar } from '../../ui';
 import { useUserQuery } from '../../user/hooks';
@@ -65,7 +65,7 @@ export const ChatDialog = () => {
             createdAt: new Date(msg.createdAt),
             user: {
               _id: msg.fromField.id,
-              name: getFullName(msg.fromField),
+              name: getDisplayName(msg.fromField),
               avatar: msg.fromField.avatar || undefined,
             },
             sent: !msg.id.startsWith('tmp'),
@@ -131,7 +131,7 @@ export const ChatDialog = () => {
   const chatUser = useMemo<User>(
     () => ({
       _id: user.id,
-      name: getFullName(user),
+      name: getDisplayName(user),
       avatar: user.avatar ?? undefined,
     }),
     [user],
@@ -141,7 +141,7 @@ export const ChatDialog = () => {
     <>
       <DialogHeader
         avatar={interlocutor?.avatar}
-        displayName={interlocutor ? getFullName(interlocutor) : '...'}
+        displayName={interlocutor ? getDisplayName(interlocutor) : '...'}
         onPress={() => {
           if (interlocutor) {
             navigation.navigate(Screens.Profile, { user: interlocutor });

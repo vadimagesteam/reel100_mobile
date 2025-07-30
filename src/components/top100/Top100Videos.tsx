@@ -11,11 +11,13 @@ export const Top100Videos = () => {
     useVideosInfiniteQuery({
       cacheKey,
       where: {
-        'where[status]': 'Finished',
+        status: 'Finished',
       },
-      orderBy: {
-        likesCount: 'desc',
-      },
+      orderBy: [
+        {
+          likesCount: 'Desc',
+        },
+      ],
     });
 
   const onEndReached = useCallback(() => {

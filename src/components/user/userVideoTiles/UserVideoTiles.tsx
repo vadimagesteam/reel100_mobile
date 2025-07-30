@@ -18,16 +18,16 @@ export const UserVideoTiles = ({ userId, withUnfinished, className }: ProfileVid
     cacheKey,
     where: useMemo(
       () => ({
-        'where[userId]': userId,
+        user: { id: userId },
         ...(withUnfinished
           ? {}
           : {
-              'where[status]': 'Finished',
+              status: 'Finished',
             }),
       }),
       [userId, withUnfinished],
     ),
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ createdAt: 'Desc' }],
     refetchInterval: shouldPoll ? 3000 : false,
   });
 

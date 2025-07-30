@@ -18,6 +18,7 @@ import {
   VideoRecordingScreen,
   VideoModalScreen,
   DeleteAccountScreen,
+  VideoFeedModalScreen,
 } from '../screens';
 import { BottomTabNavigator } from './TabsNavigator';
 
@@ -82,6 +83,14 @@ export const AppNavigator = () => (
     <Stack.Screen
       name={Screens.VideoModal}
       component={VideoModalScreen}
+      options={{
+        animation: 'fade_from_bottom',
+        animationDuration: 200,
+      }}
+    />
+    <Stack.Screen
+      name={Screens.VideoFeedModal}
+      component={VideoFeedModalScreen}
       options={{
         animation: 'fade_from_bottom',
         animationDuration: 200,

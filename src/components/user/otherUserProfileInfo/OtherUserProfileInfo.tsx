@@ -1,17 +1,17 @@
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { UserType } from '../../../state/user/types';
 import { colors } from '../../../theme';
 import { SvgIcon, Button, Avatar, Reel100Gradient } from '../../ui';
+import { FollowButton } from '../FollowButton';
 import CounterSection from '../myProfileInfo/CounterSection';
 
 interface ProfileUserInfoProps {
   fullName: string;
+  user: UserType;
   avatar?: string | null;
   followerCount: number | undefined;
   likeCount: number | undefined;
   followCount: number | undefined;
-  followButtonText: string;
-  followButtonLoading?: boolean;
-  onFollowPress: () => void;
   onChatPress: () => void;
   onFollowersPress: () => void;
   onFollowingPress: () => void;
@@ -23,12 +23,10 @@ export const ProfileUserInfo = ({
   followerCount,
   likeCount,
   followCount,
-  followButtonText,
-  followButtonLoading,
-  onFollowPress,
   onChatPress,
   onFollowersPress,
   onFollowingPress,
+  user,
 }: ProfileUserInfoProps) => {
   return (
     <>
@@ -41,21 +39,14 @@ export const ProfileUserInfo = ({
             <Avatar uri={avatar} name={fullName} size={70} />
             <Text className="ml-[5px] text-[20px] font-bold text-primary">{fullName}</Text>
           </View>
-          <Button
-            loading={followButtonLoading}
-            onPress={onFollowPress}
-            className="mt-[10px] min-w-[120px]"
-            size="md"
-          >
-            {followButtonText}
-          </Button>
+          <FollowButton user={user} />
         </View>
         <TouchableOpacity className="justify-end pb-[14px] pr-[20px]" onPress={onChatPress}>
           <SvgIcon image="commentIcon" color={colors.white} style={styles.chatIcon} />
         </TouchableOpacity>
       </View>
 
-      <View className="bg-graphite h-[70px] flex-row items-center justify-center rounded-[10px]">
+      <View className="h-[70px] flex-row items-center justify-center rounded-[10px] bg-graphite">
         <CounterSection onPress={onFollowersPress} label="Followers" count={followerCount!} />
         <CounterSection
           className="border-l-[0.5px] border-r-[0.5px] border-l-silver3 border-r-silver3"

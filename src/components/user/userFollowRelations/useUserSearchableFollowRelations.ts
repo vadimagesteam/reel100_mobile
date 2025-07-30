@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { UserType } from '../../../state/user/types';
-import { getFullName } from '../../../state/user/utils';
+import { getDisplayName } from '../../../state/user/utils';
 
 // fixme: this must be re-worked using API
 export const useUserSearchableFollowRelations = (
@@ -21,7 +21,7 @@ export const useUserSearchableFollowRelations = (
     }
     const list = user[apiRelationType].map((v) => ('who' in v ? v.who : v.whom));
     const q = searchQuery.toLowerCase().trim();
-    return q ? list?.filter((r) => getFullName(r).toLowerCase().includes(q)) : list;
+    return q ? list?.filter((r) => getDisplayName(r).toLowerCase().includes(q)) : list;
   }, [user, apiRelationType, searchQuery]);
 
   return {

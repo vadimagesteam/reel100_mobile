@@ -6,7 +6,7 @@ import { useUserSearchableFollowRelations } from '../../components/user/userFoll
 import { SearchableUserList } from '../../components/userList';
 import { Screens } from '../../navigation/screens';
 import { UserBase } from '../../state/user/types';
-import { getFullName } from '../../state/user/utils';
+import { getDisplayName } from '../../state/user/utils';
 import { colors } from '../../theme';
 import { useNavigation, useRoute } from '../../navigation';
 
@@ -34,7 +34,7 @@ export const ProfileStatsScreen = () => {
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      title: user ? getFullName(user) : 'loading...',
+      title: user ? getDisplayName(user) : 'loading...',
     });
   }, [navigation, user]);
 
