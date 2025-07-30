@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { Text, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import Animated, { FadeIn, FadeInLeft, FadeInRight } from 'react-native-reanimated';
 import { TileConfig } from './tileConfig';
 import type { VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoInfoOverlay } from './VideoInfoOverlay';
@@ -15,6 +16,8 @@ export interface VideoTileProps<ItemType = VideoPost>
   width?: number;
 }
 
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
 export const VideoTile = ({
   item,
   className,
@@ -28,7 +31,8 @@ export const VideoTile = ({
   const lastInRow = rowSize && index !== undefined && (index + 1) % rowSize === 0;
 
   return (
-    <TouchableOpacity
+    <AnimatedTouchable
+      entering={FadeIn.delay(20 * Math.min(index, 10))}
       activeOpacity={0.7}
       className={clsx(
         'relative mb-1 h-[150px] overflow-hidden rounded-[8px]',
@@ -61,6 +65,6 @@ export const VideoTile = ({
           <Text className="text-[10px] text-primary">No preview</Text>
         </View>
       )}
-    </TouchableOpacity>
+    </AnimatedTouchable>
   );
 };
