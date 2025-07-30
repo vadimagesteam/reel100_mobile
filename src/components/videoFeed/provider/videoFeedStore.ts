@@ -1,8 +1,10 @@
 import { createStore } from 'zustand';
 import { CommentType } from '../comments/hooks/useCommentsInfiniteQuery';
 
+export type CacheKey = (string | number | object | undefined)[];
+
 export type VideoFeedStore = {
-  cacheKey: string[] | null;
+  cacheKey: CacheKey | null;
   isPlayerFullScreen: boolean;
   isPaused: boolean;
   currentTime: number;
@@ -21,7 +23,7 @@ export type VideoFeedStore = {
 
   actions: {
     setBackPressHandler: (handler: () => void) => void;
-    setCacheKey: (key: string[]) => void;
+    setCacheKey: (key: CacheKey) => void;
     setHeartIconPos: (coords: { x: number; y: number }) => void;
     updateTime: (time: number) => void;
     setIsPlayerFullScreen: (isFullScreen: boolean) => void;

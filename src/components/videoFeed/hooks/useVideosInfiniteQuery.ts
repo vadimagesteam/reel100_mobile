@@ -3,13 +3,14 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query';
+import { CacheKey } from '../provider/videoFeedStore';
 import { apiVideosFetcher, ApiVideosFetcherParams, VideoPost } from '../queries/apiVideosFetcher';
 import { useEffect, useMemo } from 'react';
 import { queryClient } from '../../../lib/api';
 
 export type usePostsInfiniteQueryParams = {
   limit?: number;
-  cacheKey: string[];
+  cacheKey: CacheKey;
   refetchInterval?: number | false;
 } & Omit<ApiVideosFetcherParams, 'skip' | 'take'>;
 

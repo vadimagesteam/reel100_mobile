@@ -51,7 +51,7 @@ export const VideoDescription = memo(
       >
         {/* Measure text size */}
         <Text
-          className="text-[12px] font-bold text-primary opacity-0"
+          className="text-[13px] font-bold text-primary opacity-0"
           onLayout={(e) => {
             const approxOneChar = e.nativeEvent.layout.width / textToMeasure.length;
             // Max size of the text container is 80%
@@ -67,12 +67,12 @@ export const VideoDescription = memo(
 
         <Animated.Text
           style={shortTextStyle}
-          className="text-[12px] font-bold text-primary"
+          className="text-[13px] font-bold text-primary"
           numberOfLines={1}
         >
           {text}
         </Animated.Text>
-        <Animated.Text style={longTextStyle} className="text-[12px] font-medium text-primary">
+        <Animated.Text style={longTextStyle} className="text-[13px] font-medium text-primary">
           {text}
         </Animated.Text>
       </GestureTouchableOpacity>

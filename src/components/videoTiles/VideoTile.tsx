@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Text, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import Animated, { FadeIn, FadeInLeft, FadeInRight } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { TileConfig } from './tileConfig';
 import type { VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoInfoOverlay } from './VideoInfoOverlay';

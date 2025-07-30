@@ -1,30 +1,84 @@
-import { useCallback, useMemo } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { endOfDay, startOfDay } from 'date-fns';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useStateSelector } from '../../state/app/uiStore';
+import { FlexLoading } from '../ui';
 import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
 import { VideoList } from '../videoFeed';
+import { EmptyTop100Videos } from './EmptyTop100Videos';
 
-export const Top100Videos = () => {
-  const cacheKey = useMemo(() => ['top100_videos'], []);
+export const Top100Videos = ({ isActiveTab }: { isActiveTab: boolean }) => {
+  const [selectedState] = useStateSelector();
+  const cacheKey = useMemo(() => ['top100_videos', selectedState?.id], [selectedState]);
 
   useSetVideoFeedCacheKey(cacheKey);
 
-  const { fetchNextPage, hasNextPage, isFetchingNextPage, flatPages, refetch, isRefetching } =
-    useVideosInfiniteQuery({
-      cacheKey,
-      where: {
-        status: 'Finished',
+  const [shouldPoll, setShouldPoll] = useState(false);
+
+  const {
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isFetchingNextPage,
+    flatPages,
+    refetch,
+    isRefetching,
+  } = useVideosInfiniteQuery({
+    cacheKey,
+    where: {
+      status: 'Finished',
+      createdAt: {
+        gte: startOfDay(new Date()).toISOString(),
+        lte: endOfDay(new Date()).toISOString(),
       },
-      orderBy: [
-        {
-          likesCount: 'Desc',
+      states: {
+        some: {
+          id: { equals: selectedState?.id! },
         },
-      ],
-    });
+      },
+    },
+    orderBy: [
+      {
+        likesCount: 'Desc',
+      },
+      {
+        createdAt: 'Asc',
+      },
+    ],
+    // for empty feed we want to poll
+    refetchInterval: shouldPoll ? 3000 : undefined,
+  });
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    if (isActiveTab && !flatPages.length) {
+      refetch();
+      setShouldPoll(true);
+    } else {
+      setShouldPoll(false);
+    }
+  }, [flatPages.length, isActiveTab, refetch]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isActiveTab && !flatPages.length) {
+        refetch();
+        setShouldPoll(true);
+      }
+      return () => {
+        setShouldPoll(false);
+      };
+    }, [flatPages.length, isActiveTab, refetch]),
+  );
+
+  if (isLoading) {
+    return <FlexLoading />;
+  }
 
   return (
     <VideoList
@@ -33,6 +87,7 @@ export const Top100Videos = () => {
       refetch={refetch}
       videos={flatPages}
       onEndReached={onEndReached}
+      ListEmptyComponent={<EmptyTop100Videos stateLabel={selectedState?.label!} />}
     />
   );
 };

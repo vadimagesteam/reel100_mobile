@@ -32,7 +32,7 @@ export const TabMainScreen = () => {
         case 'top100':
           return (
             <TabAwareVideoFeedProvider isActiveTab={isActiveTab}>
-              <Top100Videos />
+              <Top100Videos isActiveTab={isActiveTab} />
             </TabAwareVideoFeedProvider>
           );
         case 'state_feed':
