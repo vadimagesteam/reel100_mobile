@@ -18,6 +18,8 @@ export type VideoFeedStore = {
 
   backPressHandler?: () => void;
 
+  allowDelete: boolean;
+
   actions: {
     setBackPressHandler: (handler: () => void) => void;
     setCacheKey: (key: string[]) => void;
@@ -62,6 +64,7 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
 
     //#overlay ui
     hearIconPos: { x: 0, y: 300 },
+    allowDelete: false,
 
     ...initialState,
 

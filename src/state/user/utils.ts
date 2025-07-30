@@ -17,4 +17,6 @@ export const extractUserBase = (user: UserType | UserProfile): UserBase =>
     'updatedAt',
     'status',
     'roles',
+    'nickname',
+    'avatar',
   ]);

@@ -10,3 +10,4 @@ export * from './useVideoPause';
 export * from './useVideosInfiniteQuery';
 export * from './useVideoComments';
 export * from './useVideoShare';
+export * from './useDeleteMutation';

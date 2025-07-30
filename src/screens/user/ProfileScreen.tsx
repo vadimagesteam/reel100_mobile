@@ -26,7 +26,11 @@ export const ProfileScreen = () => {
         <AppHeader showBackButton={canGoBack} noPx />
         {isMe ? <Profile /> : <OtherProfile />}
       </HideableView>
-      <VideoFeedProvider>
+      <VideoFeedProvider
+        initialState={{
+          allowDelete: isMe,
+        }}
+      >
         <UserVideoTiles className="mx-[10px]" userId={userId} withUnfinished={isMe} />
       </VideoFeedProvider>
     </HidebleContainer>

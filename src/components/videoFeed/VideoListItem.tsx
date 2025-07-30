@@ -1,7 +1,7 @@
 import { PortalHost } from '@gorhom/portal';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, View } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 import Video, {
   type OnLoadData,
   type OnProgressData,
@@ -13,8 +13,9 @@ import Video, {
 } from 'react-native-video';
 import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
-import { isAndroid, formatSeconds } from '../../utils';
+import { isAndroid } from '../../utils';
 import {
+  useDeleteMutation,
   useLikeMutations,
   useVideoFeed,
   useVideoFullscreen,
@@ -46,6 +47,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
   const { isPaused, setIsPaused } = useVideoPause();
   const { shareVideo } = useVideoShare();
 
+  const allowDelete = useVideoFeed((s) => s.allowDelete);
   const backPressHandler = useVideoFeed((s) => s.backPressHandler);
   const { openComments } = useVideoFeed((s) => s.actions);
 
@@ -56,6 +58,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
 
   const { data: likeData } = useVideoLikeQuery('video', videoId);
   const { toggleLike } = useLikeMutations();
+  const { mutate: deleteVideo } = useDeleteMutation();
 
   useFocusEffect(
     useCallback(() => {
@@ -96,6 +99,25 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
       type: 'video',
       id: videoId,
     });
+  };
+
+  const handleDelete = () => {
+    Alert.alert('Delete this video?', 'This action cannot be undone', [
+      {
+        style: 'cancel',
+        text: 'Cancel',
+      },
+      {
+        style: 'destructive',
+        text: 'Delete',
+        onPress: async () => {
+          deleteVideo({
+            id: videoId,
+          });
+          setFullscreen(false);
+        },
+      },
+    ]);
   };
 
   return (
@@ -148,6 +170,8 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
           showComments
           showShare
           showLikes
+          allowDelete={allowDelete}
+          onDelete={handleDelete}
           liked={!!likeData?.id}
           onLike={handleLike}
           onShare={() => shareVideo(video.id)}

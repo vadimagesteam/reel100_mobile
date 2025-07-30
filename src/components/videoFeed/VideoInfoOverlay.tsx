@@ -27,6 +27,7 @@ export interface VideoInfoOverlayProps {
   showComments?: boolean;
   showShare?: boolean;
   showLikes?: boolean;
+  allowDelete?: boolean;
   liked?: boolean;
   isPaused?: boolean;
   onLike?: () => void;
@@ -34,6 +35,7 @@ export interface VideoInfoOverlayProps {
   onComments?: () => void;
   onUser?: () => void;
   onBackPress?: () => void;
+  onDelete?: () => void;
 }
 
 export const VideoInfoOverlay = ({
@@ -45,10 +47,12 @@ export const VideoInfoOverlay = ({
   showComments,
   showShare,
   showLikes,
+  allowDelete,
   onUser,
   onShare,
   onComments,
   onLike,
+  onDelete,
   liked,
 }: VideoInfoOverlayProps) => {
   const insets = useSafeAreaInsets();
@@ -146,7 +150,7 @@ export const VideoInfoOverlay = ({
         </View>
       )}
 
-      <Animated.View className="absolute bottom-[80px] right-4 z-[11] flex flex-col gap-6">
+      <Animated.View className="absolute bottom-[80px] right-4 z-[11] flex flex-col items-end gap-6">
         {showLikes && (
           <GestureTouchableOpacity
             onPress={onLike}
@@ -175,6 +179,15 @@ export const VideoInfoOverlay = ({
         {showShare && (
           <GestureTouchableOpacity hitSlop={20} onPress={onShare}>
             <SvgIcon image="shareIcon" color={colors.white} style={styles.icon} />
+          </GestureTouchableOpacity>
+        )}
+        {allowDelete && (
+          <GestureTouchableOpacity
+            onPress={onDelete}
+            hitSlop={20}
+            className="flex-col items-center gap-2"
+          >
+            <Ionicons name="trash-bin-outline" size={25} color={colors.red} />
           </GestureTouchableOpacity>
         )}
       </Animated.View>
