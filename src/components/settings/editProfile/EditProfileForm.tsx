@@ -2,15 +2,44 @@ import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } fr
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { Controller, useForm } from 'react-hook-form';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
-import { UserBase } from '../../../state/user/types';
+import { UserProfile } from '../../../state/user/types';
 import { useLoadingCallback } from '../../../utils';
 import { Avatar, Button, Input } from '../../ui';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useAuthActions, useUser } from '../../../state/user/authStore';
 
-type FormData = Pick<UserBase, 'avatar' | 'firstName' | 'lastName'> & {
+const socialValidationRules = {
+  instagram: {
+    pattern: {
+      value: /^https?:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._%-]+\/?$/,
+      message: 'Enter a valid Instagram URL',
+    },
+  },
+  facebook: {
+    pattern: {
+      value: /^https?:\/\/(www\.)?facebook\.com\/[A-Za-z0-9._%-]+\/?$/,
+      message: 'Enter a valid Facebook URL',
+    },
+  },
+  youtube: {
+    pattern: {
+      value: /^https?:\/\/(www\.)?youtube\.com\/(channel|c|user)\/[A-Za-z0-9._%-]+\/?$/,
+      message: 'Enter a valid YouTube URL',
+    },
+  },
+  tiktok: {
+    pattern: {
+      value: /^https?:\/\/(www\.)?tiktok\.com\/@?[A-Za-z0-9._%-]+\/?$/,
+      message: 'Enter a valid TikTok URL',
+    },
+  },
+};
+
+type FormData = Pick<UserProfile, 'avatar' | 'firstName' | 'lastName' | 'socialNetworks'> & {
   nickname: string;
 };
+
+type SocialKeys = keyof NonNullable<FormData['socialNetworks']>;
 
 export const EditProfileForm = () => {
   const profile = useUser();
@@ -29,6 +58,7 @@ export const EditProfileForm = () => {
       avatar: profile.avatar,
       firstName: profile.firstName,
       lastName: profile.lastName,
+      socialNetworks: profile.socialNetworks || {},
     },
   });
 
@@ -80,93 +110,120 @@ export const EditProfileForm = () => {
 
   const avatar = watch('avatar');
 
-  return (
-    <View className="flex-1">
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerClassName="flex-1 mt-10 gap-4 px-5"
-      >
-        <View className="flex-col items-center gap-2">
-          <TouchableOpacity
-            hitSlop={15}
-            onPress={handlePhotoSelect}
-            className="relative flex-col items-center justify-center gap-2 self-center"
-          >
-            <Avatar uri={avatar} name="" size={100} />
-            {!avatar && (
-              <View className="absolute size-[36px] items-center justify-center">
-                {isAvatarUploading ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <Ionicons name="camera-outline" color="#fff" size={36} />
-                )}
-              </View>
-            )}
-          </TouchableOpacity>
-          <Text className="text-silver3">Change Avatar</Text>
-        </View>
+  const renderSocialLink = (name: `socialNetworks.${SocialKeys}`, label: string) => {
+    const fieldName = name.replace('socialNetworks.', '') as SocialKeys;
+    return (
+      <>
         <Controller
-          name="firstName"
-          rules={{
-            required: 'First name is required',
-          }}
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input placeholder="First Name" value={value} onChangeText={onChange} onBlur={onBlur} />
-          )}
-        />
-        {errors?.firstName?.message && (
-          <Text className="pl-2 text-red1">{errors?.firstName?.message}</Text>
-        )}
-        <Controller
-          name="lastName"
-          rules={{
-            required: 'Last name is required',
-          }}
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input placeholder="Last Name" value={value} onChangeText={onChange} onBlur={onBlur} />
-          )}
-        />
-        {errors?.lastName?.message && (
-          <Text className="pl-2 text-red1">{errors?.lastName?.message}</Text>
-        )}
-
-        <Controller
-          name="nickname"
-          rules={{
-            required: 'Username is required',
-            maxLength: {
-              value: 22,
-              message: 'Username must be less or equal 22 characters',
-            },
-          }}
+          name={name as any}
+          rules={socialValidationRules[fieldName]}
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
-              maxLength={22}
-              placeholder="Username"
+              autoComplete="off"
+              placeholder={label}
               value={value}
-              onChangeText={(v) => {
-                onChange(v.replace(/\s|[^\p{Emoji}\p{L}\p{N}_]/gu, ''));
-              }}
+              onChangeText={onChange}
               onBlur={onBlur}
             />
           )}
         />
 
-        {errors?.nickname?.message && (
-          <Text className="pl-2 text-red1">{errors?.nickname?.message}</Text>
+        {errors?.socialNetworks?.[fieldName]?.message && (
+          <Text className="pl-2 text-red1">{errors.socialNetworks[fieldName].message}</Text>
         )}
+      </>
+    );
+  };
 
-        {isDirty && (
-          <Animated.View entering={FadeInDown} exiting={FadeOutDown}>
-            <Button loading={isSubmitting} onPress={handleSubmit(handleSave)}>
-              Save Changes
-            </Button>
-          </Animated.View>
+  return (
+    <ScrollView automaticallyAdjustKeyboardInsets contentContainerClassName="mt-9 grow gap-4 px-5">
+      <View className="flex-col items-center gap-2">
+        <TouchableOpacity
+          hitSlop={15}
+          onPress={handlePhotoSelect}
+          className="relative flex-col items-center justify-center gap-2 self-center"
+        >
+          <Avatar uri={avatar} name="" size={100} />
+          {!avatar && (
+            <View className="absolute size-[36px] items-center justify-center">
+              {isAvatarUploading ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Ionicons name="camera-outline" color="#fff" size={36} />
+              )}
+            </View>
+          )}
+        </TouchableOpacity>
+        <Text className="text-silver3">Change Avatar</Text>
+      </View>
+      <Controller
+        name="firstName"
+        rules={{
+          required: 'First name is required',
+        }}
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input placeholder="First Name" value={value} onChangeText={onChange} onBlur={onBlur} />
         )}
-      </ScrollView>
-    </View>
+      />
+      {errors?.firstName?.message && (
+        <Text className="pl-2 text-red1">{errors?.firstName?.message}</Text>
+      )}
+      <Controller
+        name="lastName"
+        rules={{
+          required: 'Last name is required',
+        }}
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input placeholder="Last Name" value={value} onChangeText={onChange} onBlur={onBlur} />
+        )}
+      />
+      {errors?.lastName?.message && (
+        <Text className="pl-2 text-red1">{errors?.lastName?.message}</Text>
+      )}
+
+      <Controller
+        name="nickname"
+        rules={{
+          required: 'Username is required',
+          maxLength: {
+            value: 22,
+            message: 'Username must be less or equal 22 characters',
+          },
+        }}
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input
+            maxLength={22}
+            placeholder="Username"
+            value={value}
+            onChangeText={(v) => {
+              onChange(v.replace(/\s|[^\p{Emoji}\p{L}\p{N}_]/gu, ''));
+            }}
+            onBlur={onBlur}
+          />
+        )}
+      />
+
+      {errors?.nickname?.message && (
+        <Text className="pl-2 text-red1">{errors?.nickname?.message}</Text>
+      )}
+
+      <Text className="mt-6 text-base font-semibold text-primary">Social Links</Text>
+      {renderSocialLink('socialNetworks.instagram', 'Instagram')}
+      {renderSocialLink('socialNetworks.facebook', 'Facebook')}
+      {renderSocialLink('socialNetworks.tiktok', 'Tiktok')}
+      {renderSocialLink('socialNetworks.youtube', 'YouTube')}
+
+      {isDirty && (
+        <Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+          <Button loading={isSubmitting} onPress={handleSubmit(handleSave)}>
+            Save Changes
+          </Button>
+        </Animated.View>
+      )}
+    </ScrollView>
   );
 };

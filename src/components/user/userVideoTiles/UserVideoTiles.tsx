@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { VideoTiles, VideoTile } from '../../videoTiles';
+import { VideoTiles } from '../../videoTiles';
 import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
 import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../videoFeed/hooks';
 
@@ -45,7 +45,6 @@ export const UserVideoTiles = ({ userId, withUnfinished, className }: ProfileVid
   return (
     <VideoTiles<VideoPost>
       className={className}
-      ItemComponent={VideoTile}
       queryControl={queryControl}
       keyExtractor={(item) => item.id}
       numColumns={3}

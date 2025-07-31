@@ -31,7 +31,7 @@ export const ProfileScreen = () => {
           allowDelete: isMe,
         }}
       >
-        <UserVideoTiles className="mx-[10px]" userId={userId} withUnfinished={isMe} />
+        <UserVideoTiles userId={userId} withUnfinished={isMe} />
       </VideoFeedProvider>
     </HidebleContainer>
   );

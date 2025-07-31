@@ -1,9 +1,12 @@
+import Ionicons from '@react-native-vector-icons/ionicons';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { useUser } from '../../../state/user/authStore';
 import { UserType } from '../../../state/user/types';
 import { colors } from '../../../theme';
-import { SvgIcon, Button, Avatar, Reel100Gradient } from '../../ui';
+import { SvgIcon, Avatar } from '../../ui';
 import { FollowButton } from '../FollowButton';
 import CounterSection from '../myProfileInfo/CounterSection';
+import { SocialNetworks } from './SocialNetworks';
 
 interface ProfileUserInfoProps {
   fullName: string;
@@ -46,10 +49,12 @@ export const ProfileUserInfo = ({
         </TouchableOpacity>
       </View>
 
+      {user.socialNetworks && <SocialNetworks socialNetworks={user.socialNetworks} />}
+
       <View className="h-[70px] flex-row items-center justify-center rounded-[10px] bg-graphite">
         <CounterSection onPress={onFollowersPress} label="Followers" count={followerCount!} />
         <CounterSection
-          className="border-l-[0.5px] border-r-[0.5px] border-l-silver3 border-r-silver3"
+          className="border-l-[0.5px] border-r-[0.5px] border-l-[#413E42] border-r-[#413E42]"
           label="Likes"
           count={likeCount!}
         />

@@ -13,29 +13,28 @@ export const GuestContainer = ({ withBackButton = true, children }: GuestContain
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView className="bg-background flex-1">
-      <KeyboardAvoidingView behavior="padding" className="flex-1">
-        <ScrollView
-          contentContainerClassName="grow"
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-        >
-          {withBackButton && (
-            <View className="w-full flex-row px-5">
-              <Button
-                hitSlop={{ right: 15 }}
-                variant="ghost"
-                buttonClassName="pl-0"
-                onPress={() => navigation.goBack()}
-              >
-                <SvgIcon image="backArrow" />
-              </Button>
-            </View>
-          )}
+    <SafeAreaView className="flex-1 bg-background">
+      <ScrollView
+        automaticallyAdjustKeyboardInsets
+        contentContainerClassName="grow"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
+        {withBackButton && (
+          <View className="w-full flex-row px-5">
+            <Button
+              hitSlop={{ right: 15 }}
+              variant="ghost"
+              buttonClassName="pl-0"
+              onPress={() => navigation.goBack()}
+            >
+              <SvgIcon image="backArrow" />
+            </Button>
+          </View>
+        )}
 
-          <View className="flex-1 justify-center gap-4 px-5">{children}</View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <View className="flex-1 justify-center gap-4 px-5">{children}</View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

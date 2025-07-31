@@ -32,10 +32,10 @@ export const CommentForm = forwardRef<TextInput, CommentFormProps>(
             onSubmit(text);
             setCommentText('');
           }}
-          className={clsx('ml-2 rounded-[20px] bg-blue px-3.5 py-2', isEmpty && 'opacity-60')}
+          className={clsx('ml-2 rounded-xl bg-button-primary px-3.5 py-2', isEmpty && 'opacity-60')}
           disabled={isEmpty}
         >
-          <Text className="font-bold text-primary">Send</Text>
+          <Text className="button-primary-text font-bold">Send</Text>
         </TouchableOpacity>
       </View>
     );

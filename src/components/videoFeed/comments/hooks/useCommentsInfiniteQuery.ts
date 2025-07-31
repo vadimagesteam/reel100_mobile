@@ -49,7 +49,7 @@ export const useCommentsInfiniteQuery = (
 
   const { refetch } = hookResult;
 
-  // Refetch manually only first page
+  // Refetch manually only the first page
   useEffect(() => {
     queryClient.setQueryData<{ pages: any[]; pageParams: any[] }>(cacheKey, (data) => {
       if (data) {

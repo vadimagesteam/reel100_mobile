@@ -81,6 +81,12 @@ export type UserProfile = UserBase & {
   resetPasswordToken: string | null;
   stats: UserStatsType;
   settings: ProfileSettings;
+  socialNetworks: {
+    instagram?: string;
+    facebook?: string;
+    youtube?: string;
+    tiktok?: string;
+  } | null;
 };
 
 export type RelationId = string;
@@ -95,6 +101,12 @@ export type UserType = UserBase & {
     id: RelationId;
     who: UserBase;
   }[];
+  socialNetworks: {
+    instagram?: string;
+    facebook?: string;
+    youtube?: string;
+    tiktok?: string;
+  } | null;
 };
 
 export type UpdateProfileInput = Partial<Pick<UserProfile, 'firstName' | 'lastName' | 'settings'>>;
