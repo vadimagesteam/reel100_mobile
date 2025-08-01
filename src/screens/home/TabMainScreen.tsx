@@ -54,7 +54,7 @@ export const TabMainScreen = () => {
     [index],
   );
 
-  // Try to identify state using Geo coords
+  // Try to identify the state using Geo coords
   useGeoLocationState();
 
   const hideOffset = TopBarHeight + insets.top + 1;
@@ -89,6 +89,6 @@ export const TabMainScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  indicatorStyle: { backgroundColor: colors.primary },
+  indicatorStyle: { backgroundColor: colors.white },
   tabBarStyle: { backgroundColor: colors.background, height: TopBarHeight },
 });
