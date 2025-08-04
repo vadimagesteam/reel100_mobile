@@ -12,7 +12,7 @@ export type UseCameraFeatures = {
 export const useCameraFeatures = (): UseCameraFeatures => {
   const [cameraPosition, setCameraPosition] = useState<UseCameraFeatures['cameraPosition']>('back');
   const [torchOn, setTorchOn] = useState(false);
-  const [frameRate, setFrameRate] = useState<UseCameraFeatures['frameRate']>(60);
+  const [frameRate, setFrameRate] = useState<UseCameraFeatures['frameRate']>(30);
 
   return {
     cameraPosition,

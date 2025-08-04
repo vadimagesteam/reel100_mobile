@@ -1,26 +1,27 @@
+import clsx from 'clsx';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
-import Animated, {
-  runOnJS,
-  useAnimatedProps,
-  useSharedValue,
-  withTiming,
-  useAnimatedStyle,
-  withSpring,
-  SharedValue,
-  interpolate,
-  Extrapolation,
-} from 'react-native-reanimated';
-import Svg, { Circle } from 'react-native-svg';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import clsx from 'clsx';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  SharedValue,
+  useAnimatedProps,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle } from 'react-native-svg';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const RADIUS = 40;
 const STROKE_WIDTH = 4;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+const SENSITIVITY_FACTOR = 1.2; // less value -> more sensitive zoom
 
 export interface RecordButtonProps {
   onStart: () => void;
@@ -28,6 +29,8 @@ export interface RecordButtonProps {
   isRecording: boolean;
   maxDurationSeconds?: number;
   zoom: SharedValue<number>;
+  minZoom: number;
+  maxZoom: number;
 }
 
 export const RecordButton = ({
@@ -36,6 +39,8 @@ export const RecordButton = ({
   onStop,
   maxDurationSeconds = 100,
   zoom,
+  minZoom,
+  maxZoom,
 }: RecordButtonProps) => {
   const insets = useSafeAreaInsets();
   const scale = useSharedValue(1);
@@ -59,10 +64,19 @@ export const RecordButton = ({
     .onStart((e) => {
       zoomActive.value = true;
       startY.value = e.absoluteY;
+
       runOnJS(onStart)();
     })
     .onUpdate((e) => {
-      zoom.value = interpolate(startY.value - e.absoluteY, [0, 300], [1, 5], Extrapolation.CLAMP);
+      zoom.value = withTiming(
+        interpolate(
+          startY.value - e.absoluteY,
+          [0, startY.value * SENSITIVITY_FACTOR],
+          [minZoom, maxZoom],
+          Extrapolation.CLAMP,
+        ),
+        { duration: 60 },
+      );
     })
     .onEnd(() => {
       runOnJS(onStop)();

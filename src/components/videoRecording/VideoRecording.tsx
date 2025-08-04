@@ -1,6 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
-import { Camera, CameraProps, useCameraDevice } from 'react-native-vision-camera';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, Dimensions, NativeModules, StyleSheet, View } from 'react-native';
+import {
+  Camera,
+  CameraProps,
+  Point,
+  useCameraDevice,
+  useCameraFormat,
+} from 'react-native-vision-camera';
 import Reanimated, {
   Extrapolation,
   interpolate,
@@ -16,8 +22,15 @@ import { VideoPreview } from './VideoPreview';
 import { useVideoRecordStore } from './videoRecordStore';
 import { PermissionsResult, requestCameraAndMicrophone } from './requestCameraAndMicrophone';
 
+const { CustomAudioSessionManager } = NativeModules;
+
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 const MaxDurationSeconds = 100;
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
+const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH;
 
 export const VideoRecording = () => {
   const navigation = useNavigation();
@@ -29,7 +42,7 @@ export const VideoRecording = () => {
     camera: false,
   });
 
-  const { cameraPosition, torchOn } = cameraFeatures;
+  const { cameraPosition, torchOn, frameRate: targetFps } = cameraFeatures;
 
   const {
     uploading,
@@ -38,7 +51,22 @@ export const VideoRecording = () => {
     actions: { clear, setPreviewUri },
   } = useVideoRecordStore();
 
-  const activeDevice = useCameraDevice(cameraPosition);
+  const activeDevice = useCameraDevice(cameraPosition, {
+    physicalDevices: ['wide-angle-camera'],
+  });
+
+  const format = useCameraFormat(activeDevice, [
+    { fps: targetFps },
+    { videoAspectRatio: screenAspectRatio },
+    { videoResolution: 'max' },
+    { photoAspectRatio: screenAspectRatio },
+    { photoResolution: 'max' },
+  ]);
+
+  const fps = Math.min(format?.maxFps ?? 1, targetFps);
+
+  const minZoom = activeDevice?.minZoom ?? 1;
+  const maxZoom = Math.min(activeDevice?.maxZoom ?? 1, 10);
 
   // todo: move to a separated screen like normal people do :)
   useEffect(() => {
@@ -77,11 +105,14 @@ export const VideoRecording = () => {
   const handleStartRecording = async () => {
     setIsRecording(true);
 
+    await CustomAudioSessionManager.deactivateAudioSession();
+
     // https://github.com/mrousavy/react-native-vision-camera/issues/3524
     // !! SOUND RECORDING ISSUE:
     // If there is no sound, ensure all <Video> from react-native-video have disableAudioSessionManagement
     cameraRef.current?.startRecording({
-      onRecordingFinished: (video) => {
+      onRecordingFinished: async (video) => {
+        await CustomAudioSessionManager.activateVideoRecordingAudioSession();
         console.log('[onRecordingFinished]', video);
         setPreviewUri(video.path);
       },
@@ -131,13 +162,24 @@ export const VideoRecording = () => {
     cameraFeatures.setCameraPosition((prev) => (prev === 'back' ? 'front' : 'back'));
   };
 
+  const focusCamera = useCallback((point: Point) => {
+    cameraRef.current?.focus(point);
+  }, []);
+
   const doubleTapGesture = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd(() => {
       runOnJS(toggleCameraPosition)();
     });
 
-  const cameraGesture = Gesture.Exclusive(pinchGesture, doubleTapGesture);
+  const tapGesture = Gesture.Tap().onEnd(({ x, y }) => {
+    runOnJS(focusCamera)({ x, y });
+  });
+
+  const cameraGesture = Gesture.Exclusive(
+    pinchGesture,
+    Gesture.Exclusive(doubleTapGesture, tapGesture),
+  );
 
   const animatedProps = useAnimatedProps<CameraProps>(() => ({ zoom: zoom.value }), [zoom]);
 
@@ -152,12 +194,16 @@ export const VideoRecording = () => {
                 ref={cameraRef}
                 style={StyleSheet.absoluteFill}
                 device={activeDevice}
+                // format={format}
+                fps={fps}
                 isActive
                 video={permissions.camera}
                 photo={permissions.camera}
                 audio={permissions.microphone}
+                enableZoomGesture={false}
                 animatedProps={animatedProps}
                 torch={torchOn ? 'on' : 'off'}
+                videoStabilizationMode="off"
               />
             </GestureDetector>
           )}
@@ -172,6 +218,8 @@ export const VideoRecording = () => {
             maxDurationSeconds={MaxDurationSeconds}
           />
           <RecordButton
+            minZoom={minZoom}
+            maxZoom={maxZoom}
             onStart={handleStartRecording}
             onStop={handleFinishRecording}
             isRecording={isRecording}
