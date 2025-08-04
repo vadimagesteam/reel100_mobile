@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "splash-4096-4096.png",
+      "filename" : "newAppSplash.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "splash-4096-4096 1.png",
+      "filename" : "newAppSplash 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "splash-4096-4096 2.png",
+      "filename" : "newAppSplash 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
