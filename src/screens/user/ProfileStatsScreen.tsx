@@ -1,26 +1,32 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { type Route, type SceneRendererProps, TabBar, TabView } from 'react-native-tab-view';
-import { useUserQuery } from '../../components/user/hooks/useUserQuery';
+import { useUserQuery } from '../../components/user/hooks';
+import { useBlockedUsers } from '../../components/user/hooks/useBlockedUsers';
 import { useUserSearchableFollowRelations } from '../../components/user/userFollowRelations/useUserSearchableFollowRelations';
 import { SearchableUserList } from '../../components/userList';
 import { Screens } from '../../navigation/screens';
+import { useUser } from '../../state/user/authStore';
 import { UserBase } from '../../state/user/types';
 import { getDisplayName } from '../../state/user/utils';
 import { colors } from '../../theme';
 import { useNavigation, useRoute } from '../../navigation';
 
-type TabRoutes = 'followers' | 'following';
+type TabRoutes = 'followers' | 'following' | 'blocked';
 
 export type ProfileStatsRouteParams = {
   userId: string;
   initialTab: TabRoutes;
 };
 
-const routes: { key: TabRoutes; title: string }[] = [
+type TabRoute = { key: TabRoutes; title: string };
+
+const BaseTabRoutes: TabRoute[] = [
   { key: 'followers', title: 'Followers' },
   { key: 'following', title: 'Following' },
 ];
+
+const TabRoutesWithBlocked: TabRoute[] = [...BaseTabRoutes, { key: 'blocked', title: 'Blocked' }];
 
 export const ProfileStatsScreen = () => {
   const navigation = useNavigation();
@@ -28,8 +34,19 @@ export const ProfileStatsScreen = () => {
     params: { userId, initialTab = 'followers' },
   } = useRoute<'ProfileStats'>();
 
+  const me = useUser();
   const layout = useWindowDimensions();
   const { data: user, isLoading } = useUserQuery(userId);
+
+  const isMyProfile = me.id === userId;
+
+  const { data: blockedUsers, isLoading: isBlockingUsersLoading } = useBlockedUsers(isMyProfile); // load blocked users for my profile
+
+  const [routes, setRoutes] = useState<TabRoute[]>(BaseTabRoutes);
+
+  useEffect(() => {
+    setRoutes(isMyProfile && blockedUsers?.length ? TabRoutesWithBlocked : BaseTabRoutes);
+  }, [blockedUsers, isMyProfile]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -85,8 +102,27 @@ export const ProfileStatsScreen = () => {
           />
         );
       }
+      if (key === 'blocked') {
+        return (
+          <SearchableUserList
+            onSearch={() => {}}
+            data={blockedUsers}
+            isLoading={isBlockingUsersLoading}
+            onPress={handleUserPress}
+          />
+        );
+      }
     },
-    [setFollowersSearch, followers, isLoading, handleUserPress, setFollowingSearch, following],
+    [
+      setFollowersSearch,
+      followers,
+      isLoading,
+      handleUserPress,
+      setFollowingSearch,
+      following,
+      blockedUsers,
+      isBlockingUsersLoading,
+    ],
   );
 
   return (

@@ -1,4 +1,3 @@
-import { PortalHost } from '@gorhom/portal';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Platform, View } from 'react-native';

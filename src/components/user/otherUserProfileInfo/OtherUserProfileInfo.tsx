@@ -1,9 +1,8 @@
-import Ionicons from '@react-native-vector-icons/ionicons';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import { useUser } from '../../../state/user/authStore';
 import { UserType } from '../../../state/user/types';
 import { colors } from '../../../theme';
 import { SvgIcon, Avatar } from '../../ui';
+import { BlockUserButton } from '../BlockUserButton';
 import { FollowButton } from '../FollowButton';
 import CounterSection from '../myProfileInfo/CounterSection';
 import { SocialNetworks } from './SocialNetworks';
@@ -42,7 +41,10 @@ export const ProfileUserInfo = ({
             <Avatar uri={avatar} name={fullName} size={70} />
             <Text className="ml-[5px] text-[20px] font-bold text-primary">{fullName}</Text>
           </View>
-          <FollowButton user={user} />
+          <View className="flex-row gap-2">
+            <FollowButton user={user} />
+            <BlockUserButton className="mt-[10px] min-w-[120px]" userId={user.id} />
+          </View>
         </View>
         <TouchableOpacity className="justify-end pb-[14px] pr-[20px]" onPress={onChatPress}>
           <SvgIcon image="commentIcon" color={colors.white} style={styles.chatIcon} />

@@ -142,6 +142,7 @@ export const ChatDialog = () => {
       <DialogHeader
         avatar={interlocutor?.avatar}
         displayName={interlocutor ? getDisplayName(interlocutor) : '...'}
+        interlocutorUserId={interlocutor?.id}
         onPress={() => {
           if (interlocutor) {
             navigation.navigate(Screens.Profile, { user: interlocutor });

@@ -43,7 +43,7 @@ const qqlQuery = `query(
         updatedAt
     }
 }
-fragment ShallowUser on User { id firstName lastName avatar }
+fragment ShallowUser on User { id firstName lastName avatar nickname }
 `;
 
 export const useChatMessages = (chatId?: string) => {

@@ -2,16 +2,16 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../../../lib/api';
 import { UserType } from '../../../state/user/types';
 
-// todo: generate types...
 export type UserWhereInput = {
   any?: string;
   id?: {
     in?: string[];
     notIn?: string[];
   };
-  firstName?: {
+  nickname?: {
     contains?: string;
     startsWith?: string;
+    mode?: 'Default' | 'Insensitive';
   };
 };
 
@@ -27,21 +27,27 @@ const qqlQuery = `query(
         orderBy: $orderBy
         take: $take
     ) {
-        id firstName lastName avatar username createdAt updatedAt
+        id
+        firstName
+        lastName
+        nickname
+        avatar
+        username 
+        createdAt
+        updatedAt
     }
 }`;
 
 export const useUsersQuery = (filter?: UserWhereInput) => {
   return useQuery({
-    queryKey: filter ? ['users', filter] : ['users'],
+    queryKey: filter ? ['users', 'filter', JSON.stringify(filter)] : ['users'],
     queryFn: async () => {
       const variables: Record<string, unknown> = {
-        take: 20,
+        take: 50,
       };
       if (filter) {
         variables.where = filter;
       }
-      console.log('Search users with filters', variables);
       const { data } = await api.post<{
         data: { users: UserType[] };
       }>('/graphql', {
@@ -53,7 +59,7 @@ export const useUsersQuery = (filter?: UserWhereInput) => {
       }
     },
     refetchOnMount: 'always',
-    staleTime: Infinity,
+    staleTime: filter ? 0 : Infinity,
     gcTime: 1000 * 60 * 60 * 24,
   });
 };

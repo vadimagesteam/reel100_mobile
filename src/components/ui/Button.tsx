@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import clsx from 'clsx';
-import { FC, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { LinearGradient } from './LinearGradient';
 
 export interface ButtonProps extends TouchableOpacityProps {
@@ -39,9 +39,9 @@ const textVariants: Record<string, string> = {
 };
 
 const sizes: Record<string, string> = {
-  sm: 'py-2 px-3',
-  md: 'py-3 px-4',
-  lg: 'py-4 px-5',
+  sm: 'h-[30px] py-2 px-3',
+  md: 'h-[40px] py-3 px-4',
+  lg: 'h-[52px] py-4 px-5',
 };
 
 const textSizes: Record<string, string> = {
@@ -50,7 +50,11 @@ const textSizes: Record<string, string> = {
   lg: 'text-lg',
 };
 
-export const Button: FC<ButtonProps> = ({
+const variantLoaderColors: Record<string, string | undefined> = {
+  danger: '#fff',
+};
+
+export const Button = ({
   variant = 'primary',
   size = 'lg',
   loading,
@@ -63,7 +67,7 @@ export const Button: FC<ButtonProps> = ({
   iconRight,
   gradientColors,
   ...rest
-}) => {
+}: ButtonProps) => {
   const baseButton = 'rounded-xl items-center justify-center flex-row overflow-hidden';
 
   const isDisabled = disabled || loading;
@@ -74,7 +78,7 @@ export const Button: FC<ButtonProps> = ({
         {loadingText}
       </Text>
     ) : (
-      <ActivityIndicator size="small" />
+      <ActivityIndicator size="small" color={variantLoaderColors[variant]} />
     )
   ) : (
     <View className="flex-row items-center gap-x-2">

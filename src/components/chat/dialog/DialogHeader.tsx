@@ -3,15 +3,22 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBackArrowButton } from '../../appHeader';
 import { Avatar } from '../../ui';
+import { BlockUserButton } from '../../user/BlockUserButton';
 
 export interface DialogHeaderProps {
   avatar?: string | null;
   displayName: string;
   // lastActive?: string;
   onPress: () => void;
+  interlocutorUserId?: string;
 }
 
-export const DialogHeader = ({ onPress, displayName, avatar }: DialogHeaderProps) => {
+export const DialogHeader = ({
+  onPress,
+  displayName,
+  interlocutorUserId,
+  avatar,
+}: DialogHeaderProps) => {
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -28,9 +35,9 @@ export const DialogHeader = ({ onPress, displayName, avatar }: DialogHeaderProps
           </View>
         </TouchableOpacity>
       </View>
-      {/*<TouchableOpacity className="rounded-[6px] bg-danger p-1" onPress={() => true}>
-        <Text className="text-base font-medium text-primary">Block user</Text>
-      </TouchableOpacity>*/}
+      {interlocutorUserId && (
+        <BlockUserButton className="min-w-[70px]" size="sm" userId={interlocutorUserId} />
+      )}
     </View>
   );
 };

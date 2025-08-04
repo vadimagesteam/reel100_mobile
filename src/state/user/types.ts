@@ -58,10 +58,6 @@ export type UserBase = {
   username: string;
   firstName: string;
   lastName: string;
-  roles: string[];
-  status: 'Active' | 'Pending' | string;
-  createdAt: string;
-  updatedAt: string;
   avatar: string | null;
   nickname: string | null;
 };
@@ -92,6 +88,10 @@ export type UserProfile = UserBase & {
 export type RelationId = string;
 
 export type UserType = UserBase & {
+  roles: string[];
+  status: 'Active' | 'Pending' | string;
+  createdAt: string;
+  updatedAt: string;
   stats: UserStatsType;
   follows: {
     id: RelationId;

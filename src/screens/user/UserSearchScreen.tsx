@@ -14,7 +14,7 @@ export const UserSearchScreen = () => {
 
   const insets = useSafeAreaInsets();
   const { data, isLoading } = useUsersQuery(
-    searchText ? { firstName: { startsWith: searchText } } : undefined,
+    searchText ? { nickname: { contains: searchText, mode: 'Insensitive' } } : undefined,
   );
 
   return (

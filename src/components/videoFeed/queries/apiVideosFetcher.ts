@@ -1,6 +1,5 @@
 import { api } from '../../../lib/api';
-import { RelationId, UserBase } from '../../../state/user/types';
-import { ChatMessageType } from '../../chat/hooks';
+import { RelationId } from '../../../state/user/types';
 
 export type VideoFileQuality = {
   fps: number;
@@ -142,9 +141,9 @@ export const apiVideosFetcher = async ({
   orderBy = [],
   where = {},
 }: ApiVideosFetcherParams): Promise<VideoPost[]> => {
-  console.log('🔥 [apiVideosFetcher]', { where, skip, take, orderBy });
+  // console.log('🔥 [apiVideosFetcher]', { where, skip, take, orderBy });
 
-  const { status, data } = await api.post<{
+  const { data } = await api.post<{
     data: {
       videos: VideoPost[];
     };
@@ -157,8 +156,6 @@ export const apiVideosFetcher = async ({
       where,
     },
   });
-
-  console.log('resp', { status }, data);
 
   return data.data.videos;
 };
