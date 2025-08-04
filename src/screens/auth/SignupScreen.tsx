@@ -1,4 +1,3 @@
-import omit from 'lodash.omit';
 import { Alert, Text } from 'react-native';
 import { Button, Checkbox, Input } from '../../components/ui';
 import { Controller, useForm } from 'react-hook-form';
@@ -15,7 +14,7 @@ interface FormData {
   firstName: string;
   lastName: string;
   nickname: string;
-  ageOver13: boolean;
+  passAgeVerification: boolean;
 }
 
 export function SignupScreen() {
@@ -39,7 +38,7 @@ export function SignupScreen() {
   });
 
   const onSubmit = async (data: FormData) => {
-    const result = await signupAction(omit(data, ['ageOver13']));
+    const result = await signupAction(data);
     if (result.type === 'success') {
       navigation.navigate(Screens.VerifyEmail);
       return;
@@ -200,8 +199,8 @@ export function SignupScreen() {
       />
 
       <Controller
-        rules={{ required: 'You have to confirm your age' }}
-        name="ageOver13"
+        rules={{ required: 'Please confirm your age' }}
+        name="passAgeVerification"
         control={control}
         render={({ field: { value, onChange } }) => (
           <Checkbox
@@ -217,8 +216,8 @@ export function SignupScreen() {
         )}
       />
 
-      {errors?.ageOver13?.message && (
-        <Text className="pl-2 text-red1">{errors?.ageOver13?.message}</Text>
+      {errors?.passAgeVerification?.message && (
+        <Text className="pl-2 text-red1">{errors?.passAgeVerification?.message}</Text>
       )}
 
       <Button loading={isSubmitting} onPress={handleSubmit(onSubmit)}>
