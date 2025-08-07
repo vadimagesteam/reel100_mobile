@@ -8,12 +8,16 @@ export interface CameraFeaturesProps {
   isRecording: boolean;
   features: UseCameraFeatures;
   onPickFromGallery: () => void;
+  hasTorch?: boolean;
+  support60FPS?: boolean;
 }
 
 export const CameraFeatures = ({
   features,
   onPickFromGallery,
   isRecording,
+  hasTorch,
+  support60FPS,
 }: CameraFeaturesProps) => {
   const { frameRate, setFrameRate, cameraPosition, setCameraPosition, torchOn, setTorchOn } =
     features;
@@ -32,25 +36,30 @@ export const CameraFeatures = ({
         <SvgIcon image="switchCameraIcon" />
       </ControlButton>
 
-      <ControlButton
-        disabled={cameraPosition === 'front'}
-        onPress={() => {
-          setTorchOn((prev) => !prev);
-        }}
-      >
-        <SvgIcon image={torchOn ? 'flashIcon' : 'flashNoIcon'} />
-      </ControlButton>
+      {hasTorch && (
+        <ControlButton
+          disabled={cameraPosition === 'front'}
+          onPress={() => {
+            setTorchOn((prev) => !prev);
+          }}
+        >
+          <SvgIcon image={torchOn ? 'flashIcon' : 'flashNoIcon'} />
+        </ControlButton>
+      )}
 
-      <ControlButton
-        animated
-        style={animStyle}
-        onPress={() => {
-          setFrameRate((prev) => (prev === 30 ? 60 : 30));
-        }}
-      >
-        <Text className="text-primary text-[10px]">{frameRate}</Text>
-        <Text className="text-primary text-[10px]">FPS</Text>
-      </ControlButton>
+      {support60FPS && (
+        <ControlButton
+          animated
+          style={animStyle}
+          onPress={() => {
+            setFrameRate((prev) => (prev === 30 ? 60 : 30));
+          }}
+        >
+          <Text className="text-[10px] text-primary">{frameRate}</Text>
+          <Text className="text-[10px] text-primary">FPS</Text>
+        </ControlButton>
+      )}
+
       <ControlButton animated style={animStyle} onPress={onPickFromGallery}>
         <SvgIcon image="gellaryCameraIcon" />
       </ControlButton>

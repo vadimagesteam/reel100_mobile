@@ -50,11 +50,12 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
           }
         };
 
+        const iconName = TabIcons[route.name as RouteKey];
         const icon = (
           <SvgIcon
-            image={TabIcons[route.name as RouteKey]}
+            image={iconName}
             color={isFocused ? colors.blue2 : colors.white}
-            style={{ width: IconSize, height: IconSize }}
+            style={iconName !== 'homeNavTab' ? { width: IconSize, height: IconSize } : {}}
           />
         );
 

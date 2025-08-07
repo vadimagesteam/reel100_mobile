@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import omit from 'lodash.omit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuthStore } from '../state/user/authStore';
 import { queryClient } from './api';
 
 export interface PersistStorageParams<T> {
@@ -14,6 +15,8 @@ export interface PersistStorageParams<T> {
 type Store<T = object> = StoreApi<T> & {
   persist: {
     clearStorage: () => void;
+    hasHydrated: () => boolean;
+    onFinishHydration: (fn: () => void) => void;
   };
 };
 
@@ -32,7 +35,6 @@ export const createPersistStore = <T extends object>(
       storage: createJSONStorage(() => AsyncStorage),
     }),
   );
-  store.persist;
   persistedStores.push(store as Store<T>);
   return store;
 };
@@ -42,4 +44,17 @@ export const clearStoreCaches = async () => {
     store.persist.clearStorage();
   }
   queryClient.clear();
+};
+
+export const getAllStoreHydratedPromises = async () => {
+  const promises = [];
+  for (const store of persistedStores) {
+    if (!store.persist.hasHydrated()) {
+      promises.push(
+        new Promise<void>((resolve) => store.persist.onFinishHydration(() => resolve())),
+      );
+    }
+  }
+
+  return Promise.allSettled(promises);
 };

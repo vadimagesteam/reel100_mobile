@@ -15,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
+import { isAndroid } from '../../../utils';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -112,7 +113,7 @@ export const RecordButton = ({
   return (
     <View
       className="absolute w-full items-center justify-center"
-      style={{ bottom: insets.bottom + 6 }}
+      style={{ bottom: insets.bottom + (isAndroid ? 12 : 6) }}
     >
       <GestureDetector gesture={composed}>
         <Animated.View

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Alert } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import { useAuthStore } from '../../../../state/user/authStore';
 import { useStatesQuery } from './useStatesQuery';
 import { useStateSelector } from '../../../../state/app/uiStore';
 import { requestLocationPermission } from '../requestLocationPermission';

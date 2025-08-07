@@ -1,4 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
+import { endOfDay, startOfDay } from 'date-fns';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
 import { VideoTiles } from '../videoTiles';
@@ -18,6 +19,10 @@ export const StateFeed = ({ isActiveTab }: { isActiveTab: boolean }) => {
     where: useMemo(
       () => ({
         status: 'Finished',
+        createdAt: {
+          gte: startOfDay(new Date()).toISOString(),
+          lte: endOfDay(new Date()).toISOString(),
+        },
         states: {
           some: {
             id: { equals: selectedState?.id! },

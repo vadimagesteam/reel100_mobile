@@ -46,7 +46,7 @@ const sizes: Record<string, string> = {
 
 const textSizes: Record<string, string> = {
   sm: 'text-sm',
-  md: 'text-base',
+  md: 'text-[13px]',
   lg: 'text-lg',
 };
 

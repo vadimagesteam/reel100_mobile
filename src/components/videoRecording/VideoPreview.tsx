@@ -5,6 +5,7 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import Video from 'react-native-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
+import { isAndroid } from '../../utils';
 import { Button } from '../ui';
 import { requestCameraRollSavePermissions } from './requestCameraRollSave';
 import { VideoDescriptionInput } from './VideoDescriptionInput';
@@ -45,7 +46,8 @@ export const VideoPreview = () => {
   const [handleDraft, isSavingDraft] = useLoadingCallback(async () => {
     let saved = false;
     try {
-      if (!(await requestCameraRollSavePermissions())) {
+      const saveResult = await requestCameraRollSavePermissions();
+      if (!isAndroid && !saveResult) {
         Alert.alert(
           'Unable to save video',
           'We need permissions to save video to your camera roll',
@@ -54,6 +56,7 @@ export const VideoPreview = () => {
       await CameraRoll.saveAsset(`file://${previewUri}`, {
         type: 'video',
       });
+      saved = true;
     } catch (e) {
       // Weird behaviour - the video is saved,
       // but this error is thrown when "add only" option selected
@@ -106,7 +109,10 @@ export const VideoPreview = () => {
       <View
         className="absolute left-0 w-full flex-row justify-between px-16"
         // eslint-disable-next-line react-native/no-inline-styles
-        style={{ bottom: insets.bottom, display: uploading ? 'none' : 'flex' }}
+        style={{
+          bottom: insets.bottom + (isAndroid ? 10 : 0),
+          display: uploading ? 'none' : 'flex',
+        }}
       >
         <Button variant="primary" onPress={handlePublish}>
           Publish Now

@@ -42,6 +42,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   isRefetching = false,
   ...flatListProps
 }) => {
+  const screenType = useVideoFeed((s) => s.screenType);
   const backPressHandler = useVideoFeed((s) => s.backPressHandler);
   const { closeComments } = useVideoFeed((s) => s.actions);
   const { isFullscreen, setFullscreen } = useVideoFullscreen();
@@ -121,7 +122,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const swipeTranslateX = useSharedValue(0);
   const swipeTranslateY = useSharedValue(0);
   const backSwipeGesture = Gesture.Pan()
-    .enabled(isFullscreen)
+    .enabled(isFullscreen && screenType === 'inner')
     .minDistance(10)
     .onStart(() => {
       swipeTranslateX.value = 0;
@@ -134,7 +135,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     .onEnd((e) => {
       swipeTranslateX.value = 0;
       swipeTranslateY.value = 0;
-      if (isFullscreen && e.translationX > 50 && (isAndroid || e.velocityX > 300)) {
+      if (isFullscreen && e.translationX > 50 && (isAndroid || e.velocityX > 100)) {
         runOnJS(handleBackSwipe)();
       }
     });

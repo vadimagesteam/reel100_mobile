@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Dimensions, NativeModules, StyleSheet, View } from 'react-native';
 import {
   Camera,
@@ -14,6 +14,7 @@ import Reanimated, {
   useAnimatedProps,
   useSharedValue,
 } from 'react-native-reanimated';
+import { isAndroid, isIOS } from '../../utils';
 import { CameraFeatures, Timer, useCameraFeatures, CloseButton, RecordButton } from './controls';
 import { useNavigation } from '@react-navigation/native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -55,12 +56,19 @@ export const VideoRecording = () => {
     physicalDevices: ['wide-angle-camera'],
   });
 
+  const supports60Fps = useMemo(
+    () => activeDevice?.formats.some((f) => f.maxFps >= 60),
+    [activeDevice?.formats],
+  );
+
+  const hasTorch = activeDevice?.hasTorch;
+
   const format = useCameraFormat(activeDevice, [
-    { fps: targetFps },
     { videoAspectRatio: screenAspectRatio },
     { videoResolution: 'max' },
     { photoAspectRatio: screenAspectRatio },
     { photoResolution: 'max' },
+    { fps: 30 },
   ]);
 
   const fps = Math.min(format?.maxFps ?? 1, targetFps);
@@ -105,14 +113,18 @@ export const VideoRecording = () => {
   const handleStartRecording = async () => {
     setIsRecording(true);
 
-    await CustomAudioSessionManager.deactivateAudioSession();
+    if (isIOS) {
+      await CustomAudioSessionManager.deactivateAudioSession();
+    }
 
     // https://github.com/mrousavy/react-native-vision-camera/issues/3524
     // !! SOUND RECORDING ISSUE:
     // If there is no sound, ensure all <Video> from react-native-video have disableAudioSessionManagement
     cameraRef.current?.startRecording({
       onRecordingFinished: async (video) => {
-        await CustomAudioSessionManager.activateVideoRecordingAudioSession();
+        if (isIOS) {
+          await CustomAudioSessionManager.activateVideoRecordingAudioSession();
+        }
         console.log('[onRecordingFinished]', video);
         setPreviewUri(video.path);
       },
@@ -123,14 +135,19 @@ export const VideoRecording = () => {
   };
 
   const handleFinishRecording = async () => {
-    await cameraRef.current?.stopRecording();
-    // Emulators debug
-    // if (!cameraRef.current) {
-    //   setPreviewUri(
-    //     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    //   );
-    // }
-    setIsRecording(false);
+    console.log('STOP RECORDING...');
+    try {
+      await cameraRef.current?.stopRecording();
+      // Emulators debug
+      // if (!cameraRef.current) {
+      //   setPreviewUri(
+      //     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      //   );
+      // }
+      setIsRecording(false);
+    } catch (error) {
+      Alert.alert((error as Error)?.message || 'Unable to stop video record: unknown error');
+    }
   };
 
   const handleCloseCamera = () => {
@@ -194,7 +211,7 @@ export const VideoRecording = () => {
                 ref={cameraRef}
                 style={StyleSheet.absoluteFill}
                 device={activeDevice}
-                // format={format}
+                format={format}
                 fps={fps}
                 isActive
                 video={permissions.camera}
@@ -208,6 +225,8 @@ export const VideoRecording = () => {
             </GestureDetector>
           )}
           <CameraFeatures
+            support60FPS={supports60Fps}
+            hasTorch={hasTorch}
             isRecording={isRecording}
             features={cameraFeatures}
             onPickFromGallery={onPickFromGallery}
