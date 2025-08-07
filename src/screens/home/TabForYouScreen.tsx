@@ -23,6 +23,7 @@ export const TabForYouScreen = () => {
     orderBy: [{ createdAt: 'Desc' }],
     where: {
       status: 'Finished',
+      forMe: true,
       ...(selectedUser
         ? {
             user: { id: selectedUser.id },

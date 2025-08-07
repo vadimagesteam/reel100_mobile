@@ -87,6 +87,7 @@ export type ApiVideosFetcherParams = {
   where?: Partial<
     Record<keyof Omit<VideoPost, 'status'>, StringFilter> & {
       // enums
+      forMe?: boolean;
       user: WhereUniqueInput;
       status: VideoPost['status'];
       states: RelationFilter<{ id: string }>;
