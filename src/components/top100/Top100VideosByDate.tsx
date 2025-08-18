@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { endOfDay } from 'date-fns';
+import { endOfDay, startOfDay } from 'date-fns';
 import { CalendarModal } from '../calendar';
 import { ListEmptyBlock } from '../ui';
 import { ApiVideosFetcherParams } from '../videoFeed/queries/apiVideosFetcher';
@@ -32,7 +32,7 @@ export const Top100VideosByDate = () => {
       ({
         status: 'Finished',
         top_100Date: {
-          gte: new Date(selectedDate).toISOString(),
+          gte: startOfDay(new Date(selectedDate)).toISOString(),
           lte: endOfDay(new Date(selectedDate)).toISOString(),
         },
         states: {
