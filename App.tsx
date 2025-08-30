@@ -1,3 +1,4 @@
+import { Toasts } from '@backpackapp-io/react-native-toast';
 import { PortalProvider } from '@gorhom/portal';
 import React, { useEffect, useState } from 'react';
 import { LogBox, View } from 'react-native';
@@ -55,6 +56,7 @@ function App() {
             <SafeAreaProvider>
               <PortalProvider>
                 <RootNavigation isAuthenticated={isAuthenticated} />
+                <Toasts overrideDarkMode={false} />
               </PortalProvider>
             </SafeAreaProvider>
           </PersistQueryClientProvider>

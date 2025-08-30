@@ -50,8 +50,6 @@ export const ShareBottomSheet = () => {
   // When video is opened via video screen add insets to the share button
   let shareButtonBottomInset = screenType === 'modal' ? insets.bottom : 0;
 
-  console.log('shareButtonBottomInset', cacheKey);
-
   return (
     <BottomSheet open={opened} onClose={handleClose} handleComponent={null} snapPoints={snapPoints}>
       {opened && (

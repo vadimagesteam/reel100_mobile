@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@backpackapp-io/react-native-toast": "^0.14.0",
     "@gorhom/bottom-sheet": "^5",
     "@gorhom/portal": "^1.0.14",
     "@react-native-async-storage/async-storage": "^2.1.2",
@@ -18,6 +19,7 @@
     "@react-native-firebase/app": "^22.2.1",
     "@react-native-firebase/messaging": "^22.2.1",
     "@react-native-masked-view/masked-view": "^0.3.2",
+    "@react-native-menu/menu": "1.2.4",
     "@react-native-vector-icons/ionicons": "^12.0.1",
     "@react-navigation/bottom-tabs": "^7.2.1",
     "@react-navigation/native": "^7.0.15",
@@ -46,6 +48,8 @@
     "react-native-gesture-handler": "^2.24.0",
     "react-native-gifted-chat": "^2.8.1",
     "react-native-image-picker": "^8.2.0",
+    "react-native-ios-context-menu": "3.1.2",
+    "react-native-ios-utilities": "5.1.7",
     "react-native-keyboard-controller": "^1.18.5",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-pager-view": "^6.8.1",
@@ -59,6 +63,7 @@
     "react-native-tab-view": "^4.1.2",
     "react-native-video": "^6.16.1",
     "react-native-vision-camera": "^4.6.4",
+    "zeego": "^3.0.6",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

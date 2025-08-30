@@ -1,9 +1,11 @@
+import { toast } from '@backpackapp-io/react-native-toast';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { ActivityIndicator, ListRenderItem, Text, View } from 'react-native';
 import { BottomSheetFlatList, BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
 import { FlexLoading } from '../../ui';
 import { CommentType, useCommentsInfiniteQuery } from './hooks/useCommentsInfiniteQuery';
 import { CommentsListItem } from './CommentsListItem';
+import { useCommentMutation } from './hooks/useDeleteCommentMutation';
 import { useScrollToNewComment } from './hooks/useScrollToNewComment';
 import { useVideoComments } from '../hooks';
 
@@ -21,6 +23,7 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
     useCommentsInfiniteQuery(videoId);
 
   const { commentsExpanded, toggleCommentReplies } = useVideoComments();
+  const { mutateAsync: deleteComment } = useCommentMutation();
 
   const itemHeighByIndex = useRef<Record<number, number>>({});
 
@@ -47,6 +50,8 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
       }, [] as CommentType[]);
   }, [flatPages, commentsExpanded]);
 
+  console.log('video id', videoId);
+
   const renderComment = useCallback<ListRenderItem<CommentType>>(
     ({ item, index }) => {
       return (
@@ -55,12 +60,16 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
             itemHeighByIndex.current[index] = e.nativeEvent.layout.height;
           }}
           comment={item}
+          onDelete={async (c) => {
+            await deleteComment({ id: c.id, videoId: c.video.id });
+            toast.success('Comment deleted');
+          }}
           onReplyPress={onReply}
           onToggleReplies={(c) => toggleCommentReplies(c.id)}
         />
       );
     },
-    [toggleCommentReplies, onReply],
+    [onReply, deleteComment, toggleCommentReplies],
   );
 
   useScrollToNewComment(listRef, flatPages, commentsTree);

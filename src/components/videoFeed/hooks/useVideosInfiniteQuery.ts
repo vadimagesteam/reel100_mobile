@@ -65,7 +65,7 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
 };
 
 export const updateVideoCache = (
-  cacheKey: string[],
+  cacheKey: CacheKey,
   videoId: string,
   updateFn: (video: VideoPost) => VideoPost,
 ) => {
