@@ -30,6 +30,7 @@ export interface VideoItemProps extends Pick<ReactVideoProps, 'muted' | 'repeat'
   video: VideoPost;
   active: boolean;
   dimensions: { width: number; height: number };
+  showTopRank?: boolean;
 }
 
 export const VideoListItemRaw: FC<VideoItemProps> = ({
@@ -37,6 +38,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
   muted,
   active,
   dimensions,
+  showTopRank = true,
   ...videoProps
 }) => {
   const { id: videoId, file, user: author } = video;
@@ -154,6 +156,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
       />
       {active && (
         <VideoInfoOverlay
+          showTopRank={showTopRank}
           video={video}
           onBackPress={() => {
             if (backPressHandler) {

@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { HidebleContainer } from '../../components/hidebleContainer';
 import { VideoFeedProvider, VideoList } from '../../components/videoFeed';
 import { useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
+import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useNavigation, useRoute } from '../../navigation';
 
 export const VideoFeedModalScreen = () => {
@@ -10,8 +11,10 @@ export const VideoFeedModalScreen = () => {
 
   const { queryParams, videoIndex, feedState } = params;
 
-  const { flatPages, refetch, isRefetching, fetchNextPage, isFetchingNextPage, hasNextPage } =
+  const { flatPages, refetch, fetchNextPage, isFetchingNextPage, hasNextPage } =
     useVideosInfiniteQuery(queryParams);
+
+  const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -38,7 +41,7 @@ export const VideoFeedModalScreen = () => {
         <VideoList
           initialVideoIndex={0}
           isRefetching={isRefetching}
-          refetch={refetch}
+          refetch={handleRefresh}
           videos={videos}
           onEndReached={onEndReached}
         />

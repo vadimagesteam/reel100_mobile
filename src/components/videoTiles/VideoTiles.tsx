@@ -22,6 +22,8 @@ export interface TilesListProps<ItemType>
   renderItem?: FlatListProps<ItemType>['renderItem'];
   emptyTitle?: string;
   emptyMessage?: string;
+  refetch?: () => void;
+  isRefreshing?: boolean;
 }
 
 /**
@@ -35,18 +37,12 @@ export const VideoTiles = <ItemType extends VideoPost>({
   className,
   emptyTitle,
   emptyMessage,
+  refetch,
+  isRefreshing = false,
   ...flatListProps
 }: TilesListProps<ItemType>) => {
-  const {
-    flatPages,
-    refetch,
-    isLoading,
-    isRefetching,
-    fetchNextPage,
-    isFetchingNextPage,
-    hasNextPage,
-    queryParams,
-  } = queryControl;
+  const { flatPages, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage, queryParams } =
+    queryControl;
 
   if (propRenderItem && ItemComponent) {
     throw new Error('Both props are not supported: renderItem & ItemComponent');
@@ -108,7 +104,7 @@ export const VideoTiles = <ItemType extends VideoPost>({
         data={data}
         renderItem={propRenderItem ?? renderItem}
         keyExtractor={(item, i) => i.toString()}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refetch} />}
         numColumns={3}
         initialNumToRender={6}
         windowSize={6}

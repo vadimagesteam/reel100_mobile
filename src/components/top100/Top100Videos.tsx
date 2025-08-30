@@ -1,6 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { endOfDay, startOfDay } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useStateSelector } from '../../state/app/uiStore';
 import { FlexLoading } from '../ui';
 import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
@@ -15,39 +16,32 @@ export const Top100Videos = ({ isActiveTab }: { isActiveTab: boolean }) => {
 
   const [shouldPoll, setShouldPoll] = useState(false);
 
-  const {
-    fetchNextPage,
-    hasNextPage,
-    isLoading,
-    isFetchingNextPage,
-    flatPages,
-    refetch,
-    isRefetching,
-  } = useVideosInfiniteQuery({
-    cacheKey,
-    where: {
-      status: 'Finished',
-      createdAt: {
-        gte: startOfDay(new Date()).toISOString(),
-        lte: endOfDay(new Date()).toISOString(),
-      },
-      states: {
-        some: {
-          id: { equals: selectedState?.id! },
+  const { fetchNextPage, hasNextPage, isLoading, isFetchingNextPage, flatPages, refetch } =
+    useVideosInfiniteQuery({
+      cacheKey,
+      where: {
+        status: 'Finished',
+        createdAt: {
+          gte: startOfDay(new Date()).toISOString(),
+          lte: endOfDay(new Date()).toISOString(),
+        },
+        states: {
+          some: {
+            id: { equals: selectedState?.id! },
+          },
         },
       },
-    },
-    orderBy: [
-      {
-        likesCount: 'Desc',
-      },
-      {
-        createdAt: 'Asc',
-      },
-    ],
-    // for empty feed we want to poll
-    refetchInterval: shouldPoll ? 3000 : undefined,
-  });
+      orderBy: [
+        {
+          likesCount: 'Desc',
+        },
+        {
+          createdAt: 'Asc',
+        },
+      ],
+      // for empty feed we want to poll
+      refetchInterval: shouldPoll ? 3000 : undefined,
+    });
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -76,6 +70,8 @@ export const Top100Videos = ({ isActiveTab }: { isActiveTab: boolean }) => {
     }, [flatPages.length, isActiveTab, refetch]),
   );
 
+  const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
+
   if (isLoading) {
     return <FlexLoading />;
   }
@@ -84,7 +80,7 @@ export const Top100Videos = ({ isActiveTab }: { isActiveTab: boolean }) => {
     <VideoList
       initialVideoIndex={0}
       isRefetching={isRefetching}
-      refetch={refetch}
+      refetch={handleRefresh}
       videos={flatPages}
       onEndReached={onEndReached}
       ListEmptyComponent={<EmptyTop100Videos stateLabel={selectedState?.label!} />}

@@ -1,5 +1,5 @@
-import { useVideoPause } from '../hooks/useVideoPause';
 import { ReactNode, useEffect } from 'react';
+import { useVideoPause } from '../hooks';
 import { VideoFeedProvider } from './VideoFeedProvider';
 
 export interface TabAwareVideoFeedProvider {

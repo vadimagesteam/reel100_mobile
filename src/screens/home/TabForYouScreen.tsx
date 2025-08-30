@@ -6,6 +6,7 @@ import { SearchInput } from '../../components/ui';
 import { VideoFeedProvider } from '../../components/videoFeed';
 import { useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
 import { VideoTiles } from '../../components/videoTiles';
+import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { Screens } from '../../navigation/screens';
 import { UserType } from '../../state/user/types';
 
@@ -33,6 +34,8 @@ export const TabForYouScreen = () => {
   });
 
   const { refetch } = controllers;
+
+  const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
 
   useFocusEffect(
     useCallback(() => {
@@ -62,6 +65,8 @@ export const TabForYouScreen = () => {
       </HideableView>
       <VideoFeedProvider initialState={{ cacheKey: cacheKey }}>
         <VideoTiles
+          refetch={handleRefresh}
+          isRefreshing={isRefetching}
           queryControl={controllers}
           emptyMessage={
             searchByFullName ? `${searchByFullName} is not uploaded any videos` : undefined

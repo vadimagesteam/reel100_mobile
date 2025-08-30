@@ -38,6 +38,7 @@ export interface VideoInfoOverlayProps {
   onUser?: () => void;
   onBackPress?: () => void;
   onDelete?: () => void;
+  showTopRank?: boolean;
 }
 
 export const VideoInfoOverlay = ({
@@ -56,6 +57,7 @@ export const VideoInfoOverlay = ({
   onLike,
   onDelete,
   liked,
+  showTopRank = true,
 }: VideoInfoOverlayProps) => {
   const insets = useSafeAreaInsets();
   const { setHeartIconPos } = useVideoFeed((s) => s.actions);
@@ -141,7 +143,7 @@ export const VideoInfoOverlay = ({
             </GestureTouchableOpacity>
           )}
 
-          {video.top_100Position !== null && (
+          {showTopRank && video.top_100Position !== null && (
             <View className="ml-1 rounded bg-orange p-1 opacity-80">
               <Text className="color-white">#{video.top_100Position}</Text>
             </View>

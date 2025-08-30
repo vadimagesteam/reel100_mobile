@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { endOfDay, startOfDay } from 'date-fns';
+import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { CalendarModal } from '../calendar';
 import { ListEmptyBlock } from '../ui';
 import { ApiVideosFetcherParams } from '../videoFeed/queries/apiVideosFetcher';
@@ -44,23 +45,19 @@ export const Top100VideosByDate = () => {
     [selectedDate, selectedState],
   );
 
-  const {
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    flatPages,
-    refetch,
-    isRefetching,
-  } = useVideosInfiniteQuery({
-    cacheKey,
-    where: filters,
-    orderBy: [
-      {
-        top_100Position: 'Desc',
-      },
-    ],
-  });
+  const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, flatPages, refetch } =
+    useVideosInfiniteQuery({
+      cacheKey,
+      where: filters,
+      limit: 1,
+      orderBy: [
+        {
+          top_100Position: 'Asc',
+        },
+      ],
+    });
+
+  const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -80,11 +77,11 @@ export const Top100VideosByDate = () => {
         onSubmitPress={confirm}
       />
       <VideoList
+        showTopRank={false}
         initialVideoIndex={0}
         isRefetching={isRefetching}
-        refetch={refetch}
+        refetch={handleRefresh}
         videos={flatPages}
-        onEndReached={onEndReached}
         ListEmptyComponent={
           !flatPages.length && !isFetching ? (
             <ListEmptyBlock title="Nothing to show yet" message="Try selecting a different date." />

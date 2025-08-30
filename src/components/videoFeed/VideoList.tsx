@@ -7,8 +7,9 @@ import Animated, {
   useSharedValue,
   Extrapolation,
   withSpring,
+  withTiming,
 } from 'react-native-reanimated';
-import { FlatList, FlatListProps, RefreshControl } from 'react-native';
+import { FlatList, FlatListProps, RefreshControl, InteractionManager } from 'react-native';
 import { useNavigation } from '../../navigation';
 import { isAndroid } from '../../utils';
 
@@ -33,6 +34,7 @@ export interface SwipeableVideosListProps
   isRefetching?: boolean;
   refetch?: () => void;
   initialVideoIndex: number;
+  showTopRank?: boolean;
 }
 
 export const VideoList: FC<SwipeableVideosListProps> = ({
@@ -40,6 +42,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   refetch,
   initialVideoIndex,
   isRefetching = false,
+  showTopRank = true,
   ...flatListProps
 }) => {
   const screenType = useVideoFeed((s) => s.screenType);
@@ -121,21 +124,19 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
 
   const swipeTranslateX = useSharedValue(0);
   const swipeTranslateY = useSharedValue(0);
+
   const backSwipeGesture = Gesture.Pan()
-    .enabled(isFullscreen && screenType === 'inner')
-    .minDistance(10)
-    .onStart(() => {
-      swipeTranslateX.value = 0;
-      swipeTranslateY.value = 0;
-    })
+    .enabled(isFullscreen)
+    .activeOffsetX(10)
     .onUpdate((e) => {
       swipeTranslateX.value = e.translationX;
       swipeTranslateY.value = e.translationY;
     })
     .onEnd((e) => {
-      swipeTranslateX.value = 0;
-      swipeTranslateY.value = 0;
-      if (isFullscreen && e.translationX > 50 && (isAndroid || e.velocityX > 100)) {
+      swipeTranslateX.value = withTiming(0);
+      swipeTranslateY.value = withTiming(0);
+
+      if (isFullscreen && e.translationX > 120 && (isAndroid || e.velocityX > 100)) {
         runOnJS(handleBackSwipe)();
       }
     });
@@ -157,9 +158,16 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
 
   const renderItem = useCallback(
     ({ item: video, index }: { item: VideoPost; index: number }) => {
-      return <VideoListItem video={video} dimensions={dimensions} active={activeIndex === index} />;
+      return (
+        <VideoListItem
+          video={video}
+          dimensions={dimensions}
+          active={activeIndex === index}
+          showTopRank={showTopRank}
+        />
+      );
     },
-    [dimensions, activeIndex],
+    [dimensions, activeIndex, showTopRank],
   );
 
   const onViewableItemsChanged = useCallback<
@@ -195,21 +203,13 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
       borderRadius: swipeTranslateX.value ? 40 : 0,
       transform: [
         {
-          scale: interpolate(swipeTranslateX.value, [0, 500], [1, 0.9], Extrapolation.CLAMP),
+          scale: interpolate(swipeTranslateX.value, [0, 500], [1, 0.5], Extrapolation.CLAMP),
         },
         {
           rotate: `${interpolate(swipeTranslateX.value, [0, 500], [0, 0.5], Extrapolation.CLAMP)}deg`,
         },
-        {
-          translateX: withSpring(
-            interpolate(swipeTranslateX.value, [0, 200], [0, 26], Extrapolation.CLAMP),
-          ),
-        },
-        {
-          translateY: withSpring(
-            interpolate(swipeTranslateY.value, [0, 200], [0, 26], Extrapolation.CLAMP),
-          ),
-        },
+        { translateX: swipeTranslateX.value },
+        { translateY: swipeTranslateY.value },
       ],
     }),
     [],
