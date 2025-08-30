@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import { BottomSheetTextInput, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Alert, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLoadingCallback } from '../../../hooks/useLoadingCallback';
 import { useSendMessage } from '../../chat/hooks';
 import { SearchInput, Button, BottomSheet } from '../../ui';
 import { SharePeopleList } from './SharePeopleList';
-import { useVideoFeedCacheKey, useVideoShare } from '../hooks';
+import { useVideoFeedCacheKey, useVideoShare, useVideoFeed } from '../hooks';
 
 export const ShareBottomSheet = () => {
   const cacheKey = useVideoFeedCacheKey();
@@ -17,6 +17,7 @@ export const ShareBottomSheet = () => {
   const [focused, setFocused] = useState(false);
   const snapPoints = useMemo(() => (focused ? ['90%'] : ['50%']), [focused]);
   const insets = useSafeAreaInsets();
+  const screenType = useVideoFeed((s) => s.screenType);
 
   const handleClose = useCallback(() => {
     setFocused(false);
@@ -47,8 +48,9 @@ export const ShareBottomSheet = () => {
   });
 
   // When video is opened via video screen add insets to the share button
-  // fixme: think about better solution here
-  let shareButtonBottomInset = cacheKey?.[0] === 'video_modal' ? insets.bottom : 0;
+  let shareButtonBottomInset = screenType === 'modal' ? insets.bottom : 0;
+
+  console.log('shareButtonBottomInset', cacheKey);
 
   return (
     <BottomSheet open={opened} onClose={handleClose} handleComponent={null} snapPoints={snapPoints}>
@@ -64,7 +66,10 @@ export const ShareBottomSheet = () => {
           />
           <SharePeopleList searchQuery={search} onSelectionChanged={handleSelectionChange} />
           {showFooter && (
-            <View className="bg-background px-6" style={{ paddingBottom: shareButtonBottomInset }}>
+            <View
+              className="bg-background px-6 pt-2"
+              style={{ paddingBottom: shareButtonBottomInset }}
+            >
               <Button loading={isSharing} onPress={handleShare} size="md">
                 Send
               </Button>

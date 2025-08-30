@@ -8,28 +8,33 @@ import { Avatar, Button, Input } from '../../ui';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useAuthActions, useUser } from '../../../state/user/authStore';
 
-const socialValidationRules = {
+export const socialValidationRules = {
   instagram: {
     pattern: {
-      value: /^https?:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._%-]+\/?$/,
+      // supports instagram.com and instagr.am
+      value: /^(?:(?:https?):\/\/)?(?:[a-z0-9-]+\.)*(?:instagram\.com|instagr\.am)(?:\/\S*)?$/i,
       message: 'Enter a valid Instagram URL',
     },
   },
   facebook: {
     pattern: {
-      value: /^https?:\/\/(www\.)?facebook\.com\/[A-Za-z0-9._%-]+\/?$/,
+      // supports facebook.com, fb.com, fb.watch, m.me and any subdomain (m., web., l., business., etc.)
+      value:
+        /^(?:(?:https?):\/\/)?(?:[a-z0-9-]+\.)*(?:facebook\.com|fb\.com|fb\.watch|m\.me)(?:\/\S*)?$/i,
       message: 'Enter a valid Facebook URL',
     },
   },
   youtube: {
     pattern: {
-      value: /^https?:\/\/(www\.)?youtube\.com\/(channel|c|user)\/[A-Za-z0-9._%-]+\/?$/,
+      // supports youtube.com (incl. subdomains like m., music.) and youtu.be
+      value: /^(?:(?:https?):\/\/)?(?:[a-z0-9-]+\.)*(?:youtube\.com|youtu\.be)(?:\/\S*)?$/i,
       message: 'Enter a valid YouTube URL',
     },
   },
   tiktok: {
     pattern: {
-      value: /^https?:\/\/(www\.)?tiktok\.com\/@?[A-Za-z0-9._%-]+\/?$/,
+      // supports tiktok.com and subdomains (vm.tiktok.com short links, etc.)
+      value: /^(?:(?:https?):\/\/)?(?:[a-z0-9-]+\.)*tiktok\.com(?:\/\S*)?$/i,
       message: 'Enter a valid TikTok URL',
     },
   },

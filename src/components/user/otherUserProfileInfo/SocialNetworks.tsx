@@ -16,7 +16,8 @@ export const SocialNetworks = ({
   ...viewProps
 }: SocialNetworksProps) => {
   const handleClick = (url: string) => {
-    Linking.openURL(url);
+    let targetUrl = !url.startsWith('http') ? `https://${url}` : url;
+    Linking.openURL(targetUrl);
   };
 
   const links = useMemo(

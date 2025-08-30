@@ -3,11 +3,12 @@ import { useUser } from '../../../state/user/authStore';
 import { UserType } from '../../../state/user/types';
 import { BottomSheetFlashList, TouchableOpacity } from '@gorhom/bottom-sheet';
 import { useCallback, useState } from 'react';
+import { getDisplayName } from '../../../state/user/utils';
 import { Avatar, FlexLoading, ListEmptyBlock } from '../../ui';
 import { useUserQuery } from '../../user/hooks';
 import { useUserSearchableFollowRelations } from '../../user/userFollowRelations/useUserSearchableFollowRelations';
 
-type ShallowUser = Pick<UserType, 'id' | 'firstName' | 'lastName'>;
+type ShallowUser = Pick<UserType, 'id' | 'firstName' | 'lastName' | 'nickname'>;
 
 export interface SharePeopleListProps {
   searchQuery?: string;
@@ -20,6 +21,7 @@ export const SharePeopleList = ({ searchQuery, onSelectionChanged }: SharePeople
   // fixme...
   const me = useUser();
   const { data: user, isLoading } = useUserQuery(me.id);
+  console.log('user', user);
   const { data } = useUserSearchableFollowRelations(user, 'following', searchQuery);
 
   const handleItemPress = useCallback(
@@ -40,7 +42,7 @@ export const SharePeopleList = ({ searchQuery, onSelectionChanged }: SharePeople
         onPress={() => handleItemPress(item)}
       >
         <View className="relative">
-          <Avatar name={`${item.firstName} ${item.lastName}`} />
+          <Avatar name={getDisplayName(item)} />
           {selected[item.id!] && (
             <View className="absolute bottom-0 right-0 size-[20px] items-center justify-center rounded-full bg-blue2">
               <Text className="text-[12px] font-black text-primary">&#x2713;</Text>
@@ -49,7 +51,7 @@ export const SharePeopleList = ({ searchQuery, onSelectionChanged }: SharePeople
         </View>
 
         <Text numberOfLines={2} className="text-[12px] text-primary">
-          {item.firstName} {item.lastName}
+          {getDisplayName(item)}
         </Text>
       </TouchableOpacity>
     ),

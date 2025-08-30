@@ -27,7 +27,7 @@ export const UserSearchScreen = () => {
       <View className="mb-2 flex-row items-center gap-x-3">
         <HeaderBackArrowButton />
         <SearchInput
-          placeholder="Global user search"
+          placeholder="Find Users"
           autoCorrect={false}
           autoFocus
           value={searchText}

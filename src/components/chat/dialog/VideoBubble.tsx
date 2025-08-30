@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import { View } from 'react-native';
+import { View, Keyboard } from 'react-native';
 import { useNavigation } from '../../../navigation';
 import { Screens } from '../../../navigation/screens';
 import { VideoTile } from '../../videoTiles';
@@ -33,6 +33,7 @@ export const VideoBubble = ({ video, isMy }: MessageBubbleProps) => {
           style={{ width, height }}
           item={video}
           onVideoPress={() => {
+            Keyboard.dismiss();
             navigation.navigate(Screens.VideoModal, {
               video,
             });

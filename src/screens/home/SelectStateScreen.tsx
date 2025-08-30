@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StateList } from '../../components/appHeader/stateSelector/StateList';
 import { SearchInput } from '../../components/ui';
@@ -31,12 +31,8 @@ export const SelectStateScreen = () => {
           onChangeText={setSearchText}
         />
       </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-      >
-        <StateList searchQuery={searchText} onPress={handleSelected} />
-      </KeyboardAvoidingView>
+
+      <StateList searchQuery={searchText} onPress={handleSelected} />
     </SafeAreaView>
   );
 };

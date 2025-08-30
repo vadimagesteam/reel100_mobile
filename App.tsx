@@ -2,6 +2,7 @@ import { PortalProvider } from '@gorhom/portal';
 import React, { useEffect, useState } from 'react';
 import { LogBox, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { usePushNotifications } from './src/hooks/pushNotifications/usePushNotifications';
 import { getAllStoreHydratedPromises } from './src/lib/createPersistStore';
 import { RootNavigation } from './src/navigation/RootNavigation';
@@ -44,20 +45,22 @@ function App() {
   }
 
   return (
-    <GestureHandlerRootView className="flex-1 bg-background">
-      {storeHydrated && (
-        <PersistQueryClientProvider
-          client={queryClient}
-          persistOptions={{ persister: asyncStoragePersister }}
-        >
-          <SafeAreaProvider>
-            <PortalProvider>
-              <RootNavigation isAuthenticated={isAuthenticated} />
-            </PortalProvider>
-          </SafeAreaProvider>
-        </PersistQueryClientProvider>
-      )}
-    </GestureHandlerRootView>
+    <KeyboardProvider>
+      <GestureHandlerRootView className="flex-1 bg-background">
+        {storeHydrated && (
+          <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{ persister: asyncStoragePersister }}
+          >
+            <SafeAreaProvider>
+              <PortalProvider>
+                <RootNavigation isAuthenticated={isAuthenticated} />
+              </PortalProvider>
+            </SafeAreaProvider>
+          </PersistQueryClientProvider>
+        )}
+      </GestureHandlerRootView>
+    </KeyboardProvider>
   );
 }
 

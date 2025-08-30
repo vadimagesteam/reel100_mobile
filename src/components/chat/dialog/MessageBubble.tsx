@@ -1,4 +1,3 @@
-import Ionicons from '@react-native-vector-icons/ionicons';
 import clsx from 'clsx';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -29,22 +28,3 @@ export const MessageBubble = ({ isMy, text, createdAt, sent, read }: MessageBubb
     </View>
   </View>
 );
-
-const styles = StyleSheet.create({
-  messageContainer: {
-    flex: 1,
-    marginVertical: 6,
-  },
-  bubble: {
-    maxWidth: '80%',
-    borderRadius: 10,
-    padding: 10,
-  },
-
-  timestamp: {
-    fontSize: 10,
-    color: colors.primary,
-    marginVertical: 5,
-    textAlign: 'right',
-  },
-});

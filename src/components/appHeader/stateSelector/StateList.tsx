@@ -29,6 +29,7 @@ export const StateList = ({ searchQuery, onPress }: SharePeopleListProps) => {
 
   return (
     <FlashList<StateItem>
+      showsVerticalScrollIndicator={false}
       data={states}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
@@ -45,7 +46,7 @@ export const StateList = ({ searchQuery, onPress }: SharePeopleListProps) => {
           className="mt-3 flex-1 flex-row items-center border-b-[0.5px] border-b-gray-800 pb-2"
           onPress={() => onPress?.(item)}
         >
-          <Text numberOfLines={2} className="text-primary text-xl">
+          <Text numberOfLines={2} className="text-xl text-primary">
             {item.label}
           </Text>
         </TouchableOpacity>

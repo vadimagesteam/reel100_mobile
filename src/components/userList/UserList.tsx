@@ -23,6 +23,7 @@ export const UserList = <T extends UserBase>({
 
   return (
     <FlashList<T>
+      showsVerticalScrollIndicator={false}
       data={data}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
@@ -42,9 +43,6 @@ export const UserList = <T extends UserBase>({
           <View className="flex-col">
             <Text numberOfLines={2} className="text-xl text-primary">
               {getDisplayName(item)}
-            </Text>
-            <Text numberOfLines={2} className="text-sm text-gray-400">
-              {item.username}
             </Text>
           </View>
         </TouchableOpacity>

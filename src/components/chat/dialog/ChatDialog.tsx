@@ -170,8 +170,10 @@ export const ChatDialog = () => {
         alwaysShowSend
         showUserAvatar={false}
         keyboardShouldPersistTaps="handled"
-        messagesContainerStyle={styles.messagesContainer}
+        focusOnInputWhenOpeningKeyboard={false}
         // @ts-expect-error Types issue
+        listViewProps={{ keyboardDismissMode: 'on-drag' }}
+        messagesContainerStyle={styles.messagesContainer}
         textInputStyle={styles.textInput}
       />
     </>
