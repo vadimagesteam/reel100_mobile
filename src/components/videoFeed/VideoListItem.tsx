@@ -99,6 +99,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
     toggleLike({
       type: 'video',
       id: videoId,
+      authorId: video.user.id,
     });
   };
 

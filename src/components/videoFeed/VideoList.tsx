@@ -45,7 +45,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   showTopRank = true,
   ...flatListProps
 }) => {
-  const screenType = useVideoFeed((s) => s.screenType);
+  // const screenType = useVideoFeed((s) => s.screenType);
   const backPressHandler = useVideoFeed((s) => s.backPressHandler);
   const { closeComments } = useVideoFeed((s) => s.actions);
   const { isFullscreen, setFullscreen } = useVideoFullscreen();
@@ -95,10 +95,11 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     if (videos[activeIndex]) {
       likeAnimationRef.current?.trigger(x, y); // show "Like" animation
       setTimeout(() => {
-        // wait for animation end (1 sec)
+        // wait for the animation end (1 sec)
         like.mutate({
           type: 'video',
           id: videos[activeIndex].id,
+          authorId: videos[activeIndex].user.id,
         });
       }, likeAnimationRef.current?.animationDuration ?? 0);
     }

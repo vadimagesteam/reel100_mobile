@@ -65,7 +65,7 @@ export const VideoTiles = <ItemType extends VideoPost>({
   const handleVideoOpen = useCallback(
     (video: VideoPost, index: number) => {
       if (video) {
-        navigation.push(Screens.VideoFeedModal, {
+        navigation.navigate(Screens.VideoFeedModal, {
           queryParams,
           videoIndex: index,
           feedState: {

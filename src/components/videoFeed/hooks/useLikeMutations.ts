@@ -1,13 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { api } from '../../../lib/api';
-import { useUser } from '../../../state/user/authStore';
+import { useUser, useAuthActions } from '../../../state/user/authStore';
+import { UserType } from '../../../state/user/types';
 import { useVideoFeedCacheKey } from './useVideoFeedCacheKey';
 import { updateVideoCache } from './useVideosInfiniteQuery';
 
 type LikeArgs = {
   type: 'video' | 'comment';
   id: string;
+  authorId: string; // if we want to update user profile stats cache
 };
 
 type LikeResponse = { id: string };
@@ -15,6 +17,7 @@ type LikeResponse = { id: string };
 export const useLikeMutations = () => {
   const queryClient = useQueryClient();
   const { id: userId } = useUser();
+  const { updateMyProfileStats } = useAuthActions();
   const videosKey = useVideoFeedCacheKey();
 
   const updateVideoLikesCount = (videoId: string, val: 1 | -1) => {
@@ -22,6 +25,35 @@ export const useLikeMutations = () => {
       ...video,
       likesCount: video.likesCount + val,
     }));
+  };
+
+  const updateUserProfileLikesCount = (authorId: string, val: 1 | -1) => {
+    // for own profile, we need to update zustand cache
+    if (authorId === userId) {
+      updateMyProfileStats((stats) => ({
+        ...stats,
+        likeCount: stats.likeCount + val,
+      }));
+      return undefined;
+    }
+
+    const prev = queryClient.getQueryData<UserType>(['user', authorId]);
+    if (prev) {
+      queryClient.setQueryData<UserType>(['user', authorId], (cache) => {
+        if (!cache) {
+          return cache;
+        }
+        return {
+          ...cache,
+          stats: {
+            ...cache.stats,
+            likeCount: cache.stats.likeCount + val,
+          },
+        };
+      });
+    }
+
+    return prev;
   };
 
   const like = useMutation({
@@ -34,7 +66,7 @@ export const useLikeMutations = () => {
       const { data } = await api.post<LikeResponse>('/api/reactions', payload);
       return data;
     },
-    onMutate: async ({ type, id }) => {
+    onMutate: async ({ type, id, authorId }) => {
       const key = ['like', type, userId, id];
       await queryClient.cancelQueries({ queryKey: key });
       const prev = queryClient.getQueryData<{ id: string } | undefined>(key);
@@ -51,16 +83,20 @@ export const useLikeMutations = () => {
         videosPrev = updateVideoLikesCount(id, 1);
       }
 
-      return { key, prev, videosPrev };
+      const authorPrev = updateUserProfileLikesCount(authorId, 1);
+
+      return { key, prev, videosPrev, authorPrev };
     },
     onError: (_err, _vars, context) => {
       if (context?.key && context?.prev) {
         queryClient.setQueryData(context.key, context.prev);
-
-        // revert video cache back
-        if (videosKey && context.videosPrev) {
-          queryClient.setQueryData(videosKey, context.videosPrev);
-        }
+      }
+      // revert video cache back
+      if (videosKey && context?.videosPrev) {
+        queryClient.setQueryData(videosKey, context.videosPrev);
+      }
+      if (context?.authorPrev) {
+        queryClient.setQueryData(['user', _vars.authorId], context.videosPrev);
       }
     },
     onSuccess: (data, { type, id }) => {
@@ -84,7 +120,7 @@ export const useLikeMutations = () => {
       }
       return { id: null };
     },
-    onMutate: ({ type, id }) => {
+    onMutate: ({ type, id, authorId }) => {
       const prev = queryClient.getQueryData<{ id: string } | undefined>(['like', type, userId, id]);
 
       let videosPrev;
@@ -92,14 +128,20 @@ export const useLikeMutations = () => {
         videosPrev = updateVideoLikesCount(id, -1);
       }
 
+      const authorPrev = updateUserProfileLikesCount(authorId, -1);
+
       return {
         videosPrev,
+        authorPrev,
       };
     },
     onError: (_err, _vars, context) => {
       // revert video cache back
       if (videosKey && context?.videosPrev) {
         queryClient.setQueryData(videosKey, context.videosPrev);
+      }
+      if (context?.authorPrev) {
+        queryClient.setQueryData(['user', _vars.authorId], context.videosPrev);
       }
     },
     onSettled: (_data, _err, { type, id }) => {
@@ -110,16 +152,16 @@ export const useLikeMutations = () => {
   });
 
   const toggleLike = useCallback(
-    ({ id, type }: LikeArgs) => {
+    ({ id, type, authorId }: LikeArgs) => {
       const key = ['like', type, userId, id];
       const prev = queryClient.getQueryData<{ id: string } | undefined>(key);
 
       const wasLiked = prev?.id;
 
       if (wasLiked) {
-        return unlike.mutate({ type, id });
+        return unlike.mutate({ type, id, authorId });
       }
-      return like.mutate({ type, id });
+      return like.mutate({ type, id, authorId });
     },
     [queryClient, unlike, like, userId],
   );

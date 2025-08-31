@@ -61,6 +61,7 @@ type AuthState = {
     savePushNotificationsToken: (token: string) => Promise<ActionResult>;
     removePushToken: (remoteTokenId: string) => Promise<ActionResult>;
     deleteMyAccount: () => Promise<ActionResult>;
+    updateMyProfileStats: (fn: (current: UserProfile['stats']) => UserProfile['stats']) => void;
   };
 };
 
@@ -405,6 +406,19 @@ export const useAuthStore = createPersistStore<AuthState>(
         await api.delete(`api/users/${user.id}`);
         set(initialState);
         return { type: 'success' };
+      },
+      updateMyProfileStats: (cb) => {
+        set((state) => {
+          if (!state.user) {
+            return state;
+          }
+          return {
+            user: {
+              ...state.user,
+              stats: cb(state.user.stats),
+            },
+          };
+        });
       },
     },
   }),
