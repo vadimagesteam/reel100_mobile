@@ -5,13 +5,14 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import Video from 'react-native-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
+import { Tabs } from '../../navigation/screens';
 import { isAndroid } from '../../utils';
 import { Button } from '../ui';
 import { requestCameraRollSavePermissions } from './requestCameraRollSave';
 import { VideoDescriptionInput } from './VideoDescriptionInput';
 import { useVideoRecordStore } from './videoRecordStore';
 import { useStateSelector } from '../../state/app/uiStore';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, TabActions } from '@react-navigation/native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../state/user/authStore';
 
@@ -40,6 +41,13 @@ export const VideoPreview = () => {
       actions.clear();
       await queryClient.invalidateQueries({ queryKey: ['user_videos', user.id] });
       navigation.goBack();
+      // @ts-expect-error
+      navigation.navigate('Tabs', {
+        screen: Tabs.TabProfile,
+        params: {
+          fromTabs: true,
+        },
+      });
     }
   };
 

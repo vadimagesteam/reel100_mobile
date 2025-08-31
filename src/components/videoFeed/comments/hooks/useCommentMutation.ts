@@ -101,7 +101,7 @@ export const useCommentMutation = () => {
         pages: updatedPages,
       });
     },
-    onSettled: (_data, _error, { videoId }) => {
+    onSettled: (_data, _error, {}) => {
       // const key = getQueryKey(videoId);
       // queryClient.invalidateQueries({ queryKey: key });
     },

@@ -1,7 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TabBar } from '../components/appTabBar/TabBar';
-import { BottomTabParamList, Tabs } from './screens';
-import { TabMainScreen, TabGlobalVideoScreen, TabForYouScreen, ProfileScreen } from '../screens';
+import { BottomTabParamList, Tabs, Screens } from './screens';
+import {
+  TabMainScreen,
+  TabGlobalVideoScreen,
+  TabForYouScreen,
+  ProfileScreen,
+  VideoRecordingScreen,
+} from '../screens';
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 

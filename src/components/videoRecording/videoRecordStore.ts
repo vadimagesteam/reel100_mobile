@@ -58,8 +58,6 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
         set({ uploading: true, error: null });
         const response = await api.post('api/videos', metaDataPayload);
 
-        console.log('VIDEO METADATA RESPONSE', response);
-
         if (response?.status === 201 && response.data?.id) {
           const videoId = response.data.id;
 

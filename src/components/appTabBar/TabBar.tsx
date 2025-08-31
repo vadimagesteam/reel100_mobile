@@ -1,6 +1,7 @@
 import { TouchableOpacity } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import CameraAddIcon from '../../assets/icons/CameraAddIcon';
 import { useUnreadChatsCount } from '../chat/hooks/useUnreadChatsCount';
 import { SvgIcon, WithCountCircle } from '../ui';
 import { Screens, Tabs } from '../../navigation/screens';
@@ -33,10 +34,16 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
 
   const unreadChats = useUnreadChatsCount();
 
+  const routes = [
+    ...state.routes.slice(0, 2),
+    { name: Screens.VideoRecording, key: Screens.VideoRecording },
+    ...state.routes.slice(2),
+  ];
+
   return (
     <Animated.View style={style} className="h-[70px] flex-row bg-black4">
-      {state.routes.map((route, index) => {
-        const isFocused = state.index === index;
+      {routes.map((route, index) => {
+        const isFocused = state.index === (index > 1 ? index - 1 : index);
 
         const onPress = () => {
           const event = navigation.emit({
@@ -49,6 +56,18 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
             navigation.navigate(route.name);
           }
         };
+
+        if (route.name === Screens.VideoRecording) {
+          return (
+            <TouchableOpacity
+              key={route.key}
+              className="mb-[10px] flex-1 items-center justify-center p-[5px]"
+              onPress={onPress}
+            >
+              <CameraAddIcon size={44} />
+            </TouchableOpacity>
+          );
+        }
 
         const iconName = TabIcons[route.name as RouteKey];
         const icon = (
