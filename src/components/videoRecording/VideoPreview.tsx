@@ -12,7 +12,7 @@ import { requestCameraRollSavePermissions } from './requestCameraRollSave';
 import { VideoDescriptionInput } from './VideoDescriptionInput';
 import { useVideoRecordStore } from './videoRecordStore';
 import { useStateSelector } from '../../state/app/uiStore';
-import { useNavigation, TabActions } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../state/user/authStore';
 

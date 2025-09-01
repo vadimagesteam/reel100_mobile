@@ -7,7 +7,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
 
 export interface ControlButtonProps extends TouchableOpacityProps {
   animated?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
 export const ControlButton = ({ children, onPress, className, ...rest }: ControlButtonProps) => {
@@ -25,8 +25,8 @@ export const ControlButton = ({ children, onPress, className, ...rest }: Control
       <AnimatedTouchableOpacity
         hitSlop={20}
         className={clsx(
-          'h-[38px] w-[38px] items-center justify-center rounded-full bg-[rgba(134,131,130,255)]',
           className,
+          'h-[38px] w-[38px] items-center justify-center rounded-full bg-[rgba(134,131,130,255)]',
         )}
         {...rest}
       >

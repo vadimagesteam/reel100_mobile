@@ -8,6 +8,7 @@ export interface CameraFeaturesProps {
   isRecording: boolean;
   features: UseCameraFeatures;
   onPickFromGallery: () => void;
+  isLibraryLoading?: boolean;
   hasTorch?: boolean;
   support60FPS?: boolean;
 }
@@ -18,6 +19,7 @@ export const CameraFeatures = ({
   isRecording,
   hasTorch,
   support60FPS,
+  isLibraryLoading,
 }: CameraFeaturesProps) => {
   const { frameRate, setFrameRate, cameraPosition, setCameraPosition, torchOn, setTorchOn } =
     features;
@@ -60,7 +62,11 @@ export const CameraFeatures = ({
         </ControlButton>
       )}
 
-      <ControlButton animated style={animStyle} onPress={onPickFromGallery}>
+      <ControlButton
+        animated
+        style={animStyle}
+        onPress={!isLibraryLoading ? onPickFromGallery : undefined}
+      >
         <SvgIcon image="gellaryCameraIcon" />
       </ControlButton>
     </View>

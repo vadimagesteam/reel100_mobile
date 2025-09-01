@@ -1,12 +1,9 @@
+import { toast } from '@backpackapp-io/react-native-toast';
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Dimensions, NativeModules, StyleSheet, View } from 'react-native';
-import {
-  Camera,
-  CameraProps,
-  Point,
-  useCameraDevice,
-  useCameraFormat,
-} from 'react-native-vision-camera';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { ImageLibraryOptions, launchImageLibrary } from 'react-native-image-picker';
 import Reanimated, {
   Extrapolation,
   interpolate,
@@ -14,14 +11,19 @@ import Reanimated, {
   useAnimatedProps,
   useSharedValue,
 } from 'react-native-reanimated';
-import { isAndroid, isIOS } from '../../utils';
+import {
+  Camera,
+  CameraProps,
+  Point,
+  useCameraDevice,
+  useCameraFormat,
+} from 'react-native-vision-camera';
+import { isIOS, useLoadingCallback } from '../../utils';
+import { sleep } from '../../utils/promise';
 import { CameraFeatures, Timer, useCameraFeatures, CloseButton, RecordButton } from './controls';
-import { useNavigation } from '@react-navigation/native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { ImageLibraryOptions, launchImageLibrary } from 'react-native-image-picker';
+import { PermissionsResult, requestCameraAndMicrophone } from './requestCameraAndMicrophone';
 import { VideoPreview } from './VideoPreview';
 import { useVideoRecordStore } from './videoRecordStore';
-import { PermissionsResult, requestCameraAndMicrophone } from './requestCameraAndMicrophone';
 
 const { CustomAudioSessionManager } = NativeModules;
 
@@ -48,7 +50,6 @@ export const VideoRecording = () => {
   const {
     uploading,
     previewUri,
-    isPreviewReady,
     actions: { clear, setPreviewUri },
   } = useVideoRecordStore();
 
@@ -92,12 +93,33 @@ export const VideoRecording = () => {
     requestPermissions();
   }, []);
 
-  const onPickFromGallery = async () => {
+  const [onPickFromGallery, isLibraryLoading] = useLoadingCallback(async () => {
     const options: ImageLibraryOptions = {
       mediaType: 'video',
       selectionLimit: 1,
+      assetRepresentationMode: 'current',
     };
+
+    let toastId: string = '';
+    let cancelled = false;
+    const getDelayedToast = async () => {
+      await sleep(2000);
+      if (cancelled) {
+        return '';
+      }
+      return toast.loading('Loading video, please wait...');
+    };
+
+    getDelayedToast().then((tId) => {
+      toastId = tId;
+    });
+
     await launchImageLibrary(options, (response) => {
+      cancelled = true;
+      if (toastId) {
+        toast.dismiss(toastId);
+      }
+
       if (response.errorCode) {
         Alert.alert(`Error #${response.errorCode}: ${response.errorMessage ?? 'Unknown error'}`);
       }
@@ -108,7 +130,7 @@ export const VideoRecording = () => {
         }
       }
     });
-  };
+  });
 
   const handleStartRecording = async () => {
     setIsRecording(true);
@@ -202,8 +224,9 @@ export const VideoRecording = () => {
 
   return (
     <View className="flex-1 bg-background">
-      {previewUri && <VideoPreview />}
-      {!isPreviewReady && (
+      {previewUri ? (
+        <VideoPreview />
+      ) : (
         <>
           {activeDevice && (
             <GestureDetector gesture={cameraGesture}>
@@ -230,6 +253,7 @@ export const VideoRecording = () => {
             isRecording={isRecording}
             features={cameraFeatures}
             onPickFromGallery={onPickFromGallery}
+            isLibraryLoading={isLibraryLoading}
           />
           <Timer
             active={isRecording}

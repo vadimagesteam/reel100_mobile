@@ -29,6 +29,7 @@ export const VideoTile = ({
 }: VideoTileProps<VideoPost>) => {
   const screenshot = item.file?.variation?.[0]?.screenshots?.[0] ?? null;
   const lastInRow = rowSize && index !== undefined && (index + 1) % rowSize === 0;
+  const isProcessing = ['InProcess', 'Pending'].includes(item.status);
 
   return (
     <AnimatedTouchable
@@ -54,7 +55,7 @@ export const VideoTile = ({
             resizeMode={FastImage.resizeMode.cover}
           />
           <VideoInfoOverlay video={item} />
-          {['InProcess', 'Pending'].includes(item.status) && (
+          {isProcessing && (
             <View className="absolute size-full items-center justify-center bg-black/80">
               <Text className="text-[12px] font-black text-blue3">Processing</Text>
             </View>
@@ -62,7 +63,13 @@ export const VideoTile = ({
         </>
       ) : (
         <View className="size-full items-center justify-center rounded-[8px] bg-black">
-          <Text className="text-[10px] text-primary">No preview</Text>
+          <Text className="text-[10px] text-primary">
+            {isProcessing ? (
+              <Text className="text-[12px] font-black text-blue3">Processing</Text>
+            ) : (
+              'No preview'
+            )}
+          </Text>
         </View>
       )}
     </AnimatedTouchable>
