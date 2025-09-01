@@ -112,6 +112,7 @@ export const VideoTiles = <ItemType extends VideoPost>({
         removeClippedSubviews={true}
         onEndReachedThreshold={0.5}
         onEndReached={onEndReached}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <ListEmptyBlock
             title={emptyTitle ?? 'No videos uploaded yet'}

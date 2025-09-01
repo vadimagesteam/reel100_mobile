@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useLoadingCallback } from '../../../hooks/useLoadingCallback';
 import { VideoTiles } from '../../videoTiles';
 import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
 import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../videoFeed/hooks';
@@ -42,10 +43,14 @@ export const UserVideoTiles = ({ userId, withUnfinished, className }: ProfileVid
     }
   }, [withUnfinished, flatPages]);
 
+  const [handleRefresh, isRefetching] = useLoadingCallback(queryControl.refetch);
+
   return (
     <VideoTiles<VideoPost>
       className={className}
       queryControl={queryControl}
+      refetch={handleRefresh}
+      isRefreshing={isRefetching}
       keyExtractor={(item) => item.id}
       numColumns={3}
       contentContainerClassName="pb-[10px]"

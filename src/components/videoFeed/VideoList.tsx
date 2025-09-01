@@ -49,7 +49,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const backPressHandler = useVideoFeed((s) => s.backPressHandler);
   const { closeComments } = useVideoFeed((s) => s.actions);
   const { isFullscreen, setFullscreen } = useVideoFullscreen();
-  const { isPaused, togglePause } = useVideoPause();
+  const { isPaused, setIsPaused, togglePause } = useVideoPause();
 
   const flatListRef = useRef<FlatList<VideoPost>>(null);
 
@@ -129,6 +129,9 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const backSwipeGesture = Gesture.Pan()
     .enabled(isFullscreen)
     .activeOffsetX(10)
+    .onStart(() => {
+      runOnJS(setIsPaused)(true);
+    })
     .onUpdate((e) => {
       swipeTranslateX.value = e.translationX;
       swipeTranslateY.value = e.translationY;
@@ -139,6 +142,8 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
 
       if (isFullscreen && e.translationX > 120 && (isAndroid || e.velocityX > 100)) {
         runOnJS(handleBackSwipe)();
+      } else {
+        runOnJS(setIsPaused)(false);
       }
     });
 
