@@ -29,7 +29,11 @@ export const VideoInfoOverlay = ({
             </Text>
           </View>
         )}
-        {showDuration && <Text className="pr-1 font-bold text-primary">22s</Text>}
+        {showDuration && video.file?.duration && (
+          <Text className="pr-1 font-bold text-primary">
+            {Math.round(video.file?.duration / 1000)}s
+          </Text>
+        )}
       </View>
       {showLikes && (
         <View className="absolute bottom-1 left-1 flex-row gap-x-1">

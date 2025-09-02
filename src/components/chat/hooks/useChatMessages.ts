@@ -36,6 +36,8 @@ const qqlQuery = `query(
             description
             file
             user { ...ShallowUser }
+            top_100Position
+            top_100Date
         }
         text
         isRead

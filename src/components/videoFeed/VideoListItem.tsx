@@ -171,7 +171,9 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
           timeLeft={
             loadStarted && progress
               ? Math.round(loadStarted?.duration - progress?.currentTime)
-              : '0'
+              : file?.duration
+                ? Math.round(file.duration / 1000)
+                : '0'
           }
           showComments
           showShare

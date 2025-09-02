@@ -19,6 +19,7 @@ export type VideoVariation = {
 export type VideoFile = {
   uuid: string;
   hlsUrl: string;
+  duration: number;
   encoding: string;
   filename: string;
   mimetype: string;
