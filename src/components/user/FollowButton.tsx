@@ -53,9 +53,10 @@ export const FollowButton = ({ user, renderButton }: FollowButtonProps) => {
 
   return (
     <Button
+      variant="outline"
       loading={isLoading}
       onPress={followUserCallback}
-      className="mt-[10px] min-w-[120px]"
+      className="grow"
       size="md"
     >
       {followButtonText}

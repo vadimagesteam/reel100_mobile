@@ -1,21 +1,22 @@
-import { ComponentType, useCallback, useEffect, useMemo, useState } from 'react';
+import { ComponentType, useCallback, useMemo, useContext } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
-  FlatList,
   FlatListProps,
   type ListRenderItemInfo,
   StyleSheet,
 } from 'react-native';
+import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated';
 import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
+import { AnimatedScrollWrapperContext } from '../animatedScrollWrapper/context';
 import { ListEmptyBlock, FlexLoading, RefreshControl } from '../ui';
+import { useVideoFeed, type VideoPostQueryResult } from '../videoFeed/hooks';
 import { type VideoPost } from '../videoFeed/queries/apiVideosFetcher';
-import { useVideoFeed, useVideoFeedCacheKey, type VideoPostQueryResult } from '../videoFeed/hooks';
 import { VideoTile, VideoTileProps } from './VideoTile';
 
 export interface TilesListProps<ItemType>
-  extends Omit<FlatListProps<ItemType>, 'data' | 'renderItem'> {
+  extends Omit<FlatListProps<ItemType>, 'data' | 'renderItem' | 'CellRendererComponent'> {
   queryControl: VideoPostQueryResult;
   prepareData?: (data: VideoPost[]) => any[];
   ItemComponent?: ComponentType<VideoTileProps<ItemType>>;
@@ -93,13 +94,18 @@ export const VideoTiles = <ItemType extends VideoPost>({
     [handleVideoOpen, ItemComponent],
   );
 
-  if (isLoading) {
-    return <FlexLoading />;
-  }
+  const animatedScrollCtx = useContext(AnimatedScrollWrapperContext);
+
+  const scrollHandler = useAnimatedScrollHandler((e) => {
+    if (animatedScrollCtx) {
+      animatedScrollCtx.scrollY.value = e.contentOffset.y;
+    }
+  });
 
   return (
     <>
-      <FlatList
+      <Animated.FlatList
+        onScroll={scrollHandler}
         className={className}
         data={data}
         renderItem={propRenderItem ?? renderItem}
@@ -114,10 +120,14 @@ export const VideoTiles = <ItemType extends VideoPost>({
         onEndReached={onEndReached}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <ListEmptyBlock
-            title={emptyTitle ?? 'No videos uploaded yet'}
-            message={emptyMessage ?? 'Uploaded videos will appear here'}
-          />
+          isLoading ? (
+            <FlexLoading />
+          ) : (
+            <ListEmptyBlock
+              title={emptyTitle ?? 'No videos uploaded yet'}
+              message={emptyMessage ?? 'Uploaded videos will appear here'}
+            />
+          )
         }
         ListFooterComponent={
           isFetchingNextPage && hasNextPage ? <ActivityIndicator color="#fff" /> : null

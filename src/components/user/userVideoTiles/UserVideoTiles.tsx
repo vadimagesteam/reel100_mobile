@@ -1,16 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
+import { FlatListProps } from 'react-native';
 import { useLoadingCallback } from '../../../hooks/useLoadingCallback';
-import { VideoTiles } from '../../videoTiles';
-import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
 import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../videoFeed/hooks';
+import { VideoPost } from '../../videoFeed/queries/apiVideosFetcher';
+import { VideoTiles } from '../../videoTiles';
 
 export interface ProfileVideoTilesProps {
   userId: string;
   withUnfinished?: boolean;
   className?: string;
+  ListHeaderComponent?: FlatListProps<VideoPost>['ListHeaderComponent'];
 }
 
-export const UserVideoTiles = ({ userId, withUnfinished, className }: ProfileVideoTilesProps) => {
+export const UserVideoTiles = ({
+  userId,
+  withUnfinished,
+  className,
+  ListHeaderComponent,
+}: ProfileVideoTilesProps) => {
   const [shouldPoll, setShouldPoll] = useState<boolean>(false);
   const cacheKey = useMemo(() => ['user_videos', userId], [userId]);
   useSetVideoFeedCacheKey(cacheKey);
@@ -57,6 +64,7 @@ export const UserVideoTiles = ({ userId, withUnfinished, className }: ProfileVid
       initialNumToRender={6}
       windowSize={5}
       maxToRenderPerBatch={6}
+      ListHeaderComponent={ListHeaderComponent}
     />
   );
 };

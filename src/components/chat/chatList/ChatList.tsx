@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { FlatList, RefreshControl } from 'react-native';
+import { useLoadingCallback } from '../../../hooks/useLoadingCallback';
 import { useNavigation } from '../../../navigation';
 import { useUser } from '../../../state/user/authStore';
 import { FlexLoading, ListEmptyBlock } from '../../ui';
@@ -13,7 +14,9 @@ const getInterlocutorUser = (myId: string, { user1, user2 }: ChatType) =>
 export const ChatList = () => {
   const me = useUser();
   const navigation = useNavigation();
-  const { data, isLoading, isRefetching, refetch } = useChats();
+  const { data, isLoading, refetch } = useChats();
+
+  const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
 
   const openChat = useCallback(
     (chat: ChatType) => {
@@ -53,7 +56,7 @@ export const ChatList = () => {
       refreshControl={
         <RefreshControl
           refreshing={isRefetching}
-          onRefresh={refetch}
+          onRefresh={handleRefresh}
           colors={['#fff']}
           tintColor="#fff"
         />

@@ -3,6 +3,7 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query';
+import { sleep } from '../../../utils/promise';
 import { CacheKey } from '../provider/videoFeedStore';
 import { apiVideosFetcher, ApiVideosFetcherParams, VideoPost } from '../queries/apiVideosFetcher';
 import { useEffect, useMemo } from 'react';

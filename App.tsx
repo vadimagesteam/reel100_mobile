@@ -1,20 +1,20 @@
 import { Toasts } from '@backpackapp-io/react-native-toast';
 import { PortalProvider } from '@gorhom/portal';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import React, { useEffect, useState } from 'react';
 import { LogBox, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import './src/lib/nativewindInterops';
+import { enableScreens } from 'react-native-screens';
+import { hideSplash, showSplash } from 'react-native-splash-view';
 import { usePushNotifications } from './src/hooks/pushNotifications/usePushNotifications';
+import { asyncStoragePersister, queryClient } from './src/lib/api';
 import { getAllStoreHydratedPromises } from './src/lib/createPersistStore';
 import { RootNavigation } from './src/navigation/RootNavigation';
 import './global.css';
 import { useAuthStore } from './src/state/user/authStore';
-import { hideSplash, showSplash } from 'react-native-splash-view';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { enableScreens } from 'react-native-screens';
-import { asyncStoragePersister, queryClient } from './src/lib/api';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import './src/lib/nativewindInterops';
 
 // import here as a temp solution to start persistign this store right away
 import './src/state/app/uiStore';

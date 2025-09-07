@@ -7,7 +7,7 @@ export interface CounterSectionProps extends TouchableOpacityProps {
   count: number;
 }
 
-const CounterSection = ({ label, className, count, ...props }: CounterSectionProps) => {
+const ProfileStatsItem = ({ label, className, count, ...props }: CounterSectionProps) => {
   return (
     <TouchableOpacity
       className={clsx('h-full flex-1 items-center justify-center', className)}
@@ -19,4 +19,4 @@ const CounterSection = ({ label, className, count, ...props }: CounterSectionPro
   );
 };
 
-export default CounterSection;
+export default ProfileStatsItem;

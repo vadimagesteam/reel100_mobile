@@ -10,7 +10,9 @@ export interface SocialNetworksProps extends ViewProps {
 
 type SocialKeys = keyof NonNullable<UserProfile['socialNetworks']>;
 
-export const SocialNetworks = ({
+const SORT_ORDER: SocialKeys[] = ['instagram', 'facebook', 'tiktok', 'youtube'];
+
+export const SocialLinkIcons = ({
   socialNetworks,
   className,
   ...viewProps
@@ -23,7 +25,8 @@ export const SocialNetworks = ({
   const links = useMemo(
     () =>
       Object.keys(socialNetworks)
-        .filter((key) => socialNetworks[key as SocialKeys] !== null)
+        .filter((key) => !!socialNetworks[key as SocialKeys])
+        .sort((a, b) => SORT_ORDER.indexOf(a as SocialKeys) - SORT_ORDER.indexOf(b as SocialKeys))
         .map(
           (key) =>
             ({
@@ -35,9 +38,12 @@ export const SocialNetworks = ({
   );
 
   return (
-    <View className={clsx('flex-row items-center justify-center gap-10', className)} {...viewProps}>
+    <View
+      className={clsx('flex-row items-center justify-center gap-x-4', className)}
+      {...viewProps}
+    >
       {links.map(({ key, link }) => (
-        <TouchableOpacity key={key} onPress={() => handleClick(link)}>
+        <TouchableOpacity hitSlop={8} key={key} onPress={() => handleClick(link)}>
           <Ionicons name={`logo-${key}`} size={22} color="white" />
         </TouchableOpacity>
       ))}

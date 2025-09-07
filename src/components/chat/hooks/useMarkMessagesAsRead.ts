@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../../lib/api';
-import { useUser } from '../../../state/user/authStore';
 import { ChatMessageType } from './useChatMessages';
 
 export type MarkMessagesAsReadArgs = {
