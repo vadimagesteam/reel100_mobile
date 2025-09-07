@@ -76,7 +76,7 @@ export const OtherProfileHeader = () => {
     user ?? {};
 
   return (
-    <View className="flex-col gap-y-3">
+    <View className="mx-2.5 mb-[15px] flex-col gap-y-3">
       <View className="flex-row gap-x-4">
         <Avatar size={88} uri={user?.avatar} name={fullName} />
 

@@ -24,21 +24,11 @@ export const ProfileScreen = () => {
 
   return (
     <SafeAreaView edges={isMe ? ['top'] : []} className="flex-1 bg-background">
-      <VideoFeedProvider
-        initialState={{
-          allowDelete: isMe,
-        }}
-      >
+      <VideoFeedProvider initialState={{ allowDelete: isMe }}>
+        {isMe && <AppHeader showBackButton={canGoBack} />}
         <AnimatedScrollWrapperRoot>
           <UserVideoTiles
-            ListHeaderComponent={
-              <>
-                {isMe && <AppHeader showBackButton={canGoBack} />}
-                <View className="mx-2.5 mb-[15px] flex-col gap-[15px]">
-                  {isMe ? <OwnProfileHeader /> : <OtherProfileHeader />}
-                </View>
-              </>
-            }
+            ListHeaderComponent={isMe ? <OwnProfileHeader /> : <OtherProfileHeader />}
             userId={userId}
             withUnfinished={isMe}
           />
