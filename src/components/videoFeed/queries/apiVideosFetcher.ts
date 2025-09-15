@@ -70,8 +70,18 @@ type StringFilter = Partial<{
   gte: string;
   lte: string;
   lt: string;
-  not: string;
-  notIn: string;
+  not: string[];
+  notIn: string[];
+}>;
+
+type NumberFilter = Partial<{
+  equals: number;
+  gt: number;
+  gte: number;
+  lte: number;
+  lt: number;
+  not: number[];
+  notIn: number[];
 }>;
 
 type RelationFilter<Keys extends object> = Partial<{
@@ -86,7 +96,7 @@ export type ApiVideosFetcherParams = {
   take: number;
   skip: number;
   where?: Partial<
-    Record<keyof Omit<VideoPost, 'status'>, StringFilter> & {
+    Record<keyof Omit<VideoPost, 'status'>, StringFilter | NumberFilter> & {
       // enums
       forMe?: boolean;
       user: WhereUniqueInput;

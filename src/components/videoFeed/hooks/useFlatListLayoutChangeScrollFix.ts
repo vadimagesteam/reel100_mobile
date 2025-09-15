@@ -6,11 +6,14 @@ export const useFlatListLayoutChangeScrollFix = <T>(
   activeItemIndex: number,
   currentContainerHeight: number,
 ) => {
-
   const prevDimensions = useRef(0);
   const finalFixTimerRef = useRef<number>(null);
   useEffect(() => {
-    if (flatListRef.current && activeItemIndex && prevDimensions.current !== currentContainerHeight) {
+    if (
+      flatListRef.current &&
+      activeItemIndex &&
+      prevDimensions.current !== currentContainerHeight
+    ) {
       const fixScrollPosition = () => {
         flatListRef.current?.scrollToOffset({
           offset: activeItemIndex * currentContainerHeight,

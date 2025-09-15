@@ -1,3 +1,4 @@
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -224,6 +225,17 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const gesturesCombined = Gesture.Exclusive(backSwipeGesture, doubleTapGesture, singleTapGesture);
   const VideoBatchSize = 6;
 
+  // flatListRef.current?.recomputeViewableItems();
+
+  useEffect(() => {
+    if (initialVideoIndex > -1) {
+      flatListRef.current?.scrollToOffset({
+        offset: initialVideoIndex * dimensions.height,
+        animated: false,
+      });
+    }
+  }, [dimensions.height, initialVideoIndex]);
+
   return (
     <Animated.View className="flex-1 overflow-hidden bg-background" style={viewStyle}>
       <GestureDetector gesture={gesturesCombined}>
@@ -237,6 +249,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
             offset: dimensions.height * index,
             index,
           })}
+          // estimatedItemSize={dimensions.height}
           data={videos}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}

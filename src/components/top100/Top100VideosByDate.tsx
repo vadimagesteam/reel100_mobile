@@ -1,20 +1,20 @@
+import { isSameDay } from 'date-fns';
 import { useCallback, useMemo } from 'react';
-import { endOfDay, startOfDay } from 'date-fns';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
+import { useStateSelector } from '../../state/app/uiStore';
 import { CalendarModal } from '../calendar';
 import { ListEmptyBlock } from '../ui';
-import { ApiVideosFetcherParams } from '../videoFeed/queries/apiVideosFetcher';
-import { useCalendarModal } from './useCalendarModal';
-import HeaderCalendar from './CalendarSelectedDate';
 import { VideoList } from '../videoFeed';
 import {
   useVideosInfiniteQuery,
   useSetVideoFeedCacheKey,
   useVideoFullscreen,
 } from '../videoFeed/hooks';
-import { useStateSelector } from '../../state/app/uiStore';
+import { ApiVideosFetcherParams } from '../videoFeed/queries/apiVideosFetcher';
+import HeaderCalendar from './CalendarSelectedDate';
+import { useCalendarModal } from './useCalendarModal';
 
-export const Top100VideosByDate = () => {
+export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => {
   const { isVisible, selectedDate, tempDate, open, cancel, confirm, setTempDate, marked } =
     useCalendarModal();
 
@@ -22,8 +22,11 @@ export const Top100VideosByDate = () => {
   const { isFullscreen } = useVideoFullscreen();
 
   const cacheKey = useMemo(
-    () => ['top100_videos_', selectedState?.id ?? 'NO_STATE', selectedDate],
-    [selectedDate, selectedState?.id],
+    () =>
+      global
+        ? ['top100_global_videos', selectedDate]
+        : ['top100_videos_', selectedState?.id ?? 'NO_STATE', selectedDate],
+    [selectedDate, selectedState?.id, global],
   );
 
   useSetVideoFeedCacheKey(cacheKey);
@@ -32,27 +35,27 @@ export const Top100VideosByDate = () => {
     () =>
       ({
         status: 'Finished',
-        top_100Date: {
-          gte: startOfDay(new Date(selectedDate)).toISOString(),
-          lte: endOfDay(new Date(selectedDate)).toISOString(),
-        },
-        states: {
-          some: {
-            id: { equals: selectedState?.id! },
-          },
-        },
+        top_100Position: { equals: 1 },
+        ...(global
+          ? {}
+          : {
+              states: {
+                some: {
+                  id: { equals: selectedState?.id! },
+                },
+              },
+            }),
       }) as ApiVideosFetcherParams['where'],
-    [selectedDate, selectedState],
+    [global, selectedState?.id],
   );
 
   const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, flatPages, refetch } =
     useVideosInfiniteQuery({
       cacheKey,
       where: filters,
-      limit: 1,
       orderBy: [
         {
-          top_100Position: 'Asc',
+          top_100Date: 'Asc',
         },
       ],
     });
@@ -65,6 +68,13 @@ export const Top100VideosByDate = () => {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const initialVideoIndex = useMemo(
+    () => flatPages.findIndex((v) => isSameDay(new Date(v.top_100Date!), new Date(selectedDate))),
+    [flatPages, selectedDate],
+  );
+
+  const listEmpty = !flatPages.length && !isFetching;
+
   return (
     <>
       {!isFullscreen && <HeaderCalendar markerDate={selectedDate} onCalendar={open} />}
@@ -76,18 +86,18 @@ export const Top100VideosByDate = () => {
         onCancelPress={cancel}
         onSubmitPress={confirm}
       />
-      <VideoList
-        showTopRank={false}
-        initialVideoIndex={0}
-        isRefetching={isRefetching}
-        refetch={handleRefresh}
-        videos={flatPages}
-        ListEmptyComponent={
-          !flatPages.length && !isFetching ? (
-            <ListEmptyBlock title="Nothing to show yet" message="Try selecting a different date." />
-          ) : null
-        }
-      />
+      {(listEmpty || initialVideoIndex === -1) && (
+        <ListEmptyBlock title="Nothing to show yet" message="Try selecting a different date." />
+      )}
+      {initialVideoIndex > -1 && (
+        <VideoList
+          showTopRank={false}
+          initialVideoIndex={initialVideoIndex}
+          isRefetching={isRefetching}
+          refetch={handleRefresh}
+          videos={flatPages}
+        />
+      )}
     </>
   );
 };

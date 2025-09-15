@@ -12,7 +12,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useUser } from '../../state/user/authStore';
 import { getDisplayName } from '../../state/user/utils';
-import { formatNumberShort, formatNumberUS, isAndroid } from '../../utils';
+import { formatNumberShort, formatNumberUS, isAndroid, isoUTCDateToLocate } from '../../utils';
 import { Avatar, Backdrop, SvgIcon } from '../ui';
 import { FollowButton } from '../user/FollowButton';
 import { VideoPost } from './queries/apiVideosFetcher';
@@ -62,6 +62,7 @@ export const VideoInfoOverlay = ({
   const insets = useSafeAreaInsets();
   const { setHeartIconPos } = useVideoFeed((s) => s.actions);
   const screenType = useVideoFeed((s) => s.screenType);
+  const showVideoDate = useVideoFeed((s) => s.showVideoDate);
 
   const me = useUser();
 
@@ -119,7 +120,7 @@ export const VideoInfoOverlay = ({
         style={topInfoStyles}
         className="absolute left-2 right-2 top-4 flex-row items-center justify-between"
       >
-        <View>
+        <View className="min-w-[20px]">
           {isPlayerFullScreen && (
             <GestureTouchableOpacity
               className="flex-row items-center gap-2"
@@ -130,6 +131,14 @@ export const VideoInfoOverlay = ({
             </GestureTouchableOpacity>
           )}
         </View>
+
+        {showVideoDate && video.top_100Date && (
+          <View>
+            <Text className="text-xl font-medium text-primary">
+              {isoUTCDateToLocate(video.top_100Date)}
+            </Text>
+          </View>
+        )}
 
         {/* Top Right */}
         <View className="flex-row">
