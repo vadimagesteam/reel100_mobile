@@ -67,13 +67,13 @@ export const VideoTile = ({
         </>
       ) : (
         <View className="size-full items-center justify-center rounded-[8px] bg-black">
-          <Text className="text-[10px] text-primary">
-            {isProcessing ? (
-              <Text className="text-[12px] font-black text-blue3">Processing</Text>
-            ) : (
-              'No preview'
-            )}
-          </Text>
+          {isProcessing ? (
+            <Text className="text-[12px] font-black text-blue3">Processing</Text>
+          ) : isBanned ? (
+            <Text className="text-[12px] font-black text-red3">BANNED</Text>
+          ) : (
+            <Text className="text-[10px] text-primary">No preview</Text>
+          )}
         </View>
       )}
     </AnimatedTouchable>

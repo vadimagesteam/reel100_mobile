@@ -134,8 +134,18 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
     ]);
   };
 
+  const handleBackPress = () => {
+    if (backPressHandler) {
+      backPressHandler();
+    } else {
+      setFullscreen(false);
+    }
+  };
+
   if (isVideoBanned) {
-    return <VideoBanned dimensions={dimensions} previewUrl={previewUrl} />;
+    return (
+      <VideoBanned dimensions={dimensions} previewUrl={previewUrl} onBackPress={handleBackPress} />
+    );
   }
 
   return (
@@ -172,13 +182,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
         <VideoInfoOverlay
           showTopRank={showTopRank}
           video={video}
-          onBackPress={() => {
-            if (backPressHandler) {
-              backPressHandler();
-            } else {
-              setFullscreen(false);
-            }
-          }}
+          onBackPress={handleBackPress}
           isPlayerFullScreen={isFullscreen}
           isPaused={isPaused}
           timeLeft={
