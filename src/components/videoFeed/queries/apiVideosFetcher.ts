@@ -50,7 +50,7 @@ export type VideoPost = {
   createdAt: string; // ISO
   updatedAt: string; // ISO
   file: VideoFile | null;
-  status: 'Finished' | 'InProcess' | 'Pending' | 'Deleted';
+  status: 'Finished' | 'InProcess' | 'Pending' | 'Deleted' | 'Banned';
   commentsCount: number;
   likesCount: number;
   viewsCount: number;

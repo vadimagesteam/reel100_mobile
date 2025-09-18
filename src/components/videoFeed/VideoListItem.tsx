@@ -24,6 +24,7 @@ import {
   useTrackVideoView,
 } from './hooks';
 import { VideoPost } from './queries/apiVideosFetcher';
+import { VideoBanned } from './VideoBanned';
 import { VideoInfoOverlay } from './VideoInfoOverlay';
 import { VideoPreview } from './VideoPreview';
 
@@ -62,9 +63,11 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
   const { toggleLike } = useLikeMutations();
   const { mutate: deleteVideo } = useDeleteMutation();
 
+  const isVideoBanned = video.status === 'Banned';
+
   useTrackVideoView({
     videoId,
-    enable: active && isFullscreen && !!loadStarted,
+    enable: active && isFullscreen && !!loadStarted && !isVideoBanned,
   });
 
   useFocusEffect(
@@ -130,6 +133,10 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
       },
     ]);
   };
+
+  if (isVideoBanned) {
+    return <VideoBanned dimensions={dimensions} previewUrl={previewUrl} />;
+  }
 
   return (
     <View style={dimensions}>

@@ -30,6 +30,7 @@ export const VideoTile = ({
   const screenshot = item.file?.variation?.[0]?.screenshots?.[0] ?? null;
   const lastInRow = rowSize && index !== undefined && (index + 1) % rowSize === 0;
   const isProcessing = ['InProcess', 'Pending'].includes(item.status);
+  const isBanned = item.status === 'Banned';
 
   return (
     <AnimatedTouchable
@@ -55,9 +56,12 @@ export const VideoTile = ({
             resizeMode={FastImage.resizeMode.cover}
           />
           <VideoInfoOverlay video={item} />
-          {isProcessing && (
+          {(isBanned || isProcessing) && (
             <View className="absolute size-full items-center justify-center bg-black/80">
-              <Text className="text-[12px] font-black text-blue3">Processing</Text>
+              {isProcessing && (
+                <Text className="text-[12px] font-black text-blue3">Processing</Text>
+              )}
+              {isBanned && <Text className="text-[12px] font-black text-red3">BANNED</Text>}
             </View>
           )}
         </>
