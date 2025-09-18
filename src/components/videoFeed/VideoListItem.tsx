@@ -21,6 +21,7 @@ import {
   useVideoLikeQuery,
   useVideoPause,
   useVideoShare,
+  useTrackVideoView,
 } from './hooks';
 import { VideoPost } from './queries/apiVideosFetcher';
 import { VideoInfoOverlay } from './VideoInfoOverlay';
@@ -60,6 +61,11 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
   const { data: likeData } = useVideoLikeQuery('video', videoId);
   const { toggleLike } = useLikeMutations();
   const { mutate: deleteVideo } = useDeleteMutation();
+
+  useTrackVideoView({
+    videoId,
+    enable: active && isFullscreen && !!loadStarted,
+  });
 
   useFocusEffect(
     useCallback(() => {

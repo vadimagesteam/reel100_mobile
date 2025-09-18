@@ -1,6 +1,6 @@
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { TouchableOpacity } from 'react-native';
-import { WithDropdownMenu } from '../../ui/menu/with-dropdown-menu';
+import { WithDropdownMenu, MenuItem } from '../../ui/menu/with-dropdown-menu';
 import { useUserBlocking } from '../hooks/userUserBlocking';
 
 export interface OtherProfileHeaderActionsProps {
@@ -28,14 +28,26 @@ export const OtherProfileHeaderActions = ({ userId }: OtherProfileHeaderActionsP
           key: 'unblockUser',
           label: 'Unblock user',
           onPress: handleUnblock,
+          iosIcon: {
+            name: 'person.fill.checkmark',
+            pointSize: 17,
+            weight: 'semibold',
+          },
+          androidIconName: 'ic_person_add',
         }
       : {
           key: 'blockUser',
           label: 'Block user',
           onPress: handleBlock,
           destructive: true,
+          iosIcon: {
+            name: 'person.fill.xmark',
+            pointSize: 17,
+            weight: 'semibold',
+          },
+          androidIconName: 'ic_block',
         },
-  ];
+  ] as MenuItem[];
 
   return (
     <WithDropdownMenu menu={menu}>

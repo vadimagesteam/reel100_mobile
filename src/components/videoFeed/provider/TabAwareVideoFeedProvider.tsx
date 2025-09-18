@@ -1,10 +1,11 @@
 import { ReactNode, useEffect } from 'react';
 import { useVideoPause } from '../hooks';
-import { VideoFeedProvider } from './VideoFeedProvider';
+import { VideoFeedProvider, VideoFeedProviderProps } from './VideoFeedProvider';
 
 export interface TabAwareVideoFeedProvider {
   isActiveTab: boolean;
   children: ReactNode;
+  initialState?: VideoFeedProviderProps['initialState'];
 }
 
 const WithAutoPause = ({ isActiveTab, children }: TabAwareVideoFeedProvider) => {
@@ -17,9 +18,13 @@ const WithAutoPause = ({ isActiveTab, children }: TabAwareVideoFeedProvider) => 
   return children;
 };
 
-export const TabAwareVideoFeedProvider = ({ isActiveTab, children }: TabAwareVideoFeedProvider) => {
+export const TabAwareVideoFeedProvider = ({
+  isActiveTab,
+  initialState,
+  children,
+}: TabAwareVideoFeedProvider) => {
   return (
-    <VideoFeedProvider>
+    <VideoFeedProvider initialState={initialState}>
       <WithAutoPause isActiveTab={isActiveTab}>{children}</WithAutoPause>
     </VideoFeedProvider>
   );

@@ -10,11 +10,13 @@ export interface ProfileVideoTilesProps {
   withUnfinished?: boolean;
   className?: string;
   ListHeaderComponent?: FlatListProps<VideoPost>['ListHeaderComponent'];
+  sortRanked?: boolean;
 }
 
 export const UserVideoTiles = ({
   userId,
   withUnfinished,
+  sortRanked,
   className,
   ListHeaderComponent,
 }: ProfileVideoTilesProps) => {
@@ -35,11 +37,13 @@ export const UserVideoTiles = ({
       }),
       [userId, withUnfinished],
     ),
-    orderBy: [{ createdAt: 'Desc' }],
+    orderBy: sortRanked
+      ? [{ top_100Position: 'Asc' }, { createdAt: 'Desc' }]
+      : [{ createdAt: 'Desc' }],
     refetchInterval: shouldPoll ? 3000 : false,
   });
 
-  // Automatically poll if there is uncompleted video
+  // Automatically poll if there is an uncompleted video
   const { flatPages } = queryControl;
   useEffect(() => {
     if (withUnfinished) {

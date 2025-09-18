@@ -37,11 +37,11 @@ export const TabForYouScreen = () => {
 
   const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
 
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     refetch();
+  //   }, [refetch]),
+  // );
 
   const searchByFullName = selectedUser
     ? `${selectedUser?.firstName} ${selectedUser?.lastName}`

@@ -13,9 +13,7 @@ export const useDeleteMutation = () => {
 
   return useMutation({
     mutationFn: async ({ id }: VideoDeleteArgs) => {
-      console.log('deleting', { id });
       const { data } = await api.delete(`/api/videos/${id}`);
-      console.log('del resp', data);
       return data;
     },
     onMutate: async ({ id }) => {

@@ -1,4 +1,3 @@
-import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AnimatedScrollWrapperRoot } from '../../components/animatedScrollWrapper';
 import { AppHeader } from '../../components/appHeader';
@@ -28,6 +27,7 @@ export const ProfileScreen = () => {
         {isMe && <AppHeader showBackButton={canGoBack} />}
         <AnimatedScrollWrapperRoot>
           <UserVideoTiles
+            sortRanked
             ListHeaderComponent={isMe ? <OwnProfileHeader /> : <OtherProfileHeader />}
             userId={userId}
             withUnfinished={isMe}

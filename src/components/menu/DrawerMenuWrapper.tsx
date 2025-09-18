@@ -35,11 +35,7 @@ export const DrawerMenuWrapper = ({ children }: { children?: React.ReactNode }) 
   useAnimatedReaction(
     () => active.value,
     (curr) => {
-      if (curr) {
-        translateX.value = withTiming(0);
-      } else {
-        translateX.value = withTiming(drawerWidth);
-      }
+      translateX.value = withTiming(curr ? 0 : drawerWidth, { duration: 200 });
       runOnJS(actions.setMenuOpened)(curr);
     },
   );

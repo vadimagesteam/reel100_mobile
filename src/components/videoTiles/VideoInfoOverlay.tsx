@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { getDisplayName } from '../../state/user/utils';
+import { formatNumberShort } from '../../utils';
 import { Avatar, SvgIcon } from '../ui';
 import { VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 
@@ -38,7 +39,12 @@ export const VideoInfoOverlay = ({
       {showLikes && (
         <View className="absolute bottom-1 left-1 flex-row gap-x-1">
           <SvgIcon image="like_heart" />
-          <Text className="text-[16px] font-bold text-primary">{video.likesCount}</Text>
+          <Text className="text-[16px] font-bold text-primary">{formatNumberShort(3322)}</Text>
+        </View>
+      )}
+      {video.top_100Position && (
+        <View className="absolute bottom-1 right-1 flex-row rounded-md bg-orange p-0.5 opacity-80">
+          <Text className="text-[15px] font-semibold text-primary">#{video.top_100Position}</Text>
         </View>
       )}
     </View>

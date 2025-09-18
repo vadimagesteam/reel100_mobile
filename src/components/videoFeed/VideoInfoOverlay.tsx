@@ -134,7 +134,7 @@ export const VideoInfoOverlay = ({
 
         {showVideoDate && video.top_100Date && (
           <View>
-            <Text className="text-xl font-medium text-primary">
+            <Text className="text-2xl font-medium text-primary">
               {isoUTCDateToLocate(video.top_100Date)}
             </Text>
           </View>

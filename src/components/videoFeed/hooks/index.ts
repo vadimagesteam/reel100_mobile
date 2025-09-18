@@ -11,3 +11,4 @@ export * from './useVideosInfiniteQuery';
 export * from './useVideoComments';
 export * from './useVideoShare';
 export * from './useDeleteMutation';
+export * from './useTrackVideoView';
