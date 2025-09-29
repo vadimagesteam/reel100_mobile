@@ -1,11 +1,7 @@
-import { StyleSheet } from 'react-native';
+import RNBottomSheet, { BottomSheetProps as OriginalBottomSheetProps } from '@gorhom/bottom-sheet';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import RNBottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetProps as OriginalBottomSheetProps,
-} from '@gorhom/bottom-sheet';
-import { colors } from '../../theme';
+import { bottomSheetStyles } from './styles';
+import { useBottomSheetBackdrop } from './useBottomSheetBackdrop';
 
 export interface BottomSheetProps extends OriginalBottomSheetProps {
   withBackdrop?: boolean;
@@ -15,12 +11,7 @@ export interface BottomSheetProps extends OriginalBottomSheetProps {
 
 export const BottomSheet = forwardRef<RNBottomSheet, BottomSheetProps>(
   ({ withBackdrop = true, open, onClose, children, ...rest }, ref) => {
-    const renderBackdrop = useCallback(
-      (props: BottomSheetBackdropProps) => (
-        <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
-      ),
-      [],
-    );
+    const backdrop = useBottomSheetBackdrop();
 
     const sheetRef = useRef<RNBottomSheet>(null);
 
@@ -47,12 +38,12 @@ export const BottomSheet = forwardRef<RNBottomSheet, BottomSheetProps>(
       <RNBottomSheet
         ref={sheetRef}
         index={open ? 0 : -1}
-        backgroundStyle={styles.backgroundStyle}
-        style={styles.bottomSheetStyle}
-        handleIndicatorStyle={styles.handleIndicatorStyle}
+        backgroundStyle={bottomSheetStyles.backgroundStyle}
+        style={bottomSheetStyles.bottomSheetStyle}
+        handleIndicatorStyle={bottomSheetStyles.handleIndicatorStyle}
         onChange={handleSheetChange}
         enableDynamicSizing={false}
-        backdropComponent={withBackdrop ? renderBackdrop : undefined}
+        backdropComponent={withBackdrop ? backdrop : undefined}
         enablePanDownToClose
         keyboardBehavior="extend"
         // animationConfigs={animationConfigs}
@@ -63,15 +54,3 @@ export const BottomSheet = forwardRef<RNBottomSheet, BottomSheetProps>(
     );
   },
 );
-
-const styles = StyleSheet.create({
-  backgroundStyle: {
-    backgroundColor: colors.black4,
-  },
-  bottomSheetStyle: {
-    backgroundColor: colors.black4,
-  },
-  handleIndicatorStyle: {
-    backgroundColor: colors.white1,
-  },
-});

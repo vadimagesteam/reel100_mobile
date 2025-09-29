@@ -38,6 +38,7 @@ export interface VideoInfoOverlayProps {
   onUser?: () => void;
   onBackPress?: () => void;
   onDelete?: () => void;
+  onReport?: () => void;
   showTopRank?: boolean;
 }
 
@@ -56,6 +57,7 @@ export const VideoInfoOverlay = ({
   onComments,
   onLike,
   onDelete,
+  onReport,
   liked,
   showTopRank = true,
 }: VideoInfoOverlayProps) => {
@@ -142,12 +144,13 @@ export const VideoInfoOverlay = ({
 
         {/* Top Right */}
         <View className="flex-row">
+          {user.id !== me.id && (
+            <GestureTouchableOpacity onPress={onReport} hitSlop={20} className="mr-4">
+              <Ionicons name="alert-circle-outline" size={25} color={colors.white} />
+            </GestureTouchableOpacity>
+          )}
           {allowDelete && (
-            <GestureTouchableOpacity
-              onPress={onDelete}
-              hitSlop={20}
-              className="flex-col items-center gap-2"
-            >
+            <GestureTouchableOpacity onPress={onDelete} hitSlop={20}>
               <Ionicons name="trash-bin-outline" size={25} color={colors.red} />
             </GestureTouchableOpacity>
           )}

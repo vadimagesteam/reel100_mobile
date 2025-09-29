@@ -1,6 +1,6 @@
 export * from './AnimatedChar';
 export * from './Avatar';
-export * from './BottomSheet';
+export * from './bottomSheet/BottomSheet';
 export * from './Button';
 export * from './FlexLoading';
 export * from './LinearGradient';

@@ -31,7 +31,7 @@ export const AppNavigator = () => (
       headerStyle: { backgroundColor: colors.background },
       headerTintColor: colors.primary,
       contentStyle: { backgroundColor: colors.background },
-
+      fullScreenGestureEnabled: true,
       // eslint-disable-next-line react/no-unstable-nested-components
       headerLeft: () => <HeaderBackArrowButton className={clsx(isAndroid && 'mr-8')} />,
     }}

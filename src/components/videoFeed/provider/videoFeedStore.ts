@@ -15,6 +15,7 @@ export type VideoFeedStore = {
   commentsExpanded: string[];
 
   share: { videoId: string } | null;
+  report: { videoId: string; userId: string } | null;
 
   hearIconPos: { x: number; y: number };
   backPressHandler?: () => void;
@@ -41,6 +42,9 @@ export type VideoFeedStore = {
 
     shareVideo: (videoId: string) => void;
     closeShare: () => void;
+
+    reportVideo: (data: { videoId: string; userId: string }) => void;
+    closeReport: () => void;
   };
 };
 
@@ -63,6 +67,9 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
 
     //#share
     share: null,
+
+    //#report
+    report: null,
 
     //#overlay ui
     hearIconPos: { x: 0, y: 300 },
@@ -120,5 +127,7 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
 
       shareVideo: (videoId) => set({ share: { videoId } }),
       closeShare: () => set({ share: null }),
+      reportVideo: (report) => set({ report }),
+      closeReport: () => set({ report: null }),
     },
   }));

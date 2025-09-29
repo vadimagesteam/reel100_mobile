@@ -1,5 +1,12 @@
 import { TextInput, TextInputProps, View, TouchableOpacity, Text } from 'react-native';
-import { FC, forwardRef, useState } from 'react';
+import {
+  FC,
+  forwardRef,
+  useState,
+  ComponentType,
+  ForwardRefExoticComponent,
+  RefAttributes,
+} from 'react';
 import clsx from 'clsx';
 import { SvgIcon } from './SvgIcon';
 
@@ -9,6 +16,7 @@ export interface InputProps extends TextInputProps {
   onClear?: () => void;
   secureToggle?: boolean;
   hasError?: boolean;
+  InputComponent?: ComponentType<TextInputProps>;
 }
 
 export const Input: FC<InputProps> = forwardRef<TextInput, InputProps>(
@@ -22,6 +30,7 @@ export const Input: FC<InputProps> = forwardRef<TextInput, InputProps>(
       secureTextEntry,
       onFocus,
       onBlur,
+      InputComponent,
       ...rest
     },
     ref,
@@ -30,13 +39,18 @@ export const Input: FC<InputProps> = forwardRef<TextInput, InputProps>(
     const [hasValue, setHasValue] = useState('value' in rest && !!rest.value);
     const [focused, setFocused] = useState(false);
 
+    const _TextInput = (InputComponent ?? TextInput) as ForwardRefExoticComponent<
+      TextInputProps & RefAttributes<TextInput>
+    >;
+
     return (
       <View className="relative">
-        <TextInput
+        <_TextInput
           ref={ref}
           autoCapitalize="none"
           placeholderTextColor="#999"
           secureTextEntry={secureToggle ? secure : secureTextEntry}
+          textAlignVertical="top"
           className={clsx(
             'rounded-xl border-2 bg-black5 p-[13px] pr-10 text-xl leading-[20px] text-primary',
             !focused && !hasError ? 'border-black5' : '',

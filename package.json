@@ -11,8 +11,9 @@
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.14.0",
-    "@gorhom/bottom-sheet": "^5",
+    "@gorhom/bottom-sheet": "5.1.8",
     "@gorhom/portal": "^1.0.14",
+    "@hookform/resolvers": "^5.2.2",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native-camera-roll/camera-roll": "^7.10.1",
     "@react-native-community/blur": "^4.4.1",
@@ -37,7 +38,7 @@
     "lodash.pick": "^4.4.0",
     "nativewind": "^4.1.23",
     "react": "19.0.0",
-    "react-hook-form": "^7.54.2",
+    "react-hook-form": "^7.63.0",
     "react-native": "0.79.5",
     "react-native-calendars": "^1.1312.1",
     "react-native-config": "^1.5.5",
@@ -47,6 +48,7 @@
     "react-native-geolocation-service": "^5.3.1",
     "react-native-gesture-handler": "^2.24.0",
     "react-native-gifted-chat": "^2.8.1",
+    "react-native-haptic-feedback": "^2.3.3",
     "react-native-image-picker": "^8.2.0",
     "react-native-ios-context-menu": "3.1.2",
     "react-native-ios-utilities": "5.1.7",
@@ -64,6 +66,7 @@
     "react-native-video": "^6.16.1",
     "react-native-vision-camera": "^4.6.4",
     "zeego": "^3.0.6",
+    "zod": "^4.1.11",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

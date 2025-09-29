@@ -39,7 +39,9 @@ export const VideoInfoOverlay = ({
       {showLikes && (
         <View className="absolute bottom-1 left-1 flex-row gap-x-1">
           <SvgIcon image="like_heart" />
-          <Text className="text-[16px] font-bold text-primary">{formatNumberShort(3322)}</Text>
+          <Text className="text-[16px] font-bold text-primary">
+            {formatNumberShort(video.likesCount)}
+          </Text>
         </View>
       )}
       {video.top_100Position && (

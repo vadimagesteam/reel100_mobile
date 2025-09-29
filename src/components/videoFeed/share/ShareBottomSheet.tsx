@@ -1,12 +1,12 @@
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { BottomSheetTextInput, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Alert, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLoadingCallback } from '../../../hooks/useLoadingCallback';
 import { useSendMessage } from '../../chat/hooks';
 import { SearchInput, Button, BottomSheet } from '../../ui';
-import { SharePeopleList } from './SharePeopleList';
 import { useVideoFeedCacheKey, useVideoShare, useVideoFeed } from '../hooks';
+import { SharePeopleList } from './SharePeopleList';
 
 export const ShareBottomSheet = () => {
   const cacheKey = useVideoFeedCacheKey();

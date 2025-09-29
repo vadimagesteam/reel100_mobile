@@ -13,8 +13,10 @@ import Animated, {
 import { FlatList, FlatListProps, RefreshControl, InteractionManager } from 'react-native';
 import { useNavigation } from '../../navigation';
 import { isAndroid } from '../../utils';
+import { ReportSheet } from '../reportSheet/ReportSheet';
 
 import { VideoPost } from './queries/apiVideosFetcher';
+import { ReportBottomSheet } from './report/ReportBottomSheet';
 import { VideoListItem } from './VideoListItem';
 import { LikeAnimation, LikeAnimationRef } from './LikeAnimation';
 import {
@@ -283,6 +285,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
       <LikeAnimation ref={likeAnimationRef} />
       <CommentsBottomSheet />
       <ShareBottomSheet />
+      <ReportBottomSheet />
     </Animated.View>
   );
 };

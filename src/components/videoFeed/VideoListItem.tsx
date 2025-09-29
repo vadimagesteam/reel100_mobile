@@ -52,7 +52,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
 
   const allowDelete = useVideoFeed((s) => s.allowDelete);
   const backPressHandler = useVideoFeed((s) => s.backPressHandler);
-  const { openComments } = useVideoFeed((s) => s.actions);
+  const { openComments, reportVideo } = useVideoFeed((s) => s.actions);
 
   const playerRef = useRef<VideoRef>(null);
 
@@ -200,6 +200,12 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
           liked={!!likeData?.id}
           onLike={handleLike}
           onShare={() => shareVideo(video.id)}
+          onReport={() =>
+            reportVideo({
+              videoId: video.id,
+              userId: video.user.id,
+            })
+          }
           onUser={() => {
             navigation.navigate(Screens.Profile, { user: author });
           }}
