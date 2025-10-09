@@ -52,7 +52,7 @@ end
 use_modular_headers!
 use_frameworks! :linkage => :static
 
-target 'ReelsApp' do
+target 'RushRanks' do
   config = use_native_modules!
 
   use_react_native!(

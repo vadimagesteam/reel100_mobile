@@ -2912,7 +2912,7 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 0ee9074f2c1e86561ace168ee1470dc67aabaf02
   FirebaseMessaging: 195bbdb73e6ca1dbc76cd46e73f3552c084ef6e4
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
-  glog: eb93e2f488219332457c3c4eafd2738ddc7e80b8
+  glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   hermes-engine: f03b0e06d3882d71e67e45b073bb827da1a21aae
@@ -3016,6 +3016,6 @@ SPEC CHECKSUMS:
   VisionCamera: f56eaedde0d3fa095143b78374d29e89e71735f9
   Yoga: bfcce202dba74007f8974ee9c5f903a9a286c445
 
-PODFILE CHECKSUM: 5c5be6c672ba9a24c3caca05a85d33e51a4662af
+PODFILE CHECKSUM: 1afe454c870953aaef72d7321dd4bfd5feb97235
 
 COCOAPODS: 1.16.2

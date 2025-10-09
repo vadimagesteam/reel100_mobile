@@ -12,7 +12,7 @@ class AppDelegate: RCTAppDelegate {
     // Call the custom method to show the splash screen
     showSplashScreen()
     
-    self.moduleName = "ReelsApp"
+    self.moduleName = "RushRanks"
     self.dependencyProvider = RCTAppDependencyProvider()
 
     FirebaseApp.configure()
