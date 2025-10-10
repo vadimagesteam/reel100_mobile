@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useWindowDimensions, StyleSheet, Platform } from 'react-native';
+import { useWindowDimensions, StyleSheet, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { type SceneRendererProps, type Route, TabView, TabBar } from 'react-native-tab-view';
 import { Top100Videos } from '../../components/top100/Top100Videos';

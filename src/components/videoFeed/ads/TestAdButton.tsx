@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Platform, StatusBar } from 'react-native';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 
-const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-1067183093868518/5054746748';
+const adUnitId = TestIds.INTERSTITIAL;
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   keywords: [], // can be customized based on video description, tags, etc

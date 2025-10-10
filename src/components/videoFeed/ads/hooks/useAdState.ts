@@ -26,7 +26,9 @@ type AdStore = {
   shouldPlayAd: () => boolean;
 };
 
-const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-1067183093868518/5054746748';
+// ios unitId: ca-app-pub-1067183093868518/5054746748
+// android unitId: ca-app-pub-1067183093868518/1999409811
+const adUnitId = TestIds.INTERSTITIAL;
 
 // Global interstitial ad instance
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
@@ -113,7 +115,9 @@ export const useAdState = create<AdStore>((set, get) => {
     resetFullscreenWatched: () => set({ fullscreenWatched: 0 }),
 
     showAd: () => {
+      console.log('SHOW ADD???', get().isAdLoaded);
       if (get().isAdLoaded) {
+        console.log('PLAY ADD???');
         interstitial.show();
       }
     },
