@@ -19,6 +19,7 @@ import {
   VideoModalScreen,
   DeleteAccountScreen,
   VideoFeedModalScreen,
+  AdDebugScreen,
 } from '../screens';
 import { BottomTabNavigator } from './TabsNavigator';
 
@@ -56,6 +57,11 @@ export const AppNavigator = () => (
       name={Screens.Settings}
       component={SettingsScreen}
       options={{ headerShown: true }}
+    />
+    <Stack.Screen
+      name={Screens.AdDebug}
+      component={AdDebugScreen}
+      options={{ title: 'Ad Debug', headerShown: true }}
     />
     <Stack.Screen
       name={Screens.EditProfile}

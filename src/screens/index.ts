@@ -19,6 +19,7 @@ export * from './user/SettingsScreen';
 export * from './user/ProfileStatsScreen';
 export * from './user/UserSearchScreen';
 export * from './user/DeleteAccountScreen';
+export * from './user/AdDebugScreen';
 
 // videos
 export * from './video/VideoRecordingScreen';

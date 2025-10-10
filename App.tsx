@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import './src/lib/nativewindInterops';
 import { enableScreens } from 'react-native-screens';
 import { hideSplash, showSplash } from 'react-native-splash-view';
+import { useAdmobInitialization } from './src/components/videoFeed/ads/hooks/useAdmobInitialization';
 import { usePushNotifications } from './src/hooks/pushNotifications/usePushNotifications';
 import { asyncStoragePersister, queryClient } from './src/lib/api';
 import { getAllStoreHydratedPromises } from './src/lib/createPersistStore';
@@ -27,6 +28,7 @@ function App() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [storeHydrated, setStoreHydrated] = useState<boolean>(false);
 
+  useAdmobInitialization(isAuthenticated);
   usePushNotifications(isAuthenticated);
 
   useEffect(() => {

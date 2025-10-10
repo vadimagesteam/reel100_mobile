@@ -25,10 +25,20 @@ export const MenuContent = () => {
     navigationRef.navigate(Screens.EditProfile);
   };
 
+  const handleAdDebug = () => {
+    navigationRef.navigate(Screens.AdDebug);
+  };
+
   const handleLogout = async () => {
     await logout();
     await clearStoreCaches();
   };
+
+  const showDebug =
+    user.username.includes('@vadimages') ||
+    ['aw.hamer@gmail.com', 'nikolavuk@yahoo.com', 'nikola.vukovic23@gmail.com'].includes(
+      user.username,
+    );
 
   return (
     <View className="flex-1 bg-surface" style={{ paddingTop: insets.top }}>
@@ -43,6 +53,7 @@ export const MenuContent = () => {
         <MenuListItem label="Home" icon="home" onPress={handleHome} />
         <MenuListItem label="Account" icon="person" onPress={handleEditProfile} />
         <MenuListItem label="Settings" icon="settings" onPress={handleSettingsScreen} />
+        {showDebug && <MenuListItem label="Ad Debug" icon="flask" onPress={handleAdDebug} />}
         <MenuListItem label="Logout" icon="log-out" onPress={handleLogout} />
       </ScrollView>
     </View>

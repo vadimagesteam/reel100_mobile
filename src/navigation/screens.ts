@@ -30,6 +30,7 @@ export const Screens = {
   Settings: 'Settings',
   DeleteAccount: 'DeleteAccount',
   EditProfile: 'EditProfile',
+  AdDebug: 'AdDebug',
   UserFollowingSearch: 'UserFollowingSearch',
   UserSearch: 'UserSearch',
   SelectState: 'SelectState',
@@ -57,6 +58,7 @@ export type AppStackParamList = {
   Settings: undefined;
   DeleteAccount: undefined;
   EditProfile: undefined;
+  AdDebug: undefined;
   ProfileStats: {
     userId: string;
     initialTab: 'followers' | 'following';

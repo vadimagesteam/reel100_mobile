@@ -1,5 +1,5 @@
-import { FlashList, FlashListRef } from '@shopify/flash-list';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FlatList, FlatListProps, RefreshControl } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   interpolate,
@@ -7,18 +7,13 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   Extrapolation,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { FlatList, FlatListProps, RefreshControl, InteractionManager } from 'react-native';
 import { useNavigation } from '../../navigation';
 import { isAndroid } from '../../utils';
-import { ReportSheet } from '../reportSheet/ReportSheet';
-
-import { VideoPost } from './queries/apiVideosFetcher';
-import { ReportBottomSheet } from './report/ReportBottomSheet';
-import { VideoListItem } from './VideoListItem';
-import { LikeAnimation, LikeAnimationRef } from './LikeAnimation';
+import { useHideableContainer } from '../hidebleContainer';
+import { useAdTrackFullScreenExit } from './ads';
+import { CommentsBottomSheet } from './comments/CommentsBottomSheet';
 import {
   useLayoutDimensions,
   useFlatListLayoutChangeScrollFix,
@@ -27,9 +22,12 @@ import {
   useVideoPause,
   useVideoFeed,
 } from './hooks';
-import { useHideableContainer } from '../hidebleContainer';
-import { CommentsBottomSheet } from './comments/CommentsBottomSheet';
+import { LikeAnimation, LikeAnimationRef } from './LikeAnimation';
+
+import { VideoPost } from './queries/apiVideosFetcher';
+import { ReportBottomSheet } from './report/ReportBottomSheet';
 import { ShareBottomSheet } from './share/ShareBottomSheet';
+import { VideoListItem } from './VideoListItem';
 
 export interface SwipeableVideosListProps
   extends Omit<FlatListProps<VideoPost>, 'data' | 'renderItem' | 'refreshing'> {
@@ -59,6 +57,9 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewPaused, setViewPaused] = useState(false);
   const { dimensions, onLayout } = useLayoutDimensions();
+
+  // Ads
+  useAdTrackFullScreenExit();
 
   // Fullscreen: hide container
   const { show: showHeader, hide: hideHeaders } = useHideableContainer();
@@ -227,14 +228,16 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const gesturesCombined = Gesture.Exclusive(backSwipeGesture, doubleTapGesture, singleTapGesture);
   const VideoBatchSize = 6;
 
-  // flatListRef.current?.recomputeViewableItems();
-
+  const initialized = useRef(false);
   useEffect(() => {
-    if (initialVideoIndex > -1) {
+    if (initialVideoIndex > -1 && !initialized.current) {
       flatListRef.current?.scrollToOffset({
         offset: initialVideoIndex * dimensions.height,
         animated: false,
       });
+      setTimeout(() => {
+        initialized.current = true;
+      }, 600);
     }
   }, [dimensions.height, initialVideoIndex]);
 
@@ -258,7 +261,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
           showsVerticalScrollIndicator={false}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
-          initialScrollIndex={initialVideoIndex}
+          // initialScrollIndex={initialVideoIndex}
           onEndReachedThreshold={0.3}
           initialNumToRender={VideoBatchSize}
           windowSize={VideoBatchSize}

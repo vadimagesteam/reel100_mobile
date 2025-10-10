@@ -12,3 +12,6 @@ export const formatNumberUS = (n: number) =>
   new Intl.NumberFormat('en-US', {
     style: 'decimal',
   }).format(n);
+
+export const randInt = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;

@@ -1,4 +1,9 @@
 {
   "name": "RushRanks",
-  "displayName": "RushRanks"
+  "displayName": "RushRanks",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-xxxxxxxx~xxxxxxxx",
+    "ios_app_id": "ca-app-pub-1067183093868518~2460372999",
+    "user_tracking_usage_description": "This identifier will be used to deliver personalized ads to you."
+  }
 }

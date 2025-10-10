@@ -21,7 +21,7 @@ platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
 setup_permissions([
-  # 'AppTrackingTransparency',
+  'AppTrackingTransparency',
   # 'Bluetooth',
   # 'Calendars',
   # 'CalendarsWriteOnly',
@@ -53,6 +53,7 @@ use_modular_headers!
 use_frameworks! :linkage => :static
 
 target 'RushRanks' do
+  $RNGoogleMobileAdsAsStaticFramework = true
   config = use_native_modules!
 
   use_react_native!(
