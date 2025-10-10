@@ -2,7 +2,7 @@ import { Toasts } from '@backpackapp-io/react-native-toast';
 import { PortalProvider } from '@gorhom/portal';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import React, { useEffect, useState } from 'react';
-import { LogBox, View } from 'react-native';
+import { LogBox, View, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -48,7 +48,7 @@ function App() {
   }
 
   return (
-    <KeyboardProvider>
+    <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
       <GestureHandlerRootView className="flex-1 bg-background">
         {storeHydrated && (
           <PersistQueryClientProvider
