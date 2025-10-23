@@ -11,13 +11,7 @@ export const EmptyTop100Videos = ({ stateLabel }: { stateLabel: string }) => (
       entering={FadeIn.delay(200)}
       className="text-center text-xl font-semibold text-primary"
     >
-      Today's top for {stateLabel} is empty
-    </Animated.Text>
-    <Animated.Text
-      entering={FadeIn.delay(300)}
-      className="text-center text-xl font-semibold text-primary"
-    >
-      Be the first one! 🙂
+      Rush the ranks {stateLabel}!
     </Animated.Text>
   </View>
 );

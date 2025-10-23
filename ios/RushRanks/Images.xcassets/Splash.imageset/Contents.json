@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "newAppSplash.png",
+      "filename" : "rushranks_splash.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "newAppSplash 1.png",
+      "filename" : "rushranks_splash 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "newAppSplash 2.png",
+      "filename" : "rushranks_splash 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

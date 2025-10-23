@@ -68,6 +68,7 @@ export const TabForYouScreen = () => {
           refetch={handleRefresh}
           isRefreshing={isRefetching}
           queryControl={controllers}
+          emptyTitle="Use RushRanks and we'll do the rest"
           emptyMessage={
             searchByFullName ? `${searchByFullName} is not uploaded any videos` : undefined
           }

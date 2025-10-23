@@ -26,9 +26,13 @@ type AdStore = {
   shouldPlayAd: () => boolean;
 };
 
-// ios unitId: ca-app-pub-1067183093868518/5054746748
-// android unitId: ca-app-pub-1067183093868518/1999409811
-const adUnitId = TestIds.INTERSTITIAL;
+const adUnitId = __DEV__
+  ? TestIds.INTERSTITIAL
+  : Platform.select({
+      ios: 'ca-app-pub-2941838425354014/2959898965',
+      android: 'Ca-app-pub-2941838425354014/4603706016',
+      default: TestIds.INTERSTITIAL,
+    });
 
 // Global interstitial ad instance
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {

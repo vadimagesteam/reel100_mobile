@@ -87,7 +87,14 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
         onSubmitPress={confirm}
       />
       {(listEmpty || initialVideoIndex === -1) && (
-        <ListEmptyBlock title="Nothing to show yet" message="Try selecting a different date." />
+        <ListEmptyBlock
+          title={
+            global
+              ? `Who will Rush the Nation today?`
+              : `${selectedState?.label}'s Rushchive for today is empty 😔`
+          }
+          message="Try selecting a different date."
+        />
       )}
       {initialVideoIndex > -1 && (
         <VideoList

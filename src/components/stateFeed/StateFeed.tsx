@@ -48,5 +48,7 @@ export const StateFeed = ({ isActiveTab }: { isActiveTab: boolean }) => {
     }, [refetch]),
   );
 
-  return <VideoTiles queryControl={controllers} />;
+  return (
+    <VideoTiles queryControl={controllers} emptyTitle={`Rush the feed ${selectedState?.label}!`} />
+  );
 };
