@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
+  EulaScreen,
   ForgotPasswordScreen,
   LoginScreen,
   ResetPasswordScreen,
@@ -17,5 +18,6 @@ export const AuthNavigator = () => (
     <Stack.Screen name={Screens.ForgotPassword} component={ForgotPasswordScreen} />
     <Stack.Screen name={Screens.ResetPassword} component={ResetPasswordScreen} />
     <Stack.Screen name={Screens.VerifyEmail} component={VerifyEmailScreen} />
+    <Stack.Screen name={Screens.Eula} component={EulaScreen} />
   </Stack.Navigator>
 );

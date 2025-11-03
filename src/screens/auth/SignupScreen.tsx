@@ -1,4 +1,4 @@
-import { Alert, Text } from 'react-native';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { Button, Checkbox, Input } from '../../components/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { GuestContainer } from '../../components/layout/guest/GuestContainer';
@@ -15,6 +15,7 @@ interface FormData {
   lastName: string;
   nickname: string;
   passAgeVerification: boolean;
+  acceptedEula: boolean;
 }
 
 export function SignupScreen() {
@@ -34,6 +35,7 @@ export function SignupScreen() {
       confirmPassword: '',
       firstName: '',
       lastName: '',
+      acceptedEula: false,
     },
   });
 
@@ -218,6 +220,34 @@ export function SignupScreen() {
 
       {errors?.passAgeVerification?.message && (
         <Text className="pl-2 text-red1">{errors?.passAgeVerification?.message}</Text>
+      )}
+
+      <Controller
+        rules={{ required: 'Please accept the EULA' }}
+        name="acceptedEula"
+        control={control}
+        render={({ field: { value, onChange } }) => (
+          <Checkbox
+            value={value}
+            onChange={onChange}
+            label={
+              <View className="flex-row flex-wrap">
+                <Text className="text-base text-primary">I agree to the </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate(Screens.Eula)}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 5, bottom: 5, left: 2, right: 2 }}
+                >
+                  <Text className="text-base text-blue2 underline">End-User License Agreement</Text>
+                </TouchableOpacity>
+              </View>
+            }
+          />
+        )}
+      />
+
+      {errors?.acceptedEula?.message && (
+        <Text className="pl-2 text-red1">{errors?.acceptedEula?.message}</Text>
       )}
 
       <Button loading={isSubmitting} onPress={handleSubmit(onSubmit)}>

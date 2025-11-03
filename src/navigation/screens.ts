@@ -18,6 +18,7 @@ export const Screens = {
   ForgotPassword: 'ForgotPassword',
   ResetPassword: 'ResetPassword',
   VerifyEmail: 'VerifyEmail',
+  Eula: 'Eula',
 
   // In app screens
   Home: 'Home',
@@ -44,6 +45,7 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
   ResetPassword: undefined;
   VerifyEmail: undefined;
+  Eula: undefined;
 };
 
 export type AppStackParamList = {

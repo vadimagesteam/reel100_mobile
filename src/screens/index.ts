@@ -4,6 +4,7 @@ export * from './auth/ForgotPasswordScreen';
 export * from './auth/ResetPasswordScreen';
 export * from './auth/SignupScreen';
 export * from './auth/VerifyEmailScreen';
+export * from './auth/EulaScreen';
 
 // home
 export * from './home/TabMainScreen';
