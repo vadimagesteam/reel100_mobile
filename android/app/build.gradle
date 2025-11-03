@@ -84,8 +84,11 @@ android {
         applicationId "com.reelsapp.beta2025"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11
-        versionName "1.0.11"
+        versionCode 12
+        versionName "1.0.12"
+
+        vectorDrawables.useSupportLibrary = true
+
         // externalNativeBuild {
         //     cmake {
         //         cppFlags "-frtti -fexceptions"
@@ -103,15 +106,21 @@ android {
             keyPassword 'android'
         }
         release {
-        storeFile file('reelsapp-release.keystore')
-        storePassword 'rels123'
-        keyAlias 'reelsapp-key'
-        keyPassword 'rels123'
+            storeFile file('reelsapp-release.keystore')
+            storePassword 'rels123'
+            keyAlias 'reelsapp-key'
+            keyPassword 'rels123'
+        }
     }
-    }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+
+            // --- This ensures the bundle supports 16 KB pages ---
+//             ndk {
+//                 abiFilters "arm64-v8a" // 64-bit only, smaller AAB, full 16KB support
+//             }
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
@@ -119,6 +128,12 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            debuggable false
+
+            // --- This ensures the bundle supports 16 KB pages ---
+            ndk {
+                abiFilters "arm64-v8a" // 64-bit only, smaller AAB, full 16KB support
+            }
         }
     }
     //  externalNativeBuild {
@@ -130,6 +145,13 @@ android {
 
     //     }
     // }
+
+    // --- ABI filters: only 64-bit builds for Play Store ---
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging false
+        }
+    }
 }
 
 dependencies {

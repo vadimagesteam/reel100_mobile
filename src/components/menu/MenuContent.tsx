@@ -34,11 +34,15 @@ export const MenuContent = () => {
     await clearStoreCaches();
   };
 
+  // fixme: this could be removed once app is live and ads fully tested
   const showDebug =
-    user.username.includes('@vadimages') ||
-    ['aw.hamer@gmail.com', 'nikolavuk@yahoo.com', 'nikola.vukovic23@gmail.com'].includes(
-      user.username,
-    );
+    // Test accounts
+    !['michael+55@vadimages.com'].includes(user.username) &&
+    // Our accounts
+    (user.username.includes('@vadimages.com') ||
+      ['aw.hamer@gmail.com', 'nikolavuk@yahoo.com', 'nikola.vukovic23@gmail.com'].includes(
+        user.username,
+      ));
 
   return (
     <View className="flex-1 bg-surface" style={{ paddingTop: insets.top }}>

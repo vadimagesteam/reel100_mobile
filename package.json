@@ -65,7 +65,7 @@
     "react-native-svg": "^15.11.2",
     "react-native-tab-view": "^4.1.2",
     "react-native-video": "^6.16.1",
-    "react-native-vision-camera": "^4.6.4",
+    "react-native-vision-camera": "^4.7.2",
     "zeego": "^3.0.6",
     "zod": "^4.1.11",
     "zustand": "^5.0.5"
