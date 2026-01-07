@@ -20,8 +20,12 @@ export type ChatApiResponseType = Omit<ChatType, 'unreadMessagesCount'> & {
   unreadMessagesCount2: number;
 };
 
-const gqlChatsQuery = `query {
-    chats {
+const gqlChatsQuery = `query(
+  $orderBy: [ChatOrderByInput!]  
+) {
+    chats(
+     orderBy: $orderBy
+    ) {
         id
         user1 { id firstName lastName avatar }
         user2 { id firstName lastName avatar }
@@ -51,8 +55,15 @@ export const useChats = () => {
       }>('/graphql', {
         operationName: null,
         query: gqlChatsQuery,
-        variables: {},
+        variables: {
+          orderBy: [
+            {
+              updatedAt: 'Desc',
+            },
+          ],
+        },
       });
+      console.log('data', data);
 
       if (data.data?.chats) {
         return data.data?.chats.map<ChatType>((chat) => ({

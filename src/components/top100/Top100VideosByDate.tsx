@@ -90,7 +90,7 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
         <ListEmptyBlock
           title={
             global
-              ? `Who will Rush the Nation today?`
+              ? 'Who will Rush the Nation today?'
               : `${selectedState?.label}'s Rushchive for today is empty 😔`
           }
           message="Try selecting a different date."

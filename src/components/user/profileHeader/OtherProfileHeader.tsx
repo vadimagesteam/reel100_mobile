@@ -56,7 +56,7 @@ export const OtherProfileHeader = () => {
         isBlocked ? (
           <Text className="color-red1">You blocked this profile</Text>
         ) : (
-          <Animated.Text style={textStyle} className="text-[16px] font-bold text-primary">
+          <Animated.Text style={textStyle} className="w-full text-[16px] font-bold text-primary">
             {fullName}
           </Animated.Text>
         ),

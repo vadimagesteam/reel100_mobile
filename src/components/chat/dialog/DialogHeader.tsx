@@ -29,9 +29,9 @@ export const DialogHeader = ({
         <HeaderBackArrowButton />
         <TouchableOpacity onPress={onPress} className="flex-row gap-2.5">
           <Avatar uri={avatar} name={displayName} size={40} />
-          <View className="flex-col gap-0.5">
+          <View className="flex-col justify-center gap-0.5">
             <Text className="text-base font-bold text-primary">{displayName}</Text>
-            <Text className="text-sm text-muted">a few seconds ago</Text>
+            {/*<Text className="text-sm text-muted">a few seconds ago</Text>*/}
           </View>
         </TouchableOpacity>
       </View>

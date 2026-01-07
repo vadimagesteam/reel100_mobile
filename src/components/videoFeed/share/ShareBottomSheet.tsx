@@ -39,7 +39,7 @@ export const ShareBottomSheet = () => {
         sendMessage({
           videoId: share?.videoId!,
           toUserId: userId,
-          text: 'I shared video with you',
+          text: 'I shared a video with you',
         }),
       ),
     );

@@ -150,7 +150,13 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
 
   if (isVideoBanned) {
     return (
-      <VideoBanned dimensions={dimensions} previewUrl={previewUrl} onBackPress={handleBackPress} />
+      <VideoBanned
+        dimensions={dimensions}
+        previewUrl={previewUrl}
+        onDelete={handleDelete}
+        allowDelete={allowDelete}
+        onBackPress={handleBackPress}
+      />
     );
   }
 
