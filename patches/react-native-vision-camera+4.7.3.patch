@@ -1,0 +1,37 @@
+diff --git a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
+index 8e57710..146096b 100644
+--- a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
++++ b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
+@@ -37,7 +37,10 @@ extension CameraSession {
+       let enableAudio = self.configuration?.audio != .disabled
+ 
+       // Callback for when the recording ends
++      // NOTE: finishWriting's completion handler fires on an arbitrary queue,
++      // so we dispatch back to cameraQueue to avoid a data race on self.recordingSession
+       let onFinish = { (recordingSession: RecordingSession, status: AVAssetWriter.Status, error: Error?) in
++        CameraQueues.cameraQueue.async {
+         defer {
+           // Disable Audio Session again
+           if enableAudio {
+@@ -83,6 +86,7 @@ extension CameraSession {
+             onError(.unknown(message: "AVAssetWriter completed with status: \(status.descriptor)"))
+           }
+         }
++        } // end CameraQueues.cameraQueue.async
+       }
+ 
+       VisionLogger.log(level: .info, message: "Starting recording into file: \(options.path)")
+@@ -145,7 +149,12 @@ extension CameraSession {
+     CameraQueues.cameraQueue.async {
+       withPromise(promise) {
+         guard let recordingSession = self.recordingSession else {
+-          throw CameraError.capture(.noRecordingInProgress)
++          // Recording may have already finished due to a race condition
++          // (e.g. on iPhone 17 where camera hardware may finalize early).
++          // Instead of throwing, resolve silently - the onRecordingFinished
++          // callback will still deliver the video if the recording completed.
++          VisionLogger.log(level: .warning, message: "stopRecording() was called but there is no active recording session. The recording may have already finished.")
++          return nil
+         }
+         recordingSession.stop()
+         return nil
