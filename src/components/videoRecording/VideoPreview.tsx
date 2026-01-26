@@ -1,6 +1,6 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import Video from 'react-native-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,6 +25,14 @@ export const VideoPreview = () => {
   const [description, setDescription] = useState('');
   const { previewUri, error, uploading, actions } = useVideoRecordStore();
   const [selectedState] = useStateSelector();
+
+  const videoSource = useMemo(() => {
+    if (!previewUri) {
+      return undefined;
+    }
+    const uri = previewUri.startsWith('file://') ? previewUri : `file://${previewUri}`;
+    return { uri };
+  }, [previewUri]);
 
   useEffect(() => {
     setVolume(uploading ? 0 : 1);
@@ -86,14 +94,17 @@ export const VideoPreview = () => {
   return (
     <>
       <Video
-        source={{ uri: previewUri! }}
+        source={videoSource}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
         volume={volume}
-        disableAudioSessionManagement
         repeat
         onLoad={() => actions.setIsPreviewReady(true)}
-        onError={(error) => console.error('[VideoPreview] Playback error:', error)}
+        onError={(e: any) => {
+          const msg = e?.error?.errorString || e?.error?.code || 'Unknown playback error';
+          console.error('[VideoPreview] Playback error:', e);
+          Alert.alert('Video Playback Error', msg);
+        }}
       />
       {!uploading && <VideoDescriptionInput value={description} setValue={setDescription} />}
       <View

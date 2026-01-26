@@ -147,10 +147,12 @@ export const VideoRecording = () => {
     // If there is no sound, ensure all <Video> from react-native-video have disableAudioSessionManagement
     cameraRef.current?.startRecording({
       onRecordingFinished: async (video) => {
+        console.log('[onRecordingFinished]', video);
         if (isIOS) {
           await CustomAudioSessionManager.activatePlaybackAudioSession();
+          // Brief pause to allow file system to flush the recorded video on newer hardware
+          await sleep(300);
         }
-        console.log('[onRecordingFinished]', video);
         setPreviewUri(video.path);
       },
       onRecordingError: (error) => {
