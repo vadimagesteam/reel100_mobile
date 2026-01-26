@@ -93,6 +93,7 @@ export const VideoPreview = () => {
         disableAudioSessionManagement
         repeat
         onLoad={() => actions.setIsPreviewReady(true)}
+        onError={(error) => console.error('[VideoPreview] Playback error:', error)}
       />
       {!uploading && <VideoDescriptionInput value={description} setValue={setDescription} />}
       <View

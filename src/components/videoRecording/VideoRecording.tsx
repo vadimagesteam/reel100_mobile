@@ -148,7 +148,7 @@ export const VideoRecording = () => {
     cameraRef.current?.startRecording({
       onRecordingFinished: async (video) => {
         if (isIOS) {
-          await CustomAudioSessionManager.activateVideoRecordingAudioSession();
+          await CustomAudioSessionManager.activatePlaybackAudioSession();
         }
         console.log('[onRecordingFinished]', video);
         setPreviewUri(video.path);
