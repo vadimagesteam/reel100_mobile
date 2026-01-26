@@ -35,3 +35,46 @@ index 8e57710..146096b 100644
          }
          recordingSession.stop()
          return nil
+diff --git a/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift b/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
+index 8dec5ce..1cc2263 100644
+--- a/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
++++ b/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
+@@ -84,6 +84,18 @@ final class Track {
+     timeline.resume()
+   }
+ 
++  /**
++   Force-marks the track input as finished if it hasn't already been naturally finished
++   through the timeline. This is needed on devices (e.g. iPhone 17) where the camera
++   hardware stops delivering frames immediately after stop(), so no "late" frame arrives
++   to trigger the natural finish flow via TrackTimeline.
++   */
++  func ensureFinished() {
++    guard !timeline.isFinished else { return }
++    VisionLogger.log(level: .info, message: "Force-finishing \(type) track input (no late frames arrived after stop).")
++    assetWriterInput.markAsFinished()
++  }
++
+   func append(buffer originalBuffer: CMSampleBuffer) throws {
+     // 1. If the track is already finished (from a previous call), don't write anything.
+     if timeline.isFinished {
+diff --git a/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift b/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
+index adee189..d015490 100644
+--- a/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
++++ b/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
+@@ -308,6 +308,15 @@ final class RecordingSession {
+     // If there are audio frames after this timestamp, they will be cut off.
+     assetWriter.endSession(atSourceTime: lastVideoTimestamp)
+     VisionLogger.log(level: .info, message: "Asset Writer session stopped at \(lastVideoTimestamp.seconds).")
++
++    // Ensure all track inputs are marked as finished before calling finishWriting.
++    // On some devices (e.g. iPhone 17), the camera hardware stops delivering frames
++    // immediately after stop(), so no "late" frame arrives to trigger Track's natural
++    // markAsFinished() flow via the timeline. Without this, finishWriting() would hang
++    // indefinitely waiting for inputs to be marked as finished.
++    videoTrack?.ensureFinished()
++    audioTrack?.ensureFinished()
++
+     assetWriter.finishWriting {
+       VisionLogger.log(level: .info, message: "Asset Writer finished writing!")
+       self.completionHandler(self, self.assetWriter.status, self.assetWriter.error)

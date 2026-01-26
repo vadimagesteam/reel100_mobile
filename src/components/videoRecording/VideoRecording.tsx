@@ -157,6 +157,7 @@ export const VideoRecording = () => {
       },
       onRecordingError: (error) => {
         console.log('[onRecordingError]', error);
+        Alert.alert('Recording Error', error?.message || 'Unknown recording error');
       },
     });
   }, [setPreviewUri]);
