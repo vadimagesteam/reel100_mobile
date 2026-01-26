@@ -132,7 +132,10 @@ export const VideoRecording = () => {
     });
   });
 
-  const handleStartRecording = async () => {
+  const isStoppingRef = useRef(false);
+
+  const handleStartRecording = useCallback(async () => {
+    isStoppingRef.current = false;
     setIsRecording(true);
 
     if (isIOS) {
@@ -154,9 +157,13 @@ export const VideoRecording = () => {
         console.log('[onRecordingError]', error);
       },
     });
-  };
+  }, [setPreviewUri]);
 
-  const handleFinishRecording = async () => {
+  const handleFinishRecording = useCallback(async () => {
+    if (isStoppingRef.current) {
+      return;
+    }
+    isStoppingRef.current = true;
     console.log('STOP RECORDING...');
     try {
       await cameraRef.current?.stopRecording();
@@ -169,8 +176,10 @@ export const VideoRecording = () => {
       setIsRecording(false);
     } catch (error) {
       Alert.alert((error as Error)?.message || 'Unable to stop video record: unknown error');
+    } finally {
+      isStoppingRef.current = false;
     }
-  };
+  }, []);
 
   const handleCloseCamera = () => {
     clear();
