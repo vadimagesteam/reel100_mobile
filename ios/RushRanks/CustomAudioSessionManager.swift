@@ -38,6 +38,22 @@ class CustomAudioSessionManager: NSObject {
   // }
   
   @objc
+  func activatePlaybackAudioSession() {
+    do {
+      let session = AVAudioSession.sharedInstance()
+      try session.setCategory(
+        .playback,
+        mode: .moviePlayback,
+        options: [.allowBluetooth, .allowAirPlay]
+      )
+      try session.setActive(true)
+      print("✅ [CustomAudioSessionManager] Audio session activated for playback")
+    } catch {
+      print("❌ [CustomAudioSessionManager] Failed to activate playback session: \(error)")
+    }
+  }
+
+  @objc
   func deactivateAudioSession() {
     do {
       try AVAudioSession.sharedInstance().setActive(false)
