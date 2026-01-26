@@ -13,7 +13,10 @@ export interface TimerProps {
 export const Timer = ({ active, onTimeOut, maxDurationSeconds }: TimerProps) => {
   const [secondsLeft, setSecondsLeft] = useState<number>(maxDurationSeconds);
   const timerRef = useRef<NodeJS.Timeout>(null);
+  const onTimeOutRef = useRef(onTimeOut);
   const opacity = useSharedValue(0);
+
+  onTimeOutRef.current = onTimeOut;
 
   useEffect(() => {
     if (active) {
@@ -24,7 +27,7 @@ export const Timer = ({ active, onTimeOut, maxDurationSeconds }: TimerProps) => 
         tickValue--;
         if (tickValue <= 0) {
           clearInterval(timerRef.current!);
-          onTimeOut();
+          onTimeOutRef.current();
         }
       }, 1000);
     } else {
@@ -35,7 +38,7 @@ export const Timer = ({ active, onTimeOut, maxDurationSeconds }: TimerProps) => 
     return () => {
       clearInterval(timerRef.current!);
     };
-  }, [active, onTimeOut, maxDurationSeconds, opacity]);
+  }, [active, maxDurationSeconds, opacity]);
 
   const styles = useAnimatedStyle(() => ({
     opacity: opacity.value,
