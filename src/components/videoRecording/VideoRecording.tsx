@@ -66,7 +66,7 @@ export const VideoRecording = () => {
 
   const format = useCameraFormat(activeDevice, [
     { videoAspectRatio: screenAspectRatio },
-    { videoResolution: 'max' },
+    { videoResolution: { width: 3840, height: 2160 } },
     { photoAspectRatio: screenAspectRatio },
     { photoResolution: 'max' },
     { fps: 30 },
@@ -146,7 +146,6 @@ export const VideoRecording = () => {
     // !! SOUND RECORDING ISSUE:
     // If there is no sound, ensure all <Video> from react-native-video have disableAudioSessionManagement
     cameraRef.current?.startRecording({
-      fileType: 'mp4',
       videoCodec: 'h265',
       onRecordingFinished: async (video) => {
         console.log('[onRecordingFinished]', video);
