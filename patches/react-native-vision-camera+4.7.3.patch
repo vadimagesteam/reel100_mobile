@@ -35,6 +35,36 @@ index 8e57710..146096b 100644
          }
          recordingSession.stop()
          return nil
+diff --git a/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift b/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
+index f985f2c..bb7e227 100644
+--- a/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
++++ b/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
+@@ -35,6 +35,25 @@ extension AVCaptureVideoDataOutput {
+     } else {
+       // User didn't pass a custom codec, just use default
+       settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
++
++      // Safety: On some devices (e.g. iPhone 17 Pro) the default recommended settings may
++      // select a ProRes/ProRes RAW codec that requires special metadata (e.g. SMPTE RDD18
++      // ISO sensitivity, white balance). Since the library does not provide this metadata,
++      // detect non-standard codecs and fall back to HEVC or H.264.
++      if let defaultSettings = settings,
++         let codecValue = defaultSettings[AVVideoCodecKey] as? String {
++        let isStandardCodec = (codecValue == AVVideoCodecType.h264.rawValue ||
++                               codecValue == AVVideoCodecType.hevc.rawValue)
++        if !isStandardCodec {
++          VisionLogger.log(level: .warning,
++            message: "Default codec \(codecValue) may require unsupported metadata. Falling back to HEVC/H.264...")
++          if supportsCodec(.hevc, writingTo: options.fileType) {
++            settings = recommendedVideoSettings(forVideoCodecType: .hevc, assetWriterOutputFileType: options.fileType)
++          } else if supportsCodec(.h264, writingTo: options.fileType) {
++            settings = recommendedVideoSettings(forVideoCodecType: .h264, assetWriterOutputFileType: options.fileType)
++          }
++        }
++      }
+     }
+     guard var settings else {
+       throw CameraError.capture(.createRecorderError(message: "Failed to get video settings!"))
 diff --git a/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift b/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
 index 8dec5ce..1cc2263 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
