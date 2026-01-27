@@ -146,6 +146,7 @@ export const VideoRecording = () => {
     // !! SOUND RECORDING ISSUE:
     // If there is no sound, ensure all <Video> from react-native-video have disableAudioSessionManagement
     cameraRef.current?.startRecording({
+      fileType: 'mp4',
       videoCodec: 'h265',
       onRecordingFinished: async (video) => {
         console.log('[onRecordingFinished]', video);

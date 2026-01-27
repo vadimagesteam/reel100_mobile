@@ -36,35 +36,110 @@ index 8e57710..146096b 100644
          recordingSession.stop()
          return nil
 diff --git a/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift b/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
-index f985f2c..bb7e227 100644
+index f985f2c..abaed9f 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
-@@ -35,6 +35,25 @@ extension AVCaptureVideoDataOutput {
-     } else {
-       // User didn't pass a custom codec, just use default
-       settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
+@@ -15,31 +15,86 @@ extension AVCaptureVideoDataOutput {
+     return availableCodecs.contains(videoCodec)
+   }
+ 
++  /// Returns true if the given settings dictionary uses a non-standard codec
++  /// (anything other than H.264 or HEVC, e.g. ProRes, ProRes RAW).
++  private func isNonStandardCodec(in settings: [String: Any]?) -> Bool {
++    guard let codecValue = settings?[AVVideoCodecKey] as? String else { return false }
++    return codecValue != AVVideoCodecType.h264.rawValue && codecValue != AVVideoCodecType.hevc.rawValue
++  }
 +
-+      // Safety: On some devices (e.g. iPhone 17 Pro) the default recommended settings may
-+      // select a ProRes/ProRes RAW codec that requires special metadata (e.g. SMPTE RDD18
-+      // ISO sensitivity, white balance). Since the library does not provide this metadata,
-+      // detect non-standard codecs and fall back to HEVC or H.264.
-+      if let defaultSettings = settings,
-+         let codecValue = defaultSettings[AVVideoCodecKey] as? String {
-+        let isStandardCodec = (codecValue == AVVideoCodecType.h264.rawValue ||
-+                               codecValue == AVVideoCodecType.hevc.rawValue)
-+        if !isStandardCodec {
-+          VisionLogger.log(level: .warning,
-+            message: "Default codec \(codecValue) may require unsupported metadata. Falling back to HEVC/H.264...")
-+          if supportsCodec(.hevc, writingTo: options.fileType) {
-+            settings = recommendedVideoSettings(forVideoCodecType: .hevc, assetWriterOutputFileType: options.fileType)
-+          } else if supportsCodec(.h264, writingTo: options.fileType) {
-+            settings = recommendedVideoSettings(forVideoCodecType: .h264, assetWriterOutputFileType: options.fileType)
-+          }
-+        }
+   /**
+    Get the recommended options for an [AVAssetWriter] with the desired [RecordVideoOptions].
+    */
+   func recommendedVideoSettings(forOptions options: RecordVideoOptions) throws -> [String: Any] {
+-    let settings: [String: Any]?
+-    VisionLogger.log(level: .info, message: "Getting recommended video settings for \(options.fileType) file...")
+-    if let videoCodec = options.codec {
+-      // User passed a custom codec
+-      if supportsCodec(videoCodec, writingTo: options.fileType) {
+-        // The codec is supported, use it
+-        VisionLogger.log(level: .info, message: "Using codec \(videoCodec)...")
+-        settings = recommendedVideoSettings(forVideoCodecType: videoCodec, assetWriterOutputFileType: options.fileType)
+-      } else {
+-        // The codec is not supported, fall-back to default
+-        VisionLogger.log(level: .info, message: "Codec \(videoCodec) is not supported, falling back to default...")
+-        settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
++    let preferredCodec: AVVideoCodecType = options.codec ?? .hevc
++    var settings: [String: Any]?
++
++    VisionLogger.log(level: .info, message: "Getting recommended video settings for \(options.fileType) file (codec: \(options.codec?.rawValue ?? "default"))...")
++
++    // Log available codecs for debugging
++    let availableCodecs = availableVideoCodecTypesForAssetWriter(writingTo: options.fileType)
++    VisionLogger.log(level: .info, message: "Available codecs for \(options.fileType): \(availableCodecs.map { $0.rawValue })")
++
++    // Strategy 1: Try the preferred codec
++    if supportsCodec(preferredCodec, writingTo: options.fileType) {
++      VisionLogger.log(level: .info, message: "Using preferred codec \(preferredCodec.rawValue)...")
++      settings = recommendedVideoSettings(forVideoCodecType: preferredCodec, assetWriterOutputFileType: options.fileType)
++    }
++
++    // Strategy 2: If preferred codec returned ProRes settings or wasn't supported, try HEVC
++    if settings == nil || isNonStandardCodec(in: settings) {
++      if preferredCodec != .hevc && supportsCodec(.hevc, writingTo: options.fileType) {
++        VisionLogger.log(level: .warning, message: "Preferred codec returned non-standard settings. Trying HEVC...")
++        settings = recommendedVideoSettings(forVideoCodecType: .hevc, assetWriterOutputFileType: options.fileType)
 +      }
++    }
++
++    // Strategy 3: Try H.264
++    if settings == nil || isNonStandardCodec(in: settings) {
++      if supportsCodec(.h264, writingTo: options.fileType) {
++        VisionLogger.log(level: .warning, message: "HEVC returned non-standard settings. Trying H.264...")
++        settings = recommendedVideoSettings(forVideoCodecType: .h264, assetWriterOutputFileType: options.fileType)
+       }
+-    } else {
+-      // User didn't pass a custom codec, just use default
++    }
++
++    // Strategy 4: Default recommended settings
++    if settings == nil {
++      VisionLogger.log(level: .warning, message: "No codec-specific settings available. Using default...")
+       settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
      }
++
      guard var settings else {
        throw CameraError.capture(.createRecorderError(message: "Failed to get video settings!"))
+     }
+ 
++    // CRITICAL SAFETY: On devices like iPhone 17 Pro, even codec-specific recommended settings
++    // may return ProRes/ProRes RAW codec settings that require SMPTE RDD18 metadata
++    // (ISO sensitivity, white balance, etc.) which this library does not provide.
++    // Force-override any non-standard codec to HEVC to prevent AVFoundation error -11875.
++    if isNonStandardCodec(in: settings) {
++      let originalCodec = settings[AVVideoCodecKey] as? String ?? "nil"
++      VisionLogger.log(level: .warning,
++        message: "FORCE-OVERRIDING non-standard codec \(originalCodec) → HEVC to prevent ProRes RAW metadata errors.")
++      settings[AVVideoCodecKey] = AVVideoCodecType.hevc.rawValue
++
++      // Also strip any ProRes-specific compression properties that may be incompatible with HEVC
++      if var compressionProps = settings[AVVideoCompressionPropertiesKey] as? [String: Any] {
++        // Keep only standard compression properties
++        let standardKeys: Set<String> = [
++          AVVideoAverageBitRateKey,
++          AVVideoExpectedSourceFrameRateKey,
++          AVVideoMaxKeyFrameIntervalKey,
++          AVVideoMaxKeyFrameIntervalDurationKey,
++          AVVideoProfileLevelKey,
++          AVVideoQualityKey,
++        ]
++        compressionProps = compressionProps.filter { standardKeys.contains($0.key) }
++        settings[AVVideoCompressionPropertiesKey] = compressionProps
++      }
++    }
++
++    VisionLogger.log(level: .info, message: "Final video settings codec: \(settings[AVVideoCodecKey] as? String ?? "nil")")
++
+     if let bitRateOverride = options.bitRateOverride {
+       // Convert from Mbps -> bps
+       let bitsPerSecond = bitRateOverride * 1_000_000
 diff --git a/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift b/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
 index 8dec5ce..1cc2263 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
@@ -89,7 +164,7 @@ index 8dec5ce..1cc2263 100644
      // 1. If the track is already finished (from a previous call), don't write anything.
      if timeline.isFinished {
 diff --git a/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift b/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
-index adee189..d015490 100644
+index adee189..1fc76db 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
 @@ -308,6 +308,15 @@ final class RecordingSession {
@@ -102,7 +177,7 @@ index adee189..d015490 100644
 +    // immediately after stop(), so no "late" frame arrives to trigger Track's natural
 +    // markAsFinished() flow via the timeline. Without this, finishWriting() would hang
 +    // indefinitely waiting for inputs to be marked as finished.
-+    videoTrack?.ensureFinished()
++    videoTrack.ensureFinished()
 +    audioTrack?.ensureFinished()
 +
      assetWriter.finishWriting {
