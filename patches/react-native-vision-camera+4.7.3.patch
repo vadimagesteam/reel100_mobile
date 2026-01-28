@@ -51,7 +51,7 @@ index ecd2a94..d4018b4 100644
  
    func configureVideoOutputFormat(configuration: CameraConfiguration) {
 diff --git a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
-index 8e57710..146096b 100644
+index 8e57710..9d91e16 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
 @@ -37,7 +37,10 @@ extension CameraSession {
@@ -73,7 +73,22 @@ index 8e57710..146096b 100644
        }
  
        VisionLogger.log(level: .info, message: "Starting recording into file: \(options.path)")
-@@ -145,7 +149,12 @@ extension CameraSession {
+@@ -120,8 +124,12 @@ extension CameraSession {
+         }
+ 
+         // Init Video
+-        let videoSettings = try videoOutput.recommendedVideoSettings(forOptions: options)
+-        try recordingSession.initializeVideoTrack(withSettings: videoSettings)
++        let activePixelFormat = videoOutput.pixelFormat
++        let videoSettings = try videoOutput.recommendedVideoSettings(forOptions: options,
++                                                                      activePixelFormat: activePixelFormat)
++        let videoFormatHint = self.videoDeviceInput?.device.activeFormat.formatDescription
++        try recordingSession.initializeVideoTrack(withSettings: videoSettings,
++                                                   sourceFormatHint: videoFormatHint)
+ 
+         // start recording session with or without audio.
+         try recordingSession.start()
+@@ -145,7 +153,12 @@ extension CameraSession {
      CameraQueues.cameraQueue.async {
        withPromise(promise) {
          guard let recordingSession = self.recordingSession else {
@@ -88,10 +103,18 @@ index 8e57710..146096b 100644
          recordingSession.stop()
          return nil
 diff --git a/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift b/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
-index f985f2c..abaed9f 100644
+index f985f2c..78a3aee 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
-@@ -15,31 +15,86 @@ extension AVCaptureVideoDataOutput {
+@@ -8,6 +8,7 @@
+ 
+ import AVFoundation
+ import Foundation
++import VideoToolbox
+ 
+ extension AVCaptureVideoDataOutput {
+   private func supportsCodec(_ videoCodec: AVVideoCodecType, writingTo fileType: AVFileType) -> Bool {
+@@ -15,31 +16,112 @@ extension AVCaptureVideoDataOutput {
      return availableCodecs.contains(videoCodec)
    }
  
@@ -105,7 +128,7 @@ index f985f2c..abaed9f 100644
    /**
     Get the recommended options for an [AVAssetWriter] with the desired [RecordVideoOptions].
     */
-   func recommendedVideoSettings(forOptions options: RecordVideoOptions) throws -> [String: Any] {
+-  func recommendedVideoSettings(forOptions options: RecordVideoOptions) throws -> [String: Any] {
 -    let settings: [String: Any]?
 -    VisionLogger.log(level: .info, message: "Getting recommended video settings for \(options.fileType) file...")
 -    if let videoCodec = options.codec {
@@ -118,6 +141,8 @@ index f985f2c..abaed9f 100644
 -        // The codec is not supported, fall-back to default
 -        VisionLogger.log(level: .info, message: "Codec \(videoCodec) is not supported, falling back to default...")
 -        settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
++  func recommendedVideoSettings(forOptions options: RecordVideoOptions,
++                                  activePixelFormat: OSType? = nil) throws -> [String: Any] {
 +    let preferredCodec: AVVideoCodecType = options.codec ?? .hevc
 +    var settings: [String: Any]?
 +
@@ -183,7 +208,32 @@ index f985f2c..abaed9f 100644
 +          AVVideoQualityKey,
 +        ]
 +        compressionProps = compressionProps.filter { standardKeys.contains($0.key) }
++
++        // Set the correct HEVC profile based on the active pixel format bit depth.
++        // If the camera delivers 10-bit buffers (x420/x422), we must use Main10 profile
++        // to avoid kVTPixelTransferNotSupportedErr (-12905).
++        let is10Bit = [kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange,
++                       kCVPixelFormatType_420YpCbCr10BiPlanarFullRange]
++                       .contains(activePixelFormat ?? 0)
++        let profileLevel = is10Bit
++            ? kVTProfileLevel_HEVC_Main10_AutoLevel as String
++            : kVTProfileLevel_HEVC_Main_AutoLevel as String
++        compressionProps[AVVideoProfileLevelKey] = profileLevel
++        VisionLogger.log(level: .info,
++          message: "Set HEVC profile to \(profileLevel) (10-bit: \(is10Bit), pixelFormat: \(activePixelFormat.map { String($0) } ?? "nil"))")
++
 +        settings[AVVideoCompressionPropertiesKey] = compressionProps
++      } else {
++        // No compression properties exist yet — create them with just the profile
++        let is10Bit = [kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange,
++                       kCVPixelFormatType_420YpCbCr10BiPlanarFullRange]
++                       .contains(activePixelFormat ?? 0)
++        let profileLevel = is10Bit
++            ? kVTProfileLevel_HEVC_Main10_AutoLevel as String
++            : kVTProfileLevel_HEVC_Main_AutoLevel as String
++        settings[AVVideoCompressionPropertiesKey] = [AVVideoProfileLevelKey: profileLevel]
++        VisionLogger.log(level: .info,
++          message: "Created compression properties with HEVC profile \(profileLevel) (10-bit: \(is10Bit))")
 +      }
 +    }
 +
@@ -216,10 +266,29 @@ index 8dec5ce..1cc2263 100644
      // 1. If the track is already finished (from a previous call), don't write anything.
      if timeline.isFinished {
 diff --git a/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift b/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
-index adee189..1fc76db 100644
+index adee189..fc4adc6 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
-@@ -308,6 +308,15 @@ final class RecordingSession {
+@@ -97,7 +97,8 @@ final class RecordingSession {
+   /**
+    Initializes the video track.
+    */
+-  func initializeVideoTrack(withSettings settings: [String: Any]) throws {
++  func initializeVideoTrack(withSettings settings: [String: Any],
++                             sourceFormatHint: CMFormatDescription? = nil) throws {
+     guard !settings.isEmpty else {
+       throw CameraError.capture(.createRecorderError(message: "Tried to initialize Video Track with empty options!"))
+     }
+@@ -109,7 +110,7 @@ final class RecordingSession {
+     }
+ 
+     VisionLogger.log(level: .info, message: "Initializing Video AssetWriter with settings: \(settings.description)")
+-    let videoWriter = AVAssetWriterInput(mediaType: .video, outputSettings: settings)
++    let videoWriter = AVAssetWriterInput(mediaType: .video, outputSettings: settings, sourceFormatHint: sourceFormatHint)
+     videoWriter.expectsMediaDataInRealTime = true
+     videoWriter.transform = videoOrientation.affineTransform
+     assetWriter.add(videoWriter)
+@@ -308,6 +309,15 @@ final class RecordingSession {
      // If there are audio frames after this timestamp, they will be cut off.
      assetWriter.endSession(atSourceTime: lastVideoTimestamp)
      VisionLogger.log(level: .info, message: "Asset Writer session stopped at \(lastVideoTimestamp.seconds).")
