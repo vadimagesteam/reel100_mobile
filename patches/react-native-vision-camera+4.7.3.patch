@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Configuration.swift b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Configuration.swift
-index ecd2a94..20d9962 100644
+index ecd2a94..7092b76 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Configuration.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Configuration.swift
-@@ -193,16 +193,51 @@ extension CameraSession {
+@@ -193,16 +193,105 @@ extension CameraSession {
        return
      }
  
@@ -12,13 +12,23 @@ index ecd2a94..20d9962 100644
 +    // Find all matching formats (JS Dictionary -> strongly typed Swift class)
 +    let matchingFormats = device.formats.filter { targetFormat.isEqualTo(format: $0) }
 +    guard !matchingFormats.isEmpty else {
-       throw CameraError.format(.invalidFormat)
-     }
- 
++      throw CameraError.format(.invalidFormat)
++    }
++
 +    // Helper to get pixel format type from format description
 +    func getPixelFormatType(_ fmt: AVCaptureDevice.Format) -> OSType {
 +      return CMFormatDescriptionGetMediaSubType(fmt.formatDescription)
 +    }
++
++    // Bayer/ProRes RAW formats that cannot be encoded with standard codecs
++    // These formats require ProRes RAW and SMPTE RDD18 metadata
++    let bayerFormats: Set<OSType> = [
++      0x62747032, // btp2 - Bayer To ProRes 2
++      0x62747033, // btp3 - Bayer To ProRes 3
++      0x62703136, // bp16 - 16-bit Bayer
++      0x62703234, // bp24 - 24-bit Bayer
++      0x62703332, // bp32 - 32-bit Bayer
++    ]
 +
 +    // Define 8-bit standard formats (most compatible for HEVC/H.264 recording)
 +    let standard8BitFormats: Set<OSType> = [
@@ -33,23 +43,67 @@ index ecd2a94..20d9962 100644
 +      kCVPixelFormatType_420YpCbCr10BiPlanarFullRange,    // xf20
 +    ]
 +
++    // CRITICAL: Filter out Bayer-only formats (like iPhone 17's 4224x2240 btp2 format)
++    // These formats cannot be used for standard video recording
++    let recordableFormats = matchingFormats.filter { fmt in
++      let pixelFormat = getPixelFormatType(fmt)
++      let isBayer = bayerFormats.contains(pixelFormat)
++      if isBayer {
++        VisionLogger.log(level: .warning, message: "Filtering out Bayer format: \(pixelFormat.toString()) (\(fmt.videoDimensions.width)x\(fmt.videoDimensions.height))")
++      }
++      return !isBayer
++    }
++
++    VisionLogger.log(level: .info, message: "Found \(matchingFormats.count) matching formats, \(recordableFormats.count) are recordable (non-Bayer)")
++
 +    // Prefer 8-bit formats first (most compatible), then 10-bit, then others.
-+    // On devices like iPhone 17 Pro, some formats only support ProRes RAW which
++    // On devices like iPhone 14 Pro+, some formats only support ProRes RAW which
 +    // requires SMPTE RDD18 metadata that this library doesn't provide (error -11875).
 +    // Additionally, 10-bit formats require HEVC Main10 profile to avoid error -12905.
 +    let format: AVCaptureDevice.Format
-+    if let format8Bit = matchingFormats.first(where: { standard8BitFormats.contains(getPixelFormatType($0)) }) {
++    if let format8Bit = recordableFormats.first(where: { standard8BitFormats.contains(getPixelFormatType($0)) }) {
 +      format = format8Bit
 +      VisionLogger.log(level: .info, message: "Selected 8-bit format: \(getPixelFormatType(format).toString()) (\(format.videoDimensions.width)x\(format.videoDimensions.height))")
-+    } else if let format10Bit = matchingFormats.first(where: { standard10BitFormats.contains(getPixelFormatType($0)) }) {
++    } else if let format10Bit = recordableFormats.first(where: { standard10BitFormats.contains(getPixelFormatType($0)) }) {
 +      format = format10Bit
 +      VisionLogger.log(level: .info, message: "Selected 10-bit format: \(getPixelFormatType(format).toString()) (\(format.videoDimensions.width)x\(format.videoDimensions.height)) - will use HEVC Main10 or H.264")
-+    } else {
-+      // No standard format found, use first match and hope the codec override handles it
-+      format = matchingFormats[0]
-+      VisionLogger.log(level: .warning, message: "No standard pixel format found among \(matchingFormats.count) matching formats. Using: \(getPixelFormatType(format).toString())")
-+    }
++    } else if !recordableFormats.isEmpty {
++      // No standard format found among recordable formats, use first recordable
++      format = recordableFormats[0]
++      VisionLogger.log(level: .warning, message: "No standard pixel format found. Using first recordable: \(getPixelFormatType(format).toString())")
++    } else if !matchingFormats.isEmpty {
++      // FALLBACK: All matching formats are Bayer - this resolution might not be recordable
++      // Try to find any format with this resolution that isn't Bayer
++      VisionLogger.log(level: .error, message: "All \(matchingFormats.count) matching formats are Bayer! Looking for alternative resolution...")
 +
++      // Find the closest non-Bayer format at a similar resolution
++      let targetWidth = matchingFormats[0].videoDimensions.width
++      let targetHeight = matchingFormats[0].videoDimensions.height
++
++      let alternativeFormats = device.formats.filter { fmt in
++        let pixelFormat = getPixelFormatType(fmt)
++        return !bayerFormats.contains(pixelFormat) &&
++               (standard8BitFormats.contains(pixelFormat) || standard10BitFormats.contains(pixelFormat))
++      }.sorted { a, b in
++        // Sort by how close they are to the target resolution
++        let aArea = Int(a.videoDimensions.width) * Int(a.videoDimensions.height)
++        let bArea = Int(b.videoDimensions.width) * Int(b.videoDimensions.height)
++        let targetArea = Int(targetWidth) * Int(targetHeight)
++        return abs(aArea - targetArea) < abs(bArea - targetArea)
++      }
++
++      if let alternative = alternativeFormats.first {
++        format = alternative
++        VisionLogger.log(level: .warning, message: "Using alternative format: \(getPixelFormatType(format).toString()) (\(format.videoDimensions.width)x\(format.videoDimensions.height)) instead of Bayer \(targetWidth)x\(targetHeight)")
++      } else {
++        // Last resort: use the Bayer format and hope for the best
++        format = matchingFormats[0]
++        VisionLogger.log(level: .error, message: "No alternative found! Using Bayer format: \(getPixelFormatType(format).toString()) - recording will likely fail")
++      }
++    } else {
+       throw CameraError.format(.invalidFormat)
+     }
+ 
      // Set new device Format
      device.activeFormat = format
  
@@ -59,62 +113,285 @@ index ecd2a94..20d9962 100644
  
    func configureVideoOutputFormat(configuration: CameraConfiguration) {
 diff --git a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
-index 8e57710..eab0901 100644
+index 8e57710..dbf4c38 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Video.swift
-@@ -37,7 +37,10 @@ extension CameraSession {
-       let enableAudio = self.configuration?.audio != .disabled
+@@ -12,6 +12,15 @@ import UIKit
+ 
+ private let INSUFFICIENT_STORAGE_ERROR_CODE = -11807
+ 
++// Bayer/ProRes RAW formats that cannot be encoded directly
++private let kBayerFormats: Set<OSType> = [
++  0x62747032, // btp2 - Bayer To ProRes 2
++  0x62747033, // btp3 - Bayer To ProRes 3
++  0x62703136, // bp16 - 16-bit Bayer
++  0x62703234, // bp24 - 24-bit Bayer
++  0x62703332, // bp32 - 32-bit Bayer
++]
++
+ extension CameraSession {
+   /**
+    Starts a video + audio recording with a custom Asset Writer.
+@@ -38,8 +47,8 @@ extension CameraSession {
  
        // Callback for when the recording ends
-+      // NOTE: finishWriting's completion handler fires on an arbitrary queue,
-+      // so we dispatch back to cameraQueue to avoid a data race on self.recordingSession
        let onFinish = { (recordingSession: RecordingSession, status: AVAssetWriter.Status, error: Error?) in
 +        CameraQueues.cameraQueue.async {
          defer {
-           // Disable Audio Session again
+-          // Disable Audio Session again
            if enableAudio {
-@@ -83,6 +86,7 @@ extension CameraSession {
+             CameraQueues.audioQueue.async {
+               self.deactivateAudioSession()
+@@ -65,7 +74,6 @@ extension CameraSession {
+ 
+         if let error = error as NSError? {
+           VisionLogger.log(level: .error, message: "RecordingSession Error \(error.code): \(error.description)")
+-          // Something went wrong, we have an error
+           if error.code == INSUFFICIENT_STORAGE_ERROR_CODE {
+             onError(.capture(.insufficientStorage))
+           } else {
+@@ -73,25 +81,22 @@ extension CameraSession {
+           }
+         } else {
+           if status == .completed {
+-            // Recording was successfully saved
+             let video = Video(path: recordingSession.url.absoluteString,
+                               duration: recordingSession.duration,
+                               size: recordingSession.size)
+             onVideoRecorded(video)
+           } else {
+-            // Recording wasn't saved and we don't have an error either.
              onError(.unknown(message: "AVAssetWriter completed with status: \(status.descriptor)"))
            }
          }
-+        } // end CameraQueues.cameraQueue.async
++        }
        }
  
        VisionLogger.log(level: .info, message: "Starting recording into file: \(options.path)")
-@@ -120,8 +124,15 @@ extension CameraSession {
+ 
+       do {
+-        // Orientation is relative to our current output orientation
+         let orientation = self.outputOrientation.relativeTo(orientation: videoOutput.orientation)
+ 
+-        // Create RecordingSession for the temp file
+         let recordingSession = try RecordingSession(url: options.path,
+                                                     fileType: options.fileType,
+                                                     metadataProvider: self.metadataProvider,
+@@ -99,12 +104,11 @@ extension CameraSession {
+                                                     orientation: orientation,
+                                                     completion: onFinish)
+ 
+-        // Init Audio + Activate Audio Session (optional)
++        // Init Audio
+         if enableAudio,
+            let audioOutput = self.audioOutput,
+            let audioInput = self.audioDeviceInput {
+           VisionLogger.log(level: .info, message: "Enabling Audio for Recording...")
+-          // Activate Audio Session asynchronously
+           CameraQueues.audioQueue.async {
+             do {
+               try self.activateAudioSession()
+@@ -113,23 +117,163 @@ extension CameraSession {
+             }
+           }
+ 
+-          // Initialize audio asset writer
+           let audioSettings = audioOutput.recommendedAudioSettingsForAssetWriter(writingTo: options.fileType)
+           try recordingSession.initializeAudioTrack(withSettings: audioSettings,
+                                                     format: audioInput.device.activeFormat.formatDescription)
          }
  
-         // Init Video
+-        // Init Video
 -        let videoSettings = try videoOutput.recommendedVideoSettings(forOptions: options)
 -        try recordingSession.initializeVideoTrack(withSettings: videoSettings)
-+        // CRITICAL: Get the actual pixel format from the device's active format description,
-+        // NOT from videoOutput.pixelFormat (which is the requested format, not actual).
-+        // On iPhone 17+ with 10-bit sensors, this is essential for correct HEVC profile selection.
-+        let deviceFormatDescription = self.videoDeviceInput?.device.activeFormat.formatDescription
-+        let devicePixelFormat = deviceFormatDescription.map { CMFormatDescriptionGetMediaSubType($0) }
++        // ============ BUILD 75: BAYER FORMAT FIX ============
++        let deviceName = UIDevice.current.name
++        let systemVersion = UIDevice.current.systemVersion
++        VisionLogger.log(level: .info, message: "========== BUILD 75 RECORDING ==========")
++        VisionLogger.log(level: .info, message: "Device: \(deviceName) iOS \(systemVersion)")
++
++        // Get device's native pixel format
++        let devicePixelFormat: OSType? = self.videoDeviceInput.map { input in
++          CMFormatDescriptionGetMediaSubType(input.device.activeFormat.formatDescription)
++        }
++
++        // Get device active format dimensions
++        var deviceWidth: Int32 = 0
++        var deviceHeight: Int32 = 0
++        if let activeFormat = self.videoDeviceInput?.device.activeFormat {
++          let dimensions = CMVideoFormatDescriptionGetDimensions(activeFormat.formatDescription)
++          deviceWidth = dimensions.width
++          deviceHeight = dimensions.height
++        }
++
++        let deviceFormatStr = devicePixelFormat.map { String(format: "0x%08X", $0) } ?? "nil"
++        let deviceFormatFourCC = devicePixelFormat.map { fourCCToString($0) } ?? "nil"
++        VisionLogger.log(level: .info, message: "Device Native Format: \(deviceFormatStr) (\(deviceFormatFourCC)) \(deviceWidth)x\(deviceHeight)")
++
++        // Check if device format is a Bayer/ProRes RAW format
++        let isBayerFormat = devicePixelFormat.map { kBayerFormats.contains($0) } ?? false
++        VisionLogger.log(level: .info, message: "Is Bayer Format: \(isBayerFormat)")
++
++        // List available output formats
++        let availableFormats = videoOutput.availableVideoPixelFormatTypes
++        let availableFormatsStr = availableFormats.map { String(format: "0x%08X (%@)", $0, fourCCToString($0)) }.joined(separator: ", ")
++        VisionLogger.log(level: .info, message: "Available Output Formats: \(availableFormatsStr)")
++
++        // Check what standard formats are available
++        let hasBGRA = availableFormats.contains(kCVPixelFormatType_32BGRA)
++        let has420f = availableFormats.contains(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
++        let has420v = availableFormats.contains(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)
++        let hasxf20 = availableFormats.contains(kCVPixelFormatType_420YpCbCr10BiPlanarFullRange)
++        let hasx420 = availableFormats.contains(kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange)
++
++        VisionLogger.log(level: .info, message: "Available: BGRA=\(hasBGRA), 420f=\(has420f), 420v=\(has420v), xf20=\(hasxf20), x420=\(hasx420)")
++
++        // STRATEGY: ALWAYS force a compatible format
++        // NEVER use native passthrough for Bayer formats or special high-res modes
++        var selectedFormat: OSType? = nil
++        var forceH264 = false
++
++        // Priority order for format selection:
++        // 1. 420f (8-bit Full Range YUV) - best for most cases
++        // 2. 420v (8-bit Video Range YUV) - also good
++        // 3. xf20 (10-bit Full Range) - for HDR content
++        // 4. x420 (10-bit Video Range) - for HDR content
++        // 5. BGRA - last resort, larger file size
++
++        if has420f {
++          selectedFormat = kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
++          VisionLogger.log(level: .info, message: "Selected 420f (8-bit YUV Full Range)")
++        } else if has420v {
++          selectedFormat = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
++          VisionLogger.log(level: .info, message: "Selected 420v (8-bit YUV Video Range)")
++        } else if hasxf20 {
++          selectedFormat = kCVPixelFormatType_420YpCbCr10BiPlanarFullRange
++          VisionLogger.log(level: .info, message: "Selected xf20 (10-bit YUV Full Range)")
++        } else if hasx420 {
++          selectedFormat = kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange
++          VisionLogger.log(level: .info, message: "Selected x420 (10-bit YUV Video Range)")
++        } else if hasBGRA {
++          selectedFormat = kCVPixelFormatType_32BGRA
++          forceH264 = true
++          VisionLogger.log(level: .info, message: "Selected BGRA (fallback)")
++        } else if let firstFormat = availableFormats.first {
++          selectedFormat = firstFormat
++          VisionLogger.log(level: .warning, message: "No standard format available, using first: 0x\(String(format: "%08X", firstFormat))")
++        }
++
++        // Determine if we're using an 8-bit format
++        let is8BitFormat = selectedFormat == kCVPixelFormatType_32BGRA ||
++                           selectedFormat == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange ||
++                           selectedFormat == kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
++
++        // ALWAYS apply the selected format - never use native passthrough
++        if let format = selectedFormat {
++          videoOutput.videoSettings = [
++            String(kCVPixelBufferPixelFormatTypeKey): format
++          ]
++          VisionLogger.log(level: .info, message: "Forced output format to: 0x\(String(format: "%08X", format)) (\(fourCCToString(format)))")
++        } else {
++          VisionLogger.log(level: .error, message: "No format available! This will likely fail.")
++        }
++
++        // Get the actual format that will be used
++        var actualPixelFormat: OSType? = nil
++        if let pixelFormatValue = videoOutput.videoSettings[String(kCVPixelBufferPixelFormatTypeKey)] {
++          if let numberValue = pixelFormatValue as? NSNumber {
++            actualPixelFormat = OSType(numberValue.uint32Value)
++          } else if let osTypeValue = pixelFormatValue as? OSType {
++            actualPixelFormat = osTypeValue
++          }
++        }
++
++        VisionLogger.log(level: .info, message: "Final output format: \(actualPixelFormat.map { String(format: "0x%08X (%@)", $0, fourCCToString($0)) } ?? "nil")")
++
++        // Determine codec: Use H.264 for 8-bit BGRA, HEVC for everything else
++        if is8BitFormat && selectedFormat == kCVPixelFormatType_32BGRA {
++          forceH264 = true
++        }
++
++        VisionLogger.log(level: .info, message: "Strategy: is8Bit=\(is8BitFormat), forceH264=\(forceH264), isBayer=\(isBayerFormat)")
++
++        // Get video settings
 +        let videoSettings = try videoOutput.recommendedVideoSettings(forOptions: options,
-+                                                                      devicePixelFormat: devicePixelFormat)
++                                                                      devicePixelFormat: actualPixelFormat,
++                                                                      forceH264: forceH264)
++
++        VisionLogger.log(level: .info, message: "Video encoder settings: \(videoSettings)")
++
++        // Initialize video track - no pixel buffer conversion needed since we're forcing format at output level
 +        try recordingSession.initializeVideoTrack(withSettings: videoSettings,
-+                                                   sourceFormatHint: deviceFormatDescription)
++                                                   sourceFormatHint: nil,
++                                                   enablePixelBufferConversion: false,
++                                                   targetPixelFormat: kCVPixelFormatType_32BGRA)
++
++        // Post debug info for the overlay
++        let codecUsed = videoSettings[AVVideoCodecKey] as? String ?? "unknown"
++        var profileUsed = "unknown"
++        if let compressionProps = videoSettings[AVVideoCompressionPropertiesKey] as? [String: Any],
++           let profile = compressionProps[AVVideoProfileLevelKey] as? String {
++          profileUsed = profile
++        }
++
++        let debugInfo: [String: Any] = [
++          "deviceFmt": "\(deviceFormatStr) (\(deviceFormatFourCC))",
++          "outFmt": actualPixelFormat.map { String(format: "0x%08X (%@)", $0, fourCCToString($0)) } ?? "nil",
++          "isBayer": isBayerFormat,
++          "is8Bit": is8BitFormat,
++          "h264": forceH264,
++          "codec": codecUsed,
++          "profile": profileUsed,
++          "size": "\(videoSettings[AVVideoWidthKey] ?? 0)x\(videoSettings[AVVideoHeightKey] ?? 0)",
++          "avail": availableFormats.map { fourCCToString($0) }.joined(separator: ","),
++        ]
++        NotificationCenter.default.post(name: NSNotification.Name("VisionCameraRecordingDebugInfo"), object: nil, userInfo: debugInfo)
++        VisionLogger.log(level: .info, message: "Debug info: \(debugInfo)")
++        VisionLogger.log(level: .info, message: "============================================")
  
-         // start recording session with or without audio.
+-        // start recording session with or without audio.
++        // Start recording
          try recordingSession.start()
-@@ -145,7 +156,12 @@ extension CameraSession {
+         self.didCancelRecording = false
+         self.recordingSession = recordingSession
+ 
+         let end = DispatchTime.now()
+-        VisionLogger.log(level: .info, message: "RecordingSesssion started in \(Double(end.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000)ms!")
++        VisionLogger.log(level: .info, message: "Recording started in \(Double(end.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000)ms!")
+       } catch let error as CameraError {
+         onError(error)
+       } catch let error as NSError {
+@@ -145,7 +289,8 @@ extension CameraSession {
      CameraQueues.cameraQueue.async {
        withPromise(promise) {
          guard let recordingSession = self.recordingSession else {
 -          throw CameraError.capture(.noRecordingInProgress)
-+          // Recording may have already finished due to a race condition
-+          // (e.g. on iPhone 17 where camera hardware may finalize early).
-+          // Instead of throwing, resolve silently - the onRecordingFinished
-+          // callback will still deliver the video if the recording completed.
-+          VisionLogger.log(level: .warning, message: "stopRecording() was called but there is no active recording session. The recording may have already finished.")
++          VisionLogger.log(level: .warning, message: "stopRecording() was called but there is no active recording session.")
 +          return nil
          }
          recordingSession.stop()
          return nil
+@@ -191,3 +336,18 @@ extension CameraSession {
+     }
+   }
+ }
++
++// Helper function to convert OSType to FourCC string
++private func fourCCToString(_ value: OSType) -> String {
++  let bytes = [
++    UInt8((value >> 24) & 0xFF),
++    UInt8((value >> 16) & 0xFF),
++    UInt8((value >> 8) & 0xFF),
++    UInt8(value & 0xFF)
++  ]
++  let isPrintable = bytes.allSatisfy { $0 >= 32 && $0 < 127 }
++  if isPrintable, let str = String(bytes: bytes, encoding: .ascii) {
++    return str
++  }
++  return "????"
++}
 diff --git a/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift b/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
-index f985f2c..019ff86 100644
+index f985f2c..5a15839 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/Extensions/AVCaptureVideoDataOutput+recommendedVideoSettings.swift
 @@ -8,6 +8,7 @@
@@ -125,7 +402,7 @@ index f985f2c..019ff86 100644
  
  extension AVCaptureVideoDataOutput {
    private func supportsCodec(_ videoCodec: AVVideoCodecType, writingTo fileType: AVFileType) -> Bool {
-@@ -15,31 +16,123 @@ extension AVCaptureVideoDataOutput {
+@@ -15,31 +16,160 @@ extension AVCaptureVideoDataOutput {
      return availableCodecs.contains(videoCodec)
    }
  
@@ -136,13 +413,16 @@ index f985f2c..019ff86 100644
 +    return codecValue != AVVideoCodecType.h264.rawValue && codecValue != AVVideoCodecType.hevc.rawValue
 +  }
 +
-+  /// Returns true if the pixel format is 10-bit (requires HEVC Main10 profile)
-+  private func is10BitPixelFormat(_ pixelFormat: OSType?) -> Bool {
++  /// Returns true if the pixel format is a known 8-bit format (safe for HEVC Main profile)
++  private func isConfirmed8BitPixelFormat(_ pixelFormat: OSType?) -> Bool {
 +    guard let pf = pixelFormat else { return false }
++    // Only these formats are confirmed 8-bit and safe for HEVC Main profile
 +    return [
-+      kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange,   // x420
-+      kCVPixelFormatType_420YpCbCr10BiPlanarFullRange,    // xf20
-+      kCVPixelFormatType_Lossy_420YpCbCr10PackedBiPlanarVideoRange,
++      kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,     // 420v
++      kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,      // 420f
++      kCVPixelFormatType_32BGRA,                           // BGRA
++      kCVPixelFormatType_32ARGB,                           // ARGB
++      kCVPixelFormatType_32RGBA,                           // RGBA
 +    ].contains(pf)
 +  }
 +
@@ -151,8 +431,9 @@ index f985f2c..019ff86 100644
 +
 +   - Parameter options: The recording options (codec, file type, bitrate, etc.)
 +   - Parameter devicePixelFormat: The actual pixel format from the device's active format.
-+     This is critical for correct HEVC profile selection on devices with 10-bit sensors (iPhone 17+).
++     This is critical for correct HEVC profile selection on devices with 10-bit sensors (iPhone 14 Pro+).
 +     IMPORTANT: Do NOT pass videoOutput.pixelFormat here - that's the requested format, not the actual format.
++   - Parameter forceH264: If true, force H.264 codec regardless of other settings. Used as fallback for problematic devices.
     */
 -  func recommendedVideoSettings(forOptions options: RecordVideoOptions) throws -> [String: Any] {
 -    let settings: [String: Any]?
@@ -166,66 +447,85 @@ index f985f2c..019ff86 100644
 -      } else {
 -        // The codec is not supported, fall-back to default
 -        VisionLogger.log(level: .info, message: "Codec \(videoCodec) is not supported, falling back to default...")
--        settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
 +  func recommendedVideoSettings(forOptions options: RecordVideoOptions,
-+                                  devicePixelFormat: OSType? = nil) throws -> [String: Any] {
-+    let preferredCodec: AVVideoCodecType = options.codec ?? .hevc
++                                devicePixelFormat: OSType? = nil,
++                                forceH264: Bool = false) throws -> [String: Any] {
 +    var settings: [String: Any]?
-+    let is10Bit = is10BitPixelFormat(devicePixelFormat)
++    let isConfirmed8Bit = isConfirmed8BitPixelFormat(devicePixelFormat)
 +
-+    VisionLogger.log(level: .info, message: "Getting recommended video settings for \(options.fileType) file (codec: \(options.codec?.rawValue ?? "default"))...")
-+    VisionLogger.log(level: .info, message: "Device pixel format: \(devicePixelFormat.map { String($0) } ?? "nil"), is10Bit: \(is10Bit)")
++    VisionLogger.log(level: .info, message: "Getting recommended video settings for \(options.fileType) file (codec: \(options.codec?.rawValue ?? "default"), forceH264: \(forceH264))...")
++    VisionLogger.log(level: .info, message: "Device pixel format: \(devicePixelFormat.map { String(format: "0x%08X", $0) } ?? "nil"), isConfirmed8Bit: \(isConfirmed8Bit)")
 +
 +    // Log available codecs for debugging
 +    let availableCodecs = availableVideoCodecTypesForAssetWriter(writingTo: options.fileType)
 +    VisionLogger.log(level: .info, message: "Available codecs for \(options.fileType): \(availableCodecs.map { $0.rawValue })")
 +
-+    // Strategy 1: Try the preferred codec
-+    if supportsCodec(preferredCodec, writingTo: options.fileType) {
-+      VisionLogger.log(level: .info, message: "Using preferred codec \(preferredCodec.rawValue)...")
-+      settings = recommendedVideoSettings(forVideoCodecType: preferredCodec, assetWriterOutputFileType: options.fileType)
-+    }
-+
-+    // Strategy 2: If preferred codec returned ProRes settings or wasn't supported, try HEVC
-+    if settings == nil || isNonStandardCodec(in: settings) {
-+      if preferredCodec != .hevc && supportsCodec(.hevc, writingTo: options.fileType) {
-+        VisionLogger.log(level: .warning, message: "Preferred codec returned non-standard settings. Trying HEVC...")
-+        settings = recommendedVideoSettings(forVideoCodecType: .hevc, assetWriterOutputFileType: options.fileType)
++    // CRITICAL FIX: If forceH264 is set, skip all other codecs and go straight to H.264
++    // H.264 is the most compatible codec and handles format conversion better than HEVC on some devices
++    if forceH264 {
++      VisionLogger.log(level: .warning, message: "FORCING H.264 codec for maximum compatibility...")
++      if supportsCodec(.h264, writingTo: options.fileType) {
++        settings = recommendedVideoSettings(forVideoCodecType: .h264, assetWriterOutputFileType: options.fileType)
++        // Ensure we got H.264, not something else
++        if let codecValue = settings?[AVVideoCodecKey] as? String, codecValue != AVVideoCodecType.h264.rawValue {
++          VisionLogger.log(level: .warning, message: "recommendedVideoSettings returned \(codecValue) instead of H.264, overriding...")
++          settings?[AVVideoCodecKey] = AVVideoCodecType.h264.rawValue
++        }
 +      }
 +    }
 +
-+    // Strategy 3: Try H.264
-+    if settings == nil || isNonStandardCodec(in: settings) {
-+      if supportsCodec(.h264, writingTo: options.fileType) {
-+        VisionLogger.log(level: .warning, message: "HEVC returned non-standard settings. Trying H.264...")
-+        settings = recommendedVideoSettings(forVideoCodecType: .h264, assetWriterOutputFileType: options.fileType)
++    // If not forcing H.264 or H.264 isn't available, try normal codec selection
++    if settings == nil {
++      let preferredCodec: AVVideoCodecType = options.codec ?? .hevc
++
++      // Strategy 1: Try the preferred codec
++      if supportsCodec(preferredCodec, writingTo: options.fileType) {
++        VisionLogger.log(level: .info, message: "Using preferred codec \(preferredCodec.rawValue)...")
++        settings = recommendedVideoSettings(forVideoCodecType: preferredCodec, assetWriterOutputFileType: options.fileType)
++      }
++
++      // Strategy 2: If preferred codec returned ProRes settings or wasn't supported, try HEVC
++      if settings == nil || isNonStandardCodec(in: settings) {
++        if preferredCodec != .hevc && supportsCodec(.hevc, writingTo: options.fileType) {
++          VisionLogger.log(level: .warning, message: "Preferred codec returned non-standard settings. Trying HEVC...")
++          settings = recommendedVideoSettings(forVideoCodecType: .hevc, assetWriterOutputFileType: options.fileType)
++        }
++      }
++
++      // Strategy 3: Try H.264
++      if settings == nil || isNonStandardCodec(in: settings) {
++        if supportsCodec(.h264, writingTo: options.fileType) {
++          VisionLogger.log(level: .warning, message: "HEVC returned non-standard settings. Trying H.264...")
++          settings = recommendedVideoSettings(forVideoCodecType: .h264, assetWriterOutputFileType: options.fileType)
++        }
++      }
++
++      // Strategy 4: Default recommended settings
++      if settings == nil {
++        VisionLogger.log(level: .warning, message: "No codec-specific settings available. Using default...")
+         settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
        }
 -    } else {
 -      // User didn't pass a custom codec, just use default
-+    }
-+
-+    // Strategy 4: Default recommended settings
-+    if settings == nil {
-+      VisionLogger.log(level: .warning, message: "No codec-specific settings available. Using default...")
-       settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
+-      settings = recommendedVideoSettingsForAssetWriter(writingTo: options.fileType)
      }
 +
      guard var settings else {
        throw CameraError.capture(.createRecorderError(message: "Failed to get video settings!"))
      }
  
-+    // CRITICAL SAFETY: On devices like iPhone 17 Pro, even codec-specific recommended settings
++    // CRITICAL SAFETY: On devices like iPhone 14 Pro+, even codec-specific recommended settings
 +    // may return ProRes/ProRes RAW codec settings that require SMPTE RDD18 metadata
 +    // (ISO sensitivity, white balance, etc.) which this library does not provide.
 +    // Force-override any non-standard codec to a compatible one.
 +    if isNonStandardCodec(in: settings) {
 +      let originalCodec = settings[AVVideoCodecKey] as? String ?? "nil"
 +
-+      // If 10-bit, use H.264 for maximum compatibility (avoids Main vs Main10 issue entirely)
-+      // Otherwise use HEVC for better compression
-+      let fallbackCodec: AVVideoCodecType = is10Bit ? .h264 : .hevc
++      // If we're forcing H.264 or the pixel format is 8-bit, use H.264 as fallback
++      // Otherwise use HEVC with Main10 for 10-bit content
++      let fallbackCodec: AVVideoCodecType = (forceH264 || isConfirmed8Bit) ? .h264 : .hevc
 +      VisionLogger.log(level: .warning,
-+        message: "FORCE-OVERRIDING non-standard codec \(originalCodec) → \(fallbackCodec.rawValue) (is10Bit: \(is10Bit))")
++        message: "FORCE-OVERRIDING non-standard codec \(originalCodec) → \(fallbackCodec.rawValue) (isConfirmed8Bit: \(isConfirmed8Bit), forceH264: \(forceH264))")
 +      settings[AVVideoCodecKey] = fallbackCodec.rawValue
 +
 +      // Strip any ProRes-specific compression properties that may be incompatible
@@ -243,38 +543,126 @@ index f985f2c..019ff86 100644
 +      }
 +    }
 +
-+    // Set correct HEVC profile for 10-bit content to avoid kVTPixelTransferNotSupportedErr (-12905)
++    // Set correct profile based on codec
 +    let codecKey = settings[AVVideoCodecKey] as? String
-+    if codecKey == AVVideoCodecType.hevc.rawValue && is10Bit {
-+      VisionLogger.log(level: .info, message: "Setting HEVC Main10 profile for 10-bit content (devicePixelFormat: \(devicePixelFormat ?? 0))...")
++    if codecKey == AVVideoCodecType.hevc.rawValue {
 +      var compressionProps = settings[AVVideoCompressionPropertiesKey] as? [String: Any] ?? [:]
++
++      // CRITICAL FIX for iPhone 17:
++      // ALWAYS use Main10 profile for HEVC. Main10 can encode both 8-bit AND 10-bit content
++      // with no quality loss. This eliminates -12905 errors entirely by removing any
++      // possibility of profile/format mismatch.
++      VisionLogger.log(level: .info, message: "Setting HEVC Main10 profile for universal compatibility")
 +      compressionProps[AVVideoProfileLevelKey] = kVTProfileLevel_HEVC_Main10_AutoLevel as String
 +      settings[AVVideoCompressionPropertiesKey] = compressionProps
-+    } else if codecKey == AVVideoCodecType.hevc.rawValue {
-+      // Ensure Main profile is set for 8-bit content
++    } else if codecKey == AVVideoCodecType.h264.rawValue {
++      // For H.264, use High profile for best quality with 8-bit content
 +      var compressionProps = settings[AVVideoCompressionPropertiesKey] as? [String: Any] ?? [:]
-+      if compressionProps[AVVideoProfileLevelKey] == nil {
-+        compressionProps[AVVideoProfileLevelKey] = kVTProfileLevel_HEVC_Main_AutoLevel as String
-+        settings[AVVideoCompressionPropertiesKey] = compressionProps
-+      }
++      VisionLogger.log(level: .info, message: "Setting H.264 High profile for best compatibility")
++      compressionProps[AVVideoProfileLevelKey] = AVVideoProfileLevelH264HighAutoLevel
++      settings[AVVideoCompressionPropertiesKey] = compressionProps
 +    }
 +
-+    VisionLogger.log(level: .info, message: "Final video settings - codec: \(settings[AVVideoCodecKey] as? String ?? "nil"), compression: \(settings[AVVideoCompressionPropertiesKey] ?? "nil")")
++    // Log comprehensive final settings for debugging
++    VisionLogger.log(level: .info, message: "========== FINAL VIDEO ENCODER SETTINGS ==========")
++    VisionLogger.log(level: .info, message: "Codec: \(settings[AVVideoCodecKey] as? String ?? "nil")")
++    if let compressionProps = settings[AVVideoCompressionPropertiesKey] as? [String: Any] {
++      VisionLogger.log(level: .info, message: "Profile: \(compressionProps[AVVideoProfileLevelKey] ?? "not set")")
++      VisionLogger.log(level: .info, message: "Bitrate: \(compressionProps[AVVideoAverageBitRateKey] ?? "not set")")
++      VisionLogger.log(level: .info, message: "All Compression Props: \(compressionProps)")
++    }
++    VisionLogger.log(level: .info, message: "Width: \(settings[AVVideoWidthKey] ?? "not set")")
++    VisionLogger.log(level: .info, message: "Height: \(settings[AVVideoHeightKey] ?? "not set")")
++    VisionLogger.log(level: .info, message: "=================================================")
 +
      if let bitRateOverride = options.bitRateOverride {
        // Convert from Mbps -> bps
        let bitsPerSecond = bitRateOverride * 1_000_000
 diff --git a/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift b/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
-index 8dec5ce..1cc2263 100644
+index 8dec5ce..570b99b 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/Recording/Track.swift
-@@ -84,6 +84,18 @@ final class Track {
+@@ -7,7 +7,9 @@
+ 
+ import AVFoundation
+ import CoreMedia
++import CoreVideo
+ import Foundation
++import VideoToolbox
+ 
+ // MARK: - TrackType
+ 
+@@ -24,6 +26,15 @@ final class Track {
+   private let assetWriterInput: AVAssetWriterInput
+   private let timeline: TrackTimeline
+ 
++  // Pixel buffer adaptor for video tracks - enables format conversion
++  private var pixelBufferAdaptor: AVAssetWriterInputPixelBufferAdaptor?
++
++  // Target pixel format for conversion (nil = no conversion)
++  private var targetPixelFormat: OSType?
++
++  // VTPixelTransferSession for format conversion (iOS 16.0+)
++  private var pixelTransferSession: Any?
++
+   /**
+    Gets whether the track has been marked as finished or not.
+ 
+@@ -68,6 +79,47 @@ final class Track {
+     timeline = TrackTimeline(ofTrackType: trackType, withClock: clock)
+   }
+ 
++  /**
++   Configure the track for video with pixel buffer conversion support.
++   This enables automatic format conversion for problematic devices like iPhone 14 Pro+, iPhone 17.
++
++   - Parameter width: Video width in pixels
++   - Parameter height: Video height in pixels
++   - Parameter targetFormat: Target pixel format for conversion (e.g., kCVPixelFormatType_32BGRA)
++   */
++  func configureForVideoWithConversion(width: Int, height: Int, targetFormat: OSType) {
++    guard type == .video else { return }
++
++    targetPixelFormat = targetFormat
++
++    // Create pixel buffer adaptor with source pixel buffer attributes
++    let sourcePixelBufferAttributes: [String: Any] = [
++      kCVPixelBufferPixelFormatTypeKey as String: targetFormat,
++      kCVPixelBufferWidthKey as String: width,
++      kCVPixelBufferHeightKey as String: height,
++      kCVPixelBufferIOSurfacePropertiesKey as String: [:],
++    ]
++
++    pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(
++      assetWriterInput: assetWriterInput,
++      sourcePixelBufferAttributes: sourcePixelBufferAttributes
++    )
++
++    // Create VTPixelTransferSession for format conversion (iOS 16.0+)
++    if #available(iOS 16.0, *) {
++      var session: VTPixelTransferSession?
++      let status = VTPixelTransferSessionCreate(allocator: kCFAllocatorDefault, pixelTransferSessionOut: &session)
++      if status == noErr, let session = session {
++        pixelTransferSession = session
++        VisionLogger.log(level: .info, message: "Created VTPixelTransferSession for format conversion to \(targetFormat.toString())")
++      } else {
++        VisionLogger.log(level: .warning, message: "Failed to create VTPixelTransferSession: \(status)")
++      }
++    } else {
++      VisionLogger.log(level: .warning, message: "VTPixelTransferSession not available (requires iOS 16.0+)")
++    }
++  }
++
+   func start() {
+     timeline.start()
+   }
+@@ -84,6 +136,18 @@ final class Track {
      timeline.resume()
    }
  
 +  /**
 +   Force-marks the track input as finished if it hasn't already been naturally finished
-+   through the timeline. This is needed on devices (e.g. iPhone 17) where the camera
++   through the timeline. This is needed on devices (e.g. iPhone 14 Pro+) where the camera
 +   hardware stops delivering frames immediately after stop(), so no "late" frame arrives
 +   to trigger the natural finish flow via TrackTimeline.
 +   */
@@ -287,21 +675,135 @@ index 8dec5ce..1cc2263 100644
    func append(buffer originalBuffer: CMSampleBuffer) throws {
      // 1. If the track is already finished (from a previous call), don't write anything.
      if timeline.isFinished {
+@@ -107,8 +171,38 @@ final class Track {
+ 
+       // 4. Write the buffer
+       if assetWriterInput.isReadyForMoreMediaData {
+-        // Asset Writer is ready - write the buffer!
+-        let successful = assetWriterInput.append(buffer)
++        var successful = false
++
++        // Check if we need to use pixel buffer conversion (for video tracks with conversion enabled)
++        if type == .video,
++           let adaptor = pixelBufferAdaptor,
++           let targetFormat = targetPixelFormat,
++           let pixelBuffer = CMSampleBufferGetImageBuffer(buffer) {
++          // Get the source pixel format
++          let sourceFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
++
++          // Check if conversion is needed
++          if sourceFormat != targetFormat {
++            // Need to convert the pixel buffer
++            if let convertedBuffer = convertPixelBuffer(pixelBuffer, toFormat: targetFormat) {
++              successful = adaptor.append(convertedBuffer, withPresentationTime: timestamp)
++              if !successful {
++                VisionLogger.log(level: .error, message: "Failed to write converted video buffer at \(timestamp.seconds)")
++              }
++            } else {
++              // Conversion failed, try direct append as fallback
++              VisionLogger.log(level: .warning, message: "Pixel buffer conversion failed, trying direct append...")
++              successful = assetWriterInput.append(buffer)
++            }
++          } else {
++            // Same format, use adaptor directly
++            successful = adaptor.append(pixelBuffer, withPresentationTime: timestamp)
++          }
++        } else {
++          // No conversion needed or not a video track - use direct append
++          successful = assetWriterInput.append(buffer)
++        }
++
+         if successful {
+           lastTimestamp = timestamp
+         } else {
+@@ -132,4 +226,64 @@ final class Track {
+       assetWriterInput.markAsFinished()
+     }
+   }
++
++  /**
++   Converts a pixel buffer to the target format using VTPixelTransferSession.
++   Returns nil if conversion fails.
++   */
++  private func convertPixelBuffer(_ sourceBuffer: CVPixelBuffer, toFormat targetFormat: OSType) -> CVPixelBuffer? {
++    guard let adaptor = pixelBufferAdaptor,
++          let pool = adaptor.pixelBufferPool else {
++      VisionLogger.log(level: .error, message: "No pixel buffer pool available for conversion")
++      return nil
++    }
++
++    // Get a pixel buffer from the pool
++    var destinationBuffer: CVPixelBuffer?
++    let status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &destinationBuffer)
++    guard status == kCVReturnSuccess, let destBuffer = destinationBuffer else {
++      VisionLogger.log(level: .error, message: "Failed to create pixel buffer from pool: \(status)")
++      return nil
++    }
++
++    // Use VTPixelTransferSession if available (iOS 16.0+)
++    if #available(iOS 16.0, *) {
++      if let session = pixelTransferSession {
++        // Force cast since we know the type if pixelTransferSession is not nil
++        let vtSession = session as! VTPixelTransferSession
++        let transferStatus = VTPixelTransferSessionTransferImage(vtSession, from: sourceBuffer, to: destBuffer)
++        if transferStatus == noErr {
++          return destBuffer
++        } else {
++          VisionLogger.log(level: .error, message: "VTPixelTransferSession failed: \(transferStatus)")
++        }
++      }
++    }
++
++    // Fallback: manual copy using Core Video
++    // This is slower but works as a fallback
++    CVPixelBufferLockBaseAddress(sourceBuffer, .readOnly)
++    CVPixelBufferLockBaseAddress(destBuffer, [])
++    defer {
++      CVPixelBufferUnlockBaseAddress(sourceBuffer, .readOnly)
++      CVPixelBufferUnlockBaseAddress(destBuffer, [])
++    }
++
++    // For simple cases, try direct memory copy
++    // This only works if formats are compatible (same bit depth, etc.)
++    let srcWidth = CVPixelBufferGetWidth(sourceBuffer)
++    let srcHeight = CVPixelBufferGetHeight(sourceBuffer)
++    let dstWidth = CVPixelBufferGetWidth(destBuffer)
++    let dstHeight = CVPixelBufferGetHeight(destBuffer)
++
++    guard srcWidth == dstWidth && srcHeight == dstHeight else {
++      VisionLogger.log(level: .error, message: "Pixel buffer size mismatch: \(srcWidth)x\(srcHeight) vs \(dstWidth)x\(dstHeight)")
++      return nil
++    }
++
++    // Use vImage or CIContext for actual conversion if needed
++    // For now, return nil to trigger fallback to direct append
++    VisionLogger.log(level: .warning, message: "Manual pixel buffer conversion not implemented, using fallback")
++    return nil
++  }
+ }
 diff --git a/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift b/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
-index adee189..fc4adc6 100644
+index adee189..9bb804e 100644
 --- a/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
 +++ b/node_modules/react-native-vision-camera/ios/Core/RecordingSession.swift
-@@ -97,7 +97,8 @@ final class RecordingSession {
+@@ -96,8 +96,16 @@ final class RecordingSession {
+ 
    /**
     Initializes the video track.
++
++   - Parameter settings: Video encoder settings
++   - Parameter sourceFormatHint: Optional format description hint
++   - Parameter enablePixelBufferConversion: If true, enables pixel buffer format conversion for problematic devices
++   - Parameter targetPixelFormat: Target pixel format for conversion (default: BGRA)
     */
 -  func initializeVideoTrack(withSettings settings: [String: Any]) throws {
 +  func initializeVideoTrack(withSettings settings: [String: Any],
-+                             sourceFormatHint: CMFormatDescription? = nil) throws {
++                             sourceFormatHint: CMFormatDescription? = nil,
++                             enablePixelBufferConversion: Bool = false,
++                             targetPixelFormat: OSType = kCVPixelFormatType_32BGRA) throws {
      guard !settings.isEmpty else {
        throw CameraError.capture(.createRecorderError(message: "Tried to initialize Video Track with empty options!"))
      }
-@@ -109,7 +110,7 @@ final class RecordingSession {
+@@ -109,12 +117,23 @@ final class RecordingSession {
      }
  
      VisionLogger.log(level: .info, message: "Initializing Video AssetWriter with settings: \(settings.description)")
@@ -310,13 +812,31 @@ index adee189..fc4adc6 100644
      videoWriter.expectsMediaDataInRealTime = true
      videoWriter.transform = videoOrientation.affineTransform
      assetWriter.add(videoWriter)
-@@ -308,6 +309,15 @@ final class RecordingSession {
+-    videoTrack = Track(ofType: .video, withAssetWriterInput: videoWriter, andClock: clock)
+-    VisionLogger.log(level: .info, message: "Initialized Video AssetWriter.")
++
++    let track = Track(ofType: .video, withAssetWriterInput: videoWriter, andClock: clock)
++
++    // Enable pixel buffer conversion for problematic devices (iPhone 14 Pro+, iPhone 17, etc.)
++    if enablePixelBufferConversion {
++      let width = settings[AVVideoWidthKey] as? Int ?? 1920
++      let height = settings[AVVideoHeightKey] as? Int ?? 1080
++      VisionLogger.log(level: .info, message: "Enabling pixel buffer conversion: \(width)x\(height) -> format \(String(format: "0x%08X", targetPixelFormat))")
++      track.configureForVideoWithConversion(width: width, height: height, targetFormat: targetPixelFormat)
++    }
++
++    videoTrack = track
++    VisionLogger.log(level: .info, message: "Initialized Video AssetWriter (pixelBufferConversion: \(enablePixelBufferConversion)).")
+   }
+ 
+   /**
+@@ -308,6 +327,15 @@ final class RecordingSession {
      // If there are audio frames after this timestamp, they will be cut off.
      assetWriter.endSession(atSourceTime: lastVideoTimestamp)
      VisionLogger.log(level: .info, message: "Asset Writer session stopped at \(lastVideoTimestamp.seconds).")
 +
 +    // Ensure all track inputs are marked as finished before calling finishWriting.
-+    // On some devices (e.g. iPhone 17), the camera hardware stops delivering frames
++    // On some devices (e.g. iPhone 14 Pro+), the camera hardware stops delivering frames
 +    // immediately after stop(), so no "late" frame arrives to trigger Track's natural
 +    // markAsFinished() flow via the timeline. Without this, finishWriting() would hang
 +    // indefinitely waiting for inputs to be marked as finished.
