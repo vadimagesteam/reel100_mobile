@@ -3,7 +3,7 @@ import { Platform, ScrollView, Text, View, NativeModules } from 'react-native';
 import { CameraDevice, CameraDeviceFormat } from 'react-native-vision-camera';
 
 // Enable/disable debug overlay globally
-export const CAMERA_DEBUG_ENABLED = __DEV__ || true; // Set to false to disable in production
+export const CAMERA_DEBUG_ENABLED = false; // Set to true or __DEV__ to enable debug overlay
 
 const { CameraDebugModule } = NativeModules;
 
