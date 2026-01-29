@@ -24,6 +24,7 @@ import { CameraFeatures, Timer, useCameraFeatures, CloseButton, RecordButton } f
 import { PermissionsResult, requestCameraAndMicrophone } from './requestCameraAndMicrophone';
 import { VideoPreview } from './VideoPreview';
 import { useVideoRecordStore } from './videoRecordStore';
+import { CameraDebugOverlay, CAMERA_DEBUG_ENABLED } from './CameraDebugOverlay';
 
 const { CustomAudioSessionManager } = NativeModules;
 
@@ -66,7 +67,7 @@ export const VideoRecording = () => {
 
   const format = useCameraFormat(activeDevice, [
     { videoAspectRatio: screenAspectRatio },
-    { videoResolution: 'max' },
+    { videoResolution: { width: 3840, height: 2160 } },
     { photoAspectRatio: screenAspectRatio },
     { photoResolution: 'max' },
     { fps: 30 },
@@ -259,6 +260,16 @@ export const VideoRecording = () => {
                 videoStabilizationMode="off"
               />
             </GestureDetector>
+          )}
+          {/* Debug Overlay - shows camera info for troubleshooting */}
+          {CAMERA_DEBUG_ENABLED && (
+            <CameraDebugOverlay
+              device={activeDevice}
+              format={format}
+              fps={fps}
+              isRecording={isRecording}
+              cameraPosition={cameraPosition}
+            />
           )}
           <CameraFeatures
             support60FPS={supports60Fps}
