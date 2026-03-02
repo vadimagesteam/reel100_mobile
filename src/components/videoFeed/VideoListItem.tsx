@@ -13,7 +13,6 @@ import Video, {
 import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
 import { isAndroid } from '../../utils';
-import { useAdState, useAdTrackVideoView, useAdPlayback } from './ads';
 import {
   useDeleteMutation,
   useLikeMutations,
@@ -70,11 +69,6 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
     videoId,
     enable: active && isFullscreen && !!loadStarted && !isVideoBanned,
   });
-
-  // ads
-  const isAdPlaying = useAdState((s) => s.isAdPlaying);
-  useAdPlayback({ enabled: active && !isVideoBanned, isFullscreen });
-  useAdTrackVideoView(progress);
 
   useFocusEffect(
     useCallback(() => {
@@ -171,7 +165,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
           playerRef.current?.seek(0);
         }}
         source={{ uri: videoUrl!, shouldCache: true }}
-        paused={!active || isPaused || isAdPlaying}
+        paused={!active || isPaused}
         resizeMode={ResizeMode.COVER}
         muted={!isFullscreen || muted || !active}
         onLoad={setLoadStarted}
