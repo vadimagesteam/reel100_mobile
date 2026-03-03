@@ -1,4 +1,3 @@
-import { isSameDay } from 'date-fns';
 import { useCallback, useMemo } from 'react';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useStateSelector } from '../../state/app/uiStore';
@@ -36,6 +35,7 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
       ({
         status: 'Finished',
         top_100Position: { equals: 1 },
+        top_100Date: { lte: selectedDate + 'T23:59:59.999Z' },
         ...(global
           ? {}
           : {
@@ -46,7 +46,7 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
               },
             }),
       }) as ApiVideosFetcherParams['where'],
-    [global, selectedState?.id],
+    [global, selectedState?.id, selectedDate],
   );
 
   const { fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, flatPages, refetch } =
@@ -55,7 +55,7 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
       where: filters,
       orderBy: [
         {
-          top_100Date: 'Asc',
+          top_100Date: 'Desc',
         },
       ],
     });
@@ -69,11 +69,20 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const initialVideoIndex = useMemo(
-    () => flatPages.findIndex((v) => isSameDay(new Date(v.top_100Date!), new Date(selectedDate))),
+    () =>
+      flatPages.findIndex((v) => {
+        if (!v.top_100Date) return false;
+        // Compare dates in Central Time (backend stores top_100Date as midnight CT)
+        const videoDateStr = new Date(v.top_100Date).toLocaleDateString('en-CA', {
+          timeZone: 'America/Chicago',
+        });
+        return videoDateStr === selectedDate;
+      }),
     [flatPages, selectedDate],
   );
 
   const listEmpty = !flatPages.length && !isFetching;
+  const effectiveIndex = initialVideoIndex === -1 && flatPages.length > 0 ? 0 : initialVideoIndex;
 
   return (
     <>
@@ -86,7 +95,7 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
         onCancelPress={cancel}
         onSubmitPress={confirm}
       />
-      {(listEmpty || initialVideoIndex === -1) && (
+      {(listEmpty || effectiveIndex === -1) && (
         <ListEmptyBlock
           title={
             global
@@ -96,13 +105,14 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
           message="Try selecting a different date."
         />
       )}
-      {initialVideoIndex > -1 && (
+      {effectiveIndex > -1 && (
         <VideoList
           showTopRank={false}
-          initialVideoIndex={initialVideoIndex}
+          initialVideoIndex={effectiveIndex}
           isRefetching={isRefetching}
           refetch={handleRefresh}
           videos={flatPages}
+          onEndReached={onEndReached}
         />
       )}
     </>

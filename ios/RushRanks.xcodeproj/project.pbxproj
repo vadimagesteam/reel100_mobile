@@ -34,9 +34,9 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F28ACCDC2DBE20F200450952 /* CustomAudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomAudioSessionManager.swift; path = RushRanks/CustomAudioSessionManager.swift; sourceTree = "<group>"; };
 		F28ACCDD2DBE216B00450952 /* CustomAudioSessionManagerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomAudioSessionManagerBridge.m; path = RushRanks/CustomAudioSessionManagerBridge.m; sourceTree = "<group>"; };
-		F2EE6A962DBAA68C00C3FB85 /* RushRanks-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "RushRanks-Bridging-Header.h"; path = "RushRanks/RushRanks-Bridging-Header.h"; sourceTree = "<group>"; };
 		F2CAMD012E2A1A0000000001 /* CameraDebugModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CameraDebugModule.swift; path = RushRanks/CameraDebugModule.swift; sourceTree = "<group>"; };
 		F2CAMD012E2A1A0000000002 /* CameraDebugModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CameraDebugModule.m; path = RushRanks/CameraDebugModule.m; sourceTree = "<group>"; };
+		F2EE6A962DBAA68C00C3FB85 /* RushRanks-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "RushRanks-Bridging-Header.h"; path = "RushRanks/RushRanks-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -326,7 +326,7 @@
 				CODE_SIGN_ENTITLEMENTS = RushRanks/RushRanks.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 80;
 				DEVELOPMENT_TEAM = 64M5LK6G97;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = RushRanks/Info.plist;
@@ -336,7 +336,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.28;
+				MARKETING_VERSION = 1.1.29;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -361,7 +361,7 @@
 				CODE_SIGN_ENTITLEMENTS = RushRanks/RushRanks.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 80;
 				DEVELOPMENT_TEAM = 64M5LK6G97;
 				INFOPLIST_FILE = RushRanks/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RushRanks;
@@ -370,7 +370,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.28;
+				MARKETING_VERSION = 1.1.29;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
