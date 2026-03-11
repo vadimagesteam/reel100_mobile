@@ -62,8 +62,8 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const { dimensions, onLayout } = useLayoutDimensions();
 
   // Ads — inline native ads interleaved every AD_INTERVAL videos
-  const { consumeAd } = useNativeAdLoader();
-  const feedItems = useInterleaveAds(videos, consumeAd);
+  const { consumeAd, poolSize } = useNativeAdLoader();
+  const feedItems = useInterleaveAds(videos, consumeAd, poolSize);
 
   // Fullscreen: hide container
   const { show: showHeader, hide: hideHeaders } = useHideableContainer();

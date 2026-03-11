@@ -6,9 +6,10 @@ import { AD_INTERVAL, FeedItem } from './types';
 export const useInterleaveAds = (
   videos: VideoPost[],
   consumeAd: () => NativeAd | null,
+  poolSize: number,
 ): FeedItem[] => {
   // Cache ads by their slot position so scrolling back shows the same ad
-  const adCacheRef = useRef<Map<number, NativeAd | null>>(new Map());
+  const adCacheRef = useRef<Map<number, NativeAd>>(new Map());
 
   return useMemo(() => {
     const items: FeedItem[] = [];
@@ -25,8 +26,12 @@ export const useInterleaveAds = (
       if ((i + 1) % AD_INTERVAL === 0) {
         const cache = adCacheRef.current;
 
+        // Only cache non-null ads; retry on next render when pool refills
         if (!cache.has(adSlotIndex)) {
-          cache.set(adSlotIndex, consumeAd());
+          const ad = consumeAd();
+          if (ad) {
+            cache.set(adSlotIndex, ad);
+          }
         }
 
         items.push({
@@ -40,5 +45,6 @@ export const useInterleaveAds = (
     }
 
     return items;
-  }, [videos, consumeAd]);
+    // poolSize triggers re-run when ads become available
+  }, [videos, consumeAd, poolSize]);
 };
