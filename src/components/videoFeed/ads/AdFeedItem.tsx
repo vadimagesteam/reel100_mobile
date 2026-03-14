@@ -26,6 +26,10 @@ const AdFeedItemRaw: FC<AdFeedItemProps> = ({ nativeAd, dimensions }) => {
         className="items-center justify-center bg-background"
       >
         <ActivityIndicator size="large" color="#fff" />
+        <Text className="mt-3 text-xs text-silver4">Loading ad...</Text>
+        <Text className="mt-1 text-xs text-silver4">
+          {__DEV__ ? 'DEV (test ads)' : 'PROD'} | Check Ad Debug screen for details
+        </Text>
       </View>
     );
   }

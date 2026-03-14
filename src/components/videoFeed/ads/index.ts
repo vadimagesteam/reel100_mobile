@@ -3,3 +3,4 @@ export * from './hooks/useAdmobInitialization';
 export * from './hooks/useNativeAdLoader';
 export * from './useInterleaveAds';
 export { AdFeedItemComponent } from './AdFeedItem';
+export { adDebugLog } from './adDebugLog';
