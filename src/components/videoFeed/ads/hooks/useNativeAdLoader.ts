@@ -28,7 +28,7 @@ const loadNativeAd = (): Promise<NativeAd> => {
   adDebugLog.info(`[Pool] Loading ad #${attempt} (unitId: ${adUnitId})`);
   return NativeAd.createForAdRequest(adUnitId, {
     aspectRatio: NativeMediaAspectRatio.PORTRAIT,
-    startVideoMuted: true,
+    startVideoMuted: false,
   });
 };
 
