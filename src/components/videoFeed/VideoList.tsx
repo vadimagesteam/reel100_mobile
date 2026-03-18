@@ -12,7 +12,10 @@ import Animated, {
 import { useNavigation } from '../../navigation';
 import { isAndroid } from '../../utils';
 import { useHideableContainer } from '../hidebleContainer';
-import { useAdTrackFullScreenExit } from './ads';
+import { AdFeedItemComponent } from './ads/AdFeedItem';
+import { useNativeAdLoader } from './ads/hooks/useNativeAdLoader';
+import { AD_INTERVAL, FeedItem } from './ads/types';
+import { useInterleaveAds } from './ads/useInterleaveAds';
 import { CommentsBottomSheet } from './comments/CommentsBottomSheet';
 import {
   useLayoutDimensions,
@@ -30,7 +33,7 @@ import { ShareBottomSheet } from './share/ShareBottomSheet';
 import { VideoListItem } from './VideoListItem';
 
 export interface SwipeableVideosListProps
-  extends Omit<FlatListProps<VideoPost>, 'data' | 'renderItem' | 'refreshing'> {
+  extends Omit<FlatListProps<FeedItem>, 'data' | 'renderItem' | 'refreshing'> {
   videos: VideoPost[];
   isRefetching?: boolean;
   refetch?: () => void;
@@ -52,14 +55,15 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const { isFullscreen, setFullscreen } = useVideoFullscreen();
   const { isPaused, setIsPaused, togglePause } = useVideoPause();
 
-  const flatListRef = useRef<FlatList<VideoPost>>(null);
+  const flatListRef = useRef<FlatList<FeedItem>>(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewPaused, setViewPaused] = useState(false);
   const { dimensions, onLayout } = useLayoutDimensions();
 
-  // Ads
-  useAdTrackFullScreenExit();
+  // Ads — inline native ads interleaved every AD_INTERVAL videos
+  const { consumeAd, poolSize } = useNativeAdLoader();
+  const feedItems = useInterleaveAds(videos, consumeAd, poolSize);
 
   // Fullscreen: hide container
   const { show: showHeader, hide: hideHeaders } = useHideableContainer();
@@ -96,14 +100,15 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const { like } = useLikeMutations();
 
   const handleDoubleTap = (x: number, y: number) => {
-    if (videos[activeIndex]) {
+    const activeItem = feedItems[activeIndex];
+    if (activeItem?.type === 'video') {
       likeAnimationRef.current?.trigger(x, y); // show "Like" animation
       setTimeout(() => {
         // wait for the animation end (1 sec)
         like.mutate({
           type: 'video',
-          id: videos[activeIndex].id,
-          authorId: videos[activeIndex].user.id,
+          id: activeItem.data.id,
+          authorId: activeItem.data.user.id,
         });
       }, likeAnimationRef.current?.animationDuration ?? 0);
     }
@@ -152,7 +157,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     });
 
   const singleTapGesture = Gesture.Tap()
-    .enabled(videos.length > 0)
+    .enabled(feedItems.length > 0)
     .shouldCancelWhenOutside(true)
     .maxDuration(250)
     .onEnd(() => {
@@ -160,17 +165,26 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     });
 
   const doubleTapGesture = Gesture.Tap()
-    .enabled(videos.length > 0)
+    .enabled(feedItems.length > 0)
     .numberOfTaps(2)
     .onEnd((e) => {
       runOnJS(handleDoubleTap)(e.x, e.y);
     });
 
   const renderItem = useCallback(
-    ({ item: video, index }: { item: VideoPost; index: number }) => {
+    ({ item, index }: { item: FeedItem; index: number }) => {
+      if (item.type === 'ad') {
+        return (
+          <AdFeedItemComponent
+            nativeAd={item.data}
+            dimensions={dimensions}
+          />
+        );
+      }
+
       return (
         <VideoListItem
-          video={video}
+          video={item.data}
           dimensions={dimensions}
           active={activeIndex === index}
           showTopRank={showTopRank}
@@ -181,7 +195,7 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   );
 
   const onViewableItemsChanged = useCallback<
-    NonNullable<FlatListProps<VideoPost>['onViewableItemsChanged']>
+    NonNullable<FlatListProps<FeedItem>['onViewableItemsChanged']>
   >(
     ({ viewableItems }) => {
       if (viewableItems.length > 0) {
@@ -228,23 +242,32 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
   const gesturesCombined = Gesture.Exclusive(backSwipeGesture, doubleTapGesture, singleTapGesture);
   const VideoBatchSize = 6;
 
+  // Convert video index to feed index (accounting for interleaved ads)
+  const initialFeedIndex = useMemo(() => {
+    if (initialVideoIndex <= 0) {
+      return initialVideoIndex;
+    }
+    const adsBeforeIndex = Math.floor(initialVideoIndex / AD_INTERVAL);
+    return initialVideoIndex + adsBeforeIndex;
+  }, [initialVideoIndex]);
+
   const initialized = useRef(false);
   useEffect(() => {
-    if (initialVideoIndex > -1 && !initialized.current) {
+    if (initialFeedIndex > -1 && !initialized.current) {
       flatListRef.current?.scrollToOffset({
-        offset: initialVideoIndex * dimensions.height,
+        offset: initialFeedIndex * dimensions.height,
         animated: false,
       });
       setTimeout(() => {
         initialized.current = true;
       }, 600);
     }
-  }, [dimensions.height, initialVideoIndex]);
+  }, [dimensions.height, initialFeedIndex]);
 
   return (
     <Animated.View className="flex-1 overflow-hidden bg-background" style={viewStyle}>
       <GestureDetector gesture={gesturesCombined}>
-        <FlatList<VideoPost>
+        <FlatList<FeedItem>
           ref={flatListRef}
           contentContainerClassName="grow"
           disableIntervalMomentum // 1 video per one swipe
@@ -254,9 +277,8 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
             offset: dimensions.height * index,
             index,
           })}
-          // estimatedItemSize={dimensions.height}
-          data={videos}
-          keyExtractor={(item) => item.id.toString()}
+          data={feedItems}
+          keyExtractor={(item) => item.key}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           onViewableItemsChanged={onViewableItemsChanged}

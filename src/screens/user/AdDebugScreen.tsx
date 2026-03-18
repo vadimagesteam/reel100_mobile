@@ -1,53 +1,35 @@
-import clsx from 'clsx';
-import { ScrollView, Text, View, TouchableOpacity } from 'react-native';
+import { useCallback, useSyncExternalStore } from 'react';
+import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAdState } from '../../components/videoFeed/ads';
-import { Input } from '../../components/ui';
+import { AD_INTERVAL } from '../../components/videoFeed/ads';
+import { adDebugLog, AdDebugEntry } from '../../components/videoFeed/ads/adDebugLog';
+
+const levelColors: Record<AdDebugEntry['level'], string> = {
+  info: 'text-silver3',
+  warn: 'text-yellow',
+  error: 'text-red-400',
+};
 
 export const AdDebugScreen = () => {
   const insets = useSafeAreaInsets();
-  const { adShowConfig, videosWatched, timeWatched, canPlayAd } = useAdState();
 
-  const willShowAd = canPlayAd();
+  const entries = useSyncExternalStore(
+    adDebugLog.subscribe,
+    adDebugLog.getEntries,
+  );
 
-  const updateMinVideoMin = (value: string) => {
-    const num = parseInt(value, 10) || 0;
-    useAdState.setState({
-      adShowConfig: {
-        ...adShowConfig,
-        minVideoWatched: [num, adShowConfig.minVideoWatched[1]],
-      },
-    });
-  };
+  const adUnitInfo = adDebugLog.getAdUnitInfo();
 
-  const updateMinVideoMax = (value: string) => {
-    const num = parseInt(value, 10) || 0;
-    useAdState.setState({
-      adShowConfig: {
-        ...adShowConfig,
-        minVideoWatched: [adShowConfig.minVideoWatched[0], num],
-      },
-    });
-  };
-
-  const updateMinSecondsWatched = (value: string) => {
-    const num = parseInt(value, 10) || 0;
-    useAdState.setState({
-      adShowConfig: {
-        ...adShowConfig,
-        minSecondsWatched: num,
-      },
-    });
-  };
-
-  const handleReset = () => {
-    useAdState.setState({
-      adShowConfig: {
-        minVideoWatched: [4, 5],
-        minSecondsWatched: 250,
-      },
-    });
-  };
+  const renderEntry = useCallback((entry: AdDebugEntry, index: number) => {
+    return (
+      <View key={index} className="mb-1 flex-row">
+        <Text className="mr-2 font-mono text-xs text-silver4">{entry.timestamp}</Text>
+        <Text className={`flex-1 font-mono text-xs ${levelColors[entry.level]}`}>
+          {entry.message}
+        </Text>
+      </View>
+    );
+  }, []);
 
   return (
     <ScrollView
@@ -60,102 +42,63 @@ export const AdDebugScreen = () => {
           This debug menu is available for Nikola & Vadimages
         </Text>
 
-        <View className="mb-8 rounded-xl bg-black5 p-4">
-          <Text className="mb-4 text-lg font-semibold text-primary">Current State</Text>
+        <View className="mb-4 rounded-xl bg-black5 p-4">
+          <Text className="mb-4 text-lg font-semibold text-primary">Inline Native Ads</Text>
 
           <View className="mb-3 flex-row items-center justify-between">
-            <Text className="text-base text-primary">Will Show Ad:</Text>
-            <View
-              className={`rounded-full px-3 py-1 ${willShowAd ? 'bg-green-600' : 'bg-red-600'}`}
-            >
-              <Text className="font-medium text-white">{willShowAd ? 'Yes' : 'No'}</Text>
-            </View>
+            <Text className="text-base text-primary">Ad Type:</Text>
+            <Text className="text-lg font-bold text-primary">Native (Inline)</Text>
           </View>
 
           <View className="mb-3 flex-row items-center justify-between">
-            <Text className="text-base text-primary">Videos Watched:</Text>
-            <Text className="text-lg font-bold text-primary">{videosWatched}</Text>
+            <Text className="text-base text-primary">Ad Interval:</Text>
+            <Text className="text-lg font-bold text-primary">Every {AD_INTERVAL} videos</Text>
+          </View>
+
+          <View className="mb-3 flex-row items-center justify-between">
+            <Text className="text-base text-primary">Platform:</Text>
+            <Text className="text-lg font-bold text-primary">{adUnitInfo.platform}</Text>
           </View>
 
           <View className="flex-row items-center justify-between">
-            <Text className="text-base text-primary">Time Watched:</Text>
-            <Text className="text-lg font-bold text-primary">{timeWatched}s</Text>
+            <Text className="text-base text-primary">Mode:</Text>
+            <View
+              className={`rounded-full px-3 py-1 ${adUnitInfo.isDev ? 'bg-yellow-600' : 'bg-green-600'}`}
+            >
+              <Text className="font-medium text-white">
+                {adUnitInfo.isDev ? 'Test Ads' : 'Production'}
+              </Text>
+            </View>
           </View>
-
-          <Text className={clsx('mt-4 text-xs', willShowAd ? 'text-green1' : 'text-red1')}>
-            {willShowAd
-              ? 'Ad will be shown on the next full screen watch'
-              : 'Ad conditions not met yet'}
-          </Text>
         </View>
 
-        <View className="mb-8">
-          <Text className="mb-4 text-lg font-semibold text-primary">Configuration</Text>
-
-          <View className="mb-4">
-            <Text className="mb-2 text-base text-primary">Min Videos Watched (Range)</Text>
-            <View className="flex-row items-center gap-3">
-              <View className="flex-1">
-                <Input
-                  value={String(adShowConfig.minVideoWatched[0])}
-                  onChangeText={updateMinVideoMin}
-                  keyboardType="numeric"
-                  placeholder="Min"
-                  className="text-center"
-                />
-              </View>
-              <Text className="text-primary">to</Text>
-              <View className="flex-1">
-                <Input
-                  value={String(adShowConfig.minVideoWatched[1])}
-                  onChangeText={updateMinVideoMax}
-                  keyboardType="numeric"
-                  placeholder="Max"
-                  className="text-center"
-                />
-              </View>
-            </View>
-            <Text className="mt-1 text-xs text-silver6">
-              Random number between these values will be selected
-            </Text>
-          </View>
-
-          <View className="mb-4">
-            <Text className="mb-2 text-base text-primary">Min Seconds Watched</Text>
-            <Input
-              value={String(adShowConfig.minSecondsWatched)}
-              onChangeText={updateMinSecondsWatched}
-              keyboardType="numeric"
-              placeholder="Seconds"
-            />
-            <Text className="mt-1 text-xs text-silver6">
-              Ad will show when either condition is met first
-            </Text>
-          </View>
-
-          <View className="mt-6 flex-col gap-3">
-            <TouchableOpacity
-              onPress={handleReset}
-              className="rounded-xl border-2 border-silver6 py-3"
-            >
-              <Text className="text-center text-base font-semibold text-silver6">
-                Reset to Default
-              </Text>
-            </TouchableOpacity>
-          </View>
+        <View className="mb-4 rounded-xl bg-black5 p-4">
+          <Text className="mb-2 text-sm font-semibold text-primary">How it works:</Text>
+          <Text className="mb-2 text-xs leading-5 text-primary">
+            {'\u2022'} Native ads appear inline in the video feed as swipeable full-screen items
+          </Text>
+          <Text className="mb-2 text-xs leading-5 text-primary">
+            {'\u2022'} An ad is placed after every {AD_INTERVAL} videos in the feed
+          </Text>
+          <Text className="mb-2 text-xs leading-5 text-primary">
+            {'\u2022'} Ads are pre-loaded in a pool of 3 for smooth display
+          </Text>
+          <Text className="text-xs leading-5 text-primary">
+            {'\u2022'} Double-tap to like is disabled on ad items
+          </Text>
         </View>
 
         <View className="rounded-xl bg-black5 p-4">
-          <Text className="mb-2 text-sm font-semibold text-primary">How it works:</Text>
-          <Text className="mb-2 text-xs leading-5 text-primary">
-            • The app randomly picks a number between Min and Max videos watched
+          <Text className="mb-3 text-lg font-semibold text-primary">
+            Live Debug Log ({entries.length} entries)
           </Text>
-          <Text className="mb-2 text-xs leading-5 text-primary">
-            • Ad shows when either videos watched OR seconds watched threshold is reached
-          </Text>
-          <Text className="text-xs leading-5 text-primary">
-            • After an ad is shown, counters reset and the cycle starts again
-          </Text>
+          {entries.length === 0 ? (
+            <Text className="font-mono text-xs text-silver4">
+              No log entries yet. Navigate to a video feed to trigger ad loading.
+            </Text>
+          ) : (
+            entries.map(renderEntry)
+          )}
         </View>
       </View>
     </ScrollView>
