@@ -326,7 +326,7 @@
 				CODE_SIGN_ENTITLEMENTS = RushRanks/RushRanks.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 82;
+				CURRENT_PROJECT_VERSION = 83;
 				DEVELOPMENT_TEAM = 64M5LK6G97;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = RushRanks/Info.plist;
@@ -336,7 +336,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.30;
+				MARKETING_VERSION = 1.1.31;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -361,7 +361,7 @@
 				CODE_SIGN_ENTITLEMENTS = RushRanks/RushRanks.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 82;
+				CURRENT_PROJECT_VERSION = 83;
 				DEVELOPMENT_TEAM = 64M5LK6G97;
 				INFOPLIST_FILE = RushRanks/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RushRanks;
@@ -370,7 +370,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.30;
+				MARKETING_VERSION = 1.1.31;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
