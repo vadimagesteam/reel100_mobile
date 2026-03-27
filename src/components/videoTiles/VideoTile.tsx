@@ -1,12 +1,24 @@
 import clsx from 'clsx';
-import { Alert, Text, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
+import { ActivityIndicator, Alert, Text, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { TileConfig } from './tileConfig';
-import type { VideoPost } from '../videoFeed/queries/apiVideosFetcher';
+import type { VideoPost, VideoProcessingStep } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoInfoOverlay } from './VideoInfoOverlay';
 import { colors } from '../../theme';
+
+const processingStepLabels: Record<VideoProcessingStep, string> = {
+  UploadingToStorage: 'Uploading',
+  ContentModeration: 'Analyzing',
+  Encoding240p: 'Encoding 240p',
+  Encoding360p: 'Encoding 360p',
+  Encoding480p: 'Encoding 480p',
+  Encoding720p: 'Encoding 720p',
+  Encoding1080p: 'Encoding 1080p',
+  GeneratingHls: 'Creating HLS',
+  Finalizing: 'Finalizing',
+};
 
 export interface VideoTileProps<ItemType = VideoPost>
   extends Omit<TouchableOpacityProps, 'onPress'> {
@@ -37,6 +49,9 @@ export const VideoTile = ({
   const lastInRow = rowSize && index !== undefined && (index + 1) % rowSize === 0;
   const isProcessing = ['InProcess', 'Pending'].includes(item.status);
   const isBanned = item.status === 'Banned';
+  const stepLabel = item.processingStep
+    ? processingStepLabels[item.processingStep]
+    : 'Processing';
   const canDelete = allowDelete && !isProcessing && !isBanned && !screenshot && onDeletePress;
 
   return (
@@ -66,7 +81,10 @@ export const VideoTile = ({
           {(isBanned || isProcessing) && (
             <View className="absolute size-full items-center justify-center bg-black/80">
               {isProcessing && (
-                <Text className="text-[12px] font-black text-blue3">Processing</Text>
+                <View className="items-center gap-1.5">
+                  <ActivityIndicator size="small" color={colors.blue3} />
+                  <Text className="text-[10px] font-black text-blue3">{stepLabel}</Text>
+                </View>
               )}
               {isBanned && <Text className="text-[12px] font-black text-red3">BANNED</Text>}
             </View>
@@ -75,7 +93,10 @@ export const VideoTile = ({
       ) : (
         <View className="size-full items-center justify-center rounded-[8px] bg-black">
           {isProcessing ? (
-            <Text className="text-[12px] font-black text-blue3">Processing</Text>
+            <View className="items-center gap-1.5">
+              <ActivityIndicator size="small" color={colors.blue3} />
+              <Text className="text-[10px] font-black text-blue3">{stepLabel}</Text>
+            </View>
           ) : isBanned ? (
             <Text className="text-[12px] font-black text-red3">BANNED</Text>
           ) : (

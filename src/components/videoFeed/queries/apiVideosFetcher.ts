@@ -43,6 +43,17 @@ export type VideoUser = {
   }[];
 };
 
+export type VideoProcessingStep =
+  | 'UploadingToStorage'
+  | 'ContentModeration'
+  | 'Encoding240p'
+  | 'Encoding360p'
+  | 'Encoding480p'
+  | 'Encoding720p'
+  | 'Encoding1080p'
+  | 'GeneratingHls'
+  | 'Finalizing';
+
 export type VideoPost = {
   id: string;
   label: string;
@@ -51,6 +62,7 @@ export type VideoPost = {
   updatedAt: string; // ISO
   file: VideoFile | null;
   status: 'Finished' | 'InProcess' | 'Pending' | 'Deleted' | 'Banned';
+  processingStep: VideoProcessingStep | null;
   commentsCount: number;
   likesCount: number;
   viewsCount: number;
@@ -126,6 +138,7 @@ const qqlQuery = `query(
         updatedAt
         file
         status
+        processingStep
         likesCount
         commentsCount
         viewsCount
