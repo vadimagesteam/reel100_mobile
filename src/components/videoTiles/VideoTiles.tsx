@@ -12,6 +12,7 @@ import { Screens } from '../../navigation/screens';
 import { AnimatedScrollWrapperContext } from '../animatedScrollWrapper/context';
 import { ListEmptyBlock, FlexLoading, RefreshControl } from '../ui';
 import { useVideoFeed, type VideoPostQueryResult } from '../videoFeed/hooks';
+import { useDeleteMutation } from '../videoFeed/hooks/useDeleteMutation';
 import { type VideoPost } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoTile, VideoTileProps } from './VideoTile';
 
@@ -51,6 +52,7 @@ export const VideoTiles = <ItemType extends VideoPost>({
 
   const navigation = useNavigation();
   const allowDelete = useVideoFeed((s) => s.allowDelete);
+  const deleteVideo = useDeleteMutation();
 
   const data = useMemo(
     () => (prepareData ? prepareData(flatPages) : flatPages),
@@ -78,6 +80,13 @@ export const VideoTiles = <ItemType extends VideoPost>({
     [allowDelete, navigation, queryParams],
   );
 
+  const handleDeleteFromTile = useCallback(
+    (video: VideoPost) => {
+      deleteVideo.mutate({ id: video.id, force: true });
+    },
+    [deleteVideo],
+  );
+
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<ItemType>) =>
       ItemComponent ? (
@@ -89,9 +98,11 @@ export const VideoTiles = <ItemType extends VideoPost>({
           style={styles.tile}
           item={item}
           onVideoPress={handleVideoOpen}
+          allowDelete={allowDelete}
+          onDeletePress={handleDeleteFromTile}
         />
       ),
-    [handleVideoOpen, ItemComponent],
+    [handleVideoOpen, ItemComponent, allowDelete, handleDeleteFromTile],
   );
 
   const animatedScrollCtx = useContext(AnimatedScrollWrapperContext);
