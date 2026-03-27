@@ -13,8 +13,10 @@ export const UserSearchScreen = () => {
   const navigation = useNavigation();
 
   const insets = useSafeAreaInsets();
+  const hasSearch = searchText.trim().length > 0;
   const { data, isLoading } = useUsersQuery(
-    searchText ? { nickname: { contains: searchText, mode: 'Insensitive' } } : undefined,
+    hasSearch ? { nickname: { contains: searchText, mode: 'Insensitive' } } : undefined,
+    { enabled: hasSearch },
   );
 
   return (

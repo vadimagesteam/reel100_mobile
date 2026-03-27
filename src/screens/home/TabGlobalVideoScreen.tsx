@@ -7,7 +7,7 @@ export const TabGlobalVideoScreen = () => {
   return (
     <HidebleContainer hideOffset={AppHeaderHeight} className="flex-1 bg-background">
       <AppHeader />
-      <VideoFeedProvider initialState={{ showVideoDate: true }}>
+      <VideoFeedProvider initialState={{ showWinningState: true }}>
         <Top100VideosByDate global />
       </VideoFeedProvider>
     </HidebleContainer>

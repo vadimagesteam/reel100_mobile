@@ -38,9 +38,10 @@ const qqlQuery = `query(
     }
 }`;
 
-export const useUsersQuery = (filter?: UserWhereInput) => {
+export const useUsersQuery = (filter?: UserWhereInput, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: filter ? ['users', 'filter', JSON.stringify(filter)] : ['users'],
+    enabled: options?.enabled,
     queryFn: async () => {
       const variables: Record<string, unknown> = {
         take: 50,

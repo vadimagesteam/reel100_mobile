@@ -54,6 +54,12 @@ export type VideoProcessingStep =
   | 'GeneratingHls'
   | 'Finalizing';
 
+export type VideoState = {
+  id: string;
+  slug: string;
+  label: string;
+};
+
 export type VideoPost = {
   id: string;
   label: string;
@@ -68,6 +74,7 @@ export type VideoPost = {
   viewsCount: number;
   description: string;
   user: VideoUser;
+  states: VideoState[];
   top_100Position: number | null;
   top_100Date: string | null;
 };
@@ -153,6 +160,7 @@ const qqlQuery = `query(
             }
           }
         }
+        states { id slug label }
         top_100Position
         top_100Date
     }
