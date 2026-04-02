@@ -122,7 +122,7 @@ export const VideoInfoOverlay = ({
         style={topInfoStyles}
         className="absolute left-2 right-2 top-4 flex-row items-center justify-between"
       >
-        <View className="min-w-[20px]">
+        <View className="min-w-[20px] flex-row items-center">
           {isPlayerFullScreen && (
             <GestureTouchableOpacity
               className="flex-row items-center gap-2"
@@ -132,13 +132,12 @@ export const VideoInfoOverlay = ({
               <Ionicons size={24} name="chevron-back" color="#fff" />
             </GestureTouchableOpacity>
           )}
+          {showWinningState && video.states?.[0] && (
+            <Text className="ml-2 text-2xl font-bold text-primary">
+              {video.states[0].slug}
+            </Text>
+          )}
         </View>
-
-        {showWinningState && video.states?.[0] && (
-          <Text className="text-2xl font-bold text-primary">
-            {video.states[0].slug}
-          </Text>
-        )}
 
         {/* Top Right */}
         <View className="flex-row">

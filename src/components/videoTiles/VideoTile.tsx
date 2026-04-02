@@ -8,16 +8,31 @@ import type { VideoPost, VideoProcessingStep } from '../videoFeed/queries/apiVid
 import { VideoInfoOverlay } from './VideoInfoOverlay';
 import { colors } from '../../theme';
 
-const processingStepLabels: Record<VideoProcessingStep, string> = {
-  UploadingToStorage: 'Uploading',
-  ContentModeration: 'Analyzing',
-  Encoding240p: 'Encoding 240p',
-  Encoding360p: 'Encoding 360p',
-  Encoding480p: 'Encoding 480p',
-  Encoding720p: 'Encoding 720p',
-  Encoding1080p: 'Encoding 1080p',
-  GeneratingHls: 'Creating HLS',
-  Finalizing: 'Finalizing',
+const processingSteps: { key: VideoProcessingStep; label: string }[] = [
+  { key: 'UploadingToStorage', label: 'Uploading' },
+  { key: 'ContentModeration', label: 'Analyzing' },
+  { key: 'Encoding240p', label: 'Encoding 240p' },
+  { key: 'Encoding360p', label: 'Encoding 360p' },
+  { key: 'Encoding480p', label: 'Encoding 480p' },
+  { key: 'Encoding720p', label: 'Encoding 720p' },
+  { key: 'Encoding1080p', label: 'Encoding 1080p' },
+  { key: 'GeneratingHls', label: 'Creating HLS' },
+  { key: 'Finalizing', label: 'Finalizing' },
+];
+
+const processingStepLabels = Object.fromEntries(
+  processingSteps.map((s) => [s.key, s.label]),
+) as Record<VideoProcessingStep, string>;
+
+const getProcessingProgress = (step: VideoProcessingStep | null): number => {
+  if (!step) {
+    return 0;
+  }
+  const index = processingSteps.findIndex((s) => s.key === step);
+  if (index === -1) {
+    return 0;
+  }
+  return Math.round(((index + 1) / processingSteps.length) * 100);
 };
 
 export interface VideoTileProps<ItemType = VideoPost>
@@ -52,6 +67,7 @@ export const VideoTile = ({
   const stepLabel = item.processingStep
     ? processingStepLabels[item.processingStep]
     : 'Processing';
+  const progress = getProcessingProgress(item.processingStep);
   const canDelete = allowDelete && !isProcessing && !isBanned && !screenshot && onDeletePress;
 
   return (
@@ -81,9 +97,15 @@ export const VideoTile = ({
           {(isBanned || isProcessing) && (
             <View className="absolute size-full items-center justify-center bg-black/80">
               {isProcessing && (
-                <View className="items-center gap-1.5">
+                <View className="w-4/5 items-center gap-1.5">
                   <ActivityIndicator size="small" color={colors.blue3} />
                   <Text className="text-[10px] font-black text-blue3">{stepLabel}</Text>
+                  <View className="h-1 w-full overflow-hidden rounded-full bg-white/20">
+                    <View
+                      className="h-full rounded-full bg-blue3"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </View>
                 </View>
               )}
               {isBanned && <Text className="text-[12px] font-black text-red3">BANNED</Text>}
@@ -93,9 +115,15 @@ export const VideoTile = ({
       ) : (
         <View className="size-full items-center justify-center rounded-[8px] bg-black">
           {isProcessing ? (
-            <View className="items-center gap-1.5">
+            <View className="w-4/5 items-center gap-1.5">
               <ActivityIndicator size="small" color={colors.blue3} />
               <Text className="text-[10px] font-black text-blue3">{stepLabel}</Text>
+              <View className="h-1 w-full overflow-hidden rounded-full bg-white/20">
+                <View
+                  className="h-full rounded-full bg-blue3"
+                  style={{ width: `${progress}%` }}
+                />
+              </View>
             </View>
           ) : isBanned ? (
             <Text className="text-[12px] font-black text-red3">BANNED</Text>

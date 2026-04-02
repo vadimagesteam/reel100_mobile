@@ -25,7 +25,7 @@ export const UserList = <T extends UserBase>({
     <FlashList<T>
       showsVerticalScrollIndicator={false}
       data={data}
-      keyboardShouldPersistTaps="handled"
+      keyboardShouldPersistTaps="always"
       keyboardDismissMode="on-drag"
       ListEmptyComponent={
         <ListEmptyBlock
