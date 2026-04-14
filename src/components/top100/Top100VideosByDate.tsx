@@ -54,7 +54,7 @@ export const Top100VideosByDate = ({ global = false }: { global?: boolean }) => 
       where: filters,
       orderBy: [
         {
-          top_100Date: 'Asc',
+          top_100Date: 'Desc',
         },
       ],
     });
