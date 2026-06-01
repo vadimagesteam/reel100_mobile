@@ -21,13 +21,16 @@ export const CommentsBottomSheet = () => {
 
   const postComment = (commentText: string) => {
     textInputRef.current?.blur();
-    // Expand reply section
-    if (commentReply) {
-      expandCommentReplies(commentReply.id);
+    // Thread every reply (including a reply to a reply) under its root comment.
+    // Replying to a reply previously produced a 3rd-level comment that was saved
+    // on the server (bumping the count) but never rendered in the 2-level tree.
+    const rootId = commentReply ? commentReply.replyTo || commentReply.id : undefined;
+    if (rootId) {
+      expandCommentReplies(rootId);
       resetCommentReply();
     }
     addComment.mutate({
-      replyTo: commentReply?.id,
+      replyTo: rootId,
       text: commentText,
       videoId: videoId!,
     });

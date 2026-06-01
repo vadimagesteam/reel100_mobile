@@ -36,11 +36,25 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const commentsTree = useMemo(() => {
+    const byId = new Map(flatPages.map((c) => [c.id, c]));
+
+    // Walk up the replyTo chain to the top-level (root) comment. Handles replies
+    // to replies at any depth, so nothing gets orphaned and lost from the list.
+    const rootIdOf = (comment: CommentType) => {
+      let current = comment;
+      const seen = new Set<string>();
+      while (current.replyTo && byId.has(current.replyTo) && !seen.has(current.id)) {
+        seen.add(current.id);
+        current = byId.get(current.replyTo)!;
+      }
+      return current.id;
+    };
+
     return flatPages
       .filter((c) => !c.replyTo)
       .reduce((acc, comment) => {
         const replies = flatPages
-          .filter((r) => r.replyTo === comment.id)
+          .filter((r) => r.id !== comment.id && rootIdOf(r) === comment.id)
           .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         return [
           ...acc,
@@ -49,8 +63,6 @@ export const CommentsList = ({ videoId, onReply }: CommentsListProps) => {
         ];
       }, [] as CommentType[]);
   }, [flatPages, commentsExpanded]);
-
-  console.log('video id', videoId);
 
   const renderComment = useCallback<ListRenderItem<CommentType>>(
     ({ item, index }) => {

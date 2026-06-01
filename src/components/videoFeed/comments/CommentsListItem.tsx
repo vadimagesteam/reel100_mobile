@@ -5,14 +5,6 @@ import { Screens } from '../../../navigation/screens';
 import { useUser } from '../../../state/user/authStore';
 import { getDisplayName } from '../../../state/user/utils';
 import { Avatar } from '../../ui';
-import {
-  ContextMenuRoot,
-  ContextMenuTrigger,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuItemTitle,
-  ContextMenuItemIcon,
-} from '../../ui/menu/context-menu';
 import { CommentContextMenu } from './CommentContextMenu';
 import { CommentType } from './hooks/useCommentsInfiniteQuery';
 import { formatTimeAgo } from '../../../utils';
@@ -70,22 +62,20 @@ export const CommentsListItem = ({
           </Text>
         </View>
 
-        {!item.replyTo && (
-          <View className="flex-row items-center justify-between">
-            <TouchableOpacity hitSlop={20} onPress={handleReply}>
-              <Text className="text-primary">Reply</Text>
+        <View className="flex-row items-center justify-between">
+          <TouchableOpacity hitSlop={20} onPress={handleReply}>
+            <Text className="text-primary">Reply</Text>
+          </TouchableOpacity>
+          {!item.replyTo && item.repliesCount > 0 && (
+            <TouchableOpacity
+              hitSlop={20}
+              onPress={() => onToggleReplies?.(item)}
+              className="flex-row items-center"
+            >
+              <Text className="ml-1 mt-1 text-silver4">view {item.repliesCount} replies</Text>
             </TouchableOpacity>
-            {item.repliesCount > 0 && (
-              <TouchableOpacity
-                hitSlop={20}
-                onPress={() => onToggleReplies?.(item)}
-                className="flex-row items-center"
-              >
-                <Text className="ml-1 mt-1 text-silver4">view {item.repliesCount} replies</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
+          )}
+        </View>
       </View>
     </CommentContextMenu>
   );
