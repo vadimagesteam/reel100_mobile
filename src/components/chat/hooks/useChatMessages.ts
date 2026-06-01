@@ -31,11 +31,25 @@ const qqlQuery = `query(
         to { ...ShallowUser }
         video {
             id
+            label
+            slug
+            createdAt
+            updatedAt
+            file
+            status
+            processingStep
             likesCount
             commentsCount
+            viewsCount
             description
-            file
-            user { ...ShallowUser }
+            user {
+              ...ShallowUser
+              whoms {
+                id
+                who { id }
+              }
+            }
+            states { id slug label }
             top_100Position
             top_100Date
         }

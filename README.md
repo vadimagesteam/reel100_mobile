@@ -34,6 +34,26 @@ npm run android
 yarn android
 ```
 
+#### Release build
+
+Gradle 8.12 requires Java 17 (Java 24+ fails with `Unsupported class file major version 69`). Before running a release build, export Java 17 and the Android SDK path:
+
+```sh
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+export PATH=$JAVA_HOME/bin:$PATH
+export ANDROID_HOME=$HOME/Library/Android/sdk
+
+yarn release:android
+```
+
+If `android/local.properties` does not exist, create it with:
+
+```
+sdk.dir=/Users/<you>/Library/Android/sdk
+```
+
+The signed bundle is output to `android/app/build/outputs/bundle/release/app-release.aab`.
+
 ### iOS
 
 For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).

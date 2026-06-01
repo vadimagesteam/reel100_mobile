@@ -5,6 +5,7 @@ import { useVideoFeedCacheKey } from './useVideoFeedCacheKey';
 
 type VideoDeleteArgs = {
   id: string;
+  force?: boolean;
 };
 
 export const useDeleteMutation = () => {
@@ -12,8 +13,10 @@ export const useDeleteMutation = () => {
   const videosKey = useVideoFeedCacheKey();
 
   return useMutation({
-    mutationFn: async ({ id }: VideoDeleteArgs) => {
-      const { data } = await api.delete(`/api/videos/${id}`);
+    mutationFn: async ({ id, force }: VideoDeleteArgs) => {
+      const { data } = await api.delete(`/api/videos/${id}`, {
+        params: force ? { force: 'true' } : undefined,
+      });
       return data;
     },
     onMutate: async ({ id }) => {

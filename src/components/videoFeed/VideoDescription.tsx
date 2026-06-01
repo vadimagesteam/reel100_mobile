@@ -40,7 +40,7 @@ export const VideoDescription = memo(
     return (
       <GestureTouchableOpacity
         hitSlop={{ top: 10 }}
-        className="z-30 w-[80%] flex-col items-start justify-center"
+        className="z-30 shrink flex-col items-start justify-center"
         style={[{ bottom: bottomInset }, test]}
         onPress={() => {
           if (hasMore) {

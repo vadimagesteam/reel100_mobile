@@ -12,7 +12,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useUser } from '../../state/user/authStore';
 import { getDisplayName } from '../../state/user/utils';
-import { formatNumberShort, formatNumberUS, isAndroid, isoUTCDateToLocate } from '../../utils';
+import { formatNumberShort, formatNumberUS, formatShortDate, isAndroid } from '../../utils';
 import { Avatar, Backdrop, SvgIcon } from '../ui';
 import { FollowButton } from '../user/FollowButton';
 import { VideoPost } from './queries/apiVideosFetcher';
@@ -64,7 +64,7 @@ export const VideoInfoOverlay = ({
   const insets = useSafeAreaInsets();
   const { setHeartIconPos } = useVideoFeed((s) => s.actions);
   const screenType = useVideoFeed((s) => s.screenType);
-  const showVideoDate = useVideoFeed((s) => s.showVideoDate);
+  const showWinningState = useVideoFeed((s) => s.showWinningState);
 
   const me = useUser();
 
@@ -122,7 +122,7 @@ export const VideoInfoOverlay = ({
         style={topInfoStyles}
         className="absolute left-2 right-2 top-4 flex-row items-center justify-between"
       >
-        <View className="min-w-[20px]">
+        <View className="min-w-[20px] flex-row items-center">
           {isPlayerFullScreen && (
             <GestureTouchableOpacity
               className="flex-row items-center gap-2"
@@ -132,15 +132,12 @@ export const VideoInfoOverlay = ({
               <Ionicons size={24} name="chevron-back" color="#fff" />
             </GestureTouchableOpacity>
           )}
-        </View>
-
-        {showVideoDate && video.top_100Date && (
-          <View>
-            <Text className="text-2xl font-medium text-primary">
-              {isoUTCDateToLocate(video.top_100Date)}
+          {showWinningState && video.states?.[0] && (
+            <Text className="ml-2 text-2xl font-bold text-primary">
+              {video.states[0].slug}
             </Text>
-          </View>
-        )}
+          )}
+        </View>
 
         {/* Top Right */}
         <View className="flex-row">
@@ -232,29 +229,35 @@ export const VideoInfoOverlay = ({
         </Animated.View>
 
         <View className="flex-row items-start gap-[10px]">
-          {me.id !== user.id && (
-            <FollowButton
-              user={user}
-              renderButton={({ followUnfollowAction, isLoading, text }) => (
-                <GestureTouchableOpacity
-                  onPress={followUnfollowAction}
-                  disabled={isLoading}
-                  style={buttonStyle}
-                  className="rounded-[4px] bg-[#d9d9d9] px-[7px] py-[5px]"
-                >
-                  <Text className="text-[14px] font-bold color-[#0D0D0D]">{text}</Text>
-                </GestureTouchableOpacity>
-              )}
-            />
-          )}
+          <View className="flex-1 flex-row items-start gap-[10px]">
+            {me.id !== user.id && (
+              <FollowButton
+                user={user}
+                renderButton={({ followUnfollowAction, isLoading, text }) => (
+                  <GestureTouchableOpacity
+                    onPress={followUnfollowAction}
+                    disabled={isLoading}
+                    style={buttonStyle}
+                    className="rounded-[4px] bg-[#d9d9d9] px-[7px] py-[5px]"
+                  >
+                    <Text className="text-[14px] font-bold color-[#0D0D0D]">{text}</Text>
+                  </GestureTouchableOpacity>
+                )}
+              />
+            )}
 
-          {video.description && (
-            <VideoDescription
-              backdropActive={backdropActive}
-              text={video.description}
-              bottomInset={isAndroid ? 14 : 8}
-            />
-          )}
+            {video.description && (
+              <VideoDescription
+                backdropActive={backdropActive}
+                text={video.description}
+                bottomInset={isAndroid ? 14 : 8}
+              />
+            )}
+          </View>
+
+          <Text className="text-[13px] font-medium text-primary opacity-80">
+            {formatShortDate(video.createdAt)}
+          </Text>
         </View>
       </Animated.View>
     </View>

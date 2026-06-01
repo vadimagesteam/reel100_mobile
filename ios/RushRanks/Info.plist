@@ -21,7 +21,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>67</string>
+	<string>90</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
@@ -52,19 +54,23 @@
 	<string>RushRanks uses your location to show popular videos near you.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>RushRanks uses your microphone while recording videos so you can include sound.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>RushRanks needs permission to save your recorded videos to your photo gallery.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your photo library to select videos.</string>
 	<key>NSPushNotificationsUsageDescription</key>
 	<string>RushRanks sends notifications to keep you updated about new likes, followers, and messages.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>This app uses speech recognition to improve voice features.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Ionicons.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>RushRanks needs permission to save your recorded videos to your photo gallery.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -83,11 +89,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Ionicons.ttf</string>
-	</array>
 </dict>
 </plist>

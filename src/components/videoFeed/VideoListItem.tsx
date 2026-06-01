@@ -124,6 +124,7 @@ export const VideoListItemRaw: FC<VideoItemProps> = ({
         onPress: async () => {
           deleteVideo({
             id: videoId,
+            force: true,
           });
           setFullscreen(false);
           if (backPressHandler) {

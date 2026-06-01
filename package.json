@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
+    "smoke:backend": "node scripts/smoke/backend-smoke.mjs",
     "postinstall": "patch-package"
   },
   "dependencies": {

@@ -43,12 +43,7 @@ export const TabMainScreen = () => {
           );
         case 'top_video':
           return (
-            <TabAwareVideoFeedProvider
-              isActiveTab={isActiveTab}
-              initialState={{
-                showVideoDate: true,
-              }}
-            >
+            <TabAwareVideoFeedProvider isActiveTab={isActiveTab}>
               <Top100VideosByDate />
             </TabAwareVideoFeedProvider>
           );

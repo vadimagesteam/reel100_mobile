@@ -7,6 +7,7 @@ export type VideoRecordStore = {
   isPreviewReady: boolean;
   error: Error | null;
   uploading: boolean;
+  uploadProgress: number;
 
   actions: {
     clear: () => void;
@@ -21,6 +22,7 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
   isPreviewReady: false,
   error: null,
   uploading: false,
+  uploadProgress: 0,
 
   actions: {
     clear: () => {
@@ -29,6 +31,7 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
         isPreviewReady: false,
         error: null,
         uploading: false,
+        uploadProgress: 0,
       });
     },
     setPreviewUri: (uri) => set({ previewUri: uri }),
@@ -55,7 +58,7 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
       };
 
       try {
-        set({ uploading: true, error: null });
+        set({ uploading: true, error: null, uploadProgress: 0 });
         const response = await api.post('api/videos', metaDataPayload);
 
         if (response?.status === 201 && response.data?.id) {
@@ -74,6 +77,12 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
           const fileUploadResponse = await api.put(`api/videos/${videoId}/file`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                set({ uploadProgress: progress });
+              }
             },
           });
 

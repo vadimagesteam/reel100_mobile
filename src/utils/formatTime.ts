@@ -80,6 +80,16 @@ export function isoUTCDateToLocate(isoDateTime: string | Date): string {
   return date.toLocaleDateString(locale, { timeZone: 'UTC' });
 }
 
+export function formatShortDate(isoDateTime: string | Date | null | undefined): string {
+  if (!isoDateTime) return '';
+  const date = typeof isoDateTime === 'string' ? new Date(isoDateTime) : isoDateTime;
+  if (isNaN(date.getTime())) return '';
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const year = String(date.getFullYear()).slice(-2);
+  return `${month}/${day}/${year}`;
+}
+
 export function isoDateTimeToLocale(isoDateTime: string | Date): string {
   const date = typeof isoDateTime === 'string' ? new Date(isoDateTime) : isoDateTime;
   return `${date.toLocaleDateString()}, ${date.toLocaleTimeString('en-US', {

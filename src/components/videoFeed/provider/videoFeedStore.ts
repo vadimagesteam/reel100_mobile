@@ -21,7 +21,7 @@ export type VideoFeedStore = {
   backPressHandler?: () => void;
   allowDelete: boolean;
   screenType: 'inner' | 'modal';
-  showVideoDate: boolean;
+  showWinningState: boolean;
 
   actions: {
     setBackPressHandler: (handler: () => void) => void;
@@ -75,7 +75,7 @@ export const createVideoFeedStore = (initialState: Partial<Omit<VideoFeedStore, 
     hearIconPos: { x: 0, y: 300 },
     allowDelete: false,
     screenType: 'inner',
-    showVideoDate: false,
+    showWinningState: false,
 
     ...initialState,
 

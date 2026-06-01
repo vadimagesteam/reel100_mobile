@@ -70,5 +70,20 @@ target 'RushRanks' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Fix fmt 11.0.2 consteval issue with Xcode 26 / Apple Clang 21
+    # Apple Clang 21 (Xcode 26) defines __cpp_consteval but consteval is broken.
+    # Patch base.h to extend the Apple clang version guard.
+    fmt_base = File.join(installer.sandbox.root, 'fmt', 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base)
+      content = File.read(fmt_base)
+      old_guard = '__apple_build_version__ < 14000029L'
+      new_guard = '__apple_build_version__ < 22000000L'
+      if content.include?(old_guard) && !content.include?(new_guard)
+        File.chmod(0644, fmt_base)
+        content = content.gsub(old_guard, new_guard)
+        File.write(fmt_base, content)
+      end
+    end
   end
 end

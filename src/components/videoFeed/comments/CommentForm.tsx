@@ -16,10 +16,12 @@ export const CommentForm = forwardRef<TextInput, CommentFormProps>(
     const isEmpty = useMemo(() => !text.trim().length, [text]);
 
     return (
-      <View className="flex-row items-center border-t border-t-[#333] bg-surface p-[15px]">
+      <View className="flex-row items-end border-t border-t-[#333] bg-surface p-[15px]">
         <BottomSheetTextInput
           ref={ref}
-          className="h-10 flex-1 rounded-full bg-[#222] px-3 text-primary"
+          multiline
+          textAlignVertical="top"
+          className="max-h-[120px] min-h-[40px] flex-1 rounded-2xl bg-[#222] px-3 py-2 text-primary"
           placeholder="Add a comment..."
           placeholderTextColor="#aaa"
           value={text}

@@ -23,7 +23,7 @@ export const VideoPreview = () => {
   const user = useUser();
   const [volume, setVolume] = useState(1);
   const [description, setDescription] = useState('');
-  const { previewUri, error, uploading, actions } = useVideoRecordStore();
+  const { previewUri, error, uploading, uploadProgress, actions } = useVideoRecordStore();
   const [selectedState] = useStateSelector();
 
   const videoSource = useMemo(() => {
@@ -122,7 +122,16 @@ export const VideoPreview = () => {
             </Button>
           </View>
         ) : (
-          <Text className="text-xl text-primary">Uploading...</Text>
+          <View className="w-4/5 items-center gap-3">
+            <Text className="text-xl text-primary">Uploading...</Text>
+            <View className="h-2 w-full overflow-hidden rounded-full bg-white/20">
+              <View
+                className="h-full rounded-full bg-blue3"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </View>
+            <Text className="text-sm text-primary">{uploadProgress}%</Text>
+          </View>
         )}
       </View>
 
