@@ -68,13 +68,17 @@ export const SelectStateScreen = () => {
         <Text className="text-xl font-bold text-primary">Choose Your State</Text>
       </View>
 
-      <SearchInput
-        placeholder="Search for a state"
-        icon="location"
-        autoCorrect={false}
-        value={searchText}
-        onChangeText={setSearchText}
-      />
+      {/* Wrapper isolates SearchInput's `grow` so it doesn't stretch vertically
+          to fill the column (it sizes to content here). */}
+      <View>
+        <SearchInput
+          placeholder="Search for a state"
+          icon="location"
+          autoCorrect={false}
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+      </View>
 
       <View className="mt-3 flex-row rounded-xl bg-surface p-1">
         {TABS.map(({ key, label }) => {

@@ -103,8 +103,9 @@ export const AppNavigator = () => (
       options={{
         // The screen renders its own header (title + back button).
         headerShown: false,
-        presentation: 'modal',
-        animation: 'fade_from_bottom',
+        // A full page push (not a modal sheet).
+        presentation: 'card',
+        animation: 'slide_from_right',
         animationDuration: 200,
       }}
     />
