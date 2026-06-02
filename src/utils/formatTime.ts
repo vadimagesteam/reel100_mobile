@@ -73,6 +73,47 @@ export const formatTimeAgo = (date: string): string => {
   return diffInYears === 1 ? 'a year ago' : `${diffInYears} years ago`;
 };
 
+/**
+ * Compact relative time for video timestamps: `32m ago`, `12h ago`, `5d ago`.
+ * Used by the feed overlay; for older videos prefer {@link formatVideoTimestamp}.
+ */
+export const formatTimeAgoShort = (date: string | Date): string => {
+  const then = typeof date === 'string' ? new Date(date) : date;
+  const diffInSeconds = Math.floor((Date.now() - then.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return 'just now';
+  }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes}m ago`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `${diffInHours}h ago`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  return `${diffInDays}d ago`;
+};
+
+/**
+ * Timestamp shown at the bottom-right of a video: relative time (`12h ago`,
+ * `32m ago`) for recent videos, and the absolute short date (`5/24/26`) once
+ * the video is older than 30 days.
+ */
+export function formatVideoTimestamp(isoDateTime: string | Date | null | undefined): string {
+  if (!isoDateTime) return '';
+  const date = typeof isoDateTime === 'string' ? new Date(isoDateTime) : isoDateTime;
+  if (isNaN(date.getTime())) return '';
+  const diffMs = Date.now() - date.getTime();
+  if (diffMs < 0) return 'just now'; // future timestamp (clock skew) — clamp
+  const diffInDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  return diffInDays >= 30 ? formatShortDate(date) : formatTimeAgoShort(date);
+}
+
 export const { locale } = Intl.NumberFormat().resolvedOptions();
 
 export function isoUTCDateToLocate(isoDateTime: string | Date): string {
