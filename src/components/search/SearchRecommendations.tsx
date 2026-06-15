@@ -11,6 +11,15 @@ import { useOpenStatePage } from './hooks/useOpenStatePage';
 import { useSearchRecommendationsQuery } from './hooks/useSearchRecommendationsQuery';
 import { StateAvatar } from './StateAvatar';
 import { StatPill } from './SearchStats';
+import { RecommendedUser } from './types';
+
+/**
+ * The handle shown for a recommended creator. `username` stores the user's
+ * email, so never render it raw (it would show "@name@gmail.com"). Prefer an
+ * explicit nickname; otherwise fall back to the email's local part.
+ */
+const creatorHandle = (user: RecommendedUser): string =>
+  user.nickname?.trim() || user.username.split('@')[0];
 
 const StatLine = ({ posts, likes }: { posts: number; likes: number }) => (
   <View className="mt-0.5 flex-row items-center gap-3">
@@ -130,7 +139,7 @@ export const SearchRecommendations = () => {
                 key={user.id}
                 isFirst={index === 0}
                 avatar={<Avatar uri={user.avatar} size={40} name={user.name} />}
-                title={`@${user.username}`}
+                title={`@${creatorHandle(user)}`}
                 posts={user.posts}
                 likes={user.likes}
                 onPress={() => navigation.navigate(Screens.Profile, { userId: user.id })}
