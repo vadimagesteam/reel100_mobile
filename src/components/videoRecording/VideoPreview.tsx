@@ -48,6 +48,13 @@ export const VideoPreview = () => {
     if (uploadOk) {
       actions.clear();
       await queryClient.invalidateQueries({ queryKey: ['user_videos', user.id] });
+      // The new upload changes the per-state upload counts and search
+      // recommendations. Those are served by the ['search', ...] queries with a
+      // long staleTime, so without this they'd keep showing pre-upload numbers
+      // (e.g. "0 today" on the Choose-Your-State screen) until the cache went
+      // stale. Marking them stale makes the next visit refetch the fresh counts;
+      // the backend recomputes them a few seconds after the video finishes.
+      queryClient.invalidateQueries({ queryKey: ['search'] });
       navigation.goBack();
       // @ts-expect-error
       navigation.navigate('Tabs', {

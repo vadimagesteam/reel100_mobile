@@ -1,8 +1,8 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { endOfDay, startOfDay } from 'date-fns';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useStateSelector } from '../../state/app/uiStore';
+import { centralDayRangeUtc } from '../../utils';
 import { FlexLoading } from '../ui';
 import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
 import { VideoList } from '../videoFeed';
@@ -21,10 +21,10 @@ export const Top100Videos = ({ isActiveTab }: { isActiveTab: boolean }) => {
       cacheKey,
       where: {
         status: 'Finished',
-        createdAt: {
-          gte: startOfDay(new Date()).toISOString(),
-          lte: endOfDay(new Date()).toISOString(),
-        },
+        // Window the cycle in Central Time (matching the ranking + countdown),
+        // not the device's local day — otherwise videos still in the active
+        // Central cycle are dropped for users west of Central.
+        createdAt: centralDayRangeUtc(),
         states: {
           some: {
             id: { equals: selectedState?.id! },
