@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Alert, AppState } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { useStatesQuery } from './useStatesQuery';
-import { useStateSelector } from '../../../../state/app/uiStore';
+import { useDetectedStateSelector, useStateSelector } from '../../../../state/app/uiStore';
 import { requestLocationPermission } from '../requestLocationPermission';
 
 const getStateFromCoords = async (latitude: number, longitude: number) => {
@@ -37,7 +37,14 @@ const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 export const useGeoLocationState = () => {
   const { data: states } = useStatesQuery();
   const [selectedState, setSelectedState] = useStateSelector();
+  const [detectedState, setDetectedState] = useDetectedStateSelector();
   const lastDetectAtRef = useRef(0);
+
+  // Read the browse filter inside the async geolocation callback without making
+  // it a dependency of `detectState` (which would re-subscribe the AppState
+  // listener on every filter change).
+  const selectedStateRef = useRef(selectedState);
+  selectedStateRef.current = selectedState;
 
   const detectState = useCallback(
     // `silent` suppresses the permission/failure alerts for background refreshes
@@ -66,7 +73,17 @@ export const useGeoLocationState = () => {
             const storedState = states.find((item) => item.label === state);
             if (storedState) {
               console.log('📍Geolocation state from API', state);
-              setSelectedState(storedState);
+              // Always record the physical location — this is what a new upload
+              // is posted to (see VideoPreview), independent of what the user is
+              // browsing.
+              setDetectedState(storedState);
+              // Only seed the browse filter on the true first run (no filter
+              // yet) so the user lands on their own state. After that the filter
+              // is theirs to change, and overriding it here was what caused
+              // videos to post to the wrong state.
+              if (!selectedStateRef.current) {
+                setSelectedState(storedState);
+              }
               return;
             }
           }
@@ -87,15 +104,22 @@ export const useGeoLocationState = () => {
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
       );
     },
-    [states, setSelectedState],
+    [states, setSelectedState, setDetectedState],
   );
 
-  // First-run detection: prompt and resolve the state when we don't have one.
+  // First-run detection. Prompt and resolve when the user has no browse filter
+  // yet; if only the filter survived a restart but we have no detected upload
+  // state, resolve it silently so a new upload still targets the real location.
   useEffect(() => {
-    if (states && !selectedState) {
-      detectState(false);
+    if (!states) {
+      return;
     }
-  }, [states, selectedState, detectState]);
+    if (!selectedState) {
+      detectState(false);
+    } else if (!detectedState) {
+      detectState(true);
+    }
+  }, [states, selectedState, detectedState, detectState]);
 
   // Keep the state fresh: silently re-detect when the app returns to the
   // foreground, throttled so we don't re-geocode on every quick app switch.
