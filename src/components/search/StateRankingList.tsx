@@ -1,17 +1,20 @@
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { FlashList } from '@shopify/flash-list';
+import { useEffect, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../../theme';
 import { FlexLoading, ListEmptyBlock } from '../ui';
 import { StateStatLine } from './SearchStats';
 import { StateAvatar } from './StateAvatar';
-import { StateRankingItem } from './types';
+import { StateRankingItem, StateRankingSort } from './types';
 
 export interface StateRankingListProps {
   data?: StateRankingItem[];
   isLoading?: boolean;
   isError?: boolean;
   searchQuery?: string;
+  /** Active sort tab; changing it re-sorts the data and resets scroll to the top. */
+  sort?: StateRankingSort;
   onPress: (state: StateRankingItem) => void;
 }
 
@@ -25,8 +28,17 @@ export const StateRankingList = ({
   isLoading,
   isError,
   searchQuery,
+  sort,
   onPress,
 }: StateRankingListProps) => {
+  const listRef = useRef<FlashList<StateRankingItem>>(null);
+
+  // Switching the sort tab reorders the data; snap back to the top so the user
+  // sees the newly-ranked states instead of staying scrolled mid-list.
+  useEffect(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [sort]);
+
   if (!data && isLoading) {
     return <FlexLoading />;
   }
@@ -42,8 +54,10 @@ export const StateRankingList = ({
 
   return (
     <FlashList<StateRankingItem>
+      ref={listRef}
       showsVerticalScrollIndicator={false}
       data={data}
+      extraData={sort}
       estimatedItemSize={68}
       keyboardShouldPersistTaps="always"
       keyboardDismissMode="on-drag"

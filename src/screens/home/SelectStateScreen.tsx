@@ -129,6 +129,7 @@ export const SelectStateScreen = () => {
           isLoading={isLoading}
           isError={isError}
           searchQuery={searchText}
+          sort={tab}
           onPress={(state) =>
             handleSelected({ id: state.id, slug: state.slug, label: state.label })
           }
