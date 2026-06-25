@@ -14,7 +14,7 @@ export type RecommendedUser = {
   posts: number;
   /** Likes received in the last 7 days. */
   likes: number;
-  /** Ranking score: posts × likes over the last 7 days. */
+  /** Ranking score: posts × (likes + 1) over the last 7 days. */
   score: number;
 };
 

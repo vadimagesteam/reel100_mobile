@@ -89,7 +89,8 @@ const Card = ({
 /**
  * "Most Active Creators" + "Most Active States" cards, shown when the search bar
  * is focused without a typed query and as the 4U feed empty state. Data comes
- * from the hourly-refreshed /api/search/recommendations endpoint.
+ * from the /api/search/recommendations endpoint, recomputed event-driven (a few
+ * seconds after any upload/like).
  */
 export const SearchRecommendations = () => {
   const navigation = useNavigation();
