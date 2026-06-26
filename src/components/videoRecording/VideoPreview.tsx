@@ -1,18 +1,19 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Video from 'react-native-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useNavigation } from '../../navigation';
-import { Screens, Tabs } from '../../navigation/screens';
+import { Tabs } from '../../navigation/screens';
 import { isAndroid } from '../../utils';
 import { Button, SvgIcon } from '../ui';
 import { requestCameraRollSavePermissions } from './requestCameraRollSave';
 import { VideoDescriptionInput } from './VideoDescriptionInput';
 import { useVideoRecordStore } from './videoRecordStore';
 import { StateItem, useDetectedStateSelector, useStateSelector } from '../../state/app/uiStore';
+import { useDetectState } from '../appHeader';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../state/user/authStore';
 import { colors } from '../../theme';
@@ -27,6 +28,8 @@ export const VideoPreview = () => {
   const { previewUri, error, uploading, uploadProgress, actions } = useVideoRecordStore();
   const [selectedState] = useStateSelector();
   const [detectedState] = useDetectedStateSelector();
+  const detectState = useDetectState();
+  const [isDetectingState, setIsDetectingState] = useState(false);
 
   // The state this video will be posted to. Defaults to the user's physical
   // location and falls back to the browse filter only until geolocation
@@ -45,14 +48,23 @@ export const VideoPreview = () => {
     }
   }, [detectedState]);
 
-  const openStatePicker = () => {
-    navigation.navigate(Screens.SelectState, {
-      placeholderValue: targetState?.label,
-      onSelected: (state) => {
+  // Re-fetch the device location and adopt the resolved state as the target.
+  // This is an explicit user action, so we mark the target as chosen and prompt
+  // on permission/failure (non-silent).
+  const handleDetectLocation = async () => {
+    if (isDetectingState) {
+      return;
+    }
+    setIsDetectingState(true);
+    try {
+      const detected = await detectState(false);
+      if (detected) {
         targetPickedRef.current = true;
-        setTargetState(state);
-      },
-    });
+        setTargetState(detected);
+      }
+    } finally {
+      setIsDetectingState(false);
+    }
   };
 
   const videoSource = useMemo(() => {
@@ -70,8 +82,8 @@ export const VideoPreview = () => {
   const handlePublish = async () => {
     if (!targetState?.id) {
       Alert.alert(
-        'Choose a state',
-        'Select the state this video belongs to before publishing.',
+        'State not detected',
+        'We couldn’t detect your state. Tap the refresh icon to set it from your location before publishing.',
       );
       return;
     }
@@ -182,18 +194,29 @@ export const VideoPreview = () => {
           display: uploading ? 'none' : 'flex',
         }}
       >
-        <TouchableOpacity
-          onPress={openStatePicker}
-          hitSlop={8}
-          className="mb-3 flex-row items-center justify-center gap-2 self-center rounded-full bg-black/50 px-4 py-2"
-        >
-          {/* eslint-disable-next-line react-native/no-inline-styles */}
-          <SvgIcon image="location" color={colors.white} style={{ width: 16, height: 16 }} />
-          <Text className="text-sm font-semibold text-primary">
-            {targetState ? `Posting to ${targetState.label}` : 'Choose a state'}
-          </Text>
-          <Text className="text-xs text-blue3">Change</Text>
-        </TouchableOpacity>
+        <View className="mb-3 flex-row items-center justify-center gap-2 self-center">
+          <View className="flex-row items-center justify-center gap-2 rounded-full bg-black/50 px-4 py-2">
+            {/* eslint-disable-next-line react-native/no-inline-styles */}
+            <SvgIcon image="location" color={colors.white} style={{ width: 16, height: 16 }} />
+            <Text className="text-sm font-semibold text-primary">
+              {targetState ? `Posting to ${targetState.label}` : 'No state detected'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={handleDetectLocation}
+            disabled={isDetectingState}
+            hitSlop={8}
+            accessibilityLabel="Detect my state from current location"
+            className="h-9 w-9 items-center justify-center rounded-full bg-black/50"
+          >
+            {isDetectingState ? (
+              <ActivityIndicator size="small" color={colors.white} />
+            ) : (
+              // eslint-disable-next-line react-native/no-inline-styles
+              <SvgIcon image="refreshIcon" color={colors.white} style={{ width: 16, height: 16 }} />
+            )}
+          </TouchableOpacity>
+        </View>
         <View className="flex-row justify-between">
           <Button variant="primary" onPress={handlePublish}>
             Publish Now
