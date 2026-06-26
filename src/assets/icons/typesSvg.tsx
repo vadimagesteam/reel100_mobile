@@ -10,6 +10,7 @@ export type SvgIconsNames =
     | 'eyeShow'
     | 'eyeHide'
     | 'location'
+    | 'refreshIcon'
     | 'arrowBottom'
     | 'menu'
     | 'top100Tab'

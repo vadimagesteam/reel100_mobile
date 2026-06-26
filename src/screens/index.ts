@@ -9,7 +9,6 @@ export * from './auth/EulaScreen';
 // home
 export * from './home/TabMainScreen';
 export * from './home/TabForYouScreen';
-export * from './user/UserFollowingSearchScreen';
 export * from './home/TabGlobalVideoScreen';
 export * from './home/SelectStateScreen';
 

@@ -9,7 +9,6 @@ import {
   ChatDialogScreen,
   ChatListScreen,
   EditProfileScreen,
-  UserFollowingSearchScreen,
   SettingsScreen,
   ProfileScreen,
   ProfileStatsScreen,
@@ -83,14 +82,6 @@ export const AppNavigator = () => (
       }}
     />
     <Stack.Screen
-      name={Screens.UserFollowingSearch}
-      component={UserFollowingSearchScreen}
-      options={{
-        animation: 'fade_from_bottom',
-        animationDuration: 200,
-      }}
-    />
-    <Stack.Screen
       name={Screens.VideoModal}
       component={VideoModalScreen}
       options={{
@@ -110,14 +101,11 @@ export const AppNavigator = () => (
       name={Screens.SelectState}
       component={SelectStateScreen}
       options={{
-        title: 'Choose Your State',
-        headerTitleStyle: { color: colors.white },
-        headerStyle: {
-          backgroundColor: colors.black4,
-        },
-        headerShown: true,
-        presentation: 'modal',
-        animation: 'fade_from_bottom',
+        // The screen renders its own header (title + back button).
+        headerShown: false,
+        // A full page push (not a modal sheet).
+        presentation: 'card',
+        animation: 'slide_from_right',
         animationDuration: 200,
       }}
     />

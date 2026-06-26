@@ -106,6 +106,7 @@ Two-stack conditional navigation based on auth state in `RootNavigation.tsx`:
 
 `patch-package` runs on `postinstall`. Active patches in `patches/`:
 - **react-native-vision-camera+4.7.3.patch**: Filters Bayer/ProRes RAW pixel formats that cannot be encoded with standard codecs; prioritizes 8-bit formats (420v, 420f, BGRA) for HEVC/H.264; handles 10-bit formats for HEVC Main10. Fixes iPhone video recording with incompatible Bayer-only camera formats.
+- **react-native+0.79.5.patch**: Softens the three `RCTAssert` calls in `RCTSurfaceTouchHandler.mm` (`_updateTouches`, `_unregisterTouches`, `_activeTouchesFromTouches`) that throw `NSInternalInconsistencyException` ("Inconsistency between local and UIKit touch registries"). A known Fabric/New Architecture race: when a competing gesture recognizer cancels touches, UIKit delivers `touchesCancelled:` for touches no longer in RN's `_activeTouches` registry. The existing `if (iterator == end) continue;` guard already handles this in release builds; the patch makes debug builds skip gracefully instead of crashing.
 
 ## Code Style
 

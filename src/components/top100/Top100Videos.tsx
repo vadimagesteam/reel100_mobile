@@ -1,8 +1,8 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { endOfDay, startOfDay } from 'date-fns';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useStateSelector } from '../../state/app/uiStore';
+import { centralDayRangeUtc } from '../../utils';
 import { FlexLoading } from '../ui';
 import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
 import { VideoList } from '../videoFeed';
@@ -21,10 +21,10 @@ export const Top100Videos = ({ isActiveTab }: { isActiveTab: boolean }) => {
       cacheKey,
       where: {
         status: 'Finished',
-        createdAt: {
-          gte: startOfDay(new Date()).toISOString(),
-          lte: endOfDay(new Date()).toISOString(),
-        },
+        // Window the cycle in Central Time (matching the ranking + countdown),
+        // not the device's local day — otherwise videos still in the active
+        // Central cycle are dropped for users west of Central.
+        createdAt: centralDayRangeUtc(),
         states: {
           some: {
             id: { equals: selectedState?.id! },
@@ -72,7 +72,22 @@ export const Top100Videos = ({ isActiveTab }: { isActiveTab: boolean }) => {
 
   const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
 
-  if (isLoading) {
+  // Show the full-screen spinner only on the first load of a given state. The
+  // empty feed polls every 3s (refetchInterval) and triggers several background
+  // refetches; React Query's `isLoading` can briefly flip true on those, which
+  // would otherwise swap the empty-state screen for FlexLoading and "blink".
+  // Once we've rendered settled content (even an empty result) for this
+  // cacheKey, keep showing it and let refetches happen silently in the
+  // background. Reset per-state (by key value) so switching to an uncached
+  // state still shows one initial loader instead of flashing "no videos".
+  const cacheKeyId = cacheKey.join('|');
+  const settledKeyRef = useRef<string | null>(null);
+  if (!isLoading) {
+    settledKeyRef.current = cacheKeyId;
+  }
+  const isInitialLoad = isLoading && settledKeyRef.current !== cacheKeyId;
+
+  if (isInitialLoad) {
     return <FlexLoading />;
   }
 
