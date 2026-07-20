@@ -3,7 +3,6 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query';
-import { sleep } from '../../../utils/promise';
 import { CacheKey } from '../provider/videoFeedStore';
 import { apiVideosFetcher, ApiVideosFetcherParams, VideoPost } from '../queries/apiVideosFetcher';
 import { useEffect, useMemo } from 'react';
@@ -13,6 +12,18 @@ export type usePostsInfiniteQueryParams = {
   limit?: number;
   cacheKey: CacheKey;
   refetchInterval?: number | false;
+  /**
+   * On mount, drop every loaded page but the first and refetch it, so a feed
+   * screen reopens with fresh data instead of a long stale scrollback.
+   * Defaults to true.
+   *
+   * The video-feed modal opens on top of a grid that shares this exact
+   * cacheKey and has already loaded the page holding the tapped video. It must
+   * pass false — otherwise this truncation removes that page from the shared
+   * cache the instant the modal mounts, so deep-linking to a video beyond the
+   * first page lands on nothing.
+   */
+  refetchFirstPageOnMount?: boolean;
 } & Omit<ApiVideosFetcherParams, 'skip' | 'take'>;
 
 export type VideoPostQueryResult<T extends VideoPost = VideoPost> = UseInfiniteQueryResult<
@@ -25,7 +36,14 @@ export type VideoPostQueryResult<T extends VideoPost = VideoPost> = UseInfiniteQ
 export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
   params: usePostsInfiniteQueryParams,
 ): VideoPostQueryResult<T> => {
-  const { limit = 20, cacheKey, where, orderBy, refetchInterval } = params;
+  const {
+    limit = 20,
+    cacheKey,
+    where,
+    orderBy,
+    refetchInterval,
+    refetchFirstPageOnMount = true,
+  } = params;
   const hookResult = useInfiniteQuery({
     queryKey: cacheKey,
     queryFn: async ({ pageParam = 0 }) => {
@@ -45,6 +63,9 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
 
   // Refetch manually only first page
   useEffect(() => {
+    if (!refetchFirstPageOnMount) {
+      return;
+    }
     queryClient.setQueryData<{ pages: any[]; pageParams: any[] }>(cacheKey, (data) => {
       if (data) {
         return {
@@ -54,7 +75,7 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
       }
     });
     refetch();
-  }, [refetch, cacheKey]);
+  }, [refetch, cacheKey, refetchFirstPageOnMount]);
 
   const flatPages = useMemo(() => hookResult.data?.pages.flat() ?? [], [hookResult.data?.pages]);
 

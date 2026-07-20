@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { isAndroid } from '../../../utils';
 
-export const useLayoutDimensions = () => {
+export const useLayoutDimensions = (initial?: { width: number; height: number }) => {
   const [dimensions, setDimensions] = useState<{
     width: number;
     height: number;
-  }>({ width: 0, height: 0 });
+  }>(initial ?? { width: 0, height: 0 });
 
   const onLayout = useCallback(
     (e: LayoutChangeEvent) =>

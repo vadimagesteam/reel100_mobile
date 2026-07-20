@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, FlatListProps, RefreshControl } from 'react-native';
+import { FlatList, FlatListProps, RefreshControl, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   interpolate,
@@ -59,7 +59,18 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [viewPaused, setViewPaused] = useState(false);
-  const { dimensions, onLayout } = useLayoutDimensions();
+  // When deep-linking to a video below the fold, seed the row height from the
+  // window so getItemLayout and initialScrollIndex are correct on the first
+  // paint — otherwise height is 0 until onLayout fires, and the feed briefly
+  // renders at the top before jumping to the target (a visible blank frame on
+  // tiles deep in a profile). onLayout still refines it afterwards. Scoped to
+  // the deep-link case so the inline feed's measurement is unchanged.
+  const windowDimensions = useWindowDimensions();
+  const seedDimensions =
+    initialVideoIndex > 0
+      ? { width: windowDimensions.width, height: windowDimensions.height }
+      : undefined;
+  const { dimensions, onLayout } = useLayoutDimensions(seedDimensions);
 
   // Ads — inline native ads interleaved every AD_INTERVAL videos
   const { consumeAd, poolSize } = useNativeAdLoader();
@@ -308,17 +319,28 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
     return initialVideoIndex + adsBeforeIndex;
   }, [initialVideoIndex]);
 
-  const initialized = useRef(false);
+  // Jump to the tapped video once, as soon as the container height is known.
+  // getItemLayout supplies exact offsets, so there is no measurement race to
+  // wait out — the previous version re-scrolled on every dependency change for
+  // a 600ms window, which now that initialVideoIndex is actually non-zero would
+  // yank the feed back if the user swiped immediately after opening.
+  // Height *changes* after this (rotation, fullscreen toggle) are handled by
+  // useFlatListLayoutChangeScrollFix above, which re-anchors on activeIndex.
+  const initialScrollDone = useRef(false);
   useEffect(() => {
-    if (initialFeedIndex > -1 && !initialized.current) {
+    if (initialScrollDone.current || dimensions.height <= 0) {
+      return;
+    }
+
+    if (initialFeedIndex > 0) {
       flatListRef.current?.scrollToOffset({
         offset: initialFeedIndex * dimensions.height,
         animated: false,
       });
-      setTimeout(() => {
-        initialized.current = true;
-      }, 600);
+      setActiveIndex(initialFeedIndex);
     }
+
+    initialScrollDone.current = true;
   }, [dimensions.height, initialFeedIndex]);
 
   return (
@@ -340,7 +362,19 @@ export const VideoList: FC<SwipeableVideosListProps> = ({
           showsVerticalScrollIndicator={false}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
-          // initialScrollIndex={initialVideoIndex}
+          // Mount the render window around the tapped video rather than at 0,
+          // so it is present on first paint. Note this must be the ad-adjusted
+          // feed index, not the raw video index. Only set when deep-linking;
+          // undefined preserves the plain top-of-feed mount.
+          initialScrollIndex={initialFeedIndex > 0 ? initialFeedIndex : undefined}
+          onScrollToIndexFailed={({ index }) => {
+            // getItemLayout makes this path unlikely, but guard it: retry the
+            // jump once the row height is settled.
+            flatListRef.current?.scrollToOffset({
+              offset: index * dimensions.height,
+              animated: false,
+            });
+          }}
           onEndReachedThreshold={0.3}
           initialNumToRender={VideoBatchSize}
           windowSize={VideoBatchSize}
