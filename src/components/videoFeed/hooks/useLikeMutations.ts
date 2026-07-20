@@ -27,6 +27,20 @@ export const useLikeMutations = () => {
     }));
   };
 
+  // A video like/unlike shifts the search recommendation scores (score uses
+  // likes) and the liked user's total-likes shown in combined search. Mark
+  // those stale so the search screens refetch fresh numbers next time they
+  // open. Skipped on error (nothing changed) and for comment likes (the
+  // backend only refreshes search stats for video Like reactions). The
+  // Choose-Your-State counts are upload-based, so a like leaves them untouched.
+  const invalidateSearchOnVideoLike = (type: 'video' | 'comment', error: unknown) => {
+    if (error || type !== 'video') {
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ['search', 'recommendations'] });
+    queryClient.invalidateQueries({ queryKey: ['search', 'combined'] });
+  };
+
   const updateUserProfileLikesCount = (authorId: string, val: 1 | -1) => {
     // for own profile, we need to update zustand cache
     if (authorId === userId) {
@@ -103,9 +117,10 @@ export const useLikeMutations = () => {
       const key = ['like', type, userId, id];
       queryClient.setQueryData(key, { id: data.id });
     },
-    onSettled: (_data, _error, { type, id }) => {
+    onSettled: (_data, error, { type, id }) => {
       const key = ['like', type, userId, id];
       queryClient.invalidateQueries({ queryKey: key });
+      invalidateSearchOnVideoLike(type, error);
     },
     retry: 3,
   });
@@ -144,9 +159,10 @@ export const useLikeMutations = () => {
         queryClient.setQueryData(['user', _vars.authorId], context.videosPrev);
       }
     },
-    onSettled: (_data, _err, { type, id }) => {
+    onSettled: (_data, error, { type, id }) => {
       const key = ['like', type, userId, id];
       queryClient.invalidateQueries({ queryKey: key });
+      invalidateSearchOnVideoLike(type, error);
     },
     retry: 3,
   });

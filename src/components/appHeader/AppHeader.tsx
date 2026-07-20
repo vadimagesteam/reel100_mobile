@@ -1,4 +1,3 @@
-import Ionicons from '@react-native-vector-icons/ionicons';
 import { Text, TouchableOpacity, View, ViewProps } from 'react-native';
 import Animated, { FlipInEasyY, LinearTransition } from 'react-native-reanimated';
 import { useNavigation } from '../../navigation';
@@ -65,15 +64,6 @@ export const AppHeader = ({
         <GlobalCountdown />
 
         <View className="flex-row items-center gap-3">
-          <TouchableOpacity
-            className="flex-row gap-2"
-            hitSlop={10}
-            onPress={() => {
-              navigation.navigate(Screens.UserSearch);
-            }}
-          >
-            <Ionicons size={18} name="search-sharp" color="#fff" />
-          </TouchableOpacity>
           <MenuButton />
         </View>
       </Animated.View>

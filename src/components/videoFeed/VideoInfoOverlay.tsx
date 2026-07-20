@@ -12,7 +12,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useUser } from '../../state/user/authStore';
 import { getDisplayName } from '../../state/user/utils';
-import { formatNumberShort, formatNumberUS, formatShortDate, isAndroid } from '../../utils';
+import { formatNumberShort, formatNumberUS, formatVideoTimestamp, isAndroid } from '../../utils';
 import { Avatar, Backdrop, SvgIcon } from '../ui';
 import { FollowButton } from '../user/FollowButton';
 import { VideoPost } from './queries/apiVideosFetcher';
@@ -256,7 +256,7 @@ export const VideoInfoOverlay = ({
           </View>
 
           <Text className="text-[13px] font-medium text-primary opacity-80">
-            {formatShortDate(video.createdAt)}
+            {formatVideoTimestamp(video.createdAt)}
           </Text>
         </View>
       </Animated.View>
