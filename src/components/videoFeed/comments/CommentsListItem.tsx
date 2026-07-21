@@ -1,13 +1,65 @@
 import clsx from 'clsx';
+import { useEffect } from 'react';
 import { Text, TouchableOpacity, View, ViewProps } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigation } from '../../../navigation';
 import { Screens } from '../../../navigation/screens';
 import { useUser } from '../../../state/user/authStore';
 import { getDisplayName } from '../../../state/user/utils';
 import { Avatar } from '../../ui';
+import { IconHeart } from '../IconHeart';
+import { useLikeMutations } from '../hooks';
 import { CommentContextMenu } from './CommentContextMenu';
 import { CommentType } from './hooks/useCommentsInfiniteQuery';
 import { formatTimeAgo } from '../../../utils';
+
+/**
+ * Heart + count for a single comment. Works identically for top-level comments
+ * and replies, and for the user's own comments.
+ *
+ * The filled/outline state and the number come straight from the comment in
+ * the list cache, which useLikeMutations updates optimistically. The separate
+ * ['like', 'comment', ...] cache — which the mutation uses to decide
+ * like-vs-unlike and to hold the reaction id for DELETE — is seeded once from
+ * the server-provided myReactionId, so the first tap behaves correctly and an
+ * unlike knows which reaction to remove.
+ */
+const CommentLikeButton = ({ comment }: { comment: CommentType }) => {
+  const { id: userId } = useUser();
+  const queryClient = useQueryClient();
+  const { toggleLike, like, unlike } = useLikeMutations();
+
+  useEffect(() => {
+    const key = ['like', 'comment', userId, comment.id];
+    if (queryClient.getQueryData(key) === undefined) {
+      queryClient.setQueryData(key, { id: comment.myReactionId });
+    }
+  }, [queryClient, userId, comment.id, comment.myReactionId]);
+
+  const handlePress = () => {
+    toggleLike({
+      type: 'comment',
+      id: comment.id,
+      authorId: comment.user.id,
+      videoId: comment.video.id,
+    });
+  };
+
+  return (
+    <TouchableOpacity
+      hitSlop={20}
+      onPress={handlePress}
+      // Debounce rapid taps so a like and its unlike can't overlap in flight.
+      disabled={like.isPending || unlike.isPending}
+      className="flex-row items-center gap-1"
+    >
+      <IconHeart variant={comment.likedByMe ? 'filled' : 'outline'} width={16} height={16} />
+      {comment.likesCount > 0 && (
+        <Text className="text-silver4">{comment.likesCount}</Text>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 export interface CommentListItemProps<T = CommentType> extends Pick<ViewProps, 'onLayout'> {
   comment: T;
@@ -63,9 +115,12 @@ export const CommentsListItem = ({
         </View>
 
         <View className="flex-row items-center justify-between">
-          <TouchableOpacity hitSlop={20} onPress={handleReply}>
-            <Text className="text-primary">Reply</Text>
-          </TouchableOpacity>
+          <View className="flex-row items-center gap-4">
+            <TouchableOpacity hitSlop={20} onPress={handleReply}>
+              <Text className="text-primary">Reply</Text>
+            </TouchableOpacity>
+            <CommentLikeButton comment={item} />
+          </View>
           {!item.replyTo && item.repliesCount > 0 && (
             <TouchableOpacity
               hitSlop={20}

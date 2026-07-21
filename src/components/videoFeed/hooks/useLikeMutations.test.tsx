@@ -38,6 +38,13 @@ jest.mock('./useVideosInfiniteQuery', () => ({
   updateVideoCache: (...args: unknown[]) => mockUpdateVideoCache(...args),
 }));
 
+const mockUpdateCommentCache = jest.fn();
+
+jest.mock('../comments/hooks/useCommentsInfiniteQuery', () => ({
+  commentsCacheKey: (videoId: string) => ['comments', 'video', videoId],
+  updateCommentCache: (...args: unknown[]) => mockUpdateCommentCache(...args),
+}));
+
 // Imported after the mocks.
 const { useLikeMutations } = require('./useLikeMutations');
 
@@ -73,6 +80,7 @@ beforeEach(() => {
   });
   // updateVideoCache returns the pre-mutation snapshot the real one would.
   mockUpdateVideoCache.mockReturnValue({ pages: 'VIDEO_CACHE_SNAPSHOT' });
+  mockUpdateCommentCache.mockReturnValue({ pages: 'COMMENT_CACHE_SNAPSHOT' });
 });
 
 afterEach(() => {
@@ -157,5 +165,99 @@ describe('useLikeMutations — bug 1: onError restores the right cache', () => {
     const profile = client.getQueryData(['user', 'author-1']) as typeof PROFILE;
     expect(profile.stats.likeCount).toBe(4);
     expect(profile.username).toBe('a');
+  });
+});
+
+describe('useLikeMutations — comment likes', () => {
+  it('updates the comment count optimistically, not the video feed', async () => {
+    mockPost.mockResolvedValue({ data: { id: 'reaction-c1' } });
+    const hook = renderLikeHook(client);
+
+    ReactTestRenderer.act(() => {
+      hook.current.like.mutate({
+        type: 'comment',
+        id: 'c1',
+        authorId: 'other',
+        videoId: 'v1',
+      });
+    });
+    await flush();
+
+    expect(mockUpdateCommentCache).toHaveBeenCalledWith(
+      ['comments', 'video', 'v1'],
+      'c1',
+      expect.any(Function),
+    );
+    // The video feed cache is untouched for a comment like.
+    expect(mockUpdateVideoCache).not.toHaveBeenCalled();
+
+    // The updater bumps likesCount and marks it liked.
+    const updater = mockUpdateCommentCache.mock.calls[0][2] as (c: any) => any;
+    const next = updater({ likesCount: 2, likedByMe: false });
+    expect(next.likesCount).toBe(3);
+    expect(next.likedByMe).toBe(true);
+  });
+
+  it('does not touch the author profile stat for a comment like', async () => {
+    // Author's profile is cached, so a stray stat bump would be observable.
+    client.setQueryData(['user', 'author-1'], { id: 'author-1', stats: { likeCount: 7 } });
+    mockPost.mockResolvedValue({ data: { id: 'reaction-c1' } });
+    const hook = renderLikeHook(client);
+
+    ReactTestRenderer.act(() => {
+      hook.current.like.mutate({
+        type: 'comment',
+        id: 'c1',
+        authorId: 'author-1',
+        videoId: 'v1',
+      });
+    });
+    await flush();
+
+    // A comment like is not a video like; the profile likeCount (likes on your
+    // videos) must not move — for cached other users or the zustand own profile.
+    expect(mockUpdateMyProfileStats).not.toHaveBeenCalled();
+    const profile = client.getQueryData(['user', 'author-1']) as { stats: { likeCount: number } };
+    expect(profile.stats.likeCount).toBe(7);
+  });
+
+  it('rolls the comment count back when the like fails', async () => {
+    mockPost.mockRejectedValue(new Error('network'));
+    const hook = renderLikeHook(client);
+
+    ReactTestRenderer.act(() => {
+      hook.current.like.mutate({
+        type: 'comment',
+        id: 'c1',
+        authorId: 'other',
+        videoId: 'v1',
+      });
+    });
+    await flush();
+
+    // Restored to the snapshot updateCommentCache returned at mutate time.
+    expect(client.getQueryData(['comments', 'video', 'v1'])).toEqual({
+      pages: 'COMMENT_CACHE_SNAPSHOT',
+    });
+  });
+});
+
+describe('useLikeMutations — own-content like revert', () => {
+  it('reverts the zustand profile stat when a like on your own video fails', async () => {
+    mockPost.mockRejectedValue(new Error('network'));
+    const hook = renderLikeHook(client);
+
+    ReactTestRenderer.act(() => {
+      // authorId === the mocked current user id ('me').
+      hook.current.like.mutate({ type: 'video', id: 'v1', authorId: 'me' });
+    });
+    await flush();
+
+    // Optimistic +1 then revert -1 — two calls whose net effect is zero.
+    expect(mockUpdateMyProfileStats).toHaveBeenCalledTimes(2);
+    const net = mockUpdateMyProfileStats.mock.calls
+      .map((c) => c[0] as (s: any) => any)
+      .reduce((stats, fn) => fn(stats), { likeCount: 10 });
+    expect(net.likeCount).toBe(10);
   });
 });
