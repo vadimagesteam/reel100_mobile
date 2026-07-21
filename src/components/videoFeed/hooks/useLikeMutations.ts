@@ -85,7 +85,12 @@ export const useLikeMutations = () => {
       await queryClient.cancelQueries({ queryKey: key });
       const prev = queryClient.getQueryData<{ id: string } | undefined>(key);
 
-      if (prev?.id !== null) {
+      // Skip the optimistic write only if a like is already recorded. The old
+      // guard read `prev?.id !== null`, but an unliked item has no cache entry
+      // so `prev?.id` is undefined, not null — the guard was truthy and
+      // returned early on the very first like, so the count never moved
+      // optimistically until a refetch.
+      if (prev?.id) {
         return { key, prev };
       }
 
@@ -109,8 +114,10 @@ export const useLikeMutations = () => {
       if (videosKey && context?.videosPrev) {
         queryClient.setQueryData(videosKey, context.videosPrev);
       }
+      // revert the author's profile-stats cache — restore authorPrev, not
+      // videosPrev, which would write video-feed data into the user cache.
       if (context?.authorPrev) {
-        queryClient.setQueryData(['user', _vars.authorId], context.videosPrev);
+        queryClient.setQueryData(['user', _vars.authorId], context.authorPrev);
       }
     },
     onSuccess: (data, { type, id }) => {
@@ -155,8 +162,10 @@ export const useLikeMutations = () => {
       if (videosKey && context?.videosPrev) {
         queryClient.setQueryData(videosKey, context.videosPrev);
       }
+      // revert the author's profile-stats cache — restore authorPrev, not
+      // videosPrev, which would write video-feed data into the user cache.
       if (context?.authorPrev) {
-        queryClient.setQueryData(['user', _vars.authorId], context.videosPrev);
+        queryClient.setQueryData(['user', _vars.authorId], context.authorPrev);
       }
     },
     onSettled: (_data, error, { type, id }) => {
