@@ -1,7 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import clsx from 'clsx';
 import { colors } from '../theme';
-import { isAndroid, isIOS26Plus } from '../utils';
 import { Screens, AppStackParamList } from './screens';
 
 import { HeaderBackArrowButton } from '../components/appHeader';
@@ -34,11 +32,7 @@ export const AppNavigator = () => (
       contentStyle: { backgroundColor: colors.background },
       fullScreenGestureEnabled: true,
       // eslint-disable-next-line react/no-unstable-nested-components
-      headerLeft: () => (
-        //fixme: for ios 26+ temp fix for style
-        // should be fixed in RN Screens & rn navigation v7+
-        <HeaderBackArrowButton className={clsx(isAndroid && 'mr-8', isIOS26Plus && 'ml-2')} />
-      ),
+      headerLeft: () => <HeaderBackArrowButton />,
     }}
   >
     <Stack.Screen name="Tabs" component={BottomTabNavigator} />
