@@ -15,6 +15,8 @@ export interface CombinedSearchListProps {
   isLoading?: boolean;
   isError?: boolean;
   searchQuery?: string;
+  /** Tapping a tag on a video result re-runs the search for that tag. */
+  onTagPress?: (tag: string) => void;
 }
 
 const rowClassName =
@@ -30,6 +32,7 @@ export const CombinedSearchList = ({
   isLoading,
   isError,
   searchQuery,
+  onTagPress,
 }: CombinedSearchListProps) => {
   const navigation = useNavigation();
   const openStatePage = useOpenStatePage();
@@ -61,41 +64,87 @@ export const CombinedSearchList = ({
           message={searchQuery ? `Nothing matching "${searchQuery}"` : 'Start typing to search'}
         />
       }
-      renderItem={({ item }) =>
-        item.type === 'user' ? (
-          <TouchableOpacity
-            className={rowClassName}
-            onPress={() => navigation.navigate(Screens.Profile, { userId: item.id })}
-          >
-            <Avatar uri={item.avatar} size={44} name={item.name} />
-            <Text numberOfLines={1} className="flex-1 text-lg font-semibold text-primary">
-              {item.name}
-            </Text>
-            <View className="flex-row items-center gap-3">
-              <StatPill icon="cloud-upload-outline" value={item.totalUploads} size={14} />
-              <StatPill icon="heart-outline" value={item.totalLikes} size={14} />
+      renderItem={({ item }) => {
+        if (item.type === 'user') {
+          return (
+            <TouchableOpacity
+              className={rowClassName}
+              onPress={() => navigation.navigate(Screens.Profile, { userId: item.id })}
+            >
+              <Avatar uri={item.avatar} size={44} name={item.name} />
+              <Text numberOfLines={1} className="flex-1 text-lg font-semibold text-primary">
+                {item.name}
+              </Text>
+              <View className="flex-row items-center gap-3">
+                <StatPill icon="cloud-upload-outline" value={item.totalUploads} size={14} />
+                <StatPill icon="heart-outline" value={item.totalLikes} size={14} />
+                <Ionicons name="chevron-forward" size={16} color={colors.muted} />
+              </View>
+            </TouchableOpacity>
+          );
+        }
+
+        if (item.type === 'state') {
+          return (
+            <TouchableOpacity
+              className={rowClassName}
+              onPress={() => openStatePage({ id: item.id, slug: item.slug, label: item.label })}
+            >
+              <StateAvatar slug={item.slug} size={44} />
+              <Text numberOfLines={1} className="flex-1 text-lg font-semibold text-primary">
+                {item.label}
+              </Text>
+              <View className="flex-row items-center gap-2">
+                <StateStatLine
+                  uploadsToday={item.uploadsToday}
+                  uploadsLast7Days={item.uploadsLast7Days}
+                />
+                <Ionicons name="chevron-forward" size={16} color={colors.muted} />
+              </View>
+            </TouchableOpacity>
+          );
+        }
+
+        // Video result: opens the video; its tags are tappable to browse.
+        return (
+          <View className={rowClassName}>
+            <TouchableOpacity
+              className="flex-1 flex-row items-center gap-3"
+              onPress={() => navigation.navigate(Screens.VideoModal, { videoId: item.id })}
+            >
+              <View className="h-11 w-11 items-center justify-center rounded-lg bg-input">
+                <Ionicons name="play" size={20} color={colors.primary} />
+              </View>
+              <View className="flex-1">
+                <Text numberOfLines={1} className="text-lg font-semibold text-primary">
+                  {item.label}
+                </Text>
+                <View className="flex-row items-center gap-2">
+                  <Text numberOfLines={1} className="text-sm text-muted">
+                    {item.user.name}
+                  </Text>
+                  <StatPill icon="heart-outline" value={item.likesCount} size={12} />
+                </View>
+                {item.tags.length > 0 && (
+                  <View className="mt-1 flex-row flex-wrap gap-1.5">
+                    {item.tags.slice(0, 4).map((tag) => (
+                      <TouchableOpacity
+                        key={tag}
+                        hitSlop={6}
+                        onPress={() => onTagPress?.(tag)}
+                        className="rounded-full bg-input px-2 py-0.5"
+                      >
+                        <Text className="text-xs text-silver4">#{tag}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
               <Ionicons name="chevron-forward" size={16} color={colors.muted} />
-            </View>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            className={rowClassName}
-            onPress={() => openStatePage({ id: item.id, slug: item.slug, label: item.label })}
-          >
-            <StateAvatar slug={item.slug} size={44} />
-            <Text numberOfLines={1} className="flex-1 text-lg font-semibold text-primary">
-              {item.label}
-            </Text>
-            <View className="flex-row items-center gap-2">
-              <StateStatLine
-                uploadsToday={item.uploadsToday}
-                uploadsLast7Days={item.uploadsLast7Days}
-              />
-              <Ionicons name="chevron-forward" size={16} color={colors.muted} />
-            </View>
-          </TouchableOpacity>
-        )
-      }
+            </TouchableOpacity>
+          </View>
+        );
+      }}
     />
   );
 };

@@ -53,6 +53,7 @@ export const UserSearchScreen = () => {
             isLoading={isSearching}
             isError={isError}
             searchQuery={searchText}
+            onTagPress={setSearchText}
           />
         ) : (
           <SearchRecommendations />

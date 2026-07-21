@@ -57,8 +57,28 @@ export type SearchStateResult = {
   uploadsLast7Days: number;
 };
 
+export type SearchVideoResult = {
+  type: 'video';
+  id: string;
+  /** Video title. */
+  label: string;
+  description: string | null;
+  slug: string;
+  likesCount: number;
+  /** User-authored tag labels, tappable to browse the tag. */
+  tags: string[];
+  user: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+};
+
 /** GET /api/search?q= — combined, alphabetically-sorted users + states. */
-export type CombinedSearchResult = SearchUserResult | SearchStateResult;
+export type CombinedSearchResult =
+  | SearchUserResult
+  | SearchStateResult
+  | SearchVideoResult;
 
 /** GET /api/search/states?sort=most_active|alphabetical */
 export type StateRankingItem = {
