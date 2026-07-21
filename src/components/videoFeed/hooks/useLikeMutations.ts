@@ -12,6 +12,8 @@ type LikeArgs = {
   id: string;
   authorId: string; // if we want to update user profile stats cache
   videoId?: string; // required for comment likes, to locate the comments cache
+  reactionId?: string; // for comment unlike: the reaction id to DELETE, passed
+  // straight from the list so it never depends on a separate cache staying in sync
 };
 
 type LikeResponse = { id: string };
@@ -171,9 +173,20 @@ export const useLikeMutations = () => {
       }
       revertUserProfileLikesCount(_vars.authorId, context?.profile);
     },
-    onSuccess: (data, { type, id }) => {
+    onSuccess: (data, { type, id, videoId }) => {
       const key = ['like', type, userId, id];
       queryClient.setQueryData(key, { id: data.id });
+
+      // Record the server reaction id on the comment itself so a later unlike
+      // in the same session can DELETE it without re-fetching. The comment list
+      // is the single source of truth for the heart; keep it authoritative.
+      if (type === 'comment' && videoId) {
+        updateCommentCache(commentsCacheKey(videoId), id, (comment) => ({
+          ...comment,
+          likedByMe: true,
+          myReactionId: data.id,
+        }));
+      }
     },
     onSettled: (_data, error, { type, id }) => {
       const key = ['like', type, userId, id];
@@ -184,12 +197,19 @@ export const useLikeMutations = () => {
   });
 
   const unlike = useMutation({
-    mutationFn: async ({ type, id }: LikeArgs) => {
+    mutationFn: async ({ type, id, reactionId }: LikeArgs) => {
       const key = ['like', type, userId, id];
-      const cache = queryClient.getQueryData<{ id: string } | undefined>(key);
-      if (cache?.id && cache?.id !== 'optimistic') {
-        queryClient.removeQueries({ queryKey: key });
-        await api.delete(`/api/reactions/${cache?.id}`);
+      // Prefer an explicitly-passed reaction id — the comment path passes the
+      // fresh id straight from the list — and fall back to the like cache for
+      // the video path. Crucially, do NOT remove the cache key here: the
+      // previous version removed it before the DELETE, so on a transient
+      // failure retry re-ran with the key already gone, skipped the DELETE,
+      // and resolved as success — leaving the reaction alive on the server
+      // while the UI showed it unliked. The key is cleared in onSuccess, after
+      // the DELETE actually lands, so retries keep targeting the same id.
+      const targetId = reactionId ?? queryClient.getQueryData<{ id: string } | undefined>(key)?.id;
+      if (targetId && targetId !== 'optimistic') {
+        await api.delete(`/api/reactions/${targetId}`);
       }
       return { id: null };
     },
@@ -211,6 +231,19 @@ export const useLikeMutations = () => {
         queryClient.setQueryData(context.countKey, context.countPrev);
       }
       revertUserProfileLikesCount(_vars.authorId, context?.profile);
+    },
+    onSuccess: (_data, { type, id, videoId }) => {
+      // Clear the like-state key now that the DELETE has landed (moved out of
+      // mutationFn so retries stay safe — see the note there).
+      queryClient.setQueryData(['like', type, userId, id], { id: null });
+
+      if (type === 'comment' && videoId) {
+        updateCommentCache(commentsCacheKey(videoId), id, (comment) => ({
+          ...comment,
+          likedByMe: false,
+          myReactionId: null,
+        }));
+      }
     },
     onSettled: (_data, error, { type, id }) => {
       const key = ['like', type, userId, id];

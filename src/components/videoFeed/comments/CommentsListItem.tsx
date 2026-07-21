@@ -1,7 +1,5 @@
 import clsx from 'clsx';
-import { useEffect } from 'react';
 import { Text, TouchableOpacity, View, ViewProps } from 'react-native';
-import { useQueryClient } from '@tanstack/react-query';
 import { useNavigation } from '../../../navigation';
 import { Screens } from '../../../navigation/screens';
 import { useUser } from '../../../state/user/authStore';
@@ -17,32 +15,27 @@ import { formatTimeAgo } from '../../../utils';
  * Heart + count for a single comment. Works identically for top-level comments
  * and replies, and for the user's own comments.
  *
- * The filled/outline state and the number come straight from the comment in
- * the list cache, which useLikeMutations updates optimistically. The separate
- * ['like', 'comment', ...] cache — which the mutation uses to decide
- * like-vs-unlike and to hold the reaction id for DELETE — is seeded once from
- * the server-provided myReactionId, so the first tap behaves correctly and an
- * unlike knows which reaction to remove.
+ * The comment in the list cache is the single source of truth: likedByMe drives
+ * the filled/outline state AND the like-vs-unlike decision, and myReactionId is
+ * passed to the unlike so it can DELETE the reaction without depending on a
+ * separate cache staying in sync. useLikeMutations keeps both fields current
+ * (optimistically on tap, then with the server id on success).
  */
 const CommentLikeButton = ({ comment }: { comment: CommentType }) => {
-  const { id: userId } = useUser();
-  const queryClient = useQueryClient();
-  const { toggleLike, like, unlike } = useLikeMutations();
-
-  useEffect(() => {
-    const key = ['like', 'comment', userId, comment.id];
-    if (queryClient.getQueryData(key) === undefined) {
-      queryClient.setQueryData(key, { id: comment.myReactionId });
-    }
-  }, [queryClient, userId, comment.id, comment.myReactionId]);
+  const { like, unlike } = useLikeMutations();
 
   const handlePress = () => {
-    toggleLike({
-      type: 'comment',
+    const common = {
+      type: 'comment' as const,
       id: comment.id,
       authorId: comment.user.id,
       videoId: comment.video.id,
-    });
+    };
+    if (comment.likedByMe) {
+      unlike.mutate({ ...common, reactionId: comment.myReactionId ?? undefined });
+    } else {
+      like.mutate(common);
+    }
   };
 
   return (

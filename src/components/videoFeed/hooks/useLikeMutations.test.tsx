@@ -261,3 +261,55 @@ describe('useLikeMutations — own-content like revert', () => {
     expect(net.likeCount).toBe(10);
   });
 });
+
+describe('useLikeMutations — retry-safe unlike (review issue 1)', () => {
+  it('re-attempts the DELETE on a transient failure instead of silently succeeding', async () => {
+    // First DELETE rejects, retry succeeds. The old code removed the like key
+    // before the DELETE, so the retry skipped it and the reaction survived.
+    mockDelete
+      .mockRejectedValueOnce(new Error('timeout'))
+      .mockResolvedValueOnce({ data: {} });
+    client.setQueryData(['like', 'video', 'me', 'v1'], { id: 'reaction-1' });
+
+    const hook = renderLikeHook(client);
+    ReactTestRenderer.act(() => {
+      hook.current.unlike.mutate({ type: 'video', id: 'v1', authorId: 'other' });
+    });
+    await flush();
+
+    // The DELETE was actually retried and hit the real reaction id both times.
+    expect(mockDelete).toHaveBeenCalledTimes(2);
+    expect(mockDelete).toHaveBeenLastCalledWith('/api/reactions/reaction-1');
+  });
+});
+
+describe('useLikeMutations — comment unlike uses the passed reaction id', () => {
+  it('DELETEs the reaction id from the list, not a cached mirror', async () => {
+    mockDelete.mockResolvedValue({ data: {} });
+    // No ['like'] cache seeded at all — the id comes only from the args.
+    const hook = renderLikeHook(client);
+
+    ReactTestRenderer.act(() => {
+      hook.current.unlike.mutate({
+        type: 'comment',
+        id: 'c1',
+        authorId: 'other',
+        videoId: 'v1',
+        reactionId: 'reaction-c1',
+      });
+    });
+    await flush();
+
+    expect(mockDelete).toHaveBeenCalledWith('/api/reactions/reaction-c1');
+    // On success it clears the like-state key and marks the comment unliked.
+    expect(mockUpdateCommentCache).toHaveBeenCalledWith(
+      ['comments', 'video', 'v1'],
+      'c1',
+      expect.any(Function),
+    );
+    const updater = mockUpdateCommentCache.mock.calls.at(-1)![2] as (c: any) => any;
+    const next = updater({ likedByMe: true, myReactionId: 'reaction-c1' });
+    expect(next.likedByMe).toBe(false);
+    expect(next.myReactionId).toBeNull();
+  });
+});
