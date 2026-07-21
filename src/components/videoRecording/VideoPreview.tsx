@@ -195,17 +195,18 @@ export const VideoPreview = () => {
           display: uploading ? 'none' : 'flex',
         }}
       >
-        {/* Always-visible caption card, above the state pill and the actions. */}
-        <View className="mb-3">
-          <VideoDescriptionInput value={description} setValue={setDescription} />
-        </View>
-
+        {/* State pill + re-detect, above the caption card per the mock. */}
         <View className="mb-3 flex-row items-center justify-center gap-2 self-center">
-          <View className="flex-row items-center justify-center gap-2 rounded-full bg-black/50 px-4 py-2">
+          <View
+            className={clsx(
+              'flex-row items-center justify-center gap-2 rounded-full px-4 py-2',
+              targetState ? 'bg-black/50' : 'bg-red3/70',
+            )}
+          >
             {/* eslint-disable-next-line react-native/no-inline-styles */}
             <SvgIcon image="location" color={colors.white} style={{ width: 16, height: 16 }} />
             <Text className="text-sm font-semibold text-primary">
-              {targetState ? `Posting to ${targetState.label}` : 'No state detected'}
+              {targetState ? `Posting to ${targetState.label}` : 'Tap refresh to set your state'}
             </Text>
           </View>
           <TouchableOpacity
@@ -223,6 +224,12 @@ export const VideoPreview = () => {
             )}
           </TouchableOpacity>
         </View>
+
+        {/* Always-visible caption card, below the state pill. */}
+        <View className="mb-3">
+          <VideoDescriptionInput value={description} setValue={setDescription} />
+        </View>
+
         <View className="flex-row justify-between">
           <Button variant="primary" onPress={handlePublish}>
             Publish Now
