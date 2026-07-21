@@ -19,6 +19,7 @@ import {
   DeleteAccountScreen,
   VideoFeedModalScreen,
   AdDebugScreen,
+  NotificationsScreen,
 } from '../screens';
 import { BottomTabNavigator } from './TabsNavigator';
 
@@ -56,6 +57,14 @@ export const AppNavigator = () => (
       component={ChatListScreen}
     />
     <Stack.Screen name={Screens.Chat} component={ChatDialogScreen} />
+    <Stack.Screen
+      name={Screens.Notifications}
+      component={NotificationsScreen}
+      options={{
+        animation: 'fade_from_bottom',
+        animationDuration: 200,
+      }}
+    />
     <Stack.Screen
       name={Screens.Settings}
       component={SettingsScreen}

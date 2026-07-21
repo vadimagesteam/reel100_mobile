@@ -29,3 +29,6 @@ export * from './video/VideoFeedModalScreen';
 // chat
 export * from './chat/ChatListScreen';
 export * from './chat/ChatDialogScreen';
+
+// notifications
+export * from './notifications/NotificationsScreen';
