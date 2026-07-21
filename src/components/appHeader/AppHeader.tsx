@@ -9,6 +9,7 @@ import { HeaderBackArrowButton } from './HeaderBackArrowButton';
 import { MenuButton } from './MenuButton';
 import clsx from 'clsx';
 import { useStateSelector } from '../../state/app/uiStore';
+import { NotificationBellButton } from '../notifications/NotificationBellButton';
 
 export const AppHeaderHeight = 60;
 
@@ -64,6 +65,7 @@ export const AppHeader = ({
         <GlobalCountdown />
 
         <View className="flex-row items-center gap-3">
+          <NotificationBellButton />
           <MenuButton />
         </View>
       </Animated.View>

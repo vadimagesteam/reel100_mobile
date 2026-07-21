@@ -36,6 +36,7 @@ export const Screens = {
   SelectState: 'SelectState',
   VideoModal: 'VideoModal',
   VideoFeedModal: 'VideoFeedModal',
+  Notifications: 'Notifications',
 } as const;
 
 export type AuthStackParamList = {
@@ -79,6 +80,7 @@ export type AppStackParamList = {
     feedState: Partial<Omit<VideoFeedStore, 'actions'>>;
     videoIndex?: number;
   };
+  Notifications: undefined;
 };
 
 export type BottomTabParamList = {
