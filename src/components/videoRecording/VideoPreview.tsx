@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Video from 'react-native-video';
+import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useNavigation } from '../../navigation';
@@ -157,7 +158,6 @@ export const VideoPreview = () => {
           Alert.alert('Video Playback Error', msg);
         }}
       />
-      {!uploading && <VideoDescriptionInput value={description} setValue={setDescription} />}
       <View
         className={clsx(
           'absolute left-0 top-0 h-full w-full items-center justify-center',
@@ -186,14 +186,20 @@ export const VideoPreview = () => {
         )}
       </View>
 
-      <View
-        className="absolute left-0 w-full px-16"
+      <KeyboardStickyView
+        offset={{ closed: 0, opened: insets.bottom }}
+        className="absolute left-0 w-full px-6"
         // eslint-disable-next-line react-native/no-inline-styles
         style={{
           bottom: insets.bottom + (isAndroid ? 10 : 0),
           display: uploading ? 'none' : 'flex',
         }}
       >
+        {/* Always-visible caption card, above the state pill and the actions. */}
+        <View className="mb-3">
+          <VideoDescriptionInput value={description} setValue={setDescription} />
+        </View>
+
         <View className="mb-3 flex-row items-center justify-center gap-2 self-center">
           <View className="flex-row items-center justify-center gap-2 rounded-full bg-black/50 px-4 py-2">
             {/* eslint-disable-next-line react-native/no-inline-styles */}
@@ -230,7 +236,7 @@ export const VideoPreview = () => {
             Save Draft
           </Button>
         </View>
-      </View>
+      </KeyboardStickyView>
     </>
   );
 };
