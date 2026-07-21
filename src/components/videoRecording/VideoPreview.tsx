@@ -12,6 +12,7 @@ import { isAndroid } from '../../utils';
 import { Button, SvgIcon } from '../ui';
 import { requestCameraRollSavePermissions } from './requestCameraRollSave';
 import { VideoDescriptionInput } from './VideoDescriptionInput';
+import { TagInput } from './TagInput';
 import { useVideoRecordStore } from './videoRecordStore';
 import { StateItem, useDetectedStateSelector, useStateSelector } from '../../state/app/uiStore';
 import { useDetectState } from '../appHeader';
@@ -26,6 +27,7 @@ export const VideoPreview = () => {
   const user = useUser();
   const [volume, setVolume] = useState(1);
   const [description, setDescription] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const { previewUri, error, uploading, uploadProgress, actions } = useVideoRecordStore();
   const [selectedState] = useStateSelector();
   const [detectedState] = useDetectedStateSelector();
@@ -89,7 +91,7 @@ export const VideoPreview = () => {
       return;
     }
 
-    const uploadOk = await actions.publish(targetState.id, description);
+    const uploadOk = await actions.publish(targetState.id, description, tags);
     if (uploadOk) {
       actions.clear();
       await queryClient.invalidateQueries({ queryKey: ['user_videos', user.id] });
@@ -228,6 +230,11 @@ export const VideoPreview = () => {
         {/* Always-visible caption card, below the state pill. */}
         <View className="mb-3">
           <VideoDescriptionInput value={description} setValue={setDescription} />
+        </View>
+
+        {/* Tag input, below the caption. */}
+        <View className="mb-3">
+          <TagInput tags={tags} setTags={setTags} />
         </View>
 
         <View className="flex-row justify-between">

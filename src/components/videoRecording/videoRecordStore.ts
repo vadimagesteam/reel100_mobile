@@ -13,7 +13,7 @@ export type VideoRecordStore = {
     clear: () => void;
     setPreviewUri: (uri: string) => void;
     setIsPreviewReady: (ready: boolean) => void;
-    publish: (stateId: string, description: string) => Promise<boolean>;
+    publish: (stateId: string, description: string, tags?: string[]) => Promise<boolean>;
   };
 };
 
@@ -37,7 +37,7 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
     setPreviewUri: (uri) => set({ previewUri: uri }),
     setIsPreviewReady: (ready) => set({ isPreviewReady: ready }),
 
-    publish: async (stateId, description) => {
+    publish: async (stateId, description, tags) => {
       const { previewUri } = get();
 
       if (!previewUri) {
@@ -63,6 +63,16 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
 
         if (response?.status === 201 && response.data?.id) {
           const videoId = response.data.id;
+
+          // Attach tags (best-effort): a failure here shouldn't abort the
+          // upload — the video still publishes without them.
+          if (tags && tags.length > 0) {
+            try {
+              await api.put(`api/tags/video/${videoId}`, { tags });
+            } catch (e) {
+              console.error('Failed to attach tags to video', e);
+            }
+          }
 
           const { type, name } = getMimeType(previewUri);
           const fileUri = previewUri.startsWith('file://') ? previewUri : `file://${previewUri}`;
