@@ -34,8 +34,10 @@ jest.mock('./useVideoFeedCacheKey', () => ({
   useVideoFeedCacheKey: () => ['videos', 'feed'],
 }));
 
+const mockForYouKey = ['for_you_videos'];
+
 jest.mock('./useVideosInfiniteQuery', () => ({
-  FOR_YOU_CACHE_KEY: ['for_you_videos'],
+  FOR_YOU_CACHE_KEY: mockForYouKey,
   updateVideoCache: (...args: unknown[]) => mockUpdateVideoCache(...args),
 }));
 
@@ -319,8 +321,7 @@ describe('useLikeMutations — 4U feed staleness', () => {
   // Seed the 4U cache the way the feed screen would, so invalidation has
   // something real to act on.
   const seedForYou = () => {
-    client.setQueryData(['for_you_videos'], { pages: [[{ id: 'v1' }]], pageParams: [0] });
-    return client.getQueryState(['for_you_videos'])!;
+    client.setQueryData(mockForYouKey, { pages: [[{ id: 'v1' }]], pageParams: [0] });
   };
 
   it('marks the 4U feed stale after a video like, without refetching it', async () => {
@@ -333,7 +334,7 @@ describe('useLikeMutations — 4U feed staleness', () => {
     });
     await flush();
 
-    const state = client.getQueryState(['for_you_videos'])!;
+    const state = client.getQueryState(mockForYouKey)!;
     // Stale, so the next mount picks up the new ranking...
     expect(state.isInvalidated).toBe(true);
     // ...but not refetched now: the like usually happens inside 4U itself and
@@ -353,7 +354,7 @@ describe('useLikeMutations — 4U feed staleness', () => {
     await flush();
 
     // The backend only records tag affinity for video likes.
-    expect(client.getQueryState(['for_you_videos'])!.isInvalidated).toBe(false);
+    expect(client.getQueryState(mockForYouKey)!.isInvalidated).toBe(false);
   });
 
   it('leaves the 4U feed alone when the like fails', async () => {
@@ -367,6 +368,6 @@ describe('useLikeMutations — 4U feed staleness', () => {
     await flush();
 
     // Nothing was recorded server-side, so the ranking has not moved.
-    expect(client.getQueryState(['for_you_videos'])!.isInvalidated).toBe(false);
+    expect(client.getQueryState(mockForYouKey)!.isInvalidated).toBe(false);
   });
 });

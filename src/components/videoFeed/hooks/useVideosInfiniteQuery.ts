@@ -64,6 +64,14 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
     initialPageParam: 0,
     staleTime: Infinity,
     gcTime: 1000 * 60 * 60 * 24,
+    // This hook owns its own mount policy (see refetchFirstPageOnMount below),
+    // so React Query must not refetch on mount as well. Left on, any newly
+    // mounted observer of an *invalidated* feed refetches every page it has
+    // loaded — and the video-feed modal mounts a second observer on the cache
+    // key the grid behind it is still using, so the list reorders under the
+    // user mid-scroll. staleTime is no protection: an invalidated query counts
+    // as stale whatever staleTime says.
+    refetchOnMount: false,
     refetchInterval,
   });
 
@@ -74,14 +82,7 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
     if (!refetchFirstPageOnMount) {
       return;
     }
-    queryClient.setQueryData<{ pages: any[]; pageParams: any[] }>(cacheKey, (data) => {
-      if (data) {
-        return {
-          pages: (data?.pages as any[]).slice(0, 1),
-          pageParams: (data?.pageParams as any[]).slice(0, 1),
-        };
-      }
-    });
+    dropPagesAfterFirst(cacheKey);
     refetch();
   }, [refetch, cacheKey, refetchFirstPageOnMount]);
 
@@ -92,6 +93,22 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
     flatPages,
     queryParams: params,
   } as VideoPostQueryResult<T>;
+};
+
+/**
+ * Throw away every loaded page but the first, so the next refetch reloads one
+ * page instead of replaying the whole scrollback. Used on mount, and by feed
+ * screens that refresh on focus.
+ */
+export const dropPagesAfterFirst = (cacheKey: CacheKey) => {
+  queryClient.setQueryData<{ pages: any[]; pageParams: any[] }>(cacheKey, (data) => {
+    if (data) {
+      return {
+        pages: (data?.pages as any[]).slice(0, 1),
+        pageParams: (data?.pageParams as any[]).slice(0, 1),
+      };
+    }
+  });
 };
 
 export const updateVideoCache = (

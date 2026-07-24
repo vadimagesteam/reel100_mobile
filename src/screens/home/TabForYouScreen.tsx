@@ -1,4 +1,5 @@
-import React from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { AppHeader, AppHeaderHeight } from '../../components/appHeader';
 import { HideableView, HidebleContainer } from '../../components/hidebleContainer';
@@ -7,10 +8,12 @@ import { SearchInput } from '../../components/ui';
 import { VideoFeedProvider } from '../../components/videoFeed';
 import {
   FOR_YOU_CACHE_KEY,
+  dropPagesAfterFirst,
   useVideosInfiniteQuery,
 } from '../../components/videoFeed/hooks';
 import { VideoTiles } from '../../components/videoTiles';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
+import { queryClient } from '../../lib/api';
 import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
 
@@ -36,6 +39,21 @@ export const TabForYouScreen = () => {
 
   const { refetch } = controllers;
   const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
+
+  // Liking a video changes the affinities this feed is ranked by, and the like
+  // mutations mark the feed stale for it. Consume that on focus rather than on
+  // mount: this is a bottom tab, so it mounts once and then stays mounted —
+  // leaving the tab and coming back is a focus, not a remount, and without
+  // this the new ranking only appeared on pull-to-refresh.
+  useFocusEffect(
+    useCallback(() => {
+      if (!queryClient.getQueryState(FOR_YOU_CACHE_KEY)?.isInvalidated) {
+        return;
+      }
+      dropPagesAfterFirst(FOR_YOU_CACHE_KEY);
+      refetch();
+    }, [refetch]),
+  );
 
   // Never show a dead page: once the personalized feed has settled empty, fall
   // back to the search-bar recommendations (Most Active Creators + States).
