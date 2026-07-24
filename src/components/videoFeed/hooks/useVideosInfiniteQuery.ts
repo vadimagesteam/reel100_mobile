@@ -8,6 +8,14 @@ import { apiVideosFetcher, ApiVideosFetcherParams, VideoPost } from '../queries/
 import { useEffect, useMemo } from 'react';
 import { queryClient } from '../../../lib/api';
 
+/**
+ * Cache key of the personalized 4U feed. Lives here rather than in the screen
+ * because the like mutations have to reach it: a like changes the tag
+ * affinities the server ranks that feed by, which makes the cached pages
+ * stale.
+ */
+export const FOR_YOU_CACHE_KEY = ['for_you_videos'];
+
 export type usePostsInfiniteQueryParams = {
   limit?: number;
   cacheKey: CacheKey;

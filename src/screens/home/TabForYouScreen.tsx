@@ -1,11 +1,14 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { AppHeader, AppHeaderHeight } from '../../components/appHeader';
 import { HideableView, HidebleContainer } from '../../components/hidebleContainer';
 import { SearchRecommendations } from '../../components/search';
 import { SearchInput } from '../../components/ui';
 import { VideoFeedProvider } from '../../components/videoFeed';
-import { useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
+import {
+  FOR_YOU_CACHE_KEY,
+  useVideosInfiniteQuery,
+} from '../../components/videoFeed/hooks';
 import { VideoTiles } from '../../components/videoTiles';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
 import { useNavigation } from '../../navigation';
@@ -14,7 +17,9 @@ import { Screens } from '../../navigation/screens';
 export const TabForYouScreen = () => {
   const navigation = useNavigation();
 
-  const cacheKey = useMemo(() => ['for_you_videos'], []);
+  // Shared with the like mutations, which mark this feed stale once a like has
+  // changed the tag affinities the server ranks it by.
+  const cacheKey = FOR_YOU_CACHE_KEY;
 
   // The 4U feed itself is computed server-side (videos with >=3 likes + people
   // the user follows, minus one-way followers and already-watched videos) via

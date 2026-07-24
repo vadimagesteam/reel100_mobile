@@ -35,6 +35,7 @@ jest.mock('./useVideoFeedCacheKey', () => ({
 }));
 
 jest.mock('./useVideosInfiniteQuery', () => ({
+  FOR_YOU_CACHE_KEY: ['for_you_videos'],
   updateVideoCache: (...args: unknown[]) => mockUpdateVideoCache(...args),
 }));
 
@@ -311,5 +312,61 @@ describe('useLikeMutations — comment unlike uses the passed reaction id', () =
     const next = updater({ likedByMe: true, myReactionId: 'reaction-c1' });
     expect(next.likedByMe).toBe(false);
     expect(next.myReactionId).toBeNull();
+  });
+});
+
+describe('useLikeMutations — 4U feed staleness', () => {
+  // Seed the 4U cache the way the feed screen would, so invalidation has
+  // something real to act on.
+  const seedForYou = () => {
+    client.setQueryData(['for_you_videos'], { pages: [[{ id: 'v1' }]], pageParams: [0] });
+    return client.getQueryState(['for_you_videos'])!;
+  };
+
+  it('marks the 4U feed stale after a video like, without refetching it', async () => {
+    mockPost.mockResolvedValue({ data: { id: 'reaction-1' } });
+    seedForYou();
+    const hook = renderLikeHook(client);
+
+    ReactTestRenderer.act(() => {
+      hook.current.like.mutate({ type: 'video', id: 'v1', authorId: 'other' });
+    });
+    await flush();
+
+    const state = client.getQueryState(['for_you_videos'])!;
+    // Stale, so the next mount picks up the new ranking...
+    expect(state.isInvalidated).toBe(true);
+    // ...but not refetched now: the like usually happens inside 4U itself and
+    // a refetch would reorder the list mid-scroll.
+    expect(state.fetchStatus).toBe('idle');
+    expect(state.data).toEqual({ pages: [[{ id: 'v1' }]], pageParams: [0] });
+  });
+
+  it('leaves the 4U feed alone for a comment like', async () => {
+    mockPost.mockResolvedValue({ data: { id: 'reaction-1' } });
+    seedForYou();
+    const hook = renderLikeHook(client);
+
+    ReactTestRenderer.act(() => {
+      hook.current.like.mutate({ type: 'comment', id: 'c1', authorId: 'other', videoId: 'v1' });
+    });
+    await flush();
+
+    // The backend only records tag affinity for video likes.
+    expect(client.getQueryState(['for_you_videos'])!.isInvalidated).toBe(false);
+  });
+
+  it('leaves the 4U feed alone when the like fails', async () => {
+    mockPost.mockRejectedValue(new Error('network'));
+    seedForYou();
+    const hook = renderLikeHook(client);
+
+    ReactTestRenderer.act(() => {
+      hook.current.like.mutate({ type: 'video', id: 'v1', authorId: 'other' });
+    });
+    await flush();
+
+    // Nothing was recorded server-side, so the ranking has not moved.
+    expect(client.getQueryState(['for_you_videos'])!.isInvalidated).toBe(false);
   });
 });

@@ -4,7 +4,7 @@ import { api } from '../../../lib/api';
 import { useUser, useAuthActions } from '../../../state/user/authStore';
 import { UserType } from '../../../state/user/types';
 import { useVideoFeedCacheKey } from './useVideoFeedCacheKey';
-import { updateVideoCache } from './useVideosInfiniteQuery';
+import { FOR_YOU_CACHE_KEY, updateVideoCache } from './useVideosInfiniteQuery';
 import { commentsCacheKey, updateCommentCache } from '../comments/hooks/useCommentsInfiniteQuery';
 
 type LikeArgs = {
@@ -66,17 +66,29 @@ export const useLikeMutations = () => {
   };
 
   // A video like/unlike shifts the search recommendation scores (score uses
-  // likes) and the liked user's total-likes shown in combined search. Mark
-  // those stale so the search screens refetch fresh numbers next time they
-  // open. Skipped on error (nothing changed) and for comment likes (the
-  // backend only refreshes search stats for video Like reactions). The
-  // Choose-Your-State counts are upload-based, so a like leaves them untouched.
-  const invalidateSearchOnVideoLike = (type: 'video' | 'comment', error: unknown) => {
+  // likes) and the liked user's total-likes shown in combined search. It also
+  // moves the liker's tag affinities, which is what the server ranks the 4U
+  // feed by — so the cached 4U pages no longer reflect what the user is
+  // interested in. Mark all of it stale. Skipped on error (nothing changed)
+  // and for comment likes (the backend only refreshes search stats, and only
+  // records affinity, for video Like reactions). The Choose-Your-State counts
+  // are upload-based, so a like leaves them untouched.
+  const invalidateOnVideoLike = (type: 'video' | 'comment', error: unknown) => {
     if (error || type !== 'video') {
       return;
     }
     queryClient.invalidateQueries({ queryKey: ['search', 'recommendations'] });
     queryClient.invalidateQueries({ queryKey: ['search', 'combined'] });
+
+    // Deliberately no refetch: the like usually happens inside the 4U feed
+    // itself, and refetching would reorder the list under the user's thumb
+    // mid-scroll. Marking it stale is enough — TabForYouScreen drops every
+    // page but the first and refetches on mount, and pull-to-refresh is
+    // always there, so the new order lands on the next visit instead.
+    queryClient.invalidateQueries({
+      queryKey: FOR_YOU_CACHE_KEY,
+      refetchType: 'none',
+    });
   };
 
   // The profile `likeCount` stat counts likes on the user's VIDEOS (see the
@@ -191,7 +203,7 @@ export const useLikeMutations = () => {
     onSettled: (_data, error, { type, id }) => {
       const key = ['like', type, userId, id];
       queryClient.invalidateQueries({ queryKey: key });
-      invalidateSearchOnVideoLike(type, error);
+      invalidateOnVideoLike(type, error);
     },
     retry: 3,
   });
@@ -248,7 +260,7 @@ export const useLikeMutations = () => {
     onSettled: (_data, error, { type, id }) => {
       const key = ['like', type, userId, id];
       queryClient.invalidateQueries({ queryKey: key });
-      invalidateSearchOnVideoLike(type, error);
+      invalidateOnVideoLike(type, error);
     },
     retry: 3,
   });
