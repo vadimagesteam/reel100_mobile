@@ -3,9 +3,9 @@ import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBackArrowButton } from '../../components/appHeader';
 import {
-  CombinedSearchList,
   SearchRecommendations,
-  useCombinedSearchQuery,
+  SearchSections,
+  useSearchSectionsQuery,
 } from '../../components/search';
 import { SearchInput } from '../../components/ui';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
@@ -18,7 +18,7 @@ export const UserSearchScreen = () => {
   const hasSearch = trimmed.length > 0;
   const debouncedQuery = useDebouncedValue(trimmed, 300);
 
-  const { data, isLoading, isError } = useCombinedSearchQuery(debouncedQuery, {
+  const { data, isLoading, isError } = useSearchSectionsQuery(debouncedQuery, {
     enabled: hasSearch,
   });
 
@@ -36,7 +36,7 @@ export const UserSearchScreen = () => {
       <View className="mb-2 flex-row items-center gap-x-3">
         <HeaderBackArrowButton />
         <SearchInput
-          placeholder="Search creators and states"
+          placeholder="Search creators, states and hashtags"
           autoCorrect={false}
           autoFocus
           value={searchText}
@@ -48,12 +48,11 @@ export const UserSearchScreen = () => {
         className="flex-1"
       >
         {hasSearch ? (
-          <CombinedSearchList
+          <SearchSections
             data={data}
             isLoading={isSearching}
             isError={isError}
-            searchQuery={searchText}
-            onTagPress={setSearchText}
+            searchQuery={debouncedQuery}
           />
         ) : (
           <SearchRecommendations />
