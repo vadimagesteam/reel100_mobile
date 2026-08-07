@@ -8,6 +8,7 @@ export enum MessageType {
   CommentLike = 'comment_like',
   VideoProcessed = 'video_processed',
   Top100 = 'top100',
+  Tag = 'tag',
 }
 
 export type ChatMessage = {
@@ -49,6 +50,16 @@ export type Top100 = {
   position?: string;
 };
 
+/**
+ * A shared hashtag page. `tags` arrives comma-separated because a deep link is
+ * a flat string of query params — and it is a list, not one name, so a shared
+ * "#oregon + #fishing" opens the intersection rather than one of its halves.
+ */
+export type TagLink = {
+  type: MessageType.Tag;
+  tags: string;
+};
+
 export type NotificationDataType =
   | ChatMessage
   | Follow
@@ -56,4 +67,5 @@ export type NotificationDataType =
   | VideoComment
   | CommentLike
   | VideoProcessed
-  | Top100;
+  | Top100
+  | TagLink;

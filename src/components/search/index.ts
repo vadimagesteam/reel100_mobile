@@ -1,5 +1,7 @@
 export * from './types';
 export * from './StateAvatar';
+export * from './TagShareButton';
+export * from './tagLink';
 export * from './StateSilhouette';
 export * from './SearchStats';
 export * from './SearchRecommendations';

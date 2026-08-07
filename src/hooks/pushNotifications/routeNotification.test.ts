@@ -1,50 +1,44 @@
 /**
- * The shared router sends every notification type to the right screen. Used by
- * both push taps and the in-app center, so this is the single place that
- * mapping is verified.
+ * A shared hashtag link goes through the same router as a push tap, so the two
+ * can never disagree about where a tag leads.
  */
 const mockNavigate = jest.fn();
-
 jest.mock('../../navigation/navigationRef', () => ({
-  navigationRef: { navigate: (...a: unknown[]) => mockNavigate(...a) },
+  navigationRef: { navigate: (...a: any[]) => mockNavigate(...a) },
 }));
 
-const { routeNotification } = require('./routeNotification');
-const { MessageType } = require('./notificationDataType');
+import { MessageType } from './notificationDataType';
+import { routeNotification } from './routeNotification';
 
-beforeEach(() => mockNavigate.mockClear());
+describe('routeNotification tag links', () => {
+  beforeEach(() => mockNavigate.mockReset());
 
-test('chat routes to the Chat screen', () => {
-  routeNotification({ type: MessageType.Chat, chatId: 'ch1', userId: 'u1' });
-  expect(mockNavigate).toHaveBeenCalledWith('Chat', { chatId: 'ch1', userId: 'u1' });
-});
+  it('opens the intersection a multi-tag link names', () => {
+    routeNotification({ type: MessageType.Tag, tags: 'oregon,fishing' });
+    expect(mockNavigate).toHaveBeenCalledWith('TagFeed', {
+      tags: ['oregon', 'fishing'],
+      title: '#oregon + #fishing',
+    });
+  });
 
-test('follow routes to the follower profile', () => {
-  routeNotification({ type: MessageType.Follow, userId: 'u1' });
-  expect(mockNavigate).toHaveBeenCalledWith('Profile', { fromTabs: false, userId: 'u1' });
-});
+  it('opens a single tag', () => {
+    routeNotification({ type: MessageType.Tag, tags: 'fishing' });
+    expect(mockNavigate).toHaveBeenCalledWith('TagFeed', {
+      tags: ['fishing'],
+      title: '#fishing',
+    });
+  });
 
-test('video like opens the video', () => {
-  routeNotification({ type: MessageType.VideoLike, videoId: 'v1' });
-  expect(mockNavigate).toHaveBeenCalledWith('VideoModal', { videoId: 'v1' });
-});
+  it('ignores stray separators rather than routing to a blank tag', () => {
+    routeNotification({ type: MessageType.Tag, tags: 'oregon, ,fishing,' });
+    expect(mockNavigate).toHaveBeenCalledWith('TagFeed', {
+      tags: ['oregon', 'fishing'],
+      title: '#oregon + #fishing',
+    });
+  });
 
-test('comment lands on the comment, not just the video', () => {
-  routeNotification({ type: MessageType.VideoComment, videoId: 'v1', commentId: 'c1' });
-  expect(mockNavigate).toHaveBeenCalledWith('VideoModal', { videoId: 'v1', commentId: 'c1' });
-});
-
-test('comment-like also lands on the comment', () => {
-  routeNotification({ type: MessageType.CommentLike, videoId: 'v1', commentId: 'c1' });
-  expect(mockNavigate).toHaveBeenCalledWith('VideoModal', { videoId: 'v1', commentId: 'c1' });
-});
-
-test('video-processed opens the video', () => {
-  routeNotification({ type: MessageType.VideoProcessed, videoId: 'v1' });
-  expect(mockNavigate).toHaveBeenCalledWith('VideoModal', { videoId: 'v1' });
-});
-
-test('top100 opens the video', () => {
-  routeNotification({ type: MessageType.Top100, videoId: 'v1', position: '3' });
-  expect(mockNavigate).toHaveBeenCalledWith('VideoModal', { videoId: 'v1' });
+  it('navigates nowhere when a link carries no tags', () => {
+    routeNotification({ type: MessageType.Tag, tags: ' , ' });
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
 });

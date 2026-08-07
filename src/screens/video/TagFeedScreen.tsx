@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import clsx from 'clsx';
 import { HeaderBackArrowButton } from '../../components/appHeader';
 import { useTagVideosHeaderQuery, type TagVideoSort } from '../../components/search/hooks';
+import { TagShareButton } from '../../components/search/TagShareButton';
 import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
 import { VideoPost } from '../../components/videoFeed/queries/apiVideosFetcher';
 import { VideoTiles } from '../../components/videoTiles';
@@ -58,7 +59,7 @@ export const TagFeedScreen = () => {
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-background">
       <View className="flex-row items-center gap-x-3 px-4 pb-2">
         <HeaderBackArrowButton />
-        <View className="flex-1 pr-9">
+        <View className="flex-1">
           <Text numberOfLines={1} className="text-center text-xl font-bold text-primary">
             {title}
           </Text>
@@ -68,6 +69,7 @@ export const TagFeedScreen = () => {
             </Text>
           )}
         </View>
+        <TagShareButton tags={tags} title={title} />
       </View>
 
       <View className="flex-row border-b-[0.5px] border-b-gray-800">

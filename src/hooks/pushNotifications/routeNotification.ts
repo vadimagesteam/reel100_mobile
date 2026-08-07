@@ -46,6 +46,24 @@ export const routeNotification = (data: NotificationDataType) => {
       });
       break;
 
+    // A shared hashtag link. Routed here rather than through its own handler so
+    // there stays exactly one place that decides where a link leads.
+    case MessageType.Tag: {
+      const tags = data.tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+      if (tags.length === 0) {
+        console.error('Tag link carried no tags', data);
+        break;
+      }
+      navigationRef.navigate(Screens.TagFeed, {
+        tags,
+        title: tags.map((t) => `#${t}`).join(' + '),
+      });
+      break;
+    }
+
     default:
       console.error('Unable to handle notification', data);
   }
