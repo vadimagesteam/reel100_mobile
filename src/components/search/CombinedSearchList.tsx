@@ -105,6 +105,13 @@ export const CombinedSearchList = ({
           );
         }
 
+        // Hashtag rows are rendered by the sectioned results screen, which
+        // supersedes this list; this component only ever receives the three
+        // older types.
+        if (item.type === 'tag') {
+          return null;
+        }
+
         // Video result: opens the video; its tags are tappable to browse.
         return (
           <View className={rowClassName}>

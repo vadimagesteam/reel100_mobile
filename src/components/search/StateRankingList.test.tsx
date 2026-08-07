@@ -29,8 +29,12 @@ jest.mock('./SearchStats', () => ({ StateStatLine: () => null }));
 jest.mock('./StateAvatar', () => ({ StateAvatar: () => null }));
 
 const DATA: StateRankingItem[] = [
-  { id: '1', label: 'Texas', slug: 'tx', uploadsToday: 9, uploadsLast7Days: 40 },
-  { id: '2', label: 'Alabama', slug: 'al', uploadsToday: 0, uploadsLast7Days: 1 },
+  { id: '1', label: 'Texas', slug: 'tx', uploadsToday: 9, totalUploads: 0,
+    totalLikes: 0,
+    uploadsLast7Days: 40 },
+  { id: '2', label: 'Alabama', slug: 'al', uploadsToday: 0, totalUploads: 0,
+    totalLikes: 0,
+    uploadsLast7Days: 1 },
 ];
 
 const render = (sort: 'most_active' | 'alphabetical') =>

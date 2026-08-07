@@ -37,6 +37,7 @@ export const Screens = {
   VideoModal: 'VideoModal',
   VideoFeedModal: 'VideoFeedModal',
   Notifications: 'Notifications',
+  TagFeed: 'TagFeed',
 } as const;
 
 export type AuthStackParamList = {
@@ -75,6 +76,12 @@ export type AppStackParamList = {
         video: VideoPost;
       }
     | { videoId: string; commentId?: string };
+  /**
+   * The hashtag page. `tags` is a list because several tags intersect —
+   * #oregon + #fishing is the videos carrying both. `title` is what the caller
+   * already knows to show while the resolved labels load.
+   */
+  TagFeed: { tags: string[]; title?: string };
   VideoFeedModal: {
     queryParams: usePostsInfiniteQueryParams;
     feedState: Partial<Omit<VideoFeedStore, 'actions'>>;

@@ -16,6 +16,7 @@ import {
   VideoModalScreen,
   DeleteAccountScreen,
   VideoFeedModalScreen,
+  TagFeedScreen,
   AdDebugScreen,
   NotificationsScreen,
 } from '../screens';
@@ -87,6 +88,14 @@ export const AppNavigator = () => (
     <Stack.Screen
       name={Screens.VideoModal}
       component={VideoModalScreen}
+      options={{
+        animation: 'fade_from_bottom',
+        animationDuration: 200,
+      }}
+    />
+    <Stack.Screen
+      name={Screens.TagFeed}
+      component={TagFeedScreen}
       options={{
         animation: 'fade_from_bottom',
         animationDuration: 200,

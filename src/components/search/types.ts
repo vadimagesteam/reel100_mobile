@@ -55,6 +55,33 @@ export type SearchStateResult = {
   slug: string;
   uploadsToday: number;
   uploadsLast7Days: number;
+  /** Lifetime uploads, shown on the search row. */
+  totalUploads: number;
+  /** Lifetime likes across the state's videos. */
+  totalLikes: number;
+};
+
+export type SearchTagRef = {
+  id: string;
+  /** Normalized lookup key, and what the hashtag page is addressed by. */
+  name: string;
+  label: string;
+};
+
+/**
+ * A hashtag row. Carries a list of tags rather than one, so a plain tag and a
+ * combination (#oregon + #fishing) are the same shape: one row component, one
+ * navigation target.
+ */
+export type SearchTagResult = {
+  type: 'tag';
+  id: string;
+  name: string;
+  /** Display text, e.g. "Fishing" or "Oregon + Fishing". */
+  label: string;
+  /** One entry is a plain tag; more than one is an intersection. */
+  tags: SearchTagRef[];
+  videosCount: number;
 };
 
 export type SearchVideoResult = {
@@ -74,11 +101,37 @@ export type SearchVideoResult = {
   };
 };
 
-/** GET /api/search?q= — combined, alphabetically-sorted users + states. */
 export type CombinedSearchResult =
   | SearchUserResult
   | SearchStateResult
+  | SearchTagResult
   | SearchVideoResult;
+
+/**
+ * One section's rows.
+ *
+ * `hasMore` rather than a total: the design's section headers show no count,
+ * only "View all", so all the app needs to know is whether that link belongs
+ * there and when paging has run out.
+ */
+export type SearchSection<T> = {
+  items: T[];
+  hasMore: boolean;
+};
+
+/** GET /api/search/sections?q= — one preview per section. */
+export type SearchSectionsResponse = {
+  creators: SearchSection<SearchUserResult>;
+  states: SearchSection<SearchStateResult>;
+  hashtags: SearchSection<SearchTagResult>;
+  videos: SearchSection<SearchVideoResult>;
+};
+
+/** The `type` query param of GET /api/search/section. */
+export type SearchSectionType = 'creator' | 'state' | 'hashtag' | 'video';
+
+/** GET /api/search/section?q=&type= — one page of a single section. */
+export type SearchSectionPageResponse = SearchSection<CombinedSearchResult>;
 
 /** GET /api/search/states?sort=most_active|alphabetical */
 export type StateRankingItem = {
@@ -87,6 +140,8 @@ export type StateRankingItem = {
   slug: string;
   uploadsToday: number;
   uploadsLast7Days: number;
+  totalUploads: number;
+  totalLikes: number;
 };
 
 export type StateRankingSort = 'most_active' | 'alphabetical';
