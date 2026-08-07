@@ -26,6 +26,7 @@ export * from './video/VideoRecordingScreen';
 export * from './video/VideoModalScreen';
 export * from './video/VideoFeedModalScreen';
 export * from './video/TagFeedScreen';
+export * from './user/SearchSectionScreen';
 
 // chat
 export * from './chat/ChatListScreen';
