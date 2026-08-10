@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { HeaderBackArrowButton } from '../../components/appHeader';
 import { useTagVideosHeaderQuery, type TagVideoSort } from '../../components/search/hooks';
 import { TagShareButton } from '../../components/search/TagShareButton';
+import { VideoFeedProvider } from '../../components/videoFeed/provider/VideoFeedProvider';
 import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
 import { VideoPost } from '../../components/videoFeed/queries/apiVideosFetcher';
 import { VideoTiles } from '../../components/videoTiles';
@@ -23,8 +24,19 @@ const TABS: { key: TagVideoSort; label: string }[] = [
  * Several tags intersect rather than union, so #oregon + #fishing is the videos
  * carrying both — the same thing the combination row in search stands for, and
  * the reason this screen takes a list of tags rather than one.
+ *
+ * The grid and the cache-key hook both read the video-feed store, so the
+ * provider has to sit above the component that uses them rather than inside it
+ * — hence the split. Deleting is off: these are other people's videos, and the
+ * only screen that allows it is a profile looking at its own.
  */
-export const TagFeedScreen = () => {
+export const TagFeedScreen = () => (
+  <VideoFeedProvider initialState={{ allowDelete: false }}>
+    <TagFeedContent />
+  </VideoFeedProvider>
+);
+
+const TagFeedContent = () => {
   const { params } = useRoute<'TagFeed'>();
   const insets = useSafeAreaInsets();
   const [sort, setSort] = useState<TagVideoSort>('top');
