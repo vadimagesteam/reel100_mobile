@@ -21,6 +21,11 @@ export interface NotificationRowProps {
  * One notification card: a circular type icon over the actor's avatar, a bold
  * title line, a muted subtitle + relative time, an unread dot, and a chevron.
  * Swipe left to reveal Delete. Unread rows read as slightly brighter surface.
+ *
+ * System notifications ("Your rush is ready", "You hit the Top 100") have no
+ * actor, so there is no avatar to draw. They show the type icon on its own
+ * rather than an initials bubble — the placeholder used to fall back to the
+ * letter R, which read as a person named R having done something.
  */
 export const NotificationRow = ({ item, onPress, onDelete }: NotificationRowProps) => {
   const swipeRef = useRef<SwipeableMethods>(null);
@@ -52,12 +57,20 @@ export const NotificationRow = ({ item, onPress, onDelete }: NotificationRowProp
           item.read ? 'bg-surface' : 'bg-input'
         }`}
       >
-        <View className="relative">
-          <Avatar size={44} name={item.actor ? getDisplayName(item.actor) : 'R'} uri={item.actor?.avatar} />
-          <View className="absolute -bottom-1 -right-1 h-5 w-5 items-center justify-center rounded-full border border-background bg-surface">
-            <SvgIcon image={icon} color={colors.white} style={styles.typeIcon} />
+        {/* The system-notification circle is bg-graphite, not bg-input: unread
+            cards already use bg-input as their own background. */}
+        {item.actor ? (
+          <View className="relative">
+            <Avatar size={44} name={getDisplayName(item.actor)} uri={item.actor.avatar} />
+            <View className="absolute -bottom-1 -right-1 h-5 w-5 items-center justify-center rounded-full border border-background bg-surface">
+              <SvgIcon image={icon} color={colors.white} style={styles.typeIcon} />
+            </View>
           </View>
-        </View>
+        ) : (
+          <View className="h-11 w-11 items-center justify-center rounded-full bg-graphite">
+            <SvgIcon image={icon} color={colors.white} style={styles.systemIcon} />
+          </View>
+        )}
 
         <View className="flex-1">
           <Text className="font-bold text-silver1" numberOfLines={1}>
@@ -77,4 +90,5 @@ export const NotificationRow = ({ item, onPress, onDelete }: NotificationRowProp
 
 const styles = StyleSheet.create({
   typeIcon: { width: 11, height: 11 },
+  systemIcon: { width: 20, height: 20 },
 });
