@@ -32,7 +32,11 @@ export const AppNavigator = () => (
       headerStyle: { backgroundColor: colors.background },
       headerTintColor: colors.primary,
       contentStyle: { backgroundColor: colors.background },
-      fullScreenGestureEnabled: true,
+      // Edge-only back swipe, not the full-width one. With the full-screen
+      // gesture on, any horizontal drift while scrolling a feed reads as a
+      // back swipe and pops the screen mid-scroll — the whole app is vertical
+      // lists, so that misfires constantly on a real phone.
+      fullScreenGestureEnabled: false,
       // eslint-disable-next-line react/no-unstable-nested-components
       headerLeft: () => <HeaderBackArrowButton />,
     }}
