@@ -21,6 +21,7 @@ import { GestureTouchableOpacity } from './GestureTouchableOpacity';
 import { IconHeart } from './IconHeart';
 import { useVideoFeed } from './hooks';
 import { VideoDescription } from './VideoDescription';
+import { VideoTagChips } from './VideoTagChips';
 
 export interface VideoInfoOverlayProps {
   isPlayerFullScreen: boolean;
@@ -259,6 +260,12 @@ export const VideoInfoOverlay = ({
             {formatVideoTimestamp(video.createdAt)}
           </Text>
         </View>
+
+        {/* The author's hashtags, under the caption they belong to. A sibling
+            row rather than a wrapper around VideoDescription: that component
+            animates itself between relative and absolute positioning, and a
+            wrapping View would silently become its containing block. */}
+        {video.tags && <VideoTagChips tags={video.tags} />}
       </Animated.View>
     </View>
   );

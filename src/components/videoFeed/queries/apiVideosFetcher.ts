@@ -60,6 +60,13 @@ export type VideoState = {
   label: string;
 };
 
+/** A hashtag on a video: `name` addresses the hashtag page, `label` prints. */
+export type VideoTag = {
+  id: string;
+  name: string;
+  label: string;
+};
+
 export type VideoPost = {
   id: string;
   label: string;
@@ -75,6 +82,11 @@ export type VideoPost = {
   description: string;
   user: VideoUser;
   states: VideoState[];
+  /**
+   * The hashtags the author attached. Optional because feeds that predate the
+   * field — and cached pages written before this shipped — have none.
+   */
+  tags?: VideoTag[];
   top_100Position: number | null;
   top_100Date: string | null;
 };
@@ -174,6 +186,7 @@ const qqlQuery = `query(
           }
         }
         states { id slug label }
+        tags { id name label }
         top_100Position
         top_100Date
     }
