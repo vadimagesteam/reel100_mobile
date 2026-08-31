@@ -6,6 +6,7 @@ export * from './StateSilhouette';
 export * from './SearchStats';
 export * from './SearchRecommendations';
 export * from './SearchResultRows';
+export * from './VideoResultsGrid';
 export * from './SearchSections';
 export * from './StateRankingList';
 export * from './hooks';

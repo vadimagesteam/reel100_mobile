@@ -1,10 +1,11 @@
 import { FlashList } from '@shopify/flash-list';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBackArrowButton } from '../../components/appHeader';
 import { useSearchSectionQuery } from '../../components/search/hooks';
 import { SearchResultRow } from '../../components/search/SearchResultRows';
-import { CombinedSearchResult } from '../../components/search/types';
+import { VideoResultCard } from '../../components/search/VideoResultsGrid';
+import { CombinedSearchResult, SearchVideoResult } from '../../components/search/types';
 import { FlexLoading, ListEmptyBlock } from '../../components/ui';
 import { useRoute } from '../../navigation';
 
@@ -22,6 +23,11 @@ export const SearchSectionScreen = () => {
 
   const { items, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useSearchSectionQuery(params.query, params.type);
+
+  // Videos render as a two-column grid here for the same reason they do in the
+  // preview card: a full list of them is exactly where thumbnails matter most.
+  // FlashList takes them two per row so paging still works.
+  const isVideoSection = params.type === 'video';
 
   return (
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-background">
@@ -42,9 +48,17 @@ export const SearchSectionScreen = () => {
       ) : (
         <FlashList<CombinedSearchResult>
           data={items}
-          estimatedItemSize={68}
+          numColumns={isVideoSection ? 2 : 1}
+          estimatedItemSize={isVideoSection ? 220 : 68}
           keyExtractor={(item) => `${item.type}:${item.id}`}
-          renderItem={({ item }) => <SearchResultRow item={item} />}
+          renderItem={({ item }) =>
+            isVideoSection ? (
+              <VideoResultCard item={item as SearchVideoResult} />
+            ) : (
+              <SearchResultRow item={item} />
+            )
+          }
+          contentContainerStyle={isVideoSection ? styles.gridContent : styles.listContent}
           onEndReachedThreshold={0.5}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {
@@ -73,3 +87,10 @@ export const SearchSectionScreen = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  // The grid's cards carry their own gutter, so the list only adds the outer
+  // margin that keeps them off the screen edges.
+  gridContent: { paddingHorizontal: 10, paddingTop: 8 },
+  listContent: { paddingTop: 8 },
+});

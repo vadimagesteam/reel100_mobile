@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
 import { colors } from '../../theme';
-import { formatNumberShort } from '../../utils';
+import { formatNumberShort, videoDisplayTitle } from '../../utils';
 import { Avatar } from '../ui';
 import { useOpenStatePage } from './hooks/useOpenStatePage';
 import { StatPill } from './SearchStats';
@@ -46,8 +46,10 @@ export const CreatorRow = ({ item }: { item: SearchUserResult }) => {
     >
       <Avatar uri={item.avatar} size={44} name={item.name} />
       <View className="flex-1">
+        {/* `username` is the sign-up email — the app has no handle — so the
+            row shows the display name the backend resolves instead. */}
         <Text numberOfLines={1} className="text-base font-semibold text-primary">
-          @{item.username}
+          {item.name}
         </Text>
         <CountsLine uploads={item.totalUploads} likes={item.totalLikes} />
       </View>
@@ -137,7 +139,7 @@ export const VideoRow = ({ item }: { item: SearchVideoResult }) => {
         </View>
         <View className="flex-1">
           <Text numberOfLines={1} className="text-base font-semibold text-primary">
-            {item.label}
+            {videoDisplayTitle(item)}
           </Text>
           <View className="flex-row items-center gap-2">
             <Text numberOfLines={1} className="text-sm text-muted">

@@ -6,7 +6,13 @@ import { Screens } from '../../navigation/screens';
 import { IonIconType } from '../ui/IonIconTypes';
 import { FlexLoading, ListEmptyBlock } from '../ui';
 import { SearchResultRow } from './SearchResultRows';
-import { CombinedSearchResult, SearchSectionsResponse, SearchSectionType } from './types';
+import { VideoResultsGrid } from './VideoResultsGrid';
+import {
+  CombinedSearchResult,
+  SearchSectionsResponse,
+  SearchSectionType,
+  SearchVideoResult,
+} from './types';
 
 export interface SearchSectionsProps {
   data?: SearchSectionsResponse;
@@ -135,9 +141,15 @@ export const SearchSections = ({
             hasMore={section.hasMore}
             query={searchQuery}
           >
-            {(section.items as CombinedSearchResult[]).map((item) => (
-              <SearchResultRow key={`${item.type}:${item.id}`} item={item} />
-            ))}
+            {/* Videos are the one section shown as thumbnails: a row of play
+                icons says nothing about which video you're looking for. */}
+            {spec.key === 'videos' ? (
+              <VideoResultsGrid items={section.items as SearchVideoResult[]} />
+            ) : (
+              (section.items as CombinedSearchResult[]).map((item) => (
+                <SearchResultRow key={`${item.type}:${item.id}`} item={item} />
+              ))
+            )}
           </SectionCard>
         );
       })}

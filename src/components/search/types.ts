@@ -87,11 +87,14 @@ export type SearchTagResult = {
 export type SearchVideoResult = {
   type: 'video';
   id: string;
-  /** Video title. */
+  /** Video title. Older uploads carry the recording's file name — see
+   * `videoDisplayTitle`, which is what should be rendered. */
   label: string;
   description: string | null;
   slug: string;
   likesCount: number;
+  /** Poster frame for the results grid. Null while the upload is encoding. */
+  thumbnail: string | null;
   /** User-authored tag labels, tappable to browse the tag. */
   tags: string[];
   user: {

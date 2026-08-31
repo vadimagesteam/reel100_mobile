@@ -2,8 +2,14 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { api } from '../../../lib/api';
 import { SearchSectionsResponse } from '../types';
 
-/** Rows previewed per section before "View all" takes over. */
-export const SECTION_PREVIEW_SIZE = 3;
+/**
+ * Rows previewed per section before "View all" takes over.
+ *
+ * Four rather than three so the videos section, which renders as a two-column
+ * grid, previews a complete 2x2 instead of a row and a half. The backend
+ * derives `hasMore` from this same number, so "View all" stays honest.
+ */
+export const SECTION_PREVIEW_SIZE = 4;
 
 /**
  * The whole results screen in one request: creators, states, hashtags and
