@@ -49,13 +49,20 @@ export const useVideosInfiniteQuery = <T extends VideoPost = VideoPost>(
     cacheKey,
     where,
     orderBy,
+    tags,
+    tagSort,
     refetchInterval,
     refetchFirstPageOnMount = true,
   } = params;
   const hookResult = useInfiniteQuery({
     queryKey: cacheKey,
     queryFn: async ({ pageParam = 0 }) => {
-      return apiVideosFetcher({ take: limit, skip: pageParam, where, orderBy });
+      // `tags`/`tagSort` have to travel with the rest: the fetcher routes a
+      // tagged request to the tags endpoint, and dropping them here sent the
+      // hashtag page down the plain GraphQL path with an empty `where` — so
+      // every hashtag showed the same unfiltered feed, and its Top/Recent tabs
+      // reordered nothing.
+      return apiVideosFetcher({ take: limit, skip: pageParam, where, orderBy, tags, tagSort });
     },
     getNextPageParam: (lastPage, allPages) => {
       const totalLoaded = allPages.flat().length;

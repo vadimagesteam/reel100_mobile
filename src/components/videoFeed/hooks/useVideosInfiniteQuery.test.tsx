@@ -27,12 +27,13 @@ const { useVideosInfiniteQuery } = require('./useVideosInfiniteQuery');
 
 const CACHE_KEY = ['for_you_videos'];
 
-function mountFeed(refetchFirstPageOnMount: boolean) {
+function mountFeed(refetchFirstPageOnMount: boolean, params: Record<string, unknown> = {}) {
   function Harness() {
     useVideosInfiniteQuery({
       cacheKey: CACHE_KEY,
       where: { forMe: true },
       refetchFirstPageOnMount,
+      ...params,
     });
     return null;
   }
@@ -97,5 +98,19 @@ describe('useVideosInfiniteQuery — a second observer on a stale shared feed', 
     await flush();
 
     expect(mockFetcher.mock.calls.length).toBeGreaterThan(afterFirst);
+  });
+});
+
+describe('useVideosInfiniteQuery — the hashtag page', () => {
+  it('forwards tags and the sort to the fetcher', async () => {
+    // Without these the fetcher takes its GraphQL branch with an empty filter,
+    // which is why every hashtag page listed the same videos and why the
+    // Top/Recent tabs appeared to do nothing.
+    mountFeed(true, { tags: ['basketball'], tagSort: 'recent' });
+    await flush();
+
+    expect(mockFetcher).toHaveBeenCalledWith(
+      expect.objectContaining({ tags: ['basketball'], tagSort: 'recent' }),
+    );
   });
 });
