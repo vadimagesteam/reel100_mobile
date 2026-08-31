@@ -17,9 +17,11 @@ export const DescriptionMaxLength = 600;
 const inputStyle: TextStyle = {
   // Grow with content up to a few lines, then scroll inside the card rather
   // than pushing the layout around.
-  minHeight: 40,
-  maxHeight: 120,
+  minHeight: 44,
+  maxHeight: 132,
   textAlignVertical: 'top',
+  fontSize: 16,
+  lineHeight: 21,
 };
 
 /**
@@ -32,7 +34,7 @@ const inputStyle: TextStyle = {
  */
 export const VideoDescriptionInput = ({ value, setValue }: VideoDescriptionInputProps) => {
   return (
-    <View className="rounded-2xl bg-[#d2d4db] px-3 pb-1.5 pt-2.5">
+    <View className="rounded-2xl bg-[#d2d4db] px-3 pb-1.5 pt-3">
       <View className="flex-row items-start gap-2">
         <SvgIcon image="commentIcon" color={colors.graphite} style={captionIconStyle} />
         <TextInput
@@ -49,11 +51,11 @@ export const VideoDescriptionInput = ({ value, setValue }: VideoDescriptionInput
           onChangeText={setValue}
         />
       </View>
-      <Text className="self-end text-[11px] text-graphite/70">
+      <Text className="self-end text-xs text-graphite/70">
         {value.length}/{DescriptionMaxLength}
       </Text>
     </View>
   );
 };
 
-const captionIconStyle = { width: 18, height: 18, marginTop: 2 };
+const captionIconStyle = { width: 20, height: 20, marginTop: 2 };

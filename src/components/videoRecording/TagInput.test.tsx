@@ -17,30 +17,37 @@ jest.mock('./hooks/useTagSuggestions', () => ({
 // The ui barrel pulls reanimated (untransformed); the input only needs SvgIcon.
 jest.mock('../ui', () => ({ SvgIcon: () => null }));
 
-const { TagInput, MAX_TAGS } = require('./TagInput');
+const { TagInput, MAX_TAGS, commitPendingTag } = require('./TagInput');
 
+/**
+ * The draft is a controlled prop now (the posting screen owns it so publishing
+ * can commit a half-typed tag), so the harness has to play that part.
+ */
 function renderInput(initial: string[] = []) {
-  let tags = initial;
-  const setTags = jest.fn((next: string[]) => {
-    tags = next;
-  });
+  const tags = initial;
+  let draft = '';
+  const setTags = jest.fn();
   let tree!: ReactTestRenderer.ReactTestRenderer;
-  ReactTestRenderer.act(() => {
-    tree = ReactTestRenderer.create(
-      React.createElement(TagInput, { tags, setTags }),
-    );
-  });
-  const rerender = (next: string[]) =>
-    ReactTestRenderer.act(() => {
-      tree.update(React.createElement(TagInput, { tags: next, setTags }));
+  const render = () =>
+    React.createElement(TagInput, {
+      tags,
+      setTags,
+      draft,
+      setDraft: (next: string) => {
+        draft = next;
+        ReactTestRenderer.act(() => tree.update(render()));
+      },
     });
-  return { tree, setTags, rerender };
+  ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(render());
+  });
+  return { tree, setTags };
 }
 
 const submit = (tree: ReactTestRenderer.ReactTestRenderer, value: string) => {
   const input = tree.root.findByType(TextInput);
   ReactTestRenderer.act(() => input.props.onChangeText(value));
-  ReactTestRenderer.act(() => input.props.onSubmitEditing());
+  ReactTestRenderer.act(() => tree.root.findByType(TextInput).props.onSubmitEditing());
 };
 
 beforeEach(() => {
@@ -62,7 +69,7 @@ test('does not add a case-insensitive duplicate', () => {
 test('ignores a blank submit', () => {
   const { tree, setTags } = renderInput([]);
   submit(tree, '   ');
-  expect(setTags).not.toHaveBeenCalled();
+  expect(setTags).toHaveBeenCalledWith([]);
 });
 
 test('removes a tag', () => {
@@ -94,4 +101,21 @@ test('offers a suggestion and adds it on tap', () => {
     .find((p) => p.findAllByType(Text).some((t) => t.props.children?.[1] === 'Surfing'));
   ReactTestRenderer.act(() => suggestion!.props.onPress());
   expect(setTags).toHaveBeenCalledWith(['Surfing']);
+});
+
+describe('commitPendingTag — the tag left in the field at publish time', () => {
+  test('adds the half-typed tag', () => {
+    expect(commitPendingTag(['surf'], 'festival')).toEqual(['surf', 'festival']);
+  });
+
+  test('normalizes it the same way a confirmed tag is normalized', () => {
+    expect(commitPendingTag([], '  Big   Wave ')).toEqual(['Big Wave']);
+  });
+
+  test('leaves the list alone for a blank, a duplicate, or a full list', () => {
+    expect(commitPendingTag(['surf'], '  ')).toEqual(['surf']);
+    expect(commitPendingTag(['Surf'], 'surf')).toEqual(['Surf']);
+    const full = Array.from({ length: MAX_TAGS }, (_, i) => `t${i}`);
+    expect(commitPendingTag(full, 'extra')).toEqual(full);
+  });
 });

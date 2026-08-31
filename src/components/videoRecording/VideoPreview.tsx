@@ -1,7 +1,16 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Video from 'react-native-video';
 import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +21,7 @@ import { isAndroid } from '../../utils';
 import { Button, SvgIcon } from '../ui';
 import { requestCameraRollSavePermissions } from './requestCameraRollSave';
 import { VideoDescriptionInput } from './VideoDescriptionInput';
-import { TagInput } from './TagInput';
+import { TagInput, commitPendingTag } from './TagInput';
 import { useVideoRecordStore } from './videoRecordStore';
 import { StateItem, useDetectedStateSelector, useStateSelector } from '../../state/app/uiStore';
 import { useDetectState } from '../appHeader';
@@ -28,6 +37,10 @@ export const VideoPreview = () => {
   const [volume, setVolume] = useState(1);
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState<string[]>([]);
+  // The tag still being typed. Held here rather than inside TagInput so
+  // publishing can commit it — a tag typed but not confirmed used to be
+  // dropped silently, and the video posted untagged.
+  const [tagDraft, setTagDraft] = useState('');
   const { previewUri, error, uploading, uploadProgress, actions } = useVideoRecordStore();
   const [selectedState] = useStateSelector();
   const [detectedState] = useDetectedStateSelector();
@@ -91,7 +104,11 @@ export const VideoPreview = () => {
       return;
     }
 
-    const uploadOk = await actions.publish(targetState.id, description, tags);
+    const finalTags = commitPendingTag(tags, tagDraft);
+    setTags(finalTags);
+    setTagDraft('');
+
+    const uploadOk = await actions.publish(targetState.id, description, finalTags);
     if (uploadOk) {
       actions.clear();
       await queryClient.invalidateQueries({ queryKey: ['user_videos', user.id] });
@@ -160,6 +177,14 @@ export const VideoPreview = () => {
           Alert.alert('Video Playback Error', msg);
         }}
       />
+      {/* Tapping the video dismisses the keyboard. The bottom stack renders
+          after this, so its inputs and buttons still take their own taps. */}
+      <Pressable
+        accessible={false}
+        style={StyleSheet.absoluteFill}
+        onPress={Keyboard.dismiss}
+      />
+
       <View
         className={clsx(
           'absolute left-0 top-0 h-full w-full items-center justify-center',
@@ -207,7 +232,7 @@ export const VideoPreview = () => {
           >
             {/* eslint-disable-next-line react-native/no-inline-styles */}
             <SvgIcon image="location" color={colors.white} style={{ width: 16, height: 16 }} />
-            <Text className="text-sm font-semibold text-primary">
+            <Text className="text-base font-semibold text-primary">
               {targetState ? `Posting to ${targetState.label}` : 'Tap refresh to set your state'}
             </Text>
           </View>
@@ -234,7 +259,7 @@ export const VideoPreview = () => {
 
         {/* Tag input, below the caption. */}
         <View className="mb-3">
-          <TagInput tags={tags} setTags={setTags} />
+          <TagInput tags={tags} setTags={setTags} draft={tagDraft} setDraft={setTagDraft} />
         </View>
 
         <View className="flex-row justify-between">
