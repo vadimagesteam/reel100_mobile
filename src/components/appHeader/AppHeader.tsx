@@ -64,7 +64,9 @@ export const AppHeader = ({
 
         <GlobalCountdown />
 
-        <View className="flex-row items-center gap-3">
+        {/* The bell used to sit almost against the menu button; a wider gap
+            keeps the two separately tappable. */}
+        <View className="flex-row items-center gap-6">
           <NotificationBellButton />
           <MenuButton />
         </View>
