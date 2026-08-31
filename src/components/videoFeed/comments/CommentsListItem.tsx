@@ -85,7 +85,7 @@ export const CommentsListItem = ({
     >
       <View className={clsx('mt-[10px]', item.replyTo && 'ml-[20px]')} onLayout={onLayout}>
         <View className="flex-row justify-between rounded-[10] bg-surface p-[10px]">
-          <View>
+          <View className="flex-1 pr-2">
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
@@ -102,9 +102,15 @@ export const CommentsListItem = ({
               <Text className="text-silver1">{item.text}</Text>
             </View>
           </View>
-          <Text className="text-[9px] text-primary">
-            {item.id.startsWith('optimistic') ? 'sending...' : formatTimeAgo(item.createdAt)}
-          </Text>
+          {/* Time above, like below: the heart belongs beside the comment it
+              applies to, not stranded on the action row under it, where it read
+              as a second Reply-style link rather than this comment's count. */}
+          <View className="items-end justify-between">
+            <Text className="text-[9px] text-primary">
+              {item.id.startsWith('optimistic') ? 'sending...' : formatTimeAgo(item.createdAt)}
+            </Text>
+            <CommentLikeButton comment={item} />
+          </View>
         </View>
 
         <View className="flex-row items-center justify-between">
@@ -112,7 +118,6 @@ export const CommentsListItem = ({
             <TouchableOpacity hitSlop={20} onPress={handleReply}>
               <Text className="text-primary">Reply</Text>
             </TouchableOpacity>
-            <CommentLikeButton comment={item} />
           </View>
           {!item.replyTo && item.repliesCount > 0 && (
             <TouchableOpacity
