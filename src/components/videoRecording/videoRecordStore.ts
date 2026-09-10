@@ -1,6 +1,7 @@
+import { toast } from '@backpackapp-io/react-native-toast';
 import { create } from 'zustand';
 import { api } from '../../lib/api';
-import { getMimeType } from '../../utils';
+import { captionTitle, getMimeType } from '../../utils';
 
 export type VideoRecordStore = {
   previewUri: string | null;
@@ -13,7 +14,7 @@ export type VideoRecordStore = {
     clear: () => void;
     setPreviewUri: (uri: string) => void;
     setIsPreviewReady: (ready: boolean) => void;
-    publish: (stateId: string, description: string) => Promise<boolean>;
+    publish: (stateId: string, description: string, tags?: string[]) => Promise<boolean>;
   };
 };
 
@@ -37,7 +38,7 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
     setPreviewUri: (uri) => set({ previewUri: uri }),
     setIsPreviewReady: (ready) => set({ isPreviewReady: ready }),
 
-    publish: async (stateId, description) => {
+    publish: async (stateId, description, tags) => {
       const { previewUri } = get();
 
       if (!previewUri) {
@@ -49,8 +50,14 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
         .pop()
         ?.replace(/\.[^/.]+$/, '');
 
+      // Nothing asks the author for a title, so the caption doubles as one.
+      // Without this the label is the recording's file name — a UUID on iOS,
+      // VID_20260830_141233 on Android — which is what search results were
+      // listing as video names.
+      const label = captionTitle(description) || fileName;
+
       const metaDataPayload = {
-        label: fileName,
+        label,
         description,
         states: {
           connect: { id: stateId },
@@ -63,6 +70,20 @@ export const useVideoRecordStore = create<VideoRecordStore>((set, get) => ({
 
         if (response?.status === 201 && response.data?.id) {
           const videoId = response.data.id;
+
+          // Attach tags (best-effort): a failure here shouldn't abort the
+          // upload — the video still publishes without them. It is said out
+          // loud, though: this used to fail into a console line nobody sees,
+          // so a video would post untagged and the author would only find out
+          // by searching for their hashtag and finding nothing.
+          if (tags && tags.length > 0) {
+            try {
+              await api.put(`api/tags/video/${videoId}`, { tags });
+            } catch (e) {
+              console.error('Failed to attach tags to video', e);
+              toast.error('Your video posted, but its hashtags could not be saved.');
+            }
+          }
 
           const { type, name } = getMimeType(previewUri);
           const fileUri = previewUri.startsWith('file://') ? previewUri : `file://${previewUri}`;

@@ -1,7 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import clsx from 'clsx';
 import { colors } from '../theme';
-import { isAndroid, isIOS26Plus } from '../utils';
 import { Screens, AppStackParamList } from './screens';
 
 import { HeaderBackArrowButton } from '../components/appHeader';
@@ -9,7 +7,6 @@ import {
   ChatDialogScreen,
   ChatListScreen,
   EditProfileScreen,
-  UserFollowingSearchScreen,
   SettingsScreen,
   ProfileScreen,
   ProfileStatsScreen,
@@ -19,7 +16,10 @@ import {
   VideoModalScreen,
   DeleteAccountScreen,
   VideoFeedModalScreen,
+  TagFeedScreen,
+  SearchSectionScreen,
   AdDebugScreen,
+  NotificationsScreen,
 } from '../screens';
 import { BottomTabNavigator } from './TabsNavigator';
 
@@ -32,13 +32,13 @@ export const AppNavigator = () => (
       headerStyle: { backgroundColor: colors.background },
       headerTintColor: colors.primary,
       contentStyle: { backgroundColor: colors.background },
-      fullScreenGestureEnabled: true,
+      // Edge-only back swipe, not the full-width one. With the full-screen
+      // gesture on, any horizontal drift while scrolling a feed reads as a
+      // back swipe and pops the screen mid-scroll — the whole app is vertical
+      // lists, so that misfires constantly on a real phone.
+      fullScreenGestureEnabled: false,
       // eslint-disable-next-line react/no-unstable-nested-components
-      headerLeft: () => (
-        //fixme: for ios 26+ temp fix for style
-        // should be fixed in RN Screens & rn navigation v7+
-        <HeaderBackArrowButton className={clsx(isAndroid && 'mr-8', isIOS26Plus && 'ml-2')} />
-      ),
+      headerLeft: () => <HeaderBackArrowButton />,
     }}
   >
     <Stack.Screen name="Tabs" component={BottomTabNavigator} />
@@ -57,6 +57,14 @@ export const AppNavigator = () => (
       component={ChatListScreen}
     />
     <Stack.Screen name={Screens.Chat} component={ChatDialogScreen} />
+    <Stack.Screen
+      name={Screens.Notifications}
+      component={NotificationsScreen}
+      options={{
+        animation: 'fade_from_bottom',
+        animationDuration: 200,
+      }}
+    />
     <Stack.Screen
       name={Screens.Settings}
       component={SettingsScreen}
@@ -83,16 +91,24 @@ export const AppNavigator = () => (
       }}
     />
     <Stack.Screen
-      name={Screens.UserFollowingSearch}
-      component={UserFollowingSearchScreen}
+      name={Screens.VideoModal}
+      component={VideoModalScreen}
       options={{
         animation: 'fade_from_bottom',
         animationDuration: 200,
       }}
     />
     <Stack.Screen
-      name={Screens.VideoModal}
-      component={VideoModalScreen}
+      name={Screens.SearchSection}
+      component={SearchSectionScreen}
+      options={{
+        animation: 'fade_from_bottom',
+        animationDuration: 200,
+      }}
+    />
+    <Stack.Screen
+      name={Screens.TagFeed}
+      component={TagFeedScreen}
       options={{
         animation: 'fade_from_bottom',
         animationDuration: 200,
@@ -110,14 +126,11 @@ export const AppNavigator = () => (
       name={Screens.SelectState}
       component={SelectStateScreen}
       options={{
-        title: 'Choose Your State',
-        headerTitleStyle: { color: colors.white },
-        headerStyle: {
-          backgroundColor: colors.black4,
-        },
-        headerShown: true,
-        presentation: 'modal',
-        animation: 'fade_from_bottom',
+        // The screen renders its own header (title + back button).
+        headerShown: false,
+        // A full page push (not a modal sheet).
+        presentation: 'card',
+        animation: 'slide_from_right',
         animationDuration: 200,
       }}
     />

@@ -1,20 +1,33 @@
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import clsx from 'clsx';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Video from 'react-native-video';
+import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
+import { useNavigation } from '../../navigation';
 import { Tabs } from '../../navigation/screens';
 import { isAndroid } from '../../utils';
-import { Button } from '../ui';
+import { Button, SvgIcon } from '../ui';
 import { requestCameraRollSavePermissions } from './requestCameraRollSave';
 import { VideoDescriptionInput } from './VideoDescriptionInput';
+import { TagInput, commitPendingTag } from './TagInput';
 import { useVideoRecordStore } from './videoRecordStore';
-import { useStateSelector } from '../../state/app/uiStore';
-import { useNavigation } from '@react-navigation/native';
+import { StateItem, useDetectedStateSelector, useStateSelector } from '../../state/app/uiStore';
+import { useDetectState } from '../appHeader';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../state/user/authStore';
+import { colors } from '../../theme';
 
 export const VideoPreview = () => {
   const insets = useSafeAreaInsets();
@@ -23,8 +36,52 @@ export const VideoPreview = () => {
   const user = useUser();
   const [volume, setVolume] = useState(1);
   const [description, setDescription] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  // The tag still being typed. Held here rather than inside TagInput so
+  // publishing can commit it — a tag typed but not confirmed used to be
+  // dropped silently, and the video posted untagged.
+  const [tagDraft, setTagDraft] = useState('');
   const { previewUri, error, uploading, uploadProgress, actions } = useVideoRecordStore();
   const [selectedState] = useStateSelector();
+  const [detectedState] = useDetectedStateSelector();
+  const detectState = useDetectState();
+  const [isDetectingState, setIsDetectingState] = useState(false);
+
+  // The state this video will be posted to. Defaults to the user's physical
+  // location and falls back to the browse filter only until geolocation
+  // resolves. It is shown and editable below so a user browsing another state's
+  // rankings never silently posts there (the cause of the wrong-state uploads).
+  const [targetState, setTargetState] = useState<StateItem | null>(
+    detectedState ?? selectedState ?? null,
+  );
+  const targetPickedRef = useRef(false);
+
+  // Geolocation resolves asynchronously; adopt it as the default once it lands,
+  // unless the user has already chosen a state for this upload.
+  useEffect(() => {
+    if (!targetPickedRef.current && detectedState) {
+      setTargetState(detectedState);
+    }
+  }, [detectedState]);
+
+  // Re-fetch the device location and adopt the resolved state as the target.
+  // This is an explicit user action, so we mark the target as chosen and prompt
+  // on permission/failure (non-silent).
+  const handleDetectLocation = async () => {
+    if (isDetectingState) {
+      return;
+    }
+    setIsDetectingState(true);
+    try {
+      const detected = await detectState(false);
+      if (detected) {
+        targetPickedRef.current = true;
+        setTargetState(detected);
+      }
+    } finally {
+      setIsDetectingState(false);
+    }
+  };
 
   const videoSource = useMemo(() => {
     if (!previewUri) {
@@ -39,15 +96,29 @@ export const VideoPreview = () => {
   }, [uploading]);
 
   const handlePublish = async () => {
-    if (!selectedState?.id) {
-      console.error('State is not selected');
+    if (!targetState?.id) {
+      Alert.alert(
+        'State not detected',
+        'We couldn’t detect your state. Tap the refresh icon to set it from your location before publishing.',
+      );
       return;
     }
 
-    const uploadOk = await actions.publish(selectedState.id, description);
+    const finalTags = commitPendingTag(tags, tagDraft);
+    setTags(finalTags);
+    setTagDraft('');
+
+    const uploadOk = await actions.publish(targetState.id, description, finalTags);
     if (uploadOk) {
       actions.clear();
       await queryClient.invalidateQueries({ queryKey: ['user_videos', user.id] });
+      // The new upload changes the per-state upload counts and search
+      // recommendations. Those are served by the ['search', ...] queries with a
+      // long staleTime, so without this they'd keep showing pre-upload numbers
+      // (e.g. "0 today" on the Choose-Your-State screen) until the cache went
+      // stale. Marking them stale makes the next visit refetch the fresh counts;
+      // the backend recomputes them a few seconds after the video finishes.
+      queryClient.invalidateQueries({ queryKey: ['search'] });
       navigation.goBack();
       // @ts-expect-error
       navigation.navigate('Tabs', {
@@ -106,7 +177,14 @@ export const VideoPreview = () => {
           Alert.alert('Video Playback Error', msg);
         }}
       />
-      {!uploading && <VideoDescriptionInput value={description} setValue={setDescription} />}
+      {/* Tapping the video dismisses the keyboard. The bottom stack renders
+          after this, so its inputs and buttons still take their own taps. */}
+      <Pressable
+        accessible={false}
+        style={StyleSheet.absoluteFill}
+        onPress={Keyboard.dismiss}
+      />
+
       <View
         className={clsx(
           'absolute left-0 top-0 h-full w-full items-center justify-center',
@@ -135,26 +213,69 @@ export const VideoPreview = () => {
         )}
       </View>
 
-      <View
-        className="absolute left-0 w-full flex-row justify-between px-16"
+      <KeyboardStickyView
+        offset={{ closed: 0, opened: insets.bottom }}
+        className="absolute left-0 w-full px-6"
         // eslint-disable-next-line react-native/no-inline-styles
         style={{
           bottom: insets.bottom + (isAndroid ? 10 : 0),
           display: uploading ? 'none' : 'flex',
         }}
       >
-        <Button variant="primary" onPress={handlePublish}>
-          Publish Now
-        </Button>
-        <Button
-          loading={isSavingDraft}
-          loadingText="Saving..."
-          variant="outline"
-          onPress={handleDraft}
-        >
-          Save Draft
-        </Button>
-      </View>
+        {/* State pill + re-detect, above the caption card per the mock. */}
+        <View className="mb-3 flex-row items-center justify-center gap-2 self-center">
+          <View
+            className={clsx(
+              'flex-row items-center justify-center gap-2 rounded-full px-4 py-2',
+              targetState ? 'bg-black/50' : 'bg-red3/70',
+            )}
+          >
+            {/* eslint-disable-next-line react-native/no-inline-styles */}
+            <SvgIcon image="location" color={colors.white} style={{ width: 16, height: 16 }} />
+            <Text className="text-base font-semibold text-primary">
+              {targetState ? `Posting to ${targetState.label}` : 'Tap refresh to set your state'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={handleDetectLocation}
+            disabled={isDetectingState}
+            hitSlop={8}
+            accessibilityLabel="Detect my state from current location"
+            className="h-9 w-9 items-center justify-center rounded-full bg-black/50"
+          >
+            {isDetectingState ? (
+              <ActivityIndicator size="small" color={colors.white} />
+            ) : (
+              // eslint-disable-next-line react-native/no-inline-styles
+              <SvgIcon image="refreshIcon" color={colors.white} style={{ width: 16, height: 16 }} />
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Always-visible caption card, below the state pill. */}
+        <View className="mb-3">
+          <VideoDescriptionInput value={description} setValue={setDescription} />
+        </View>
+
+        {/* Tag input, below the caption. */}
+        <View className="mb-3">
+          <TagInput tags={tags} setTags={setTags} draft={tagDraft} setDraft={setTagDraft} />
+        </View>
+
+        <View className="flex-row justify-between">
+          <Button variant="primary" onPress={handlePublish}>
+            Publish Now
+          </Button>
+          <Button
+            loading={isSavingDraft}
+            loadingText="Saving..."
+            variant="outline"
+            onPress={handleDraft}
+          >
+            Save Draft
+          </Button>
+        </View>
+      </KeyboardStickyView>
     </>
   );
 };

@@ -49,6 +49,8 @@ export const useCommentMutation = () => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           likesCount: 0,
+          likedByMe: false,
+          myReactionId: null,
           replies: [],
           repliesCount: 0,
         };

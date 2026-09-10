@@ -13,9 +13,41 @@ export type CommentType = {
   createdAt: string;
   updatedAt: string;
   likesCount: number;
+  // Viewer's own like state, resolved server-side in the comments list query
+  // (see the backend listCommentsWithViewerLike). myReactionId is the id of the
+  // viewer's Like reaction, needed to unlike without a second lookup.
+  likedByMe: boolean;
+  myReactionId: string | null;
 
   repliesCount: number;
   replies: CommentType[];
+};
+
+type CommentPages = { pages: CommentType[][]; pageParams: unknown[] };
+
+export const commentsCacheKey = (videoId: string) => ['comments', 'video', videoId];
+
+/**
+ * Optimistically patch a single comment inside the infinite-query cache,
+ * wherever it sits across loaded pages. Mirrors updateVideoCache. Returns the
+ * previous cache so a failed mutation can roll it back.
+ */
+export const updateCommentCache = (
+  cacheKey: readonly unknown[],
+  commentId: string,
+  updateFn: (comment: CommentType) => CommentType,
+) => {
+  const prev = queryClient.getQueryData<CommentPages>(cacheKey);
+  if (!prev?.pages) {
+    return prev;
+  }
+  queryClient.setQueryData<CommentPages>(cacheKey, {
+    ...prev,
+    pages: prev.pages.map((page) =>
+      page.map((comment) => (comment.id === commentId ? updateFn(comment) : comment)),
+    ),
+  });
+  return prev;
 };
 
 export type useCommentsInfiniteQueryParams = {

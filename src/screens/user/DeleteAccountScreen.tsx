@@ -19,7 +19,19 @@ export const DeleteAccountScreen = () => {
   const { deleteMyAccount } = useAuthActions();
 
   const [handleConfirm, isLoading] = useLoadingCallback(async () => {
-    await deleteMyAccount();
+    try {
+      await deleteMyAccount();
+    } catch (error) {
+      // The request used to fail for every real user (the server could not
+      // remove the row) and nothing caught it: useLoadingCallback only clears
+      // its spinner, so the screen just went quiet and the user tried again.
+      // Whatever goes wrong now, say so.
+      Alert.alert(
+        'Deletion failed',
+        'We could not delete your account. Please check your connection and try again, or contact support if it keeps happening.',
+      );
+      return;
+    }
     Alert.alert('Deletion completed', 'Your account has been successfully deleted.');
   });
 
@@ -48,9 +60,16 @@ export const DeleteAccountScreen = () => {
           </Animated.View>
 
           <Text className="text-2xl font-bold text-primary">Sad to hear that</Text>
+          {/*
+            Wording matches what deletion actually does: the account is closed
+            and can never be signed into again, but videos and comments already
+            posted are not erased — other people's chats and comment threads
+            depend on them. Claiming everything is wiped would be untrue.
+          */}
           <Text className="text-xl font-normal text-muted">
-            Are you sure you want to delete your account? All related data will be deleted
-            permanently. This action cannot be undone.
+            Are you sure you want to delete your account? You will be signed out and will not be
+            able to sign in again. Videos and comments you have already posted may remain visible.
+            This action cannot be undone.
           </Text>
         </View>
 

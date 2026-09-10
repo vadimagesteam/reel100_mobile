@@ -9,7 +9,6 @@ export * from './auth/EulaScreen';
 // home
 export * from './home/TabMainScreen';
 export * from './home/TabForYouScreen';
-export * from './user/UserFollowingSearchScreen';
 export * from './home/TabGlobalVideoScreen';
 export * from './home/SelectStateScreen';
 
@@ -26,7 +25,12 @@ export * from './user/AdDebugScreen';
 export * from './video/VideoRecordingScreen';
 export * from './video/VideoModalScreen';
 export * from './video/VideoFeedModalScreen';
+export * from './video/TagFeedScreen';
+export * from './user/SearchSectionScreen';
 
 // chat
 export * from './chat/ChatListScreen';
 export * from './chat/ChatDialogScreen';
+
+// notifications
+export * from './notifications/NotificationsScreen';
