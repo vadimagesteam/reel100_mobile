@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { HidebleContainer } from '../../components/hidebleContainer';
 import { VideoFeedProvider, VideoList } from '../../components/videoFeed';
 import { useVideosInfiniteQuery } from '../../components/videoFeed/hooks';
@@ -12,7 +12,14 @@ export const VideoFeedModalScreen = () => {
   const { queryParams, videoIndex, feedState } = params;
 
   const { flatPages, refetch, fetchNextPage, isFetchingNextPage, hasNextPage } =
-    useVideosInfiniteQuery(queryParams);
+    useVideosInfiniteQuery({
+      ...queryParams,
+      // The grid this modal opened from shares queryParams.cacheKey and has
+      // already loaded the page holding the tapped video. Preserve those pages
+      // instead of truncating the shared cache to page 1, which would drop the
+      // tapped video when it lives beyond the first page.
+      refetchFirstPageOnMount: false,
+    });
 
   const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
 
@@ -21,11 +28,6 @@ export const VideoFeedModalScreen = () => {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  const videos = useMemo(
-    () => (videoIndex ? flatPages.slice(videoIndex) : flatPages),
-    [flatPages, videoIndex],
-  );
 
   return (
     <HidebleContainer>
@@ -38,11 +40,17 @@ export const VideoFeedModalScreen = () => {
           backPressHandler: () => navigation.goBack(),
         }}
       >
+        {/*
+          Pass the whole list and start the feed at the tapped position. This
+          previously sliced off everything before `videoIndex` and opened at 0,
+          which meant tapping the third tile physically removed the first two
+          videos — there was nothing above to scroll back to.
+        */}
         <VideoList
-          initialVideoIndex={0}
+          initialVideoIndex={videoIndex ?? 0}
           isRefetching={isRefetching}
           refetch={handleRefresh}
-          videos={videos}
+          videos={flatPages}
           onEndReached={onEndReached}
         />
       </VideoFeedProvider>

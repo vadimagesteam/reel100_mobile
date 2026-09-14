@@ -1,9 +1,9 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { endOfDay, startOfDay } from 'date-fns';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useVideosInfiniteQuery, useSetVideoFeedCacheKey } from '../videoFeed/hooks';
 import { VideoTiles } from '../videoTiles';
 import { useStateSelector } from '../../state/app/uiStore';
+import { centralDayRangeUtc } from '../../utils';
 
 export const StateFeed = ({ isActiveTab }: { isActiveTab: boolean }) => {
   const [selectedState] = useStateSelector();
@@ -19,10 +19,10 @@ export const StateFeed = ({ isActiveTab }: { isActiveTab: boolean }) => {
     where: useMemo(
       () => ({
         status: 'Finished',
-        createdAt: {
-          gte: startOfDay(new Date()).toISOString(),
-          lte: endOfDay(new Date()).toISOString(),
-        },
+        // Window the cycle in Central Time (matching the ranking + countdown),
+        // not the device's local day — otherwise videos still in the active
+        // Central cycle are dropped for users west of Central.
+        createdAt: centralDayRangeUtc(),
         states: {
           some: {
             id: { equals: selectedState?.id! },

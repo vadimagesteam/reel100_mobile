@@ -1,8 +1,7 @@
 import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
-import { Alert } from 'react-native';
 import { navigationRef } from '../../navigation/navigationRef';
-import { Screens } from '../../navigation/screens';
-import { MessageType, NotificationDataType } from './notificationDataType';
+import { NotificationDataType } from './notificationDataType';
+import { routeNotification } from './routeNotification';
 
 type RemoteMessage = FirebaseMessagingTypes.RemoteMessage;
 
@@ -18,35 +17,5 @@ export const handlePushNotification = async (message: RemoteMessage) => {
     return;
   }
 
-  switch (data.type) {
-    case MessageType.Chat:
-      navigationRef.navigate(Screens.Chat, {
-        chatId: data.chatId,
-        userId: data.userId,
-      });
-      break;
-
-    case MessageType.Follow:
-      navigationRef.navigate(Screens.Profile, {
-        fromTabs: false,
-        userId: data.userId,
-      });
-      break;
-
-    case MessageType.VideoComment:
-      navigationRef.navigate(Screens.VideoModal, {
-        videoId: data.videoId,
-        commentId: data.commentId,
-      });
-      break;
-
-    case MessageType.VideoLike:
-      navigationRef.navigate(Screens.VideoModal, {
-        videoId: data.videoId,
-      });
-      break;
-
-    default:
-      console.error('Unable to handle notification', data);
-  }
+  routeNotification(data);
 };

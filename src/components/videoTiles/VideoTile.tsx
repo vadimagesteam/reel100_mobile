@@ -7,6 +7,7 @@ import { TileConfig } from './tileConfig';
 import type { VideoPost, VideoProcessingStep } from '../videoFeed/queries/apiVideosFetcher';
 import { VideoInfoOverlay } from './VideoInfoOverlay';
 import { colors } from '../../theme';
+import { CircleIconButton } from '../ui';
 
 const processingSteps: { key: VideoProcessingStep; label: string }[] = [
   { key: 'UploadingToStorage', label: 'Uploading' },
@@ -131,8 +132,9 @@ export const VideoTile = ({
             <Text className="text-[10px] text-primary">No preview</Text>
           )}
           {canDelete && (
-            <TouchableOpacity
-              className="absolute right-1 top-1 rounded-full bg-black/60 p-1"
+            <CircleIconButton
+              size={28}
+              className="absolute right-1 top-1 bg-black/60"
               hitSlop={10}
               onPress={(e) => {
                 e.stopPropagation();
@@ -147,7 +149,7 @@ export const VideoTile = ({
               }}
             >
               <Ionicons name="trash-bin-outline" size={18} color={colors.red} />
-            </TouchableOpacity>
+            </CircleIconButton>
           )}
         </View>
       )}

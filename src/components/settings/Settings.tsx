@@ -1,4 +1,5 @@
 import { ScrollView, Text, View } from 'react-native';
+import { useNavigationBarInset } from '../../hooks/useNavigationBarInset';
 import { useNavigation } from '../../navigation';
 import { Screens } from '../../navigation/screens';
 import { Button } from '../ui';
@@ -7,8 +8,9 @@ import { NotificationsSettings } from './notifications/NotificationsSettings';
 
 export const Settings = () => {
   const navigation = useNavigation();
+  const navBarInset = useNavigationBarInset();
   return (
-    <ScrollView className="flex-1">
+    <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: navBarInset }}>
       <NotificationsSettings />
 
       <View className="flex-col gap-y-2">

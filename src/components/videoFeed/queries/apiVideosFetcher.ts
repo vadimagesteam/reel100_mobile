@@ -60,6 +60,13 @@ export type VideoState = {
   label: string;
 };
 
+/** A hashtag on a video: `name` addresses the hashtag page, `label` prints. */
+export type VideoTag = {
+  id: string;
+  name: string;
+  label: string;
+};
+
 export type VideoPost = {
   id: string;
   label: string;
@@ -75,6 +82,11 @@ export type VideoPost = {
   description: string;
   user: VideoUser;
   states: VideoState[];
+  /**
+   * The hashtags the author attached. Optional because feeds that predate the
+   * field — and cached pages written before this shipped — have none.
+   */
+  tags?: VideoTag[];
   top_100Position: number | null;
   top_100Date: string | null;
 };
@@ -124,6 +136,19 @@ export type ApiVideosFetcherParams = {
     }
   >;
   orderBy?: Array<Partial<Record<keyof VideoPost, 'Asc' | 'Desc'>>>;
+  /**
+   * Tag names for the hashtag page. Several tags intersect — videos carrying
+   * all of them.
+   *
+   * These do not go through the GraphQL query below: VideoWhereInput has no
+   * tags field, so a tag filter is not expressible there at all. When present,
+   * the request is served by the tags endpoint instead. Routing it through this
+   * same fetcher is what lets the hashtag page reuse the whole existing grid
+   * and video-feed modal rather than fork a parallel set of them.
+   */
+  tags?: string[];
+  /** Ordering of the hashtag grid; ignored unless `tags` is set. */
+  tagSort?: 'top' | 'recent';
 };
 
 const qqlQuery = `query(
@@ -161,6 +186,7 @@ const qqlQuery = `query(
           }
         }
         states { id slug label }
+        tags { id name label }
         top_100Position
         top_100Date
     }
@@ -173,7 +199,16 @@ export const apiVideosFetcher = async ({
   skip,
   orderBy = [],
   where = {},
+  tags,
+  tagSort = 'top',
 }: ApiVideosFetcherParams): Promise<VideoPost[]> => {
+  if (tags && tags.length > 0) {
+    const { data } = await api.get<{ videos: VideoPost[] }>('/api/tags/videos', {
+      params: { tags: tags.join(','), sort: tagSort, skip, take },
+    });
+    return data.videos;
+  }
+
   console.log('🔥 [apiVideosFetcher]', { where, skip, take, orderBy });
 
   const { data } = await api.post<{

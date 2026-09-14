@@ -1,6 +1,7 @@
 import { usePostsInfiniteQueryParams } from '../components/videoFeed/hooks';
 import { VideoFeedStore } from '../components/videoFeed/provider/videoFeedStore';
 import { VideoPost } from '../components/videoFeed/queries/apiVideosFetcher';
+import { SearchSectionType } from '../components/search/types';
 import { StateItem } from '../state/app/uiStore';
 import { UserBase } from '../state/user/types';
 
@@ -32,11 +33,13 @@ export const Screens = {
   DeleteAccount: 'DeleteAccount',
   EditProfile: 'EditProfile',
   AdDebug: 'AdDebug',
-  UserFollowingSearch: 'UserFollowingSearch',
   UserSearch: 'UserSearch',
   SelectState: 'SelectState',
   VideoModal: 'VideoModal',
   VideoFeedModal: 'VideoFeedModal',
+  Notifications: 'Notifications',
+  TagFeed: 'TagFeed',
+  SearchSection: 'SearchSection',
 } as const;
 
 export type AuthStackParamList = {
@@ -65,9 +68,6 @@ export type AppStackParamList = {
     userId: string;
     initialTab: 'followers' | 'following';
   };
-  UserFollowingSearch: {
-    onSelected: (user: UserBase) => void;
-  };
   UserSearch: undefined;
   SelectState: {
     placeholderValue?: string;
@@ -78,11 +78,28 @@ export type AppStackParamList = {
         video: VideoPost;
       }
     | { videoId: string; commentId?: string };
+  /**
+   * The hashtag page. `tags` is a list because several tags intersect —
+   * #oregon + #fishing is the videos carrying both. `title` is what the caller
+   * already knows to show while the resolved labels load.
+   */
+  TagFeed: { tags: string[]; title?: string };
+  /**
+   * The full list behind a section's "View all". Carries the query as well as
+   * the type, because the search box is no longer on screen to say what these
+   * results are for.
+   */
+  SearchSection: {
+    query: string;
+    type: SearchSectionType;
+    title: string;
+  };
   VideoFeedModal: {
     queryParams: usePostsInfiniteQueryParams;
     feedState: Partial<Omit<VideoFeedStore, 'actions'>>;
     videoIndex?: number;
   };
+  Notifications: undefined;
 };
 
 export type BottomTabParamList = {

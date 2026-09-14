@@ -2,34 +2,44 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBackArrowButton } from '../../components/appHeader';
+import {
+  SearchRecommendations,
+  SearchSections,
+  useSearchSectionsQuery,
+} from '../../components/search';
 import { SearchInput } from '../../components/ui';
-import { useUsersQuery } from '../../components/user/hooks';
-import { UserList } from '../../components/userList';
-import { useNavigation } from '../../navigation';
-import { Screens } from '../../navigation/screens';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import { useNavigationBarInset } from '../../hooks/useNavigationBarInset';
 
 export const UserSearchScreen = () => {
   const [searchText, setSearchText] = useState('');
-  const navigation = useNavigation();
-
   const insets = useSafeAreaInsets();
-  const hasSearch = searchText.trim().length > 0;
-  const { data, isLoading } = useUsersQuery(
-    hasSearch ? { nickname: { contains: searchText, mode: 'Insensitive' } } : undefined,
-    { enabled: hasSearch },
-  );
+  const navBarInset = useNavigationBarInset();
+
+  const trimmed = searchText.trim();
+  const hasSearch = trimmed.length > 0;
+  const debouncedQuery = useDebouncedValue(trimmed, 300);
+
+  const { data, isLoading, isError } = useSearchSectionsQuery(debouncedQuery, {
+    enabled: hasSearch,
+  });
+
+  // While the debounce hasn't caught up to the current input, show loading so
+  // the list doesn't briefly flash "no results" between keystrokes.
+  const isSearching = isLoading || (hasSearch && debouncedQuery !== trimmed);
 
   return (
     <View
       style={{
         paddingTop: insets.top,
+        paddingBottom: navBarInset,
       }}
       className="flex-1 bg-background px-4"
     >
       <View className="mb-2 flex-row items-center gap-x-3">
         <HeaderBackArrowButton />
         <SearchInput
-          placeholder="Find Users"
+          placeholder="Search creators, states and hashtags"
           autoCorrect={false}
           autoFocus
           value={searchText}
@@ -40,13 +50,16 @@ export const UserSearchScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        <UserList
-          data={data}
-          isLoading={isLoading}
-          onPress={(user) => {
-            navigation.navigate(Screens.Profile, { user });
-          }}
-        />
+        {hasSearch ? (
+          <SearchSections
+            data={data}
+            isLoading={isSearching}
+            isError={isError}
+            searchQuery={debouncedQuery}
+          />
+        ) : (
+          <SearchRecommendations />
+        )}
       </KeyboardAvoidingView>
     </View>
   );

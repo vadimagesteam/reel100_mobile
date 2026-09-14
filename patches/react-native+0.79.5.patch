@@ -1,0 +1,43 @@
+diff --git a/node_modules/react-native/React/Fabric/RCTSurfaceTouchHandler.mm b/node_modules/react-native/React/Fabric/RCTSurfaceTouchHandler.mm
+index a793251..f76bef9 100644
+--- a/node_modules/react-native/React/Fabric/RCTSurfaceTouchHandler.mm
++++ b/node_modules/react-native/React/Fabric/RCTSurfaceTouchHandler.mm
+@@ -203,7 +203,11 @@ - (void)_updateTouches:(NSSet<UITouch *> *)touches
+ {
+   for (UITouch *touch in touches) {
+     auto iterator = _activeTouches.find(touch);
+-    RCTAssert(iterator != _activeTouches.end(), @"Inconsistency between local and UIKit touch registries");
++    // patch: known RN Fabric race — when a competing gesture recognizer cancels
++    // touches (via _cancelTouches setEnabled:NO/YES, which triggers `reset` and
++    // clears _activeTouches), UIKit still delivers touchesCancelled: for touches
++    // no longer in our registry. The RCTAssert below crashes debug builds; release
++    // builds already skip via the guard. Skip gracefully instead of asserting.
+     if (iterator == _activeTouches.end()) {
+       continue;
+     }
+@@ -216,7 +220,11 @@ - (void)_unregisterTouches:(NSSet<UITouch *> *)touches
+ {
+   for (UITouch *touch in touches) {
+     auto iterator = _activeTouches.find(touch);
+-    RCTAssert(iterator != _activeTouches.end(), @"Inconsistency between local and UIKit touch registries");
++    // patch: known RN Fabric race — when a competing gesture recognizer cancels
++    // touches (via _cancelTouches setEnabled:NO/YES, which triggers `reset` and
++    // clears _activeTouches), UIKit still delivers touchesCancelled: for touches
++    // no longer in our registry. The RCTAssert below crashes debug builds; release
++    // builds already skip via the guard. Skip gracefully instead of asserting.
+     if (iterator == _activeTouches.end()) {
+       continue;
+     }
+@@ -233,7 +241,11 @@ - (void)_unregisterTouches:(NSSet<UITouch *> *)touches
+ 
+   for (UITouch *touch in touches) {
+     auto iterator = _activeTouches.find(touch);
+-    RCTAssert(iterator != _activeTouches.end(), @"Inconsistency between local and UIKit touch registries");
++    // patch: known RN Fabric race — when a competing gesture recognizer cancels
++    // touches (via _cancelTouches setEnabled:NO/YES, which triggers `reset` and
++    // clears _activeTouches), UIKit still delivers touchesCancelled: for touches
++    // no longer in our registry. The RCTAssert below crashes debug builds; release
++    // builds already skip via the guard. Skip gracefully instead of asserting.
+     if (iterator == _activeTouches.end()) {
+       continue;
+     }

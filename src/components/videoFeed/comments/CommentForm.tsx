@@ -1,9 +1,12 @@
 import React, { forwardRef, useMemo } from 'react';
 import { BottomSheetTextInput, TouchableOpacity } from '@gorhom/bottom-sheet';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 import clsx from 'clsx';
-import { useVideoComments } from '../hooks';
+import { useNavigationBarInset } from '../../../hooks/useNavigationBarInset';
+import { useNavigationBarInsetPadding } from '../../../hooks/useNavigationBarInsetPadding';
+import { useVideoComments, useVideoFeed } from '../hooks';
 
 export interface CommentFormProps {
   onSubmit: (text: string) => void;
@@ -15,8 +18,20 @@ export const CommentForm = forwardRef<TextInput, CommentFormProps>(
     const { text, setCommentText } = useVideoComments();
     const isEmpty = useMemo(() => !text.trim().length, [text]);
 
+    // In a full-screen video the sheet reaches the bottom edge, under the
+    // Android navigation bar; in the tabs it ends above the tab bar instead.
+    const screenType = useVideoFeed((s) => s.screenType);
+    const navBarInset = useNavigationBarInset();
+    const bottomPaddingStyle = useNavigationBarInsetPadding(
+      15,
+      screenType === 'modal' ? navBarInset : 0,
+    );
+
     return (
-      <View className="flex-row items-end border-t border-t-[#333] bg-surface p-[15px]">
+      <Animated.View
+        style={bottomPaddingStyle}
+        className="flex-row items-end border-t border-t-[#333] bg-surface p-[15px]"
+      >
         <BottomSheetTextInput
           ref={ref}
           multiline
@@ -39,7 +54,7 @@ export const CommentForm = forwardRef<TextInput, CommentFormProps>(
         >
           <Text className="button-primary-text font-bold">Send</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     );
   },
 );

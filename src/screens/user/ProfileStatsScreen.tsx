@@ -5,6 +5,7 @@ import { useUserQuery } from '../../components/user/hooks';
 import { useBlockedUsers } from '../../components/user/hooks/useBlockedUsers';
 import { useUserSearchableFollowRelations } from '../../components/user/userFollowRelations/useUserSearchableFollowRelations';
 import { SearchableUserList } from '../../components/userList';
+import { useNavigationBarInset } from '../../hooks/useNavigationBarInset';
 import { Screens } from '../../navigation/screens';
 import { useUser } from '../../state/user/authStore';
 import { UserBase } from '../../state/user/types';
@@ -36,6 +37,7 @@ export const ProfileStatsScreen = () => {
 
   const me = useUser();
   const layout = useWindowDimensions();
+  const navBarInset = useNavigationBarInset();
   const { data: user, isLoading } = useUserQuery(userId);
 
   const isMyProfile = me.id === userId;
@@ -127,6 +129,7 @@ export const ProfileStatsScreen = () => {
 
   return (
     <TabView
+      style={{ paddingBottom: navBarInset }}
       navigationState={{ index, routes }}
       renderScene={renderScene}
       onIndexChange={setIndex}

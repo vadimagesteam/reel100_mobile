@@ -12,7 +12,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useUser } from '../../state/user/authStore';
 import { getDisplayName } from '../../state/user/utils';
-import { formatNumberShort, formatNumberUS, formatShortDate, isAndroid } from '../../utils';
+import { formatNumberShort, formatNumberUS, formatVideoTimestamp, isAndroid } from '../../utils';
 import { Avatar, Backdrop, SvgIcon } from '../ui';
 import { FollowButton } from '../user/FollowButton';
 import { VideoPost } from './queries/apiVideosFetcher';
@@ -21,6 +21,7 @@ import { GestureTouchableOpacity } from './GestureTouchableOpacity';
 import { IconHeart } from './IconHeart';
 import { useVideoFeed } from './hooks';
 import { VideoDescription } from './VideoDescription';
+import { VideoTagChips } from './VideoTagChips';
 
 export interface VideoInfoOverlayProps {
   isPlayerFullScreen: boolean;
@@ -256,9 +257,15 @@ export const VideoInfoOverlay = ({
           </View>
 
           <Text className="text-[13px] font-medium text-primary opacity-80">
-            {formatShortDate(video.createdAt)}
+            {formatVideoTimestamp(video.createdAt)}
           </Text>
         </View>
+
+        {/* The author's hashtags, under the caption they belong to. A sibling
+            row rather than a wrapper around VideoDescription: that component
+            animates itself between relative and absolute positioning, and a
+            wrapping View would silently become its containing block. */}
+        {video.tags && <VideoTagChips tags={video.tags} />}
       </Animated.View>
     </View>
   );
