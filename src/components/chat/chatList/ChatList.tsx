@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { FlatList, RefreshControl } from 'react-native';
 import { useLoadingCallback } from '../../../hooks/useLoadingCallback';
+import { useNavigationBarInset } from '../../../hooks/useNavigationBarInset';
 import { useNavigation } from '../../../navigation';
 import { useUser } from '../../../state/user/authStore';
 import { FlexLoading, ListEmptyBlock } from '../../ui';
@@ -15,6 +16,7 @@ export const ChatList = () => {
   const me = useUser();
   const navigation = useNavigation();
   const { data, isLoading, refetch } = useChats();
+  const navBarInset = useNavigationBarInset();
 
   const [handleRefresh, isRefetching] = useLoadingCallback(refetch);
 
@@ -51,6 +53,7 @@ export const ChatList = () => {
   return (
     <FlatList
       data={data}
+      contentContainerStyle={{ paddingBottom: navBarInset }}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
       refreshControl={

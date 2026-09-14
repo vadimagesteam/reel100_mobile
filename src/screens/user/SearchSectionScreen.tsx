@@ -7,6 +7,7 @@ import { SearchResultRow } from '../../components/search/SearchResultRows';
 import { VideoResultCard } from '../../components/search/VideoResultsGrid';
 import { CombinedSearchResult, SearchVideoResult } from '../../components/search/types';
 import { FlexLoading, ListEmptyBlock } from '../../components/ui';
+import { useNavigationBarInset } from '../../hooks/useNavigationBarInset';
 import { useRoute } from '../../navigation';
 
 /**
@@ -20,6 +21,7 @@ import { useRoute } from '../../navigation';
 export const SearchSectionScreen = () => {
   const { params } = useRoute<'SearchSection'>();
   const insets = useSafeAreaInsets();
+  const navBarInset = useNavigationBarInset();
 
   const { items, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useSearchSectionQuery(params.query, params.type);
@@ -30,7 +32,10 @@ export const SearchSectionScreen = () => {
   const isVideoSection = params.type === 'video';
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background">
+    <View
+      style={{ paddingTop: insets.top, paddingBottom: navBarInset }}
+      className="flex-1 bg-background"
+    >
       <View className="flex-row items-center gap-x-3 px-4 pb-3">
         <HeaderBackArrowButton />
         <View className="flex-1 pr-9">

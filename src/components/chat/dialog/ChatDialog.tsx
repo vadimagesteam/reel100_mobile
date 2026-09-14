@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated from 'react-native-reanimated';
 import {
   GiftedChat,
   IMessage as GiftedChatMessageType,
@@ -8,6 +9,8 @@ import {
   Send,
 } from 'react-native-gifted-chat';
 import { BubbleProps } from 'react-native-gifted-chat/src/Bubble';
+import { useNavigationBarInset } from '../../../hooks/useNavigationBarInset';
+import { useNavigationBarInsetPadding } from '../../../hooks/useNavigationBarInsetPadding';
 import { useNavigation, useRoute } from '../../../navigation';
 import { Screens } from '../../../navigation/screens';
 import { useUser } from '../../../state/user/authStore';
@@ -114,12 +117,19 @@ export const ChatDialog = () => {
     );
   };
 
+  // Keep the composer above the Android navigation bar; the extra space folds
+  // away while the keyboard (which covers the nav bar) is open.
+  const navBarInset = useNavigationBarInset();
+  const navBarInsetStyle = useNavigationBarInsetPadding(0, navBarInset);
+
   const renderInputToolbar = (props: any) => (
-    <InputToolbar
-      {...props}
-      containerStyle={styles.inputToolbar}
-      primaryStyle={styles.inputToolbarPrimaryStyle}
-    />
+    <Animated.View style={[styles.inputToolbarInset, navBarInsetStyle]}>
+      <InputToolbar
+        {...props}
+        containerStyle={styles.inputToolbar}
+        primaryStyle={styles.inputToolbarPrimaryStyle}
+      />
+    </Animated.View>
   );
 
   const renderSend = (props: any) => (
@@ -181,6 +191,9 @@ export const ChatDialog = () => {
 };
 
 const styles = StyleSheet.create({
+  inputToolbarInset: {
+    backgroundColor: colors.black4,
+  },
   inputToolbar: {
     backgroundColor: colors.black4,
     paddingVertical: 10,

@@ -9,10 +9,12 @@ import {
 } from '../../components/search';
 import { SearchInput } from '../../components/ui';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import { useNavigationBarInset } from '../../hooks/useNavigationBarInset';
 
 export const UserSearchScreen = () => {
   const [searchText, setSearchText] = useState('');
   const insets = useSafeAreaInsets();
+  const navBarInset = useNavigationBarInset();
 
   const trimmed = searchText.trim();
   const hasSearch = trimmed.length > 0;
@@ -30,6 +32,7 @@ export const UserSearchScreen = () => {
     <View
       style={{
         paddingTop: insets.top,
+        paddingBottom: navBarInset,
       }}
       className="flex-1 bg-background px-4"
     >

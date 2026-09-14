@@ -2,6 +2,7 @@ import { TouchableOpacity } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import CameraAddIcon from '../../assets/icons/CameraAddIcon';
+import { useNavigationBarInset } from '../../hooks/useNavigationBarInset';
 import { useUnreadChatsCount } from '../chat/hooks/useUnreadChatsCount';
 import { SvgIcon, WithCountCircle } from '../ui';
 import { Screens, Tabs } from '../../navigation/screens';
@@ -25,11 +26,18 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
 
   const isHiddenScreens = innerRoutes.some((r) => r.name === Screens.VideoRecording);
 
+  // Grow the bar by the Android navigation bar height so the system buttons
+  // sit below the tabs instead of on top of them.
+  const bottomInset = useNavigationBarInset();
+  const height = BottomTabHeight + bottomInset;
+
   const style = useAnimatedStyle(() => ({
     position: isHiddenScreens ? 'absolute' : 'static',
     left: 0,
     right: 0,
-    bottom: withTiming(isHiddenScreens ? -70 : 0),
+    height,
+    paddingBottom: bottomInset,
+    bottom: withTiming(isHiddenScreens ? -height : 0),
   }));
 
   const unreadChats = useUnreadChatsCount();
@@ -41,7 +49,7 @@ export const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, naviga
   ];
 
   return (
-    <Animated.View style={style} className="h-[70px] flex-row bg-black4">
+    <Animated.View style={style} className="flex-row bg-black4">
       {routes.map((route, index) => {
         const isFocused = state.index === (index > 1 ? index - 1 : index);
 

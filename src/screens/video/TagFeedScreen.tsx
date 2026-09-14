@@ -10,6 +10,7 @@ import { useSetVideoFeedCacheKey, useVideosInfiniteQuery } from '../../component
 import { VideoPost } from '../../components/videoFeed/queries/apiVideosFetcher';
 import { VideoTiles } from '../../components/videoTiles';
 import { useLoadingCallback } from '../../hooks/useLoadingCallback';
+import { useNavigationBarInset } from '../../hooks/useNavigationBarInset';
 import { useRoute } from '../../navigation';
 import { formatNumberShort } from '../../utils';
 
@@ -39,6 +40,7 @@ export const TagFeedScreen = () => (
 const TagFeedContent = () => {
   const { params } = useRoute<'TagFeed'>();
   const insets = useSafeAreaInsets();
+  const navBarInset = useNavigationBarInset();
   const [sort, setSort] = useState<TagVideoSort>('top');
 
   const tags = params.tags;
@@ -68,7 +70,10 @@ const TagFeedContent = () => {
   const [handleRefresh, isRefetching] = useLoadingCallback(queryControl.refetch);
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background">
+    <View
+      style={{ paddingTop: insets.top, paddingBottom: navBarInset }}
+      className="flex-1 bg-background"
+    >
       <View className="flex-row items-center gap-x-3 px-4 pb-2">
         <HeaderBackArrowButton />
         <View className="flex-1">

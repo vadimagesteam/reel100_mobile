@@ -2,6 +2,7 @@ import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } fr
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { Controller, useForm } from 'react-hook-form';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import { useNavigationBarInset } from '../../../hooks/useNavigationBarInset';
 import { UserProfile } from '../../../state/user/types';
 import { useLoadingCallback } from '../../../utils';
 import { Avatar, Button, Input } from '../../ui';
@@ -49,6 +50,7 @@ type SocialKeys = keyof NonNullable<FormData['socialNetworks']>;
 export const EditProfileForm = () => {
   const profile = useUser();
   const { updateProfile, uploadAvatar } = useAuthActions();
+  const navBarInset = useNavigationBarInset();
 
   const {
     control,
@@ -142,7 +144,11 @@ export const EditProfileForm = () => {
   };
 
   return (
-    <ScrollView automaticallyAdjustKeyboardInsets contentContainerClassName="mt-9 grow gap-4 px-5">
+    <ScrollView
+      automaticallyAdjustKeyboardInsets
+      contentContainerClassName="mt-9 grow gap-4 px-5"
+      contentContainerStyle={{ paddingBottom: navBarInset }}
+    >
       <View className="flex-col items-center gap-2">
         <TouchableOpacity
           hitSlop={15}

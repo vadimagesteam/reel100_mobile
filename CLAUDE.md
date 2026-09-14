@@ -66,6 +66,7 @@ Two-stack conditional navigation based on auth state in `RootNavigation.tsx`:
 - Custom dark theme colors in `src/theme/colors.ts` — semantic mapping (background, surface, input, buttons, text variants)
 - `src/lib/nativewindInterops.ts` configures `cssInterop` for third-party components (@gorhom/bottom-sheet, react-native-fast-image, @react-native-community/blur)
 - Prettier sorts Tailwind classes via `prettier-plugin-tailwindcss`
+- **Android draws behind the system navigation bar** (`KeyboardProvider navigationBarTranslucent`, plus Android 15+ edge-to-edge enforcement). On 3-button navigation the back/home/recents buttons cover and swallow taps on anything at the bottom edge. Pad bottom-anchored UI on screens without the tab bar with `useNavigationBarInset()` (`src/hooks/`, 0 on iOS); for input bars pinned above the keyboard use `useNavigationBarInsetPadding()`, which drops the inset while the keyboard is open.
 
 ### Key Source Directories
 - `src/components/` — reusable UI (video feed, chat, user components, bottom sheets)
@@ -119,7 +120,8 @@ Two-stack conditional navigation based on auth state in `RootNavigation.tsx`:
 ## Native Build Config
 
 - **iOS**: Permissions configured in Podfile via react-native-permissions (Camera, Microphone, PhotoLibrary, Location, Notifications, AppTrackingTransparency). Static framework linkage for Firebase/AdMob.
-- **Android**: minSdk 24, compileSdk 35, targetSdk 35. Google Services plugin for Firebase. NDK 27.1.12297006, Kotlin 2.0.21.
+- **Android**: minSdk 24, compileSdk 36, targetSdk 36 (Google Play minimum), AGP 8.9.3 (first line that supports API 36). Google Services plugin for Firebase. NDK 27.1.12297006, Kotlin 2.0.21.
+- **Android back handling**: `AndroidManifest.xml` sets `android:enableOnBackInvokedCallback="false"`. On Android 16+ with targetSdk 36, the system otherwise stops calling `onBackPressed()`, which RN 0.79's `ReactActivity` uses to reach JS `BackHandler` / react-navigation — the back gesture would exit the app instead of popping screens. Remove only after RN's activity moves to `OnBackPressedCallback`.
 - **Ruby/CocoaPods**: Gemfile pins CocoaPods >= 1.13 (excluding 1.15.0, 1.15.1), xcodeproj < 1.26.0, concurrent-ruby < 1.3.4. These constraints prevent known build failures.
 
 ## Environment Setup
